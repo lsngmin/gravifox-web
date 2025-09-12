@@ -1,5 +1,5 @@
 import React, {Fragment} from 'react';
-import {Link} from "react-router-dom";
+import {Link, useNavigate} from "react-router-dom";
 import { useState } from 'react';
 import { ChevronDownIcon, PhoneIcon, PlayCircleIcon } from '@heroicons/react/20/solid'
 import {
@@ -46,6 +46,7 @@ const Navigation = () => {
     const [clicked, setClicked] = useState(false);
     const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
 
+    const navigate = useNavigate();
 
     const handleClick = () => {
         if (userInfo) {
@@ -59,8 +60,16 @@ const Navigation = () => {
             <nav aria-label="Global" className="mx-auto flex items-center justify-between px-6 lg:px-8">
                 <div className="flex items-center gap-x-10 lg:flex-1">
                     <a href="/" className="-m-1.5 p-1.5 relative z-20">
-                        <span className="sr-only">truebox</span>
-                        <img className="h-8 w-auto" src={Logo} alt="truebox"/>
+                        <span className="sr-only">gravifox</span>
+                        <div className="flex justify-center">
+                            <h1
+                                onClick={() => navigate("/")}
+                                translate="no"
+                                className="cursor-pointer select-none text-[clamp(14px,2.8vw,26px)] font-extrabold tracking-tight leading-none text-indigo-500 drop-shadow-md"
+                            >
+                                GRAVIFOX.
+                            </h1>
+                        </div>
                     </a>
                     <PopoverGroup className="hidden lg:flex lg:gap-x-8">
                         <Link className="text-xs font-bold text-indigo-600 hover:text-indigo-500 relative z-20" to="/free-trial">Free Trial</Link>
@@ -110,8 +119,8 @@ const Navigation = () => {
                             className=" fixed inset-y-0 right-0 z-30 w-full bg-white px-6 py-6 sm:max-w-sm sm:ring-1 sm:ring-gray-900/10 overflow-y-auto overscroll-none">
                             <div className="flex items-center justify-between">
                                 <a href="/" className="-m-1.5 p-1.5">
-                                    <span className="sr-only">Your Company</span>
-                                    <img className="h-6 w-auto" src={Logo} alt="truebox"/>
+                                    <span className="sr-only">gravifox</span>
+                                    <img className="h-6 w-auto" src={Logo} alt="gravifox"/>
                                 </a>
                                 <button
                                     type="button"

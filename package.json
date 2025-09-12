@@ -21,6 +21,7 @@
     "clsx": "^2.1.1",
     "dayjs": "^1.11.13",
     "framer-motion": "^12.6.3",
+    "lucide-react": "^0.544.0",
     "preline": "^3.0.1",
     "react": "^19.0.0",
     "react-apexcharts": "^1.7.0",

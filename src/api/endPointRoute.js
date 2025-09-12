@@ -26,6 +26,11 @@ export const AUTH_ENDPOINTS = {
     GOOGLE:    `${API_BASE_URL}/oauth2/authorization/google`,
 };
 
+export const EMAIL_ENDPOINTS = {
+    REQUEST: `${API_BASE_URL}/api/v1/auth/email/request`,
+    VERIFY: `${API_BASE_URL}/api/v1/auth/email/verify`,
+};
+
 export const PROFILE_ENDPOINTS = {
     GET_INFO: `${API_BASE_URL}/api/v1/profile/`,
     POST_PASSWORD: `${API_BASE_URL}/api/v1/profile/password`,

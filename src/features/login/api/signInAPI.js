@@ -38,7 +38,11 @@ const SignInAPI = () => {
             setAccessToken(response.data.accessToken);
             navigate(from, {replace: true});
         } catch (error) {
-            throw Object.assign(new Error(error?.response?.data?.message), {status:error?.response?.status})
+            const resp = error?.response;
+            const err = new Error(resp?.data?.message || 'Login failed');
+            err.status = resp?.status;
+            err.code = resp?.data?.code;
+            throw err;
         }
     };
     return {signIn};

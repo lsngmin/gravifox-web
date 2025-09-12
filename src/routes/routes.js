@@ -13,6 +13,8 @@ import Pricing from "pages/Pricing";
 import Agree from "pages/Agree";
 import Register from "../pages/Register";
 import Support from "pages/Support";
+import MediaAnalyze from "pages/MediaAnalyze";
+import EmailVerification from "pages/EmailVerification";
 
 function AnimatedRoutes() {
     const location = useLocation();
@@ -135,6 +137,34 @@ function AnimatedRoutes() {
                             transition={{ duration: 0.3 }}
                         >
                             <Register />
+                        </motion.div>
+                    }
+                />
+
+                <Route
+                    path="/verify"
+                    element={
+                        <motion.div
+                            initial={{ opacity: 0, y: 20 }}
+                            animate={{ opacity: 1, y: 0 }}
+                            exit={{ opacity: 0, y: -20 }}
+                            transition={{ duration: 0.3 }}
+                        >
+                            <EmailVerification />
+                        </motion.div>
+                    }
+                />
+
+                <Route
+                    path="/analyze"
+                    element={
+                        <motion.div
+                            initial={{ opacity: 0, y: 20 }}
+                            animate={{ opacity: 1, y: 0 }}
+                            exit={{ opacity: 0, y: -20 }}
+                            transition={{ duration: 0.3 }}
+                        >
+                            <MediaAnalyze />
                         </motion.div>
                     }
                 />

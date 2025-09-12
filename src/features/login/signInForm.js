@@ -26,6 +26,10 @@ export default function SignInForm({changeForm}) {
         try {
             await signIn(formState)
         } catch (error) {
+            if (error?.code === 'EMAIL_NOT_VERIFIED') {
+                navigate('/verify', { state: { email: formState.userId } });
+                return;
+            }
             setErrorStatus(error.status);
             setErrorMessage(error.message);
         }
