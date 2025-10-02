@@ -1,0 +1,87 @@
+import React from 'react';
+import { useTranslation } from 'react-i18next';
+
+export default function SupportedInputs() {
+  const { t } = useTranslation('home');
+  const badges = [
+    t('supported.badges.mp4', 'MP4'),
+    t('supported.badges.mov', 'MOV'),
+    t('supported.badges.jpg', 'JPG'),
+    t('supported.badges.png', 'PNG'),
+    t('supported.badges.url', 'URL input'),
+    t('supported.badges.maxLength', '<= 2 min'),
+    t('supported.badges.maxRes', 'Up to 4K'),
+  ];
+
+  return (
+    <section id="supported" className="relative isolate overflow-hidden py-16 sm:py-20">
+      <div className="pointer-events-none absolute inset-0 bg-gradient-to-br from-slate-900 via-indigo-950 to-slate-900" aria-hidden="true" />
+      <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_top,_rgba(129,140,248,0.35),_transparent_65%)]" aria-hidden="true" />
+      <div className="relative mx-auto max-w-6xl px-6 text-slate-100">
+        <div className="mx-auto max-w-3xl text-center">
+          <h3 className="text-xs font-semibold uppercase tracking-[0.3em] text-indigo-300">
+            {t('supported.eyebrow', 'Supported Inputs')}
+          </h3>
+          <p className="mt-3 text-3xl sm:text-4xl font-bold tracking-tight text-white">
+            {t('supported.title', 'Formats and constraints')}
+          </p>
+          <p className="mt-4 text-sm sm:text-base text-indigo-100/90">
+            {t('supported.subtitle', 'Popular media formats and reasonable defaults for a smooth start.')}
+          </p>
+        </div>
+
+        <div className="mx-auto mt-12 max-w-5xl">
+          <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+            <article className="rounded-3xl border border-indigo-400/30 bg-white/5 p-6 shadow-xl shadow-black/30 backdrop-blur">
+              <h4 className="text-sm font-semibold uppercase tracking-wider text-indigo-200">
+                {t('supported.cards.video.title', 'Video Inference')}
+              </h4>
+              <p className="mt-3 text-xs text-indigo-100/80">
+                {t('supported.cards.video.subtitle', 'Segment-aware sampling keeps verdicts snappy, even for longer clips.')}
+              </p>
+              <div className="mt-5 flex flex-wrap gap-2">
+                {[badges[0], badges[1], badges[5]].map((label) => (
+                  <span key={label} className="rounded-full bg-indigo-500/20 px-3 py-1 text-xs font-semibold text-indigo-100">
+                    {label}
+                  </span>
+                ))}
+              </div>
+            </article>
+
+            <article className="rounded-3xl border border-indigo-400/30 bg-white/5 p-6 shadow-xl shadow-black/30 backdrop-blur">
+              <h4 className="text-sm font-semibold uppercase tracking-wider text-indigo-200">
+                {t('supported.cards.image.title', 'Image Analysis')}
+              </h4>
+              <p className="mt-3 text-xs text-indigo-100/80">
+                {t('supported.cards.image.subtitle', 'Per-frame detectors combine facial cues, lighting anomalies, and texture fingerprints.')}
+              </p>
+              <div className="mt-5 flex flex-wrap gap-2">
+                {[badges[2], badges[3], badges[6]].map((label) => (
+                  <span key={label} className="rounded-full bg-indigo-500/20 px-3 py-1 text-xs font-semibold text-indigo-100">
+                    {label}
+                  </span>
+                ))}
+              </div>
+            </article>
+
+            <article className="rounded-3xl border border-indigo-400/30 bg-white/5 p-6 shadow-xl shadow-black/30 backdrop-blur lg:col-span-1 sm:col-span-2">
+              <h4 className="text-sm font-semibold uppercase tracking-wider text-indigo-200">
+                {t('supported.cards.api.title', 'API & Streaming')}
+              </h4>
+              <p className="mt-3 text-xs text-indigo-100/80">
+                {t('supported.cards.api.subtitle', 'Signed URLs, direct uploads, and RTMP passthrough keep ingestion flexible without sacrificing security.')}
+              </p>
+              <div className="mt-5 flex flex-wrap gap-2">
+                {[badges[4], t('supported.badges.signed', 'Signed URLs'), t('supported.badges.streaming', 'RTMP beta')].map((label) => (
+                  <span key={label} className="rounded-full bg-indigo-500/20 px-3 py-1 text-xs font-semibold text-indigo-100">
+                    {label}
+                  </span>
+                ))}
+              </div>
+            </article>
+          </div>
+        </div>
+      </div>
+    </section>
+  );
+}

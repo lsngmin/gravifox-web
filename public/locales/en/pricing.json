@@ -1,0 +1,48 @@
+{
+  "hero": {
+    "title": "Simple, fair pricing",
+    "subtitle": "Start free, scale with Pro — elegant and transparent."
+  },
+  "free": {
+    "badge": "Free",
+    "title": "Free Plan",
+    "subtitle": "A solid start with essentials",
+    "price": "₩0",
+    "per": "/ month",
+    "cta": "Get started",
+    "features": {
+      "tokens": "20 analysis tokens per month",
+      "queue": "Low-priority processing queue",
+      "metrics": "Basic analytics",
+      "models": "Limited model access"
+    }
+  },
+  "pro": {
+    "badge": "Pro",
+    "title": "Pro Plan",
+    "subtitle": "Validate quality with zero risk",
+    "price": "₩19,000",
+    "per": "/ month",
+    "cta": "Contact sales",
+    "features": {
+      "tokens": "500 analysis tokens per month",
+      "queue": "High-priority processing queue",
+      "metrics": "Advanced analytics",
+      "models": "Extended model access"
+    }
+  },
+  "enterprise": {
+    "badge": "Enterprise",
+    "title": "Enterprise",
+    "subtitle": "Security, scale, and dedicated support for enterprise.",
+    "price": "Custom quote",
+    "per": "/ month",
+    "cta": "Contact",
+    "features": {
+      "sso": "SSO / SAML support",
+      "infra": "Dedicated infra & region options",
+      "sla": "SLA & dedicated support",
+      "audit": "Security & audit logs"
+    }
+  }
+}

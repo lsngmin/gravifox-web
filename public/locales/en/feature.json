@@ -1,0 +1,53 @@
+{
+  "hero": {
+    "ribbon": "AI-FIRST DEFENSE STACK",
+    "title": "Deepfake intelligence engineered for trust & safety leaders",
+    "subtitle": "GraviFox orchestrates multimodal detection, automated triage, and investigator workflows so you can neutralize synthetic media threats before they spread.",
+    "primaryCta": "Request live demo",
+    "secondaryCta": "Explore tech stack",
+    "snapshot": {
+      "title": "Snapshot: live operations",
+      "value": "6,482 incidents neutralised",
+      "caption": "Last 30 days across enterprise tenants",
+      "metrics": {
+        "highConfidence": "High confidence takedowns",
+        "falsePositives": "False positive replays",
+        "coverage": "Coverage across surfaces"
+      },
+      "footer": "Continuous learning cohorts refresh every 18 hours"
+    }
+  },
+  "pillars": {
+    "title": "Designed to keep trust & safety a step ahead",
+    "subtitle": "Platform primitives engineered for resilience, auditability, and lightning-fast response.",
+    "items": {
+      "resilience": {
+        "title": "Resilient by design",
+        "description": "Model fallbacks, scenario-specific detectors, and automatic retraining keep signal stable no matter how adversaries adapt."
+      },
+      "fidelity": {
+        "title": "Audit-grade fidelity",
+        "description": "Cryptographically signed evidence bundles and immutable traceability make it easier to collaborate with compliance teams."
+      },
+      "velocity": {
+        "title": "Investigator velocity",
+        "description": "Guided workflows, collaboration handoffs, and alert priority tuning let response teams move as fast as incidents unfold."
+      }
+    }
+  },
+  "workflow": {
+    "title": "A deploy-ready response loop",
+    "subtitle": "From ingestion to action, each stage is orchestrated to keep investigators focused on decisions—not tooling.",
+    "cta": "See end-to-end reference flow"
+  },
+  "integrations": {
+    "title": "Connect the stack you already trust",
+    "subtitle": "Out-of-the-box integrations and webhooks help you push verdicts, escalate alerts, and sync evidence in minutes."
+  },
+  "cta": {
+    "title": "Ready to orchestrate deepfake defense like a product team?",
+    "subtitle": "Spin up a pilot workspace, sync your moderation stack, and experience how fast incident response can move when AI and humans collaborate.",
+    "primary": "Launch guided pilot",
+    "secondary": "Talk to our team"
+  }
+}

@@ -1,0 +1,48 @@
+{
+  "hero": {
+    "title": "간단하고 투명한 요금제",
+    "subtitle": "무료로 시작해 프로로 확장하세요. 우아하고 투명하게."
+  },
+  "free": {
+    "badge": "Free",
+    "title": "무료 요금제",
+    "subtitle": "필수 기능으로 충분한 시작",
+    "price": "₩0",
+    "per": "/ 월",
+    "cta": "지금 시작하기",
+    "features": {
+      "tokens": "월 20건 분석 토큰 제공",
+      "queue": "낮은 우선순위 처리 큐",
+      "metrics": "제한적 분석 지표",
+      "models": "제한적 분석 모델"
+    }
+  },
+  "pro": {
+    "badge": "Pro",
+    "title": "프로 요금제",
+    "subtitle": "리스크 없이 품질을 확인하세요",
+    "price": "₩19,000",
+    "per": "/ 월",
+    "cta": "문의하기",
+    "features": {
+      "tokens": "월 500건 분석 토큰 제공",
+      "queue": "높은 우선순위 처리 큐",
+      "metrics": "고급 분석 지표",
+      "models": "분석 모델 확장"
+    }
+  },
+  "enterprise": {
+    "badge": "Enterprise",
+    "title": "엔터프라이즈",
+    "subtitle": "보안·확장성·전담 지원이 필요한 기업을 위해",
+    "price": "맞춤 견적",
+    "per": "/ 월",
+    "cta": "컨택트",
+    "features": {
+      "sso": "SSO / SAML 지원",
+      "infra": "전용 인프라 및 리전 선택",
+      "sla": "SLA / 전담 기술 지원",
+      "audit": "보안·감사 로그 제공"
+    }
+  }
+}

@@ -1,0 +1,292 @@
+{
+  "hero": {
+    "headline": "Stop synthetic media before it hits your users",
+    "title": "Deepfake detection in one API call",
+    "title2": "No model ops — just results",
+    "subtitle": "Detect AI-generated or manipulated media before it spreads. Use one API or dashboard—no ML expertise required.",
+    "ribbon": "AI-FIRST DEFENSE STACK",
+    "talkToTeam": "Talk to our team in under 24 hours",
+    "metrics": {
+      "latency": {
+        "value": "4.1s",
+        "label": "Median verdict",
+        "desc": "Even during peak traffic windows."
+      },
+      "accuracy": {
+        "value": "99.3%",
+        "label": "Detection precision",
+        "desc": "Continuously tuned on real incidents."
+      },
+      "uptime": {
+        "value": "24/7",
+        "label": "Live response desk",
+        "desc": "On-call specialists in three regions."
+      }
+    },
+    "live": {
+      "title": "Live trust desk status",
+      "status": "Online",
+      "desc": "Global investigators cover APAC · EMEA · AMER. Average first response under 20 minutes for priority signals.",
+      "slaTitle": "Current SLA",
+      "slaValue": "P1 incidents triaged in <15 minutes · Evidence bundles delivered within 2 hours.",
+      "footer": "24/7 escalation · Dedicated incident channel upon activation"
+    },
+    "bullets": [
+      "Upload a video, image, or audio clip and we flag synthetic content before it reaches users.",
+      "See risk scores, evidence snapshots, and remediation suggestions in plain language.",
+      "Route decisions to Slack, email, or moderation tools without touching ML infrastructure."
+    ],
+    "cards": [
+      {
+        "pill": "New to GraviFox?",
+        "title": "Understand how the platform protects you",
+        "body": "Detects deepfakes across video, image, and audio. Explains why something is risky and what action to take next.",
+        "footer": "Designed so product, policy, and engineering teams can work together."
+      },
+      {
+        "pill": "Your first five minutes",
+        "title": "Try it without writing a single line of code",
+        "body": "Use sample media or upload your own, watch verdicts stream in, and invite teammates to review.",
+        "footer": "Guided walkthroughs and playbooks help non-technical teams feel confident."
+      }
+    ]
+  },
+  "cta": {
+    "start": "Get started free",
+    "pricing": "View pricing"
+  },
+  "top": {
+    "ctaText": "Have a question or partnership idea? Let’s talk",
+    "link": "Contact us"
+  },
+  "feature": {
+    "eyebrow": "Integrate Instantly",
+    "title": "Plug and Play",
+    "subtitle": "Vision, language, and custom models ready out-of-the-box",
+    "subtitle2": "Focus on building; we handle the heavy lifting.",
+    "items": {
+      "oneLine": {
+        "name": "One-Line API Call.",
+        "desc": "Send your data and get AI-powered insights in milliseconds—no setup required.",
+        "highlight": "SDKs for JavaScript, Python, and Go"
+      },
+      "security": {
+        "name": "Enterprise-Grade Security.",
+        "desc": "All requests are end-to-end encrypted and protected by strict access controls.",
+        "highlight": "SOC 2, GDPR, ISO-ready controls"
+      },
+      "scaling": {
+        "name": "Auto-Scaling Infrastructure.",
+        "desc": "Seamlessly handle any traffic spike with our fully managed, elastically scaling servers.",
+        "highlight": "Global inference edge with smart routing"
+      }
+    }
+  },
+  "trust": {
+    "numbers": {
+      "title": "Trusted performance at scale",
+      "items": {
+        "uptime": { "label": "API uptime", "value": "99.9%" },
+        "requests": { "label": "Monthly analyses", "value": "50K+" },
+        "customers": { "label": "Active customers", "value": "120+" },
+        "regions": { "label": "Global regions", "value": "3" }
+      }
+    },
+    "logos": {
+      "title": "Trusted by teams and partners",
+      "items": ["Acme Inc.", "Contoso", "Globex", "Umbrella"]
+    }
+  },
+  "how": {
+    "eyebrow": "How It Works",
+    "title": "Analyze in 3 simple steps",
+    "subtitle": "From media to insight — fast, secure, and reliable.",
+    "step": "Step",
+    "steps": {
+      "upload": {
+        "title": "Ingest media & context",
+        "desc": "Post a file, URL, or stream. Annotate with case metadata and policy tags."
+      },
+      "api": {
+        "title": "Adaptive detection",
+        "desc": "Auto-routed ensembles score content in parallel; no manual model swaps needed."
+      },
+      "result": {
+        "title": "Respond & automate",
+        "desc": "Receive verdicts, evidence bundles, and webhook triggers within seconds."
+      }
+    }
+  },
+  "value": {
+    "eyebrow": "Why Gravifox",
+    "title": "Balanced accuracy, speed, and simplicity",
+    "subtitle": "Designed for quick adoption and dependable results.",
+    "items": {
+      "speed": {
+        "title": "Fast results",
+        "desc": "See insights in seconds, not minutes.",
+        "stat": "~3.8s median turnaround"
+      },
+      "integration": {
+        "title": "Easy integration",
+        "desc": "One-line API or lightweight SDK.",
+        "stat": "Ship in a sprint, not a quarter"
+      },
+      "accuracy": {
+        "title": "Reliable detection",
+        "desc": "Models tuned for real-world signals.",
+        "stat": "Certified by leading trust teams"
+      },
+      "cost": {
+        "title": "Cost-effective",
+        "desc": "Fair, transparent pricing as you scale.",
+        "stat": "Only pay for verdicts you use"
+      }
+    }
+  },
+  "supported": {
+    "eyebrow": "Supported Inputs",
+    "title": "Formats and constraints",
+    "subtitle": "Popular media formats and reasonable defaults for a smooth start.",
+    "badges": {
+      "mp4": "MP4",
+      "mov": "MOV",
+      "jpg": "JPG",
+      "png": "PNG",
+      "url": "URL input",
+      "maxLength": "<= 2 min",
+      "maxRes": "Up to 4K",
+      "signed": "Signed URLs",
+      "streaming": "RTMP beta"
+    },
+    "cards": {
+      "video": {
+        "title": "Video Inference",
+        "subtitle": "Segment-aware sampling keeps verdicts snappy, even for longer clips."
+      },
+      "image": {
+        "title": "Image Analysis",
+        "subtitle": "Per-frame detectors combine facial cues, lighting anomalies, and texture fingerprints."
+      },
+      "api": {
+        "title": "API & Streaming",
+        "subtitle": "Signed URLs, direct uploads, and RTMP passthrough keep ingestion flexible without sacrificing security."
+      }
+    }
+  },
+  "sample": {
+    "eyebrow": "Sample Output",
+    "title": "See results before you build",
+    "subtitle": "Minimal request. Clear response. Copy and try now.",
+    "response": "Response"
+  },
+  "security": {
+    "eyebrow": "Security & Privacy",
+    "title": "Enterprise-minded by default",
+    "subtitle": "We keep your data protected with clear, predictable controls.",
+    "callout": "Zero data retention by default · SOC 2 Type II in progress",
+    "items": {
+      "encryption": {
+        "title": "Encryption in transit",
+        "desc": "TLS 1.2+ for all requests.",
+        "badge": "AES-256 + PFS"
+      },
+      "access": {
+        "title": "Access controls",
+        "desc": "Scoped keys and role-based access.",
+        "badge": "SOC 2 aligned"
+      },
+      "retention": {
+        "title": "Data retention",
+        "desc": "Configurable retention and deletion policies.",
+        "badge": "Custom policies"
+      },
+      "region": {
+        "title": "Regional hosting",
+        "desc": "Choose regions to meet compliance.",
+        "badge": "US / EU / APAC"
+      }
+    }
+  },
+  "faq": {
+    "eyebrow": "FAQ",
+    "title": "Answers to common questions",
+    "stepLabel": "Topic",
+    "items": [
+      {
+        "q": "How accurate is detection?",
+        "a": "Our ensembles track emerging manipulations daily. Precision/recall reports are shared each release."
+      },
+      {
+        "q": "How fast is the API?",
+        "a": "Median verdicts land under 5 seconds, even during peak load, thanks to streamed inference."
+      },
+      {
+        "q": "Does setup require ML expertise?",
+        "a": "No. Use our REST API, SDKs, and Terraform modules to deploy in minutes—no model ops needed."
+      },
+      {
+        "q": "What about data retention?",
+        "a": "Retention defaults to zero. You control region, duration, and deletion policies per workspace."
+      }
+    ]
+  },
+  "socialProof": {
+    "eyebrow": "What users say",
+    "title": "Proof from teams like yours",
+    "items": [
+      {
+        "quote": "GraviFox slashed our moderation backlog by 62% without extra headcount.",
+        "author": "Director of Trust & Safety",
+        "company": "Streamly"
+      },
+      {
+        "quote": "The evidence bundles make legal reviews painless. We export and hand off in minutes.",
+        "author": "Policy Operations Lead",
+        "company": "MetaLayer"
+      },
+      {
+        "quote": "Integration took a sprint, not a quarter. Our engineers love the observability hooks.",
+        "author": "Head of Platform",
+        "company": "Brightline"
+      }
+    ]
+  },
+  "useCases": {
+    "eyebrow": "Use Cases",
+    "title": "Where Gravifox fits",
+    "subtitle": "Practical scenarios where detection adds value.",
+    "items": {
+      "mediaModeration": {
+        "title": "Media moderation",
+        "desc": "Screen user uploads for deepfakes and manipulated content.",
+        "detail": "Live verdict streaming for UGC flows"
+      },
+      "brandSafety": {
+        "title": "Brand safety",
+        "desc": "Protect campaigns and assets from deceptive media risks.",
+        "detail": "Evidence packs for legal & policy teams"
+      },
+      "platformIntegrity": {
+        "title": "Platform integrity",
+        "desc": "Flag suspicious accounts and content at scale.",
+        "detail": "Risk-based throttling and step-up checks"
+      }
+    }
+  },
+  "anchor": {
+    "how": "How it works",
+    "value": "Why Gravifox",
+    "feature": "Features",
+    "useCases": "Use cases",
+    "supported": "Formats",
+    "sample": "Sample",
+    "security": "Security",
+    "faq": "FAQ",
+    "testimonials": "Stories"
+  },
+  "meta": {
+    "title": "GraviFox — Deepfake detection API",
+    "description": "Detect deepfakes with a simple API. Fast, secure, and easy to integrate."
+  }
+}
