@@ -1,9 +1,9 @@
 {
   "hero": {
     "headline": "Stop synthetic media before it hits your users",
-    "title": "Deepfake detection in one API call",
-    "title2": "No model ops — just results",
-    "subtitle": "Detect AI-generated or manipulated media before it spreads. Use one API or dashboard—no ML expertise required.",
+    "title": "GenAI image authenticity in one API call",
+    "title2": "No model ops \u2014 just results",
+    "subtitle": "Detect AI-generated or manipulated media before it spreads. Use one API or dashboard\u2014no ML expertise required.",
     "ribbon": "AI-FIRST DEFENSE STACK",
     "talkToTeam": "Talk to our team in under 24 hours",
     "metrics": {
@@ -26,13 +26,13 @@
     "live": {
       "title": "Live trust desk status",
       "status": "Online",
-      "desc": "Global investigators cover APAC · EMEA · AMER. Average first response under 20 minutes for priority signals.",
+      "desc": "Global investigators cover APAC \u00b7 EMEA \u00b7 AMER. Average first response under 20 minutes for priority signals.",
       "slaTitle": "Current SLA",
-      "slaValue": "P1 incidents triaged in <15 minutes · Evidence bundles delivered within 2 hours.",
-      "footer": "24/7 escalation · Dedicated incident channel upon activation"
+      "slaValue": "P1 incidents triaged in <15 minutes \u00b7 Evidence bundles delivered within 2 hours.",
+      "footer": "24/7 escalation \u00b7 Dedicated incident channel upon activation"
     },
     "bullets": [
-      "Upload a video, image, or audio clip and we flag synthetic content before it reaches users.",
+      "Upload an image and we confirm GenAI traces before it reaches users.",
       "See risk scores, evidence snapshots, and remediation suggestions in plain language.",
       "Route decisions to Slack, email, or moderation tools without touching ML infrastructure."
     ],
@@ -40,7 +40,7 @@
       {
         "pill": "New to GraviFox?",
         "title": "Understand how the platform protects you",
-        "body": "Detects deepfakes across video, image, and audio. Explains why something is risky and what action to take next.",
+        "body": "Spots GenAI imagery across photos and frames. Explains why it is risky and what to do next.",
         "footer": "Designed so product, policy, and engineering teams can work together."
       },
       {
@@ -56,7 +56,7 @@
     "pricing": "View pricing"
   },
   "top": {
-    "ctaText": "Have a question or partnership idea? Let’s talk",
+    "ctaText": "Have a question or partnership idea? Let\u2019s talk",
     "link": "Contact us"
   },
   "feature": {
@@ -67,7 +67,7 @@
     "items": {
       "oneLine": {
         "name": "One-Line API Call.",
-        "desc": "Send your data and get AI-powered insights in milliseconds—no setup required.",
+        "desc": "Send your data and get AI-powered insights in milliseconds\u2014no setup required.",
         "highlight": "SDKs for JavaScript, Python, and Go"
       },
       "security": {
@@ -86,21 +86,38 @@
     "numbers": {
       "title": "Trusted performance at scale",
       "items": {
-        "uptime": { "label": "API uptime", "value": "99.9%" },
-        "requests": { "label": "Monthly analyses", "value": "50K+" },
-        "customers": { "label": "Active customers", "value": "120+" },
-        "regions": { "label": "Global regions", "value": "3" }
+        "uptime": {
+          "label": "API uptime",
+          "value": "99.9%"
+        },
+        "requests": {
+          "label": "Monthly analyses",
+          "value": "50K+"
+        },
+        "customers": {
+          "label": "Active customers",
+          "value": "120+"
+        },
+        "regions": {
+          "label": "Global regions",
+          "value": "3"
+        }
       }
     },
     "logos": {
       "title": "Trusted by teams and partners",
-      "items": ["Acme Inc.", "Contoso", "Globex", "Umbrella"]
+      "items": [
+        "Acme Inc.",
+        "Contoso",
+        "Globex",
+        "Umbrella"
+      ]
     }
   },
   "how": {
     "eyebrow": "How It Works",
     "title": "Analyze in 3 simple steps",
-    "subtitle": "From media to insight — fast, secure, and reliable.",
+    "subtitle": "From media to insight \u2014 fast, secure, and reliable.",
     "step": "Step",
     "steps": {
       "upload": {
@@ -184,7 +201,7 @@
     "eyebrow": "Security & Privacy",
     "title": "Enterprise-minded by default",
     "subtitle": "We keep your data protected with clear, predictable controls.",
-    "callout": "Zero data retention by default · SOC 2 Type II in progress",
+    "callout": "Zero data retention by default \u00b7 SOC 2 Type II in progress",
     "items": {
       "encryption": {
         "title": "Encryption in transit",
@@ -223,7 +240,7 @@
       },
       {
         "q": "Does setup require ML expertise?",
-        "a": "No. Use our REST API, SDKs, and Terraform modules to deploy in minutes—no model ops needed."
+        "a": "No. Use our REST API, SDKs, and Terraform modules to deploy in minutes\u2014no model ops needed."
       },
       {
         "q": "What about data retention?",
@@ -259,7 +276,7 @@
     "items": {
       "mediaModeration": {
         "title": "Media moderation",
-        "desc": "Screen user uploads for deepfakes and manipulated content.",
+        "desc": "Screen user uploads for GenAI and manipulated images before they go live.",
         "detail": "Live verdict streaming for UGC flows"
       },
       "brandSafety": {
@@ -286,7 +303,7 @@
     "testimonials": "Stories"
   },
   "meta": {
-    "title": "GraviFox — Deepfake detection API",
-    "description": "Detect deepfakes with a simple API. Fast, secure, and easy to integrate."
+    "title": "GraviFox \u2014 GenAI image authenticity API",
+    "description": "Verify AI-generated images with a simple API. Fast, secure, and easy to integrate."
   }
 }

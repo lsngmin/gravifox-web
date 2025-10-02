@@ -1,7 +1,7 @@
 {
   "hero": {
     "ribbon": "AI-FIRST DEFENSE STACK",
-    "title": "Deepfake intelligence engineered for trust & safety leaders",
+    "title": "GenAI image intelligence for trust & safety leaders",
     "subtitle": "GraviFox orchestrates multimodal detection, automated triage, and investigator workflows so you can neutralize synthetic media threats before they spread.",
     "primaryCta": "Request live demo",
     "secondaryCta": "Explore tech stack",
@@ -37,7 +37,7 @@
   },
   "workflow": {
     "title": "A deploy-ready response loop",
-    "subtitle": "From ingestion to action, each stage is orchestrated to keep investigators focused on decisions—not tooling.",
+    "subtitle": "From ingestion to action, each stage is orchestrated to keep investigators focused on decisions\u2014not tooling.",
     "cta": "See end-to-end reference flow"
   },
   "integrations": {
@@ -45,7 +45,7 @@
     "subtitle": "Out-of-the-box integrations and webhooks help you push verdicts, escalate alerts, and sync evidence in minutes."
   },
   "cta": {
-    "title": "Ready to orchestrate deepfake defense like a product team?",
+    "title": "Ready to orchestrate GenAI image response like a product team?",
     "subtitle": "Spin up a pilot workspace, sync your moderation stack, and experience how fast incident response can move when AI and humans collaborate.",
     "primary": "Launch guided pilot",
     "secondary": "Talk to our team"

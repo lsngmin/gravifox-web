@@ -26,9 +26,9 @@ export default function PageSection() {
     const bulletPoints = t('hero.bullets', {
         returnObjects: true,
         defaultValue: [
-            'Stop deepfake uploads before they go live.',
-            'Give investigators evidence bundles they can trust.',
-            'Connect verdicts to your existing moderation workflows.',
+            'Stop GenAI image uploads before they go live.',
+            'Give reviewers authenticity evidence they can trust.',
+            'Connect verdicts to the workflows you already use.',
         ],
     });
 

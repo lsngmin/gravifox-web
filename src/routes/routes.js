@@ -44,8 +44,8 @@ function CanonicalLink() {
         link.setAttribute('href', href);
 
         // Basic meta
-        const title = t('meta.title', { ns: 'home', defaultValue: 'GraviFox — Deepfake detection API' });
-        const desc = t('meta.description', { ns: 'home', defaultValue: 'Detect deepfakes with a simple API. Fast, secure, and easy to integrate.' });
+        const title = t('meta.title', { ns: 'home', defaultValue: 'GraviFox — GenAI image authenticity API' });
+        const desc = t('meta.description', { ns: 'home', defaultValue: 'Verify AI-generated images with a simple API. Fast, secure, and easy to integrate.' });
         const siteName = t('app.name', { ns: 'common', defaultValue: 'GraviFox' });
         document.title = title;
         const ensureMeta = (name, attr = 'name') => {

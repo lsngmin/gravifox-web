@@ -12,7 +12,7 @@ const CtaBanner = () => {
       <div className="relative mx-auto flex max-w-5xl flex-col gap-6 px-6 text-center text-indigo-50 sm:text-left sm:flex-row sm:items-center sm:justify-between">
         <div className="space-y-4">
           <h2 className="text-2xl sm:text-3xl font-bold leading-tight">
-            {t('cta.title', 'Ready to orchestrate deepfake defense like a product team?')}
+            {t('cta.title', 'Ready to orchestrate GenAI image response like a product team?')}
           </h2>
           <p className="text-sm sm:text-base text-indigo-100/90">
             {t(

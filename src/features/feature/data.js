@@ -2,7 +2,7 @@ export const metrics = [
   {
     label: 'Detection precision',
     value: '99.3%',
-    description: 'Weighted average across face, voice, and multimodal deepfake scenarios under live inference.'
+    description: 'Weighted average across texture, lighting, and metadata authenticity checks under live inference.'
   },
   {
     label: 'Time to verdict',
@@ -41,7 +41,7 @@ export const workflow = [
   },
   {
     title: 'Detect',
-    caption: 'Adaptive ensembles evaluate media frame-by-frame, pivoting between face, voice, and manipulation fingerprint models.'
+    caption: 'Adaptive ensembles evaluate each image region, pivoting between texture, lighting, and manipulation fingerprint models.'
   },
   {
     title: 'Triage',

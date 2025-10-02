@@ -25,7 +25,7 @@ const HeroSection = () => {
             <h1 className="text-3xl sm:text-4xl lg:text-5xl font-extrabold leading-tight text-slate-900">
               {t(
                 'hero.title',
-                'Deepfake intelligence engineered for trust & safety leaders'
+                'GenAI image intelligence for trust & safety leaders'
               )}
             </h1>
             <p className="text-base sm:text-lg text-slate-600 max-w-xl">

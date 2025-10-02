@@ -61,7 +61,7 @@ export default function Pricing() {
                   {t('story.headline', '매일 업그레이드되는 AI 품질, 계획은 그대로')}
                 </h2>
                 <p className="mt-4 text-sm md:text-base text-slate-300">
-                  {t('story.copy', 'GraviFox는 새로운 위협 유형과 딥페이크 탐지 기법을 실시간으로 반영합니다. 요금제는 복잡하지 않게 유지하면서, 모델 업데이트와 성능 향상을 지속 제공합니다.')}
+                  {t('story.copy', 'GraviFox는 새로 등장하는 GenAI 이미지 징후를 바로 반영합니다. 요금제는 복잡하지 않게 유지하면서, 모델 업데이트와 성능 향상을 계속 제공합니다.')}
                 </p>
               </div>
               <div className="grid gap-4">

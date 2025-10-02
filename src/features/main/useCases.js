@@ -8,7 +8,7 @@ export default function UseCases() {
     {
       icon: VideoCameraIcon,
       title: t('useCases.items.mediaModeration.title', 'Media moderation'),
-      desc: t('useCases.items.mediaModeration.desc', 'Screen user uploads for deepfakes and manipulated content.'),
+      desc: t('useCases.items.mediaModeration.desc', 'Screen user uploads for GenAI and manipulated images.'),
       detail: t('useCases.items.mediaModeration.detail', 'Live verdict streaming for UGC flows'),
     },
     {
