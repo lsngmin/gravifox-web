@@ -3,7 +3,7 @@ import React from "react";
 const SideNavigation = ({ setSelected }) => {
     return (
         <>
-            <aside className="w-96 min-h-screen bg-gray-50" aria-label="Sidebar">
+            <aside className="w-96 min-h-screen bg-gray-50" aria-label="SideBar">
                 <div className="px-8 py-12 overflow-y-auto">
                     <ul className="space-y-3">
                         <li>

@@ -1,5 +1,5 @@
-import React, {Fragment} from 'react';
-import {Link, useNavigate} from "react-router-dom";
+import React, {Fragment, useEffect, useMemo} from 'react';
+import {Link, useLocation, useNavigate} from "react-router-dom";
 import { useState } from 'react';
 import { ChevronDownIcon, PhoneIcon, PlayCircleIcon } from '@heroicons/react/20/solid'
 import {
@@ -47,6 +47,17 @@ const Navigation = () => {
     const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
 
     const navigate = useNavigate();
+    const location = useLocation();
+    const localeMatch = location.pathname.match(/^\/([a-zA-Z-]{2,5})(?=\/|$)/);
+    const localePrefix = localeMatch ? `/${localeMatch[1]}` : '';
+    const navItems = useMemo(() => ([
+        { key: 'analyze', label: 'Analyze', to: `${localePrefix}/analyze`, path: '/analyze' },
+        { key: 'features', label: 'Features', to: `${localePrefix}/feature`, path: '/feature' },
+        { key: 'pricing', label: 'Pricing', to: `${localePrefix}/pricing`, path: '/pricing' },
+        { key: 'docs', label: 'Docs', to: `${localePrefix}/docs`, path: '/docs' },
+        { key: 'blog', label: 'Blog', to: `${localePrefix}/blog`, path: '/blog', hash: '#blog' },
+        { key: 'support', label: 'Support', to: `${localePrefix}/support`, path: '/support' },
+    ]), [localePrefix]);
 
     const handleClick = () => {
         if (userInfo) {
@@ -54,12 +65,108 @@ const Navigation = () => {
             setClicked(true);
         }
     };
+    const [scrolled, setScrolled] = useState(false);
+    const [shrink, setShrink] = useState(0); // 0 ~ 1
+    useEffect(() => {
+        let ticking = false;
+        const max = 120; // px range to fully shrink
+        const onScroll = () => {
+            if (ticking) return;
+            ticking = true;
+            window.requestAnimationFrame(() => {
+                const y = window.scrollY || 0;
+                const p = Math.max(0, Math.min(1, y / max));
+                setShrink(p);
+                setScrolled(p > 0.02);
+                ticking = false;
+            });
+        };
+        onScroll();
+        window.addEventListener('scroll', onScroll, { passive: true });
+        return () => window.removeEventListener('scroll', onScroll);
+    }, []);
+
+    const headerStyle = useMemo(() => {
+        const lerp = (a, b, t) => a + (b - a) * t;
+        const top = lerp(0, 20, shrink);
+        const side = lerp(0, 16, shrink);
+        const radius = lerp(0, 20, shrink);
+        const scale = lerp(1, 0.95, shrink);
+        const backgroundOpacity = lerp(0.98, 0.94, shrink);
+        const shadowStrength = lerp(0.18, 0.12, shrink);
+        const borderAlpha = lerp(0.55, 0.3, shrink);
+
+        return {
+            left: side ? `${side}px` : undefined,
+            right: side ? `${side}px` : undefined,
+            top: `${top}px`,
+            borderRadius: radius ? `${radius}px` : undefined,
+            transform: `scale(${scale.toFixed(3)})`,
+            backgroundColor: `rgba(255,255,255,${backgroundOpacity.toFixed(2)})`,
+            boxShadow: `0 18px 32px -24px rgba(15,23,42,${shadowStrength.toFixed(2)})`,
+            border: `1px solid rgba(226, 232, 240, ${borderAlpha.toFixed(2)})`,
+            willChange: 'left,right,top,border-radius,box-shadow,transform,background-color,border',
+        };
+    }, [shrink]);
+
+    const normalizePath = (path) => {
+        if (!path) return '/';
+        const [clean] = path.split(/[?#]/);
+        if (!clean) return '/';
+        const withoutLocale =
+            localePrefix && clean.startsWith(localePrefix)
+                ? clean.slice(localePrefix.length) || '/'
+                : clean;
+        let normalized = withoutLocale.startsWith('/') ? withoutLocale : `/${withoutLocale}`;
+        if (normalized.length > 1) {
+            while (normalized.length > 1 && normalized.endsWith('/')) {
+                normalized = normalized.slice(0, -1);
+            }
+        }
+        return normalized || '/';
+    };
+
+    const getTargetPath = (to) => {
+        if (typeof to === 'string') {
+            return to.split(/[?#]/)[0] || '/';
+        }
+        if (to && typeof to === 'object') {
+            const candidate = to.pathname || '/';
+            return candidate.split(/[?#]/)[0] || '/';
+        }
+        return '/';
+    };
+
+    const currentPath = normalizePath(location.pathname);
+    const currentHash = location.hash || '';
+
+    const activeItemKey = useMemo(() => {
+        const match = navItems.find((item) => {
+            const normalizedItemPath = normalizePath(item.path);
+            if (normalizedItemPath !== currentPath) {
+                return false;
+            }
+            if (item.hash) {
+                return currentHash === item.hash;
+            }
+            return true;
+        });
+        return match?.key || null;
+    }, [navItems, currentPath, currentHash]);
+
+    const highlightStrength = useMemo(() => {
+        const eased = Math.max(0, Math.min(1, (shrink - 0.1) / 0.9));
+        return Number.isFinite(eased) ? eased : 0;
+    }, [shrink]);
 
     return (
-        <header className="relative inset-x-0 top-0 z-10 bg-white/70 backdrop-blur-sm shadow-[0_1px_3px_0_rgb(0,0,0,0.05)]">
-            <nav aria-label="Global" className="mx-auto flex items-center justify-between px-6 lg:px-8">
+        <header
+            className={`fixed inset-x-0 top-0 z-30 transition-[padding,top,border-radius,transform,background,backdrop-filter,box-shadow,left,right] duration-400 ease-out`}
+            style={headerStyle}
+        >
+            <nav aria-label="Global" className={`mx-auto flex items-center justify-between px-6 lg:px-8 py-3`} style={{ paddingBlock: `${(12 - 8*shrink).toFixed(1)}px`, paddingInline: `${(24 - 8*shrink).toFixed(1)}px` }}>
                 <div className="flex items-center gap-x-10 lg:flex-1">
-                    <a href="/" className="-m-1.5 p-1.5 relative z-20">
+                    <a href="/" className="-m-1.5 p-1.5 relative z-20 mr-6">
                         <span className="sr-only">gravifox</span>
                         <div className="flex justify-center">
                             <h1
@@ -71,11 +178,29 @@ const Navigation = () => {
                             </h1>
                         </div>
                     </a>
-                    <PopoverGroup className="hidden lg:flex lg:gap-x-8">
-                        <Link className="text-xs font-bold text-indigo-600 hover:text-indigo-500 relative z-20" to="/free-trial">Free Trial</Link>
-                        <Link className="text-xs font-semibold text-gray-600 hover:text-gray-900 relative z-20" to="/pricing">Pricing</Link>
-                        <Link className="text-xs font-semibold text-gray-600 hover:text-gray-900 relative z-20" to="/api-docs">Docs</Link>
-                        <Link className="text-xs font-semibold text-gray-600 hover:text-gray-900 relative z-20" to="/support">Support</Link>
+                    <PopoverGroup className="hidden lg:flex lg:gap-x-8 pt-0.5">
+                        {navItems.map((item) => {
+                            const isActive = activeItemKey === item.key;
+                            const highlightLevel = isActive ? highlightStrength : 0;
+                            const showHighlight = highlightLevel > 0;
+                            const linkClasses = `group relative inline-flex text-[1.05rem] font-bold tracking-wide transition-colors duration-200 ${isActive ? 'text-indigo-600' : 'text-gray-700 hover:text-gray-900'}`;
+                            const pillClasses = `inline-flex items-center justify-center rounded-full border px-3.5 py-1.5 text-current transition-all duration-300 leading-tight ${showHighlight ? 'bg-indigo-50/90 border-indigo-200' : 'border-transparent group-hover:border-indigo-100 group-hover:bg-indigo-50/70'}`;
+                            const highlightStyle = showHighlight
+                                ? {
+                                    boxShadow: `0 12px 28px -18px rgba(79, 70, 229, ${(0.35 + 0.2 * highlightLevel).toFixed(2)})`,
+                                    borderColor: `rgba(129, 140, 248, ${(0.6 + 0.25 * highlightLevel).toFixed(2)})`,
+                                    backgroundColor: `rgba(238, 242, 255, ${(0.9 + 0.08 * highlightLevel).toFixed(2)})`,
+                                }
+                                : undefined;
+
+                            return (
+                                <Link key={item.key} to={item.to} className={linkClasses}>
+                                    <span className={pillClasses} style={highlightStyle}>
+                                        {item.label}
+                                    </span>
+                                </Link>
+                            );
+                        })}
                     </PopoverGroup>
                 </div>
                 <div className="flex lg:hidden relative z-20">

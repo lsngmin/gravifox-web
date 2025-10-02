@@ -29,9 +29,12 @@ export default function UploadMoreNote({
                     type="file"
                     className="hidden"
                     accept={accept}
+                    onClick={(e) => { e.target.value = ""; }}
                     onChange={(e) => {
                         const f = e.target.files?.[0];
                         if (f && onAdd) onAdd(f);
+                        // 같은 파일을 연속 선택해도 change가 다시 발생하도록 초기화
+                        e.target.value = "";
                     }}
                 />
             </div>

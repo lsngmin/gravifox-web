@@ -33,11 +33,16 @@ const SignupAPI = () => {
             }
         };
         try {
+            // 닉네임이 비어있다면 이메일 로컬파트로 대체
+            if (!requestData.profile.nickname || !requestData.profile.nickname.trim()) {
+                requestData.profile.nickname = String(formState.email || '').split('@')[0] || 'user';
+            }
             const response = await axios.post(AUTH_ENDPOINTS.SIGNUP, requestData, { withCredentials: true });
 
-            const {userId} = response.data;
-            if(userId === formState.email) {
-                navigate("/");
+            const { userId } = response.data;
+            if (userId === formState.email) {
+                // 회원가입 직후 이메일 인증 안내 페이지로 이동 (토큰 발급 없음)
+                navigate("/verify", { state: { email: formState.email } });
             }
         } catch (error) {
             // 에러 발생 시 호출한 컴포넌트에 에러를 전달합니다

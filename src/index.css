@@ -1,3 +1,23 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+/* Brand palette (override in :root to match GRAVIFOX logo) */
+:root {
+  --brand: #6366F1;              /* default indigo-500 */
+  --brand-strong: rgba(99,102,241,0.18);
+  --brand-mid: rgba(99,102,241,0.12);
+  --brand-light: rgba(99,102,241,0.60);
+}
+
+/* Global: disable text/image drag/select for cleaner UX */
+html, body, #root {
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  user-select: none;
+}
+img, a, button {
+  -webkit-user-drag: none;
+  user-drag: none;
+}
+* { -webkit-tap-highlight-color: transparent; }

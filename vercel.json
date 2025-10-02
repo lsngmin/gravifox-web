@@ -3,7 +3,11 @@
     {
       "source": "/api/:match*",
       "destination": "https://api.tvsbox.click/:match*"
-    }
+    },
+    { "source": "/en", "destination": "/" },
+    { "source": "/en/(.*)", "destination": "/" },
+    { "source": "/ko", "destination": "/" },
+    { "source": "/ko/(.*)", "destination": "/" }
   ],
 
   "git": {

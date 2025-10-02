@@ -1,7 +1,10 @@
 import {createContext, useContext, useEffect, useState} from "react";
 
 import axios from "axios";
-import {AUTH_ENDPOINTS} from "../api/endPointRoute";
+import { setHttpAccessToken, setHttpHandlers } from "../api/http";
+import { isTokenValid, getExpiryMs, decodeJwt } from "../utils/jwt";
+import { AUTH_ENDPOINTS, PROFILE_ENDPOINTS } from "../api/endPointRoute";
+import { getProfileCache, setProfileCache, clearProfileCache } from "../utils/profileCache";
 
 const AuthContext = createContext();
 
@@ -9,9 +12,14 @@ export const AuthProvider = ({ children }) => {
     const [accessToken, setAccessToken] = useState(null);
     const [userInfo, setUserInfo] = useState(null);
     const [isLoading, setIsLoading] = useState(true);
+    // 앱 시작 시 로그인 확인이 끝날 때까지 화면을 가리기 위한 게이트
+    const [isChecking, setIsChecking] = useState(true);
 
     const logout = () => {
         setAccessToken(null);
+        if (userInfo?.userNo) {
+            try { clearProfileCache(userInfo.userNo); } catch {}
+        }
         setUserInfo(null);
 
         axios.post(AUTH_ENDPOINTS.SIGNOUT, {}, {
@@ -23,44 +31,125 @@ export const AuthProvider = ({ children }) => {
     }
 
     useEffect(() => {
-        const fetchAccessToken = async () => {
-            try {
-                if (!accessToken) {//액세스 토큰 X -> refresh 호출 -> 액세스 토큰 발급
-                    const response = await axios.post(AUTH_ENDPOINTS.REFRESH, {}, {withCredentials: true})
-                    setAccessToken(response.data.accessToken)
-                }
-            } catch (error) {
-                //통신 에러 -> 프론트엔드 측 문제 X -> 페이지 정상 렌더링 필요
-            } finally {
-                setIsLoading(false);
+        // Provide hooks for axios interceptors
+        setHttpHandlers({
+            onTokenUpdated: (t) => setAccessToken(t),
+            onUnauthorized: () => {
+                setAccessToken(null);
+                setUserInfo(null);
             }
-        }
-        fetchAccessToken();
+        });
     }, []);
 
     useEffect(() => {
-        if (!accessToken) return;
+        // Keep axios layer in sync with current token
+        setHttpAccessToken(accessToken);
+    }, [accessToken]);
 
-        const fetchUserData = async () => {
-            if (accessToken) {
-                axios.get(AUTH_ENDPOINTS.ME, {
-                    headers: {
-                        "Authorization": `Bearer ${accessToken}`
-                    },
-                    withCredentials: true
-                })
-                    .then(response => {
-                        setUserInfo(response.data);
-                    })
-                    .catch(error => {
-                        console.log(error);
-                    });
+    useEffect(() => {
+        const bootstrap = async () => {
+            try {
+                // 게스트는 초기 체크만 끝내고 진행
+                const isGuest = (() => {
+                    try { return typeof document !== 'undefined' && document.cookie && document.cookie.includes('guest=1'); } catch { return false; }
+                })();
+                if (isGuest) {
+                    return;
+                }
+
+                // 1) AccessToken 확보 (없으면 refresh 시도)
+                let at = accessToken;
+                if (!at) {
+                    const response = await axios.post(AUTH_ENDPOINTS.REFRESH, {}, { withCredentials: true });
+                    const next = response?.data?.accessToken;
+                    if (next && isTokenValid(next)) {
+                        setAccessToken(next);
+                        at = next;
+                        // Ensure request interceptor sees the token immediately
+                        setHttpAccessToken(next);
+                    }
+                }
+
+                if (!at || !isTokenValid(at)) {
+                    return; // 비로그인 상태로 간주
+                }
+
+                // Ensure token is present in interceptors for subsequent calls
+                setHttpAccessToken(at);
+
+                // 2) 토큰 해석으로 최소 사용자 식별자 확보
+                const payload = decodeJwt(at) || {};
+                const userNo = Number(payload.userNo);
+                const userId = payload.userId;
+                if (!userNo) {
+                    return;
+                }
+
+                // 3) 캐시 하이드레이트 (즉시 화면에 표시할 수 있게)
+                const cached = getProfileCache(userNo);
+                if (cached?.data) {
+                    setUserInfo({ userNo, userId, ...cached.data });
+                } else {
+                    setUserInfo({ userNo, userId });
+                }
+
+                // 4) 백그라운드 동기화 (ETag로 변경 없으면 304)
+                try {
+                    const headers = {};
+                    if (cached?.etag) headers['If-None-Match'] = cached.etag;
+                    const resp = await axios.get(PROFILE_ENDPOINTS.GET_INFO, { headers });
+                    // axios는 304도 성공으로 처리함. status로 분기
+                    if (resp?.status === 200 && resp.data) {
+                        const etag = resp.headers?.etag || resp.headers?.ETag;
+                        setUserInfo({ userNo, userId, ...resp.data });
+                        if (etag) setProfileCache(userNo, resp.data, etag);
+                    }
+                } catch (e) {
+                    // 권한 문제 등은 인터셉터에서 처리됨. 여기서는 침묵.
+                }
+            } catch (error) {
+                // 네트워크 오류 등은 초기화만 수행
+            } finally {
+                setIsLoading(false);
+                setIsChecking(false);
             }
         };
-        fetchUserData();
-    },  [accessToken]);
+        bootstrap();
+    }, []);
+
+    // 사전 만료 갱신 타이머: exp - 30초에 refresh 시도
+    useEffect(() => {
+        if (!accessToken) return;
+        const expMs = getExpiryMs(accessToken);
+        if (!expMs) return;
+        const now = Date.now();
+        const lead = 30_000; // 30 seconds
+        let delay = expMs - now - lead;
+        if (delay < 0) delay = 0;
+        const id = setTimeout(async () => {
+            try {
+                const resp = await axios.post(AUTH_ENDPOINTS.REFRESH, {}, { withCredentials: true });
+                const at = resp?.data?.accessToken;
+                if (at && isTokenValid(at)) {
+                    setAccessToken(at);
+                } else {
+                    setAccessToken(null);
+                    setUserInfo(null);
+                }
+            } catch {
+                setAccessToken(null);
+                setUserInfo(null);
+            }
+        }, delay);
+        return () => clearTimeout(id);
+    }, [accessToken]);
+    // 앱 시작 확인 중에는 전체 흰 화면만 노출
+    if (isChecking) {
+        return <div style={{background: '#fff', width: '100vw', height: '100vh'}} />
+    }
+
     return (
-        <AuthContext.Provider value={{ accessToken, setAccessToken, userInfo, setUserInfo, logout, isLoading }}>
+        <AuthContext.Provider value={{ accessToken, setAccessToken, userInfo, setUserInfo, logout, isLoading, isChecking }}>
             {children}
         </AuthContext.Provider>
     );

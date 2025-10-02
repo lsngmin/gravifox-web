@@ -1,52 +1,31 @@
-import {useEffect, useRef, useState} from "react";
-import { Transition } from '@headlessui/react';
-import ApiKeyCard from "./components/apiKeyCard";
-import { UsedApiRequests, RemainingApiRequests } from "./components/apiUsageCard";
-import ApiTargetCard from "./components/apiTargetCard";
-import AnalysisHistory from "./analysisHistory";
-import DonutChart from "./analysisHistory";
-import {useAuth} from "../../providers/authProvider";
-import {DashboardAPI} from "./api/dashboardAPI";
+import AnalysisHistoryList from "./components/AnalysisHistoryList";
+import StatsSummaryBar from "./components/StatsSummaryBar";
 
-const SummaryDashboard = ({ selected }) => {
-    const { accessToken } = useAuth();
-    const {fetchData} = DashboardAPI();
-    const [apiRequestLeft, setApiRequestLeft] = useState(null);
-    useEffect(() => {
-        if(!accessToken) {
-            return;
-        }
-        const loadDashboard = async () => {
-            try {
-                const data = await fetchData();
-                setApiRequestLeft(data.data.apiRequestsLeft);
-            } catch (error) {
-            }
-        };
-        loadDashboard();
-    }, [accessToken]);
-
-
+const SummaryDashboard = () => {
     return (
-        <div className="flex-1 p-4 mx-auto max-w-(--breakpoint-2xl) md:p-6 bg-gray-100">
-            <div className="grid grid-cols-6 gap-4 md:gap-6">
-                <div className="col-span-12 space-y-6 xl:col-span-7">
-                    {selected === 'analysis' &&
-                        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 md:gap-6">
-                            <DonutChart />
+        <div className="flex-1 p-4 md:p-6">
+            <div className="mx-auto w-full max-w-6xl space-y-6">
+                {/* Hero header with soft gradient */}
+                <div className="relative overflow-hidden rounded-2xl border border-slate-200">
+                    <div className="absolute inset-0 bg-gradient-to-r from-indigo-50 via-white to-white" />
+                    <div className="relative flex items-center justify-between px-5 py-5 md:px-6 md:py-6">
+                        <h1 className="text-lg md:text-xl font-bold text-slate-800">Dashboard</h1>
+                        <div className="flex items-center gap-2">
+                            <a
+                                href="/analyze"
+                                className="inline-flex items-center rounded-md bg-indigo-600 px-3.5 py-2 text-sm font-semibold text-white hover:bg-indigo-700"
+                            >
+                                + New Analysis
+                            </a>
                         </div>
-                    }
-                    {selected === 'dashboard' &&
-                        <>
-                            <ApiKeyCard/>
-                            <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 md:gap-6">
-                                <RemainingApiRequests left={apiRequestLeft}/>
-                                <UsedApiRequests left={apiRequestLeft}/>
-                            </div>
-                            <ApiTargetCard left={apiRequestLeft}/>
-                        </>
-                    }
+                    </div>
+                    <div className="relative px-5 pb-5 md:px-6">
+                        <StatsSummaryBar />
+                    </div>
                 </div>
+
+                {/* Body */}
+                <AnalysisHistoryList />
             </div>
         </div>
     );

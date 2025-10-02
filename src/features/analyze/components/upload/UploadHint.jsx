@@ -21,6 +21,8 @@ export default function UploadHint({
         if (!fl?.length) return;
         if (onFiles) onFiles(fl);
         else if (onChange) onChange(fl[0]);
+        // 같은 파일을 연속 선택해도 change가 다시 발생하도록 초기화
+        e.target.value = "";
     };
 
     return (
@@ -42,6 +44,7 @@ export default function UploadHint({
                 accept={accept}
                 multiple={multiple}
                 className="hidden"
+                onClick={(e) => { e.target.value = ""; }}
                 onChange={handleChange}
             />
         </div>

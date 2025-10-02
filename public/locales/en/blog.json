@@ -1,0 +1,19 @@
+{
+  "hero": {
+    "kicker": "Insights & updates",
+    "title": "Our Blog",
+    "subtitle": "Product notes, AI research snippets, infra learnings, and release highlights.",
+    "ctaPrimary": "Latest posts",
+    "ctaSecondary": "Browse by tags"
+  },
+  "filters": {
+    "all": "All"
+  },
+  "newsletter": {
+    "title": "Get new posts in your inbox",
+    "subtitle": "We send occasional emails about product updates and articles.",
+    "placeholder": "Enter your email",
+    "submit": "Subscribe",
+    "done": "Subscribed"
+  }
+}

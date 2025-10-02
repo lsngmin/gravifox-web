@@ -1,33 +1,59 @@
-import React from 'react';
-import { Link } from 'react-router-dom';
+import React, { useMemo } from 'react';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 
-const Footer = () => {
-    const handleContactClick = () => {
-        window.scrollTo(0, 0);
+const Footer = ({ transparent = false }) => {
+    const { i18n } = useTranslation();
+    const navigate = useNavigate();
+    const location = useLocation();
+    const currentLng = useMemo(() => (i18n.language || 'en').slice(0,2), [i18n.language]);
+
+    const changeLanguage = (next) => {
+        const supported = ['en','ko'];
+        const lng = supported.includes(next) ? next : 'en';
+        try { i18n.changeLanguage(lng); localStorage.setItem('i18nextLng', lng); } catch {}
+        const stripLang = (path) => {
+            if (path === '/en' || path === '/ko') return '/';
+            if (path.startsWith('/en/')) return path.substring(3);
+            if (path.startsWith('/ko/')) return path.substring(3);
+            return path;
+        };
+        const pathNoLng = stripLang(location.pathname || '/');
+        const nextPath = `/${lng}${pathNoLng === '/' ? '' : pathNoLng}${location.search || ''}${location.hash || ''}`;
+        navigate(nextPath, { replace: true });
     };
 
     return (
-        <section className="bg-white">
-            <div className="max-w-screen-xl px-4 py-12 mx-auto space-y-8 overflow-hidden sm:px-6 lg:px-8">
-                <nav className="flex flex-wrap justify-center -mx-5 -my-2">
-                    <div className="px-5 py-2">
-                        <a href="#" className="text-sm leading-6 text-gray-500 hover:text-gray-900">
-                            About
-                        </a>
-                    </div>
-
-                    <div className="px-5 py-2">
-                        <a href="#" className="text-sm leading-6 text-gray-500 hover:text-gray-900">
-                            Contact
-                        </a>
-                    </div>
-                    <div className="px-5 py-2">
-                        <a href="#" className="text-sm leading-6 text-gray-500 hover:text-gray-900">
-                            Terms
-                        </a>
+        <section className={transparent ? "bg-transparent" : "bg-white"}>
+            <div className="max-w-screen-xl px-4 py-12 mx-auto space-y-6 overflow-hidden sm:px-6 lg:px-8">
+                <nav className="flex flex-wrap items-center justify-center gap-4 text-sm">
+                    <a href="#" className="text-sm leading-6 text-gray-500 hover:text-gray-900">About</a>
+                    <span className="text-gray-300">·</span>
+                    <a href="#" className="text-sm leading-6 text-gray-500 hover:text-gray-900">Contact</a>
+                    <span className="text-gray-300">·</span>
+                    <a href="#" className="text-sm leading-6 text-gray-500 hover:text-gray-900">Terms</a>
+                    <span className="text-gray-300">·</span>
+                    <div className="inline-flex items-center gap-2">
+                        <span className="text-sm text-gray-500">Language</span>
+                        <div className="inline-flex rounded-md ring-1 ring-gray-200 overflow-hidden">
+                            <button
+                                type="button"
+                                onClick={() => changeLanguage('en')}
+                            className={`px-3 py-1.5 text-sm font-medium ${currentLng === 'en' ? 'bg-indigo-600 text-white' : 'bg-white text-gray-600 hover:bg-gray-50'}`}
+                            >
+                                EN
+                            </button>
+                            <button
+                                type="button"
+                                onClick={() => changeLanguage('ko')}
+                            className={`px-3 py-1.5 text-sm font-medium ${currentLng === 'ko' ? 'bg-indigo-600 text-white' : 'bg-white text-gray-600 hover:bg-gray-50'}`}
+                            >
+                                KO
+                            </button>
+                        </div>
                     </div>
                 </nav>
-                <p className="mt-8 text-xs leading-6 text-center text-gray-400">
+                <p className="mt-6 text-xs leading-6 text-center text-gray-400">
                     © 2025 Gravifox Project. All rights reserved.
                 </p>
             </div>

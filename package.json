@@ -10,6 +10,7 @@
     "@preline/dropdown": "^3.0.1",
     "@preline/stepper": "^3.0.0",
     "@preline/strong-password": "^3.0.0",
+    "@tailwindcss/typography": "^0.5.17",
     "@tanstack/react-table": "^8.21.2",
     "@testing-library/dom": "^10.4.0",
     "@testing-library/jest-dom": "^6.6.3",
@@ -21,13 +22,18 @@
     "clsx": "^2.1.1",
     "dayjs": "^1.11.13",
     "framer-motion": "^12.6.3",
+    "i18next": "^22.5.1",
+    "i18next-browser-languagedetector": "^8.2.0",
+    "i18next-http-backend": "^3.0.2",
     "lucide-react": "^0.544.0",
     "preline": "^3.0.1",
     "react": "^19.0.0",
     "react-apexcharts": "^1.7.0",
     "react-calendar": "^5.1.0",
     "react-dom": "^19.0.0",
+    "react-i18next": "^12.3.1",
     "react-icons": "^5.5.0",
+    "react-markdown": "^10.1.0",
     "react-responsive": "^10.0.1",
     "react-router-dom": "^7.3.0",
     "react-scripts": "5.0.1",
@@ -65,6 +71,7 @@
   "devDependencies": {
     "autoprefixer": "^10.4.21",
     "postcss": "^8.5.3",
-    "tailwindcss": "^3.4.17"
+    "tailwindcss": "^3.4.17",
+    "typescript": "^4.9.5"
   }
 }

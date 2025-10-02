@@ -1,0 +1,19 @@
+{
+  "hero": {
+    "kicker": "소식과 인사이트",
+    "title": "블로그",
+    "subtitle": "제품 노트, AI 연구 스니펫, 인프라 회고, 릴리즈 하이라이트를 전합니다.",
+    "ctaPrimary": "최신 글 보기",
+    "ctaSecondary": "태그로 살펴보기"
+  },
+  "filters": {
+    "all": "전체"
+  },
+  "newsletter": {
+    "title": "새 글을 이메일로 받아보기",
+    "subtitle": "가끔 제품 업데이트와 글을 모아 보내드려요.",
+    "placeholder": "이메일 주소",
+    "submit": "구독",
+    "done": "구독 완료"
+  }
+}

@@ -22,7 +22,7 @@ export default function NavigationAuthButton() {
     return (
         <nav className="flex justify-end gap-4 p-4">
             {isLoggedIn ? (
-                    <AvatarButton avatar={avatar} />
+                    <AvatarButton />
             ) : (
                 <Link
                     to="/login"

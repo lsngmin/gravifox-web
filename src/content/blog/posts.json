@@ -1,0 +1,31 @@
+{
+  "posts": [
+    {
+      "slug": "introducing-gravifox",
+      "title": "Introducing Gravifox: 이미지·동영상 딥페이크 탐지의 시작",
+      "excerpt": "Gravifox가 해결하려는 문제와 현재까지의 파이프라인(얼굴 검출 → 특징 추출 → 분류) 그리고 향후 로드맵을 공유합니다.",
+      "date": "2025-09-10",
+      "readTime": 6,
+      "tags": ["deepfake", "ai", "product"],
+      "content": "## 왜 딥페이크 탐지인가?\n\n온라인에서 생성형 콘텐츠가 폭발적으로 늘어나면서 신뢰 문제가 커지고 있습니다... (마크다운 본문 예시)"
+    },
+    {
+      "slug": "downstant-architecture",
+      "title": "Downstant 아키텍처: yt-dlp · PM2 · Nginx · Blue-Green",
+      "excerpt": "EC2 기반에서 동영상 다운로드를 안정적으로 제공하기 위해 설계한 배포/확장 전략을 정리했습니다.",
+      "date": "2025-09-05",
+      "readTime": 7,
+      "tags": ["infra", "aws", "devops"],
+      "content": "## 개요\n\n배포 파이프라인과 장애 대응 전략을 정리합니다..."
+    },
+    {
+      "slug": "i18n-routing",
+      "title": "다국어 라우팅과 SEO: :lng 프리픽스 전략",
+      "excerpt": "국가/언어 프리픽스를 가진 라우팅이 검색 노출과 분석에 주는 장점, 그리고 canonical 처리 팁.",
+      "date": "2025-08-28",
+      "readTime": 5,
+      "tags": ["i18n", "seo"],
+      "content": "### 핵심\n\n프리픽스 라우팅과 hreflang, canonical의 관계를 정리합니다..."
+    }
+  ]
+}

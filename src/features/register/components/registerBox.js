@@ -125,7 +125,6 @@ const RegisterBox = () => {
         try {
             // 예시: signIn 대신 회원가입 API 호출로 교체
             await signup(formState);
-            navigate("/");
         } catch (error) {
             // 서버 에러 처리
             console.error(error);

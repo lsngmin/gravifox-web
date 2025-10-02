@@ -18,18 +18,24 @@ import UploadPanel from "./components/upload/UploadPanel";
 export default function HowItWorksSection() {
     const [files, setFiles] = useState([]);
     const [picking, setPicking] = useState(null);
-
     async function handleSamplePick(kind) {
         try {
             setPicking(kind);
+            const base = process.env.PUBLIC_URL || "";
             const url =
-                kind === "image" ? "/samples/face-sample.jpg" : "/samples/video-sample.mp4";
+                kind === "image"
+                    ? `${base}/samples/face-sample.jpg`
+                    : `${base}/samples/video-sample.mp4`;
             const res = await fetch(url);
             if (!res.ok) throw new Error("fetch failed");
             const blob = await res.blob();
-            const file = new File([blob], kind === "image" ? "sample.jpg" : "sample.mp4", {
+            const file = new File(
+                [blob],
+                kind === "image" ? "face-sample.jpg" : "video-sample.mp4",
+                {
                 type: blob.type || (kind === "image" ? "image/jpeg" : "video/mp4"),
-            });
+                }
+            );
             setFiles(prev => [...prev, file]);
         } catch (e) {
             alert("샘플을 자동으로 불러오지 못했습니다. 다운로드 후 직접 업로드해 주세요.");
@@ -47,6 +53,8 @@ export default function HowItWorksSection() {
             <ToolTip/>
             <UploadPanel files={files} setFiles={setFiles} />
             <Faq/>
+
+
         </section>
     );
 }
