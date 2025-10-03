@@ -205,21 +205,21 @@ export default function AnalyzeResult() {
   return (
     <div className="p-0">
       <Navigation />
-      <div className="mx-auto mt-24 w-full max-w-6xl px-4 sm:px-6 lg:px-8">
-        <div className="mb-4 flex items-center justify-between">
+      <div className="mx-auto mt-28 w-full max-w-6xl px-4 sm:mt-32 sm:px-6 lg:mt-36 lg:px-8">
+        <div className="mb-6 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
           <h1 className="text-2xl font-semibold text-slate-600">미디어 분석 완료</h1>
-          <div className="flex items-center gap-2">
+          <div className="flex w-full flex-col gap-2 sm:w-auto sm:flex-row sm:items-center">
             <button
               type="button"
               onClick={() => navigate("/analyze")}
-              className="inline-flex items-center justify-center rounded-md border border-slate-200 bg-white px-3.5 py-2 text-sm font-semibold text-slate-700 hover:bg-slate-50"
+              className="inline-flex w-full items-center justify-center rounded-md border border-slate-200 bg-white px-3.5 py-2 text-sm font-semibold text-slate-700 transition hover:bg-slate-50 sm:w-auto"
             >
               돌아가기
             </button>
             <button
               type="button"
               onClick={() => window.print()}
-              className="inline-flex items-center justify-center rounded-md bg-indigo-600 px-3.5 py-2 text-sm font-semibold text-white shadow-sm hover:bg-indigo-700"
+              className="inline-flex w-full items-center justify-center rounded-md bg-indigo-600 px-3.5 py-2 text-sm font-semibold text-white shadow-sm transition hover:bg-indigo-700 sm:w-auto"
             >
               PDF로 저장
             </button>
@@ -227,16 +227,16 @@ export default function AnalyzeResult() {
         </div>
 
         {summary.total > 0 && (
-          <div className="mb-4">
-            <div className="mx-auto w-full max-w-5xl flex flex-wrap items-center gap-3 rounded-xl border border-slate-200 bg-white p-4 text-sm">
-              <div className="flex items-center gap-2">
+          <div className="mb-6">
+            <div className="mx-auto flex w-full max-w-5xl flex-col gap-3 rounded-xl border border-slate-200 bg-white p-4 text-sm sm:flex-row sm:items-center">
+              <div className="flex flex-wrap items-center gap-2">
                 <span className="rounded-md bg-slate-100 px-2 py-1 text-slate-700">총 {summary.total}</span>
                 <span className="rounded-md bg-indigo-50 px-2 py-1 text-indigo-700">진행 {summary.running}</span>
                 <span className="rounded-md bg-emerald-50 px-2 py-1 text-emerald-700">완료 {summary.done}</span>
                 <span className="rounded-md bg-rose-50 px-2 py-1 text-rose-700">실패 {summary.failed}</span>
               </div>
-              <div className="ml-auto flex items-center gap-2">
-                <div className="h-2 w-40 rounded-full bg-slate-100 overflow-hidden">
+              <div className="flex w-full items-center gap-2 sm:ml-auto sm:w-auto">
+                <div className="h-2 w-full overflow-hidden rounded-full bg-slate-100 sm:w-40">
                   <div className="h-2 rounded-full transition-all" style={{ width: `${summary.pct}%`, background: 'var(--brand)' }} />
                 </div>
                 <span className="text-slate-600">{summary.pct}%</span>
@@ -271,14 +271,14 @@ export default function AnalyzeResult() {
 
               // 진행 중: 파일명 + 우측 멘트(헤더 내부 중앙 정렬)
               return (
-                <div key={jid} className="mx-auto w-full max-w-5xl rounded-xl border border-slate-200 bg-white p-6">
-                  <div className="flex items-center justify-between">
+                <div key={jid} className="mx-auto w-full max-w-5xl rounded-xl border border-slate-200 bg-white p-5">
+                  <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
                     <div className="min-w-0">
                       {r.fileMeta?.name && (
                         <p className="truncate text-sm font-medium text-slate-800">파일: {r.fileMeta.name}</p>
                       )}
                     </div>
-                    <div className="flex w-48 h-6 items-center justify-end text-right overflow-hidden">
+                    <div className="mt-1 flex h-6 w-full items-center justify-center overflow-hidden text-center sm:mt-0 sm:w-48 sm:justify-end sm:text-right">
                       <LoadingMent stage={r.stage} />
                     </div>
                   </div>
@@ -289,15 +289,17 @@ export default function AnalyzeResult() {
         )}
 
         {ids.length === 0 && (
-          <div className="mt-4 rounded-md border border-slate-200 bg-white p-6 text-sm text-slate-700">
-            유효한 분석 세션이 없어요. 파일을 업로드하고 분석을 시작해주세요.
-            <button
-              type="button"
-              onClick={() => navigate("/analyze")}
-              className="ml-3 inline-flex items-center justify-center rounded-md border border-slate-200 bg-white px-3.5 py-1.5 text-sm font-semibold text-slate-700 hover:bg-slate-50"
-            >
-              업로드 페이지로 이동
-            </button>
+          <div className="mt-6 rounded-md border border-slate-200 bg-white p-6 text-sm text-slate-700">
+            <p className="text-sm text-slate-700">유효한 분석 세션이 없어요. 파일을 업로드하고 분석을 시작해주세요.</p>
+            <div className="mt-4 flex flex-col gap-2 sm:flex-row sm:items-center">
+              <button
+                type="button"
+                onClick={() => navigate("/analyze")}
+                className="inline-flex w-full items-center justify-center rounded-md border border-slate-200 bg-white px-3.5 py-2 text-sm font-semibold text-slate-700 transition hover:bg-slate-50 sm:w-auto"
+              >
+                업로드 페이지로 이동
+              </button>
+            </div>
           </div>
         )}
       </div>

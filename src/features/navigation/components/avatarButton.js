@@ -13,7 +13,18 @@ import {ChevronDownIcon} from "@heroicons/react/20/solid";
 import LanguageMenu from "./LanguageMenu";
 import { useTranslation } from 'react-i18next';
 
-export default function AvatarButton() {
+const BUTTON_DIMENSIONS = {
+    sm: {
+        button: "w-10 h-10",
+        icon: "w-7 h-7",
+    },
+    md: {
+        button: "w-12 h-12",
+        icon: "w-8 h-8",
+    },
+};
+
+export default function AvatarButton({ size = "md" }) {
     const { logout, userInfo } = useAuth();
     const navigate = useNavigate();
     const location = useLocation();
@@ -54,18 +65,20 @@ export default function AvatarButton() {
     const displayName = userInfo?.nickname || userInfo?.userId || "User";
     const displayEmail = userInfo?.userId || "";
 
+    const { button: buttonSizeClass, icon: iconSizeClass } = BUTTON_DIMENSIONS[size] || BUTTON_DIMENSIONS.md;
+
     return (
         <Menu as="div" className="relative">
             <div>
                 <MenuButton>
                     <button
                         type="button"
-                        className="relative inline-flex items-center justify-center w-12 h-12 -my-1
+                        className={`relative inline-flex items-center justify-center ${buttonSizeClass} -my-1
              rounded-full border-2 border-gray-300 bg-indigo-500
              text-white hover:bg-indigo-600 hover:border-indigo-600
-             transition-colors duration-200"
+             transition-colors duration-200`}
                     >
-                        <UserIcon className="w-8 h-8" aria-hidden="true" />
+                        <UserIcon className={iconSizeClass} aria-hidden="true" />
                     </button>
                 </MenuButton>
             </div>
