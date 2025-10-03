@@ -96,6 +96,19 @@ const Navigation = () => {
         };
     }, [shrink]);
 
+    const composedHeaderStyle = useMemo(() => {
+        if (!mobileMenuOpen) return headerStyle;
+        return {
+            ...headerStyle,
+            left: '0px',
+            right: '0px',
+            borderRadius: '0px',
+            transform: 'none',
+            boxShadow: '0 18px 40px -12px rgba(15,23,42,0.32)',
+            border: '1px solid rgba(226, 232, 240, 0.45)',
+        };
+    }, [headerStyle, mobileMenuOpen]);
+
     const normalizePath = (path) => {
         if (!path) return '/';
         const [clean] = path.split(/[?#]/);
@@ -159,7 +172,7 @@ const Navigation = () => {
     return (
         <header
             className="fixed inset-x-0 top-0 z-40 transition-[padding,top,border-radius,transform,background,backdrop-filter,box-shadow,left,right] duration-400 ease-out"
-            style={headerStyle}
+            style={composedHeaderStyle}
         >
             <div className="relative">
                 <nav
@@ -289,7 +302,11 @@ const Navigation = () => {
                                     <nav className="mt-5 space-y-2">
                                         {navItems.map((item) => {
                                             const isActive = activeItemKey === item.key;
-                                            const linkClasses = `flex items-center justify-between rounded-xl px-4 py-3 text-base font-semibold transition ${isActive ? 'bg-indigo-50 text-indigo-600' : 'text-slate-700 hover:bg-slate-50 hover:text-slate-900'}`;
+                                            const linkClasses = `group flex items-center gap-3 rounded-xl px-4 py-3 text-base font-semibold transition ${
+                                                isActive
+                                                    ? 'bg-indigo-50 text-indigo-600 shadow-[0_16px_32px_-24px_rgba(79,70,229,0.45)] ring-1 ring-inset ring-indigo-100'
+                                                    : 'text-slate-700 hover:bg-slate-50/90 hover:text-slate-900 hover:ring-1 hover:ring-inset hover:ring-slate-200'
+                                            }`;
                                             return (
                                                 <Link
                                                     key={item.key}
@@ -297,8 +314,12 @@ const Navigation = () => {
                                                     onClick={() => setMobileMenuOpen(false)}
                                                     className={linkClasses}
                                                 >
-                                                    <span>{item.label}</span>
-                                                    {isActive && <span className="text-xs font-medium text-indigo-500">현재</span>}
+                                                    <span className="truncate text-left">{item.label}</span>
+                                                    {isActive && (
+                                                        <span className="ml-auto inline-flex items-center rounded-full bg-indigo-100/90 px-2.5 py-0.5 text-[11px] font-medium text-indigo-600 shadow-sm">
+                                                            현재
+                                                        </span>
+                                                    )}
                                                 </Link>
                                             );
                                         })}
