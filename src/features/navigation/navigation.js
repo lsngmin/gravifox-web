@@ -237,7 +237,7 @@ const Navigation = () => {
                 </nav>
 
                 <Transition show={mobileMenuOpen} as={Fragment}>
-                    <>
+                    <div className="lg:hidden">
                         <Transition.Child
                             as={Fragment}
                             enter="transition-opacity duration-200 ease-out"
@@ -248,7 +248,7 @@ const Navigation = () => {
                             leaveTo="opacity-0"
                         >
                             <div
-                                className="fixed inset-x-0 bottom-0 z-30 bg-slate-900/30 lg:hidden"
+                                className="fixed inset-x-0 bottom-0 z-30 bg-slate-900/30"
                                 style={{ top: `${navHeight}px` }}
                                 onClick={() => setMobileMenuOpen(false)}
                             />
@@ -264,7 +264,7 @@ const Navigation = () => {
                             leaveTo="-translate-y-2 opacity-0"
                         >
                             <div
-                                className="fixed inset-x-0 z-40 origin-top lg:hidden"
+                                className="fixed inset-x-0 z-40 origin-top"
                                 style={{ top: `${navHeight}px` }}
                             >
                                 <div className="max-h-[calc(100vh-24px)] overflow-y-auto border-t border-slate-200 bg-white px-6 pb-8 pt-6 shadow-[0_18px_36px_-18px_rgba(15,23,42,0.25)]">
@@ -323,7 +323,7 @@ const Navigation = () => {
                                 </div>
                             </div>
                         </Transition.Child>
-                    </>
+                    </div>
                 </Transition>
             </div>
         </header>
