@@ -29,19 +29,19 @@ export default function SampleChoiceBox({ onPick, picking }) {
     }
 
     return (
-        <div className="mt-8 flex items-center justify-between gap-3 rounded-xl border border-slate-200 bg-slate-50 p-4">
+        <div className="mt-8 flex flex-col gap-4 rounded-xl border border-slate-200 bg-slate-50 p-4 sm:flex-row sm:items-center sm:justify-between">
             {/* 왼쪽 문구 */}
-            <p className="m-0 min-w-0 flex-1 text-sm text-slate-600">
+            <p className="m-0 min-w-0 text-center text-sm text-slate-600 sm:flex-1 sm:text-left">
                 파일이 없어도 괜찮아요. 준비된{" "}
                 <span className="font-medium text-slate-800">샘플 파일</span>로
                 바로 테스트할 수 있어요.
             </p>
 
             {/* 오른쪽 컨테이너: 고정 폭 + 오버플로우 표시 */}
-            <div className="relative min-h-[28px] w-[260px] flex-shrink-0 overflow-visible">
+            <div className="relative min-h-[28px] mt-1 flex w-full flex-shrink-0 overflow-visible sm:mt-0 sm:w-[260px]">
                 {/* 1) 초기: '사용할게요' 버튼 (오른쪽 끝 정렬) */}
                 <div
-                    className={`absolute inset-0 z-10 flex items-center justify-end gap-2 transition-opacity duration-700 ease-in-out ${
+                    className={`absolute inset-0 z-10 flex items-center justify-center gap-2 transition-opacity duration-700 ease-in-out sm:justify-end ${
                         showSamples || phase !== "idle" ? "pointer-events-none opacity-0" : "opacity-100"
                     }`}
                 >
@@ -56,7 +56,7 @@ export default function SampleChoiceBox({ onPick, picking }) {
 
                 {/* 2) 샘플 선택 버튼 (이미지/비디오) */}
                 <div
-                    className={`absolute inset-0 z-10 flex flex-nowrap items-center justify-end gap-2 transition-opacity duration-700 ease-in-out ${
+                    className={`absolute inset-0 z-10 flex flex-nowrap items-center justify-center gap-2 transition-opacity duration-700 ease-in-out sm:justify-end ${
                         phase === "options" ? "opacity-100" : "pointer-events-none opacity-0"
                     }`}
                 >
@@ -80,7 +80,7 @@ export default function SampleChoiceBox({ onPick, picking }) {
 
                 {/* 3) 상태 배지: 업로드 중 (옵션이 사라진 뒤 약간 늦게 등장하도록 delay) */}
                 <div
-                    className={`absolute inset-0 z-10 flex items-center justify-end transition-opacity duration-1000 ease-in-out ${
+                    className={`absolute inset-0 z-10 flex items-center justify-center transition-opacity duration-1000 ease-in-out sm:justify-end ${
                         phase === "loading" ? "opacity-100 delay-100" : "pointer-events-none opacity-0"
                     }`}
                 >
@@ -100,7 +100,7 @@ export default function SampleChoiceBox({ onPick, picking }) {
 
                 {/* 4) 상태 배지: 확인 요청 */}
                 <div
-                    className={`absolute inset-0 z-10 flex items-center justify-end transition-opacity duration-1000 ease-in-out ${
+                    className={`absolute inset-0 z-10 flex items-center justify-center transition-opacity duration-1000 ease-in-out sm:justify-end ${
                         phase === "done" ? "opacity-100" : "pointer-events-none opacity-0"
                     }`}
                 >

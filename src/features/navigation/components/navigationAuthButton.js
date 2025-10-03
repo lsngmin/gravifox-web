@@ -2,7 +2,6 @@ import React, {useEffect, useState} from "react";
 import {Link, useNavigate} from "react-router-dom";
 
 import {useAuth} from "providers/authProvider";
-import avatar from "assets/1.jpg";
 import AvatarButton from "./avatarButton";
 
 export default function NavigationAuthButton() {
@@ -20,17 +19,17 @@ export default function NavigationAuthButton() {
     }, [accessToken]);
 
     return (
-        <nav className="flex justify-end gap-4 p-4">
+        <div className="flex items-center justify-end gap-3">
             {isLoggedIn ? (
-                    <AvatarButton />
+                <AvatarButton />
             ) : (
                 <Link
                     to="/login"
-                    className="block px-3 py-2 text-xs font-semibold text-gray-600 hover:text-gray-900 hover:bg-gray-100 rounded transition"
+                    className="rounded-full border border-slate-200 px-4 py-2 text-sm font-semibold text-slate-600 transition hover:border-indigo-200 hover:text-indigo-600 hover:bg-indigo-50"
                 >
                     Log in <span aria-hidden="true">&rarr;</span>
                 </Link>
             )}
-        </nav>
+        </div>
     );
 }

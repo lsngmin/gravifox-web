@@ -31,7 +31,7 @@ export default function MediaAnalyze() {
             {/* 네비게이션 재사용 */}
             {/** Navigation은 전역 헤더 역할을 하며, 메인과 동일하게 재사용합니다. */}
             <Navigation/>
-            <main className="flex-1 pt-24 sm:pt-28 lg:pt-32 pb-16">
+            <main className="flex-1 pt-28 sm:pt-32 lg:pt-36 pb-16">
                 {/* 본문 카드 */}
                 <HowItWorksSection />
             </main>
