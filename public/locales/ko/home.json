@@ -1,7 +1,7 @@
 {
   "hero": {
     "headline": "사용자에게 도달하기 전에 합성 미디어를 차단하세요",
-    "title": "딥페이크 탐지, API 한 줄로 끝",
+    "title": "AI 이미지 진위 판별, API 한 줄로 끝",
     "title2": "모델 운영 없이 결과만 받아보세요",
     "subtitle": "확산 전에 AI 생성·조작 미디어를 탐지하세요. API나 대시보드 한 번이면 되고, ML 전문지식은 필요 없습니다.",
     "ribbon": "AI 선제 대응 스택",
@@ -32,7 +32,7 @@
       "footer": "24시간 에스컬레이션 · 활성화 시 전용 협업 채널 제공"
     },
     "bullets": [
-      "비디오·이미지·오디오를 업로드하면 공개 전 딥페이크 여부를 판정합니다.",
+      "이미지를 올리면 공개 전에 AI 합성 여부를 알려줘요.",
       "위험 점수와 증거 캡처, 후속 조치 가이드를 한눈에 제공합니다.",
       "Slack·이메일·모더레이션 도구와 연결해 ML 인프라 없이도 자동화할 수 있습니다."
     ],
@@ -40,7 +40,7 @@
       {
         "pill": "GraviFox 먼저 알아보기",
         "title": "플랫폼이 어떤 일을 대신 해주는지",
-        "body": "영상·이미지·음성을 가리지 않고 조작 미디어를 찾아내어 위험 이유와 대응 방법을 쉽게 설명합니다.",
+        "body": "사진 속 합성 흔적을 짚어 주고, 위험 이유와 다음 단계를 쉽게 풀어 드려요.",
         "footer": "제품·정책·엔지니어 팀이 함께 쓰기 쉽게 설계했습니다."
       },
       {
@@ -86,15 +86,32 @@
     "numbers": {
       "title": "규모에도 신뢰되는 성능",
       "items": {
-        "uptime": { "label": "API 가용성", "value": "99.9%" },
-        "requests": { "label": "월간 분석량", "value": "50K+" },
-        "customers": { "label": "활성 고객사", "value": "120+" },
-        "regions": { "label": "글로벌 리전", "value": "3" }
+        "uptime": {
+          "label": "API 가용성",
+          "value": "99.9%"
+        },
+        "requests": {
+          "label": "월간 분석량",
+          "value": "50K+"
+        },
+        "customers": {
+          "label": "활성 고객사",
+          "value": "120+"
+        },
+        "regions": {
+          "label": "글로벌 리전",
+          "value": "3"
+        }
       }
     },
     "logos": {
       "title": "팀과 파트너들이 신뢰합니다",
-      "items": ["Acme Inc.", "Contoso", "Globex", "Umbrella"]
+      "items": [
+        "Acme Inc.",
+        "Contoso",
+        "Globex",
+        "Umbrella"
+      ]
     }
   },
   "how": {
@@ -259,7 +276,7 @@
     "items": {
       "mediaModeration": {
         "title": "미디어 가이드라인/모더레이션",
-        "desc": "사용자 업로드에서 딥페이크·조작 미디어를 선제적으로 거르세요.",
+        "desc": "사용자 업로드 이미지에서 AI 합성·조작 징후를 미리 걸러내세요.",
         "detail": "UGC 플로우용 실시간 판정 스트리밍"
       },
       "brandSafety": {
@@ -286,7 +303,7 @@
     "testimonials": "스토리"
   },
   "meta": {
-    "title": "GraviFox — 딥페이크 탐지 API",
-    "description": "간단한 API로 딥페이크를 탐지하세요. 빠르고, 안전하며, 연동이 쉽습니다."
+    "title": "GraviFox — AI 이미지 진위 판별 API",
+    "description": "간단한 API로 AI 생성 이미지를 구분하세요. 빠르고, 안전하며, 연동이 쉽습니다."
   }
 }

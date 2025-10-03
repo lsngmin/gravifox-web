@@ -403,7 +403,7 @@ const updates = [
     {
         id: "release-0620",
         title: "June detector model refresh",
-        summary: "Improved deepfake recall (+3.2%) and added support for AV1 encoded inputs.",
+        summary: "Improved GenAI image recall (+3.2%) and added support for AV1 encoded inputs.",
         date: "2024-06-20",
     },
     {

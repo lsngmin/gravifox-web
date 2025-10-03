@@ -38,10 +38,10 @@ export default function SampleOutput() {
 
   const response = `{
   "score": 0.92,
-  "label": "likely_deepfake",
-  "explanations": [
-    { "frame": 12, "weight": 0.41 },
-    { "frame": 27, "weight": 0.33 }
+  "label": "likely_ai_generated",
+  "signals": [
+    { "region": "skin_texture", "weight": 0.41 },
+    { "region": "background_light", "weight": 0.33 }
   ]
 }`;
 

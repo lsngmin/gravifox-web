@@ -2,12 +2,12 @@
   "posts": [
     {
       "slug": "introducing-gravifox",
-      "title": "Introducing Gravifox: 이미지·동영상 딥페이크 탐지의 시작",
-      "excerpt": "Gravifox가 해결하려는 문제와 현재까지의 파이프라인(얼굴 검출 → 특징 추출 → 분류) 그리고 향후 로드맵을 공유합니다.",
+      "title": "Introducing Gravifox: AI 이미지 진위 판별의 시작",
+      "excerpt": "Gravifox가 해결하려는 문제와 현재까지의 파이프라인(이미지 전처리 → 흔적 분석 → 판정) 그리고 향후 로드맵을 공유합니다.",
       "date": "2025-09-10",
       "readTime": 6,
-      "tags": ["deepfake", "ai", "product"],
-      "content": "## 왜 딥페이크 탐지인가?\n\n온라인에서 생성형 콘텐츠가 폭발적으로 늘어나면서 신뢰 문제가 커지고 있습니다... (마크다운 본문 예시)"
+      "tags": ["genai", "ai", "product"],
+      "content": "## 왜 AI 이미지 진위를 검증해야 할까요?\n\n온라인에서 생성형 콘텐츠가 폭발적으로 늘어나면서 신뢰 문제가 커지고 있습니다... (마크다운 본문 예시)"
     },
     {
       "slug": "downstant-architecture",
