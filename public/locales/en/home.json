@@ -1,40 +1,40 @@
 {
   "hero": {
-    "headline": "Stop synthetic media before it hits your users",
+    "headline": "Catch AI-manipulated content before people see it",
     "title": "GenAI image authenticity in one API call",
-    "title2": "No model ops \u2014 just results",
-    "subtitle": "Detect AI-generated or manipulated media before it spreads. Use one API or dashboard\u2014no ML expertise required.",
+    "title2": "No model ops — just results",
+    "subtitle": "Upload images or videos and get a verdict in seconds. We include plain-language evidence and next steps so your reviewers know what to do.",
     "ribbon": "AI-FIRST DEFENSE STACK",
     "talkToTeam": "Talk to our team in under 24 hours",
     "metrics": {
       "latency": {
         "value": "4.1s",
         "label": "Median verdict",
-        "desc": "Even during peak traffic windows."
+        "desc": "Median verdict returns in 4.1 seconds so you can act before users click."
       },
       "accuracy": {
         "value": "99.3%",
         "label": "Detection precision",
-        "desc": "Continuously tuned on real incidents."
+        "desc": "Continuously retrained on real reports to cut false positives."
       },
       "uptime": {
         "value": "24/7",
         "label": "Live response desk",
-        "desc": "On-call specialists in three regions."
+        "desc": "Specialists stay on-call every day of the week for urgent escalations."
       }
     },
     "live": {
       "title": "Live trust desk status",
       "status": "Online",
-      "desc": "Global investigators cover APAC \u00b7 EMEA \u00b7 AMER. Average first response under 20 minutes for priority signals.",
+      "desc": "Global investigators cover APAC · EMEA · AMER. Average first response under 20 minutes for priority signals.",
       "slaTitle": "Current SLA",
-      "slaValue": "P1 incidents triaged in <15 minutes \u00b7 Evidence bundles delivered within 2 hours.",
-      "footer": "24/7 escalation \u00b7 Dedicated incident channel upon activation"
+      "slaValue": "P1 incidents triaged in <15 minutes · Evidence bundles delivered within 2 hours.",
+      "footer": "24/7 escalation · Dedicated incident channel upon activation"
     },
     "bullets": [
-      "Upload an image and we confirm GenAI traces before it reaches users.",
-      "See risk scores, evidence snapshots, and remediation suggestions in plain language.",
-      "Route decisions to Slack, email, or moderation tools without touching ML infrastructure."
+      "Upload suspect media and get instant synthetic checks.",
+      "Review the risk score and evidence snapshots, then brief your team.",
+      "Send approve or block decisions straight to Slack or your moderation tools."
     ],
     "cards": [
       {
@@ -56,29 +56,29 @@
     "pricing": "View pricing"
   },
   "top": {
-    "ctaText": "Have a question or partnership idea? Let\u2019s talk",
+    "ctaText": "Have a question or partnership idea? Let’s talk",
     "link": "Contact us"
   },
   "feature": {
-    "eyebrow": "Integrate Instantly",
-    "title": "Plug and Play",
-    "subtitle": "Vision, language, and custom models ready out-of-the-box",
-    "subtitle2": "Focus on building; we handle the heavy lifting.",
+    "eyebrow": "Connect without hassle",
+    "title": "Set up in minutes",
+    "subtitle": "Use vision, language, and custom checks without standing up infrastructure.",
+    "subtitle2": "Keep shipping features while we manage the ML operations.",
     "items": {
       "oneLine": {
-        "name": "One-Line API Call.",
-        "desc": "Send your data and get AI-powered insights in milliseconds\u2014no setup required.",
-        "highlight": "SDKs for JavaScript, Python, and Go"
+        "name": "Start with one copy-paste.",
+        "desc": "Send a link or file and we return a clear verdict with no extra config.",
+        "highlight": "Example: Flag a support ticket screenshot straight from Zendesk"
       },
       "security": {
-        "name": "Enterprise-Grade Security.",
-        "desc": "All requests are end-to-end encrypted and protected by strict access controls.",
-        "highlight": "SOC 2, GDPR, ISO-ready controls"
+        "name": "Keep data locked down.",
+        "desc": "Every request stays encrypted in transit and we only store it long enough for review.",
+        "highlight": "Example: Limit access to just your trust & safety team"
       },
       "scaling": {
-        "name": "Auto-Scaling Infrastructure.",
-        "desc": "Seamlessly handle any traffic spike with our fully managed, elastically scaling servers.",
-        "highlight": "Global inference edge with smart routing"
+        "name": "Scale with your traffic.",
+        "desc": "We auto-adjust capacity so launches and news spikes stay covered.",
+        "highlight": "Example: Handle weekend surges without paging your infra team"
       }
     }
   },
@@ -117,7 +117,7 @@
   "how": {
     "eyebrow": "How It Works",
     "title": "Analyze in 3 simple steps",
-    "subtitle": "From media to insight \u2014 fast, secure, and reliable.",
+    "subtitle": "From media to insight — fast, secure, and reliable.",
     "step": "Step",
     "steps": {
       "upload": {
@@ -162,9 +162,9 @@
     }
   },
   "supported": {
-    "eyebrow": "Supported Inputs",
-    "title": "Formats and constraints",
-    "subtitle": "Popular media formats and reasonable defaults for a smooth start.",
+    "eyebrow": "What you can upload",
+    "title": "Supported formats and limits",
+    "subtitle": "We list the basics so anyone on your team knows what to upload.",
     "badges": {
       "mp4": "MP4",
       "mov": "MOV",
@@ -178,16 +178,19 @@
     },
     "cards": {
       "video": {
-        "title": "Video Inference",
-        "subtitle": "Segment-aware sampling keeps verdicts snappy, even for longer clips."
+        "title": "Check videos",
+        "subtitle": "Upload short clips or demos and we sample the important moments for a fast verdict.",
+        "example": "Example: MP4 or MOV product demo, under 2 minutes"
       },
       "image": {
-        "title": "Image Analysis",
-        "subtitle": "Per-frame detectors combine facial cues, lighting anomalies, and texture fingerprints."
+        "title": "Check images",
+        "subtitle": "Send a single photo and we inspect faces, lighting, and textures to tell you what's real.",
+        "example": "Example: JPG or PNG headshot, screenshots up to 4K"
       },
       "api": {
-        "title": "API & Streaming",
-        "subtitle": "Signed URLs, direct uploads, and RTMP passthrough keep ingestion flexible without sacrificing security."
+        "title": "Connect API or streams",
+        "subtitle": "Send links or direct uploads and we handle signing and streaming passthrough automatically.",
+        "example": "Example: Protected URL, internal dashboard upload, RTMP beta stream"
       }
     }
   },
@@ -201,7 +204,7 @@
     "eyebrow": "Security & Privacy",
     "title": "Enterprise-minded by default",
     "subtitle": "We keep your data protected with clear, predictable controls.",
-    "callout": "Zero data retention by default \u00b7 SOC 2 Type II in progress",
+    "callout": "Zero data retention by default · SOC 2 Type II in progress",
     "items": {
       "encryption": {
         "title": "Encryption in transit",
@@ -240,7 +243,7 @@
       },
       {
         "q": "Does setup require ML expertise?",
-        "a": "No. Use our REST API, SDKs, and Terraform modules to deploy in minutes\u2014no model ops needed."
+        "a": "No. Use our REST API, SDKs, and Terraform modules to deploy in minutes—no model ops needed."
       },
       {
         "q": "What about data retention?",
@@ -303,7 +306,7 @@
     "testimonials": "Stories"
   },
   "meta": {
-    "title": "GraviFox \u2014 GenAI image authenticity API",
+    "title": "GraviFox — GenAI image authenticity API",
     "description": "Verify AI-generated images with a simple API. Fast, secure, and easy to integrate."
   }
 }
