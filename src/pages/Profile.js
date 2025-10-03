@@ -1,10 +1,7 @@
-import React, {useEffect, useState} from "react";
+import React from "react";
 
 import Navigation from "../features/navigation/navigation";
 import Footer from "../features/footer/footer";
-import profileAPI from "../features/profile/api/profileAPI";
-import {useAuth} from "../providers/authProvider";
-import SideBar from "../features/profile/components/ProfileSidebar";
 import UserInfo from "../features/profile/components/userInfo";
 
 const Profile = () => {
@@ -26,7 +23,7 @@ const Profile = () => {
                 <Footer />
             </footer>
         </div>
-    )
+    );
 };
 
 export default Profile;

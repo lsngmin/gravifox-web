@@ -3,7 +3,6 @@ import { useLocation, useNavigate } from "react-router-dom";
 import Navigation from "../features/navigation/navigation";
 import Footer from "../features/footer/footer";
 import AnalysisReport from "../features/analyze/components/report/AnalysisReport";
-import HelpTips from "../features/analyze/components/report/HelpTips";
 import { ANALYZE_ENDPOINTS } from "../api/endPointRoute";
 
 // 로딩 멘트(랜덤 회전). 스테이지에 맞춘 후보 포함
@@ -100,8 +99,6 @@ export default function AnalyzeResult() {
   const [reports, setReports] = useState({}); // jobId -> { stage, progress, result, error, connected, fileMeta }
   const reportRef = useRef(null);
 
-  const onPrint = () => window.print();
-
   const summary = useMemo(() => {
     const total = jobIds.length;
     let done = 0, failed = 0;
@@ -188,19 +185,9 @@ export default function AnalyzeResult() {
     });
 
     return () => { sources.forEach(s => { try { s.close(); } catch {} }); };
-  }, [jobIdsCsv, legacyJobId, legacyToken]);
+  }, [jobIds, legacyJobId, legacyToken, search]);
 
   const ids = jobIds;
-
-  // helpers
-  const prettyBytes = (n) => {
-    if (typeof n !== 'number') return '-';
-    const u = ['B','KB','MB','GB','TB'];
-    let i = 0, v = n;
-    while (v >= 1024 && i < u.length - 1) { v /= 1024; i++; }
-    const digits = v >= 100 ? 0 : v >= 10 ? 1 : 2;
-    return `${v.toFixed(digits)} ${u[i]}`;
-  };
 
   return (
     <div className="p-0">

@@ -1,5 +1,5 @@
 import React, { useMemo } from 'react';
-import { Link, useLocation, useNavigate } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 
 const Footer = ({ transparent = false }) => {
@@ -23,15 +23,38 @@ const Footer = ({ transparent = false }) => {
         navigate(nextPath, { replace: true });
     };
 
+    const goTo = (path) => {
+        const next = path.startsWith('/') ? path : `/${path}`;
+        navigate(`/${currentLng}${next}`);
+    };
+
     return (
         <section className={transparent ? "bg-transparent" : "bg-white"}>
             <div className="max-w-screen-xl px-4 py-12 mx-auto space-y-6 overflow-hidden sm:px-6 lg:px-8">
                 <nav className="flex flex-wrap items-center justify-center gap-4 text-sm">
-                    <a href="#" className="text-sm leading-6 text-gray-500 hover:text-gray-900">About</a>
+                    <button
+                        type="button"
+                        onClick={() => goTo('/feature')}
+                        className="text-sm leading-6 text-gray-500 hover:text-gray-900"
+                    >
+                        About
+                    </button>
                     <span className="text-gray-300">·</span>
-                    <a href="#" className="text-sm leading-6 text-gray-500 hover:text-gray-900">Contact</a>
+                    <button
+                        type="button"
+                        onClick={() => goTo('/support')}
+                        className="text-sm leading-6 text-gray-500 hover:text-gray-900"
+                    >
+                        Contact
+                    </button>
                     <span className="text-gray-300">·</span>
-                    <a href="#" className="text-sm leading-6 text-gray-500 hover:text-gray-900">Terms</a>
+                    <button
+                        type="button"
+                        onClick={() => goTo('/docs')}
+                        className="text-sm leading-6 text-gray-500 hover:text-gray-900"
+                    >
+                        Terms
+                    </button>
                     <span className="text-gray-300">·</span>
                     <div className="inline-flex items-center gap-2">
                         <span className="text-sm text-gray-500">Language</span>

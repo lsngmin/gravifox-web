@@ -2,7 +2,6 @@ import React from "react";
 
 import Navigation from "../features/navigation/navigation";
 import Footer from "../features/footer/footer";
-import Banner from "../features/banner/banner";
 import PageSection from "features/main/pageSection";
 import Feature from "features/main/feature";
 import HowItWorks from "features/main/howItWorks";

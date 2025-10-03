@@ -1,4 +1,4 @@
-import React, {useEffect, useState} from 'react';
+import React from 'react';
 
 const tips = [
   { title: '판정 기준', body: "의심 확률이 임계값 이상이면 ‘FAKE’, 미만이면 ‘REAL’로 해석됩니다." },
@@ -13,8 +13,6 @@ function Dot({ style }) {
 }
 
 export default function HelpTips({ variant = 'A' }) {
-  const brandStyle = { background: 'var(--brand)' };
-
   if (variant === 'A') {
     // 콜아웃 스트라이프
     return (

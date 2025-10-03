@@ -1,4 +1,4 @@
-import React, {useEffect, useState} from 'react';
+import React, {useEffect} from 'react';
 import { useNavigate } from 'react-router-dom';
 import {useAuth} from "providers/authProvider";
 import {UploadProvider} from "features/freeTrial/provider/uploadProvider";
@@ -9,10 +9,6 @@ import Navigation from "../features/navigation/navigation";
 
 const FreeTrial = () => {
     const navigate = useNavigate();
-    const [selectedImage, setSelectedImage] = useState(null);
-    const [previewUrl, setPreviewUrl] = useState(null);
-    const [isAnalyzing, setIsAnalyzing] = useState(false);
-    const [result, setResult] = useState(null);
     const {accessToken, isLoading} = useAuth();
 
 
@@ -21,7 +17,7 @@ const FreeTrial = () => {
         if (!isLoading && !accessToken) {
             navigate("/login");
         }
-    }, [isLoading, accessToken]);
+    }, [isLoading, accessToken, navigate]);
 
     if (isLoading) return <div>로딩 중...</div>;
 

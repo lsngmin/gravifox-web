@@ -1,5 +1,4 @@
 import React, { useState, useEffect } from "react";
-import SignInAPI from "../../login/api/signInAPI";
 import {useNavigate, useSearchParams} from "react-router-dom";
 import signupAPI from "../../login/api/signupAPI";
 
@@ -9,17 +8,6 @@ const RegisterBox = () => {
 
     const termsCookieParam = searchParams.get("termsCookie");
     const termsMarketingParam = searchParams.get("termsMarketing");
-
-    useEffect(() => {
-        if (termsCookieParam == null && termsMarketingParam == null) {
-            navigate("/agree", { replace: true });
-        }
-        formState.termsCookie = termsCookieParam;
-        formState.termsMarketing = termsMarketingParam;
-
-    }, [termsCookieParam, termsMarketingParam, navigate]);
-
-    const { signup, error } = signupAPI();
 
     const [showPassword, setShowPassword] = useState(false);
 
@@ -39,7 +27,19 @@ const RegisterBox = () => {
     });
     const [canSubmit, setCanSubmit] = useState(false);
 
-    const { signIn } = SignInAPI();
+    useEffect(() => {
+        if (termsCookieParam == null && termsMarketingParam == null) {
+            navigate("/agree", { replace: true });
+            return;
+        }
+        setFormState((prev) => ({
+            ...prev,
+            termsCookie: termsCookieParam ?? "",
+            termsMarketing: termsMarketingParam ?? "",
+        }));
+    }, [termsCookieParam, termsMarketingParam, navigate]);
+
+    const { signup } = signupAPI();
 
     // ─── 유효성 검사 함수들 ─────────────────────────────────────────────────────
 

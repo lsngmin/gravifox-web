@@ -1,11 +1,9 @@
-import {useState} from "react";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
 import {AUTH_ENDPOINTS} from "../../../api/endPointRoute";
 
 
 const SignupAPI = () => {
-    const [error, setError] = useState(null);
     const navigate = useNavigate();
     /**
      * 사용자 정보를 기반으로 회원가입 요청을 보냅니다. 성공 시 사용자 정보와 서버의 응답 정보를 비교 후 맞다면 회원가입 성공으로 메인 페이지 이동
@@ -49,6 +47,6 @@ const SignupAPI = () => {
             throw Object.assign(new Error(error?.response?.data?.message), {status:error?.response?.status})
         }
     };
-    return {signup, error}
+    return {signup}
 }
 export default SignupAPI;

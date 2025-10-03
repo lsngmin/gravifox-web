@@ -34,7 +34,7 @@ export default function HowItWorksHeader() {
                 필요하면 <span className="font-semibold text-slate-800">이메일</span>이나 <span
                 className="font-semibold text-slate-800">대시보드</span>로 확인할 수 있어요.
                 진행 중 문제가 발생하거나 도움이 필요하다면 {" "}
-                <a href="#"
+                <a href="/support"
                    className="text-indigo-600 hover:text-indigo-700 font-medium">
                     여기
                 </a>를 클릭하세요.

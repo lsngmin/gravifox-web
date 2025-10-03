@@ -32,7 +32,7 @@ const AgreementBox = () => {
         if (allChecked !== agreeAll) {
             setAgreeAll(allChecked);
         }
-    }, [tos, privacy, cookie, marketing]);
+    }, [tos, privacy, cookie, marketing, agreeAll]);
 
     // 전체 동의 클릭 시
     const handleAgreeAllChange = () => {

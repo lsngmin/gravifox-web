@@ -115,7 +115,7 @@ export const AuthProvider = ({ children }) => {
             }
         };
         bootstrap();
-    }, []);
+    }, [accessToken]);
 
     // 사전 만료 갱신 타이머: exp - 30초에 refresh 시도
     useEffect(() => {

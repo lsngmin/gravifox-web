@@ -14,7 +14,7 @@ const Dashboard = () => {
             // Members-only: redirect guests to login (routes will localize)
             navigate('/login');
         }
-    }, [isLoading, accessToken]);
+    }, [isLoading, accessToken, navigate]);
 
     if (isLoading) return null;
 

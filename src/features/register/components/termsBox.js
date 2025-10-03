@@ -15,6 +15,9 @@ export default function TermsBox({type}) {
         case "Marketing Consent":
             content = marketingConsentText;
             break;
+        default:
+            content = "";
+            break;
     }
     return (
         <div
@@ -26,5 +29,5 @@ export default function TermsBox({type}) {
                 {content}
             </p>
         </div>
-    )
+    );
 }

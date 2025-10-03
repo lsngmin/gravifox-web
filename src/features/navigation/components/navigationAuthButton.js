@@ -1,13 +1,12 @@
 import React, {useEffect, useState} from "react";
-import {Link, useNavigate} from "react-router-dom";
+import {Link} from "react-router-dom";
 
 import {useAuth} from "providers/authProvider";
 import AvatarButton from "./avatarButton";
 
 export default function NavigationAuthButton() {
     const [isLoggedIn, setIsLoggedIn] = useState(false);
-    const { accessToken, logout } = useAuth();
-    const navigate = useNavigate();
+    const { accessToken } = useAuth();
 
     useEffect(() => {
         // 페이지 로드될 때 토큰 확인

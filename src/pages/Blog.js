@@ -1,5 +1,4 @@
 import React, { useMemo, useState } from "react";
-import { useTranslation } from "react-i18next";
 import ContentDecor from "features/main/contentDecor";
 import Navigation from "../features/navigation/navigation";
 
@@ -13,7 +12,6 @@ import Footer from "../features/footer/footer";
 
 
 const Blog = () => {
-    const { t } = useTranslation("blog");
     const { posts, isLoading, error } = useBlogPosts();
 
 
