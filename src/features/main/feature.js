@@ -34,15 +34,15 @@ export default function Feature() {
       <div className="relative mx-auto grid max-w-6xl gap-10 px-6 lg:grid-cols-[1fr_1.1fr] lg:items-center">
         <div className="space-y-6">
           <span className="inline-flex items-center gap-2 rounded-full bg-indigo-50 px-3 py-1 text-xs font-semibold uppercase tracking-[0.3em] text-indigo-500 ring-1 ring-indigo-100">
-            {t('feature.eyebrow', 'Integrate Instantly')}
+            {t('feature.eyebrow', '바로 연결해 보세요')}
           </span>
           <h2 className="text-3xl sm:text-4xl font-bold leading-tight text-slate-900">
-            {t('feature.title', 'Plug and Play')}
+            {t('feature.title', '몇 분 만에 셋업하세요')}
           </h2>
           <p className="text-sm sm:text-base text-slate-600">
-            {t('feature.subtitle', 'Vision, language, and custom models ready out-of-the-box')}
+            {t('feature.subtitle', '비전·언어·맞춤 검증을 인프라 구축 없이 바로 쓸 수 있어요')}
             <br />
-            {t('feature.subtitle2', 'Focus on building; we handle the heavy lifting.')}
+            {t('feature.subtitle2', '제품 개발에 집중하세요. ML 운영은 저희가 대신 관리해요.')}
           </p>
 
           <div className="grid gap-4">
@@ -59,7 +59,7 @@ export default function Feature() {
                   <div className="flex-1 space-y-2">
                     <h3 className="text-base font-semibold text-slate-900">{t(titleKey)}</h3>
                     <p className="text-sm text-slate-600 leading-relaxed">{t(descKey)}</p>
-                    <div className="text-xs font-semibold uppercase tracking-wide text-indigo-500">
+                    <div className="text-xs font-medium text-indigo-500 leading-normal">
                       {t(highlightKey)}
                     </div>
                   </div>

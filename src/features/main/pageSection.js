@@ -9,26 +9,26 @@ export default function PageSection() {
         {
             value: t('hero.metrics.latency.value', '4.1s'),
             label: t('hero.metrics.latency.label', 'Median verdict'),
-            desc: t('hero.metrics.latency.desc', 'Even during peak traffic windows.'),
+            desc: t('hero.metrics.latency.desc', '사용자가 보기 전에 결과를 받을 수 있도록 평균 응답 시간이 4.1초예요.'),
         },
         {
             value: t('hero.metrics.accuracy.value', '99.3%'),
             label: t('hero.metrics.accuracy.label', 'Detection precision'),
-            desc: t('hero.metrics.accuracy.desc', 'Continuously tuned on real incidents.'),
+            desc: t('hero.metrics.accuracy.desc', '실제 신고 사례로 계속 학습해 오탐을 줄였어요.'),
         },
         {
             value: t('hero.metrics.uptime.value', '24/7'),
             label: t('hero.metrics.uptime.label', 'Live response desk'),
-            desc: t('hero.metrics.uptime.desc', 'On-call specialists in three regions.'),
+            desc: t('hero.metrics.uptime.desc', '주 7일 전문 인력이 대기하며 긴급 대응을 도와드려요.'),
         },
     ];
 
     const bulletPoints = t('hero.bullets', {
         returnObjects: true,
         defaultValue: [
-            'Stop GenAI image uploads before they go live.',
-            'Give reviewers authenticity evidence they can trust.',
-            'Connect verdicts to the workflows you already use.',
+            '콘텐츠를 업로드하고 합성 흔적을 즉시 확인하세요.',
+            '위험 점수와 증거 이미지를 검토하고 팀에 공유하세요.',
+            '승인·차단 결과를 슬랙이나 검수 툴로 자동 전송하세요.',
         ],
     });
 
@@ -53,12 +53,12 @@ export default function PageSection() {
                     <div className="space-y-8 text-indigo-50">
                         <div className="space-y-5">
                             <h1 className="text-4xl font-extrabold tracking-tight sm:text-5xl lg:text-6xl">
-                                {t('hero.headline', 'Stop synthetic media before it hits your users')}
+                                {t('hero.headline', 'AI로 조작된 콘텐츠를 걸러내 사용자 피해를 미리 막으세요')}
                             </h1>
                             <p className="text-base sm:text-lg text-indigo-100/90 max-w-3xl">
                                 {t(
                                     'hero.subtitle',
-                                    '몇 초 만에 분석 결과를 확인하세요. 인프라/ML 전문지식은 필요 없습니다.'
+                                    '이미지와 영상을 올리면 몇 초 안에 진위와 위험도를 알려드려요. 심사팀이 안심하고 대응할 수 있도록 근거와 다음 행동을 함께 제공합니다.'
                                 )}
                             </p>
                         </div>
