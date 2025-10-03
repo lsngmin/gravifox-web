@@ -39,7 +39,7 @@ export default function AnchorNav() {
 
   const [active, setActive] = useState(items[0].id);
   const navRef = useRef(null);
-  const [headerOffset, setHeaderOffset] = useState(64);
+  const [headerOffset, setHeaderOffset] = useState(72);
 
   useEffect(() => {
     const obs = new IntersectionObserver(
@@ -61,13 +61,14 @@ export default function AnchorNav() {
     let ticking = false;
     const measure = () => {
       const header = document.querySelector('header');
+      const baseGap = window.innerWidth < 1024 ? 12 : 8;
       if (!header) {
-        setHeaderOffset(64);
+        setHeaderOffset(64 + baseGap);
         return;
       }
       const rect = header.getBoundingClientRect();
       // offset = current top distance + height + small gap
-      const off = Math.max(0, Math.round(rect.top)) + Math.ceil(rect.height) + 8;
+      const off = Math.max(0, Math.round(rect.top)) + Math.ceil(rect.height) + baseGap;
       setHeaderOffset(off);
     };
     const onScroll = () => {
@@ -95,9 +96,10 @@ export default function AnchorNav() {
     // Compute dynamic offset: header (fixed) + anchor nav (sticky) heights
     const header = document.querySelector('header');
     const headerRect = header ? header.getBoundingClientRect() : { top: 0, height: 64 };
-    const headerH = (headerRect?.top || 0) + (headerRect?.height || 64) + 8;
+    const headerGap = window.innerWidth < 1024 ? 12 : 8;
+    const headerH = (headerRect?.top || 0) + (headerRect?.height || 64) + headerGap;
     const anchorH = navRef.current ? navRef.current.getBoundingClientRect().height : 48;
-    const extra = 12; // tighter breathing room since header shrinks more
+    const extra = window.innerWidth < 1024 ? 20 : 12; // tighter breathing room since header shrinks more
     const y = el.getBoundingClientRect().top + window.scrollY - (headerH + anchorH + extra);
     window.scrollTo({ top: y, behavior: 'smooth' });
   };
@@ -106,11 +108,11 @@ export default function AnchorNav() {
     <nav
       ref={navRef}
       id="anchor-nav"
-      className="sticky z-20 hidden border-b border-slate-200 bg-white/85 backdrop-blur supports-[backdrop-filter]:bg-white/60 lg:block"
+      className="sticky z-20 w-full border-b border-slate-200 bg-white/90 backdrop-blur supports-[backdrop-filter]:bg-white/70"
       style={{ top: headerOffset }}
     >
-      <div className="mx-auto max-w-7xl px-6 lg:px-8">
-        <ul className="flex items-center gap-2 py-3 text-sm overflow-x-auto no-scrollbar">
+      <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+        <ul className="flex flex-nowrap items-center gap-2 overflow-x-auto py-3 text-sm no-scrollbar">
           {items.map((it) => {
             const Icon = iconMap[it.id] || PlayIcon;
             const isActive = active === it.id;
@@ -119,8 +121,10 @@ export default function AnchorNav() {
                 <a
                   href={`#${it.id}`}
                   aria-current={isActive ? 'true' : undefined}
+                  aria-label={it.label}
                   onClick={(e) => onClick(e, it.id)}
-                  className={`relative inline-flex items-center gap-1.5 rounded-full px-3 py-1.5 transition ${
+                  tabIndex={0}
+                  className={`relative inline-flex items-center gap-1.5 rounded-full px-3 py-1.5 transition focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-400 ${
                     isActive
                       ? 'bg-indigo-50 text-indigo-700 ring-1 ring-indigo-200'
                       : 'text-slate-600 hover:text-slate-900'
