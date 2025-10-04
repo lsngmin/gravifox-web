@@ -347,7 +347,7 @@ const Navigation = () => {
                             >
                                 <div className="mx-auto px-6 pb-8 pt-2">
                                     <div className="w-full relative rounded-3xl border border-slate-200 bg-white px-5 pb-8 pt-4 shadow-[0_22px_48px_-22px_rgba(15,23,42,0.32)] sm:px-6">
-                                        <div className="flex items-start justify-between gap-3">
+                                        <div className="flex items-center justify-between gap-3">
                                             <div className="min-w-0 flex-1">
                                                 {isLoggedIn ? (
                                                     <div className="flex items-center gap-3 rounded-2xl bg-indigo-50/70 px-4 py-3 text-slate-700">
@@ -355,15 +355,17 @@ const Navigation = () => {
                                                             {userInitials}
                                                         </div>
                                                         <div className="min-w-0">
-                                                            <p className="truncate text-sm font-semibold text-slate-900">{displayName || t('navigation.welcomeBack')}</p>
+                                                            <p className="text-sm font-semibold text-slate-900 whitespace-normal break-words">
+                                                                {displayName || t('navigation.welcomeBack')}
+                                                            </p>
                                                             {displayEmail && (
-                                                                <p className="truncate text-xs text-slate-500">{displayEmail}</p>
+                                                                <p className="text-xs text-slate-500 break-all whitespace-normal">{displayEmail}</p>
                                                             )}
                                                         </div>
                                                     </div>
                                                 ) : (
                                                     <div className="rounded-2xl bg-slate-50 px-4 py-2.5 text-[13px] font-medium leading-tight text-slate-600">
-                                                        <span className="block truncate">{t('navigation.ctaGuest')}</span>
+                                                        <span className="block whitespace-normal break-words">{t('navigation.ctaGuest')}</span>
                                                     </div>
                                                 )}
                                             </div>
@@ -371,7 +373,7 @@ const Navigation = () => {
                                                 type="button"
                                                 onClick={() => setMobileMenuOpen(false)}
                                                 aria-label={t('navigation.closeMenu')}
-                                                className="-m-2 p-2 rounded-md text-slate-500 transition hover:bg-slate-100 hover:text-slate-700 active:scale-95"
+                                                className="-m-2 flex h-10 w-10 items-center justify-center rounded-md text-slate-500 transition hover:bg-slate-100 hover:text-slate-700 active:scale-95"
                                             >
                                                 <XMarkIcon aria-hidden="true" className="size-6" />
                                             </button>
@@ -398,7 +400,7 @@ const Navigation = () => {
                                                         style={{ transitionDelay: reducedMotion ? undefined : `${Math.min(idx * 120, 600)}ms` }}
                                                         data-open={mobileMenuOpen ? '' : undefined}
                                                     >
-                                                        <span className={`${itemAnimBase} truncate text-left`}>{label}</span>
+                                                        <span className={`${itemAnimBase} whitespace-normal break-words text-left`}>{label}</span>
                                                         <span className={`flex items-center gap-2 text-sm font-medium ${itemAnimBase}`}>
                                                             {isActive && (
                                                                 <span className="inline-flex items-center rounded-full bg-indigo-100/90 px-2 py-0.5 text-[11px] font-medium text-indigo-600 shadow-sm">
