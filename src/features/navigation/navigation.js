@@ -95,33 +95,45 @@ const Navigation = () => {
         if (!mobileMenuOpen) return headerStyle;
         return {
             ...headerStyle,
-            left: '0px',
-            right: '0px',
-            borderRadius: headerStyle.borderRadius,
+            transformOrigin: 'top center',
             borderBottomLeftRadius: '0px',
             borderBottomRightRadius: '0px',
-            transform: 'none',
             boxShadow: '0 18px 40px -12px rgba(15,23,42,0.32)',
-            border: '1px solid rgba(226, 232, 240, 0.45)',
+            border: '1px solid rgba(226, 232, 240, 0)',
+            borderLeft: '0px',
+            borderRight: '0px',
+            borderBottom: '0px',
         };
     }, [headerStyle, mobileMenuOpen]);
 
-    const normalizePath = (path) => {
-        if (!path) return '/';
-        const [clean] = path.split(/[?#]/);
-        if (!clean) return '/';
-        const withoutLocale =
-            localePrefix && clean.startsWith(localePrefix)
-                ? clean.slice(localePrefix.length) || '/'
-                : clean;
-        let normalized = withoutLocale.startsWith('/') ? withoutLocale : `/${withoutLocale}`;
-        if (normalized.length > 1) {
-            while (normalized.length > 1 && normalized.endsWith('/')) {
-                normalized = normalized.slice(0, -1);
+    const mobileMenuContainerStyle = useMemo(
+        () => ({
+            top: `${navHeight}px`,
+            left: headerStyle.left ?? '0px',
+            right: headerStyle.right ?? '0px',
+        }),
+        [navHeight, headerStyle.left, headerStyle.right]
+    );
+
+    const normalizePath = useCallback(
+        (path) => {
+            if (!path) return '/';
+            const [clean] = path.split(/[?#]/);
+            if (!clean) return '/';
+            const withoutLocale =
+                localePrefix && clean.startsWith(localePrefix)
+                    ? clean.slice(localePrefix.length) || '/'
+                    : clean;
+            let normalized = withoutLocale.startsWith('/') ? withoutLocale : `/${withoutLocale}`;
+            if (normalized.length > 1) {
+                while (normalized.length > 1 && normalized.endsWith('/')) {
+                    normalized = normalized.slice(0, -1);
+                }
             }
-        }
-        return normalized || '/';
-    }, [localePrefix]);
+            return normalized || '/';
+        },
+        [localePrefix]
+    );
 
     const currentPath = normalizePath(location.pathname);
     const currentHash = location.hash || '';
@@ -259,7 +271,7 @@ const Navigation = () => {
                         >
                             <div
                                 className="pointer-events-none fixed inset-x-0 bottom-0 z-30 bg-slate-900/25 backdrop-blur-[2px]"
-                                style={{ top: `${navHeight}px` }}
+                                style={{ ...mobileMenuContainerStyle, bottom: 0 }}
                             />
                         </Transition.Child>
 
@@ -272,10 +284,7 @@ const Navigation = () => {
                             leaveFrom="translate-y-0 opacity-100"
                             leaveTo="-translate-y-2 opacity-0"
                         >
-                            <div
-                                className="fixed inset-x-0 z-40 origin-top"
-                                style={{ top: `${navHeight}px` }}
-                            >
+                            <div className="fixed inset-x-0 z-40 origin-top" style={mobileMenuContainerStyle}>
                                 <div className="mx-auto max-w-lg max-h-[calc(100vh-24px)] overflow-y-auto border border-slate-200 border-t-0 bg-white px-5 pb-8 pt-6 shadow-[0_22px_48px_-22px_rgba(15,23,42,0.32)] transition-[border-radius] duration-300 ease-out sm:max-w-xl sm:px-6"
                                     style={{ borderBottomLeftRadius: '28px', borderBottomRightRadius: '28px' }}
                                 >
