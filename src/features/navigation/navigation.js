@@ -1,4 +1,5 @@
 import React, { Fragment, useCallback, useEffect, useMemo, useState } from 'react';
+import { createPortal } from 'react-dom';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { PopoverGroup, Transition } from '@headlessui/react';
 import { Bars3Icon, ChevronRightIcon, XMarkIcon } from '@heroicons/react/24/outline';
@@ -8,10 +9,21 @@ import NavigationAuthButton from 'features/navigation/components/navigationAuthB
 import MobileNavigationAuthButton from 'features/navigation/components/mobileNavigationAuthButton';
 import AvatarButton from 'features/navigation/components/avatarButton';
 
+// PortalOverlay: forwards Transition props to a real element rendered into document.body
+const PortalOverlay = React.forwardRef(function PortalOverlay({ className, ...props }, ref) {
+    return createPortal(<div ref={ref} className={className} {...props} />, document.body);
+});
+
+// PortalPanel: portaled container for the mobile menu panel
+const PortalPanel = React.forwardRef(function PortalPanel({ className, style, ...props }, ref) {
+    return createPortal(<div ref={ref} className={className} style={style} {...props} />, document.body);
+});
+
 const Navigation = () => {
     const { userInfo } = useAuth();
     const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
     const [shrink, setShrink] = useState(0);
+    const [reducedMotion, setReducedMotion] = useState(false);
 
     const navigate = useNavigate();
     const location = useLocation();
@@ -49,6 +61,35 @@ const Navigation = () => {
         setMobileMenuOpen(false);
     }, [location.pathname, location.search]);
 
+    // Respect prefers-reduced-motion and lock body scroll when menu is open
+    useEffect(() => {
+        const media = window.matchMedia('(prefers-reduced-motion: reduce)');
+        const onChange = () => setReducedMotion(media.matches);
+        onChange();
+        media.addEventListener?.('change', onChange);
+        return () => media.removeEventListener?.('change', onChange);
+    }, []);
+
+    useEffect(() => {
+        if (mobileMenuOpen) {
+            const prev = document.body.style.overflow;
+            document.body.style.overflow = 'hidden';
+            return () => {
+                document.body.style.overflow = prev;
+            };
+        }
+    }, [mobileMenuOpen]);
+
+    // Close on ESC for accessibility
+    useEffect(() => {
+        if (!mobileMenuOpen) return;
+        const onKeyDown = (e) => {
+            if (e.key === 'Escape') setMobileMenuOpen(false);
+        };
+        window.addEventListener('keydown', onKeyDown);
+        return () => window.removeEventListener('keydown', onKeyDown);
+    }, [mobileMenuOpen]);
+
     const headerStyle = useMemo(() => {
         const lerp = (a, b, t) => a + (b - a) * t;
         const top = lerp(0, 20, shrink);
@@ -78,17 +119,10 @@ const Navigation = () => {
 
     const composedHeaderStyle = useMemo(() => {
         if (!mobileMenuOpen) {
-            return {
-                ...headerStyle,
-                zIndex: 40,
-            };
+            return { ...headerStyle, zIndex: 40 };
         }
-        return {
-            ...headerStyle,
-            transform: 'none',
-            transformOrigin: 'top center',
-            zIndex: 60,
-        };
+        // Keep existing transform/scale so header doesn't "grow" on open.
+        return { ...headerStyle, zIndex: 60 };
     }, [headerStyle, mobileMenuOpen]);
 
     const normalizePath = useCallback(
@@ -219,6 +253,8 @@ const Navigation = () => {
                             onClick={() => setMobileMenuOpen((prev) => !prev)}
                             className="-m-2.5 inline-flex items-center justify-center rounded-md p-2.5 text-gray-700"
                             aria-expanded={mobileMenuOpen}
+                            aria-controls="mobile-main-menu"
+                            aria-label={mobileMenuOpen ? 'Close main menu' : 'Open main menu'}
                         >
                             <span className="sr-only">{mobileMenuOpen ? 'Close main menu' : 'Open main menu'}</span>
                             {mobileMenuOpen ? (
@@ -233,87 +269,129 @@ const Navigation = () => {
                     </div>
                 </nav>
 
-                <Transition
-                    show={mobileMenuOpen}
-                    as={Fragment}
-                    appear
-                    enter="transform-gpu transition-all duration-[1100ms] ease-[cubic-bezier(0.16,1,0.3,1)]"
-                    enterFrom="opacity-0 -translate-y-20 scale-[0.94]"
-                    enterTo="opacity-100 translate-y-0 scale-100"
-                    leave="transform-gpu transition-all duration-[900ms] ease-[cubic-bezier(0.7,0,0.84,0)]"
-                    leaveFrom="opacity-100 translate-y-0 scale-100"
-                    leaveTo="opacity-0 -translate-y-16 scale-[0.95]"
-                >
-                    <div className="lg:hidden origin-top" style={{ willChange: 'transform, opacity' }}>
-                        <div className="mx-auto px-6 pb-8 pt-2">
-                            <div className="w-full rounded-3xl border border-slate-200 bg-white px-5 pb-8 pt-6 shadow-[0_22px_48px_-22px_rgba(15,23,42,0.32)] sm:px-6">
-                                {isLoggedIn ? (
-                                    <div className="flex items-center gap-3 rounded-2xl bg-indigo-50/70 px-4 py-3 text-slate-700">
-                                        <div className="flex h-10 w-10 items-center justify-center rounded-full bg-indigo-500 text-sm font-semibold text-white">
-                                            {userInitials}
-                                        </div>
-                                        <div className="min-w-0">
-                                            <p className="truncate text-sm font-semibold text-slate-900">{displayName || 'Welcome back'}</p>
-                                            {displayEmail && (
-                                                <p className="truncate text-xs text-slate-500">{displayEmail}</p>
-                                            )}
-                                        </div>
-                                    </div>
-                                ) : (
-                                    <div className="rounded-2xl bg-slate-50 px-4 py-4 text-sm text-slate-600">
-                                        지금 가입하고 분석 결과를 한곳에 모아 보세요.
-                                    </div>
-                                )}
-
-                                <nav className="mt-5 space-y-2">
-                                    {navItems.map((item) => {
-                                        const isActive = activeItemKey === item.key;
-                                        const linkClasses = `group flex items-center justify-between gap-4 rounded-2xl px-5 py-3.5 text-base font-semibold transition ${
-                                            isActive
-                                                ? 'bg-indigo-50/95 text-indigo-600 shadow-[0_18px_36px_-24px_rgba(79,70,229,0.5)] ring-1 ring-inset ring-indigo-100'
-                                                : 'text-slate-700 hover:bg-slate-50/95 hover:text-slate-900 hover:ring-1 hover:ring-inset hover:ring-slate-200'
-                                        }`;
-                                        return (
-                                            <Link
-                                                key={item.key}
-                                                to={buildLinkTarget(item)}
+                {(() => {
+                    const enterBase = reducedMotion
+                        ? 'transition-none'
+                        : 'transform-gpu transition-all duration-[1400ms] ease-[cubic-bezier(0.22,1,0.36,1)]';
+                    const leaveBase = reducedMotion
+                        ? 'transition-none'
+                        : 'transform-gpu transition-all duration-[1000ms] ease-[cubic-bezier(0.4,0,0.2,1)]';
+                    const enterFrom = reducedMotion ? 'opacity-0' : 'opacity-0 -translate-y-2';
+                    const enterTo = 'opacity-100 translate-y-0';
+                    const leaveFrom = 'opacity-100 translate-y-0';
+                    const leaveTo = reducedMotion ? 'opacity-0' : 'opacity-0 -translate-y-1';
+                    return (
+                        <Transition show={mobileMenuOpen} as={Fragment} appear>
+                            <Transition.Child
+                                as={PortalOverlay}
+                                enter={reducedMotion ? 'transition-none' : 'transition-opacity duration-[700ms] ease-out'}
+                                enterFrom="opacity-0"
+                                enterTo="opacity-100"
+                                leave={reducedMotion ? 'transition-none' : 'transition-opacity duration-[600ms] ease-in'}
+                                leaveFrom="opacity-100"
+                                leaveTo="opacity-0"
+                                className="fixed inset-0 z-[70] bg-slate-900/35 backdrop-blur-[2px]"
+                                onClick={() => setMobileMenuOpen(false)}
+                            />
+                            <Transition.Child
+                                as={PortalPanel}
+                                enter={enterBase}
+                                enterFrom={enterFrom}
+                                enterTo={enterTo}
+                                leave={leaveBase}
+                                leaveFrom={leaveFrom}
+                                leaveTo={leaveTo}
+                                className="fixed inset-x-0 top-0 lg:hidden origin-top z-[80]"
+                                id="mobile-main-menu"
+                                role="dialog"
+                                aria-modal="true"
+                                aria-label="Mobile menu"
+                                style={{ willChange: 'transform, opacity' }}
+                            >
+                                <div className="mx-auto px-6 pb-8 pt-2">
+                                        <div className="w-full relative rounded-3xl border border-slate-200 bg-white px-5 pb-8 pt-6 shadow-[0_22px_48px_-22px_rgba(15,23,42,0.32)] sm:px-6">
+                                            <button
+                                                type="button"
                                                 onClick={() => setMobileMenuOpen(false)}
-                                                className={linkClasses}
+                                                aria-label="Close menu"
+                                                className="absolute right-3 top-3 -m-2 p-2 rounded-md text-slate-500 hover:text-slate-700 hover:bg-slate-100 active:scale-95 transition"
                                             >
-                                                <span className="truncate text-left">{item.label}</span>
-                                                <span className="flex items-center gap-2 text-sm font-medium">
-                                                    {isActive && (
-                                                        <span className="inline-flex items-center rounded-full bg-indigo-100/90 px-2 py-0.5 text-[11px] font-medium text-indigo-600 shadow-sm">
-                                                            현재
-                                                        </span>
-                                                    )}
-                                                    <ChevronRightIcon aria-hidden="true" className="size-4 text-slate-300 transition-colors group-hover:text-indigo-300" />
-                                                </span>
-                                            </Link>
-                                        );
-                                    })}
-                                </nav>
+                                                <XMarkIcon aria-hidden="true" className="size-6" />
+                                            </button>
+                                            {isLoggedIn ? (
+                                                <div className="flex items-center gap-3 rounded-2xl bg-indigo-50/70 px-4 py-3 text-slate-700">
+                                                    <div className="flex h-10 w-10 items-center justify-center rounded-full bg-indigo-500 text-sm font-semibold text-white">
+                                                        {userInitials}
+                                                    </div>
+                                                    <div className="min-w-0">
+                                                        <p className="truncate text-sm font-semibold text-slate-900">{displayName || 'Welcome back'}</p>
+                                                        {displayEmail && (
+                                                            <p className="truncate text-xs text-slate-500">{displayEmail}</p>
+                                                        )}
+                                                    </div>
+                                                </div>
+                                            ) : (
+                                                <div className="rounded-2xl bg-slate-50 px-4 py-4 text-sm text-slate-600">
+                                                    지금 가입하고 분석 결과를 한곳에 모아 보세요.
+                                                </div>
+                                            )}
 
-                                <div className="mt-6">
-                                    <Link
-                                        to={freeTrialPath}
-                                        onClick={() => setMobileMenuOpen(false)}
-                                        className="flex w-full items-center justify-center rounded-xl bg-gradient-to-r from-indigo-500 to-purple-500 px-4 py-3 text-base font-semibold text-white shadow-md transition hover:from-indigo-600 hover:to-purple-600"
-                                    >
-                                        Free Trial
-                                    </Link>
-                                </div>
+                                            <nav className="mt-5 space-y-2">
+                                                {navItems.map((item, idx) => {
+                                                    const isActive = activeItemKey === item.key;
+                                                    const linkClasses = `group flex items-center justify-between gap-4 rounded-2xl px-5 py-3.5 text-base font-semibold transition ${
+                                                        isActive
+                                                            ? 'bg-indigo-50/95 text-indigo-600 shadow-[0_18px_36px_-24px_rgba(79,70,229,0.5)] ring-1 ring-inset ring-indigo-100'
+                                                            : 'text-slate-700 hover:bg-slate-50/95 hover:text-slate-900 hover:ring-1 hover:ring-inset hover:ring-slate-200'
+                                                    }`;
+                                                    const itemAnimBase = reducedMotion
+                                                        ? ''
+                                                        : 'transform-gpu transition-all duration-[900ms] ease-[cubic-bezier(0.22,1,0.36,1)]';
+                                                    return (
+                                                        <Link
+                                                            key={item.key}
+                                                            to={buildLinkTarget(item)}
+                                                            onClick={() => setMobileMenuOpen(false)}
+                                                            className={`${linkClasses} ${mobileMenuOpen ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-2'}`}
+                                                            style={{ transitionDelay: reducedMotion ? undefined : `${Math.min(idx * 120, 600)}ms` }}
+                                                            data-open={mobileMenuOpen ? '' : undefined}
+                                                        >
+                                                            <span className={`${itemAnimBase} truncate text-left`}>{item.label}</span>
+                                                            <span className={`flex items-center gap-2 text-sm font-medium ${itemAnimBase}`}>
+                                                                {isActive && (
+                                                                    <span className="inline-flex items-center rounded-full bg-indigo-100/90 px-2 py-0.5 text-[11px] font-medium text-indigo-600 shadow-sm">
+                                                                        현재
+                                                                    </span>
+                                                                )}
+                                                                <ChevronRightIcon aria-hidden="true" className="size-4 text-slate-300 transition-colors group-hover:text-indigo-300" />
+                                                            </span>
+                                                        </Link>
+                                                    );
+                                                })}
+                                            </nav>
 
-                                <div className="mt-6 border-t border-slate-200 pt-6">
-                                    <MobileNavigationAuthButton
-                                        localePrefix={localePrefix}
-                                        onNavigate={() => setMobileMenuOpen(false)}
-                                    />
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </Transition>
+                                            <div className="mt-6">
+                                                <Link
+                                                    to={freeTrialPath}
+                                                    onClick={() => setMobileMenuOpen(false)}
+                                                    className="flex w-full items-center justify-center rounded-xl bg-gradient-to-r from-indigo-500 to-purple-500 px-4 py-3 text-base font-semibold text-white shadow-md transition hover:from-indigo-600 hover:to-purple-600"
+                                                >
+                                                    Free Trial
+                                                </Link>
+                                            </div>
+
+                                            <div className="mt-6 border-t border-slate-200 pt-6">
+                                                <MobileNavigationAuthButton
+                                                    localePrefix={localePrefix}
+                                                    onNavigate={() => setMobileMenuOpen(false)}
+                                                />
+                                            </div>
+                                        </div>
+                                    </div>
+                            </Transition.Child>
+                        </Transition>
+                    );
+                })()}
             </div>
         </header>
     );
