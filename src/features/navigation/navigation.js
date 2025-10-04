@@ -237,12 +237,12 @@ const Navigation = () => {
                     show={mobileMenuOpen}
                     as={Fragment}
                     appear
-                    enter="transform-gpu transition-all duration-500 ease-[cubic-bezier(0.22,1,0.36,1)]"
-                    enterFrom="opacity-0 -translate-y-6 scale-[0.96]"
+                    enter="transform-gpu transition-all duration-[1100ms] ease-[cubic-bezier(0.16,1,0.3,1)]"
+                    enterFrom="opacity-0 -translate-y-20 scale-[0.94]"
                     enterTo="opacity-100 translate-y-0 scale-100"
-                    leave="transform-gpu transition-all duration-400 ease-[cubic-bezier(0.4,0,0.2,1)]"
+                    leave="transform-gpu transition-all duration-[900ms] ease-[cubic-bezier(0.7,0,0.84,0)]"
                     leaveFrom="opacity-100 translate-y-0 scale-100"
-                    leaveTo="opacity-0 -translate-y-3 scale-[0.97]"
+                    leaveTo="opacity-0 -translate-y-16 scale-[0.95]"
                 >
                     <div className="lg:hidden origin-top" style={{ willChange: 'transform, opacity' }}>
                         <div className="mx-auto px-6 pb-8 pt-2">
