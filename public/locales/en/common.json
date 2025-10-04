@@ -1,5 +1,26 @@
 {
   "app": {
     "name": "GraviFox"
+  },
+  "navigation": {
+    "items": {
+      "analyze": "Analyze",
+      "features": "Features",
+      "pricing": "Pricing",
+      "docs": "Docs",
+      "blog": "Blog",
+      "support": "Support"
+    },
+    "openMenu": "Open main menu",
+    "closeMenu": "Close main menu",
+    "current": "Current",
+    "ctaGuest": "Sign up now to keep all analysis results in one place.",
+    "welcomeBack": "Welcome back",
+    "actions": {
+      "login": "Log in",
+      "logout": "Log out",
+      "freeTrial": "Free Trial",
+      "viewDashboard": "View Dashboard"
+    }
   }
 }

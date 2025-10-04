@@ -1,5 +1,26 @@
 {
   "app": {
     "name": "그라비폭스"
+  },
+  "navigation": {
+    "items": {
+      "analyze": "분석",
+      "features": "기능",
+      "pricing": "요금제",
+      "docs": "문서",
+      "blog": "블로그",
+      "support": "지원"
+    },
+    "openMenu": "주 메뉴 열기",
+    "closeMenu": "주 메뉴 닫기",
+    "current": "현재",
+    "ctaGuest": "지금 가입하고 분석 결과를 한곳에 모아 보세요.",
+    "welcomeBack": "다시 만나 반가워요",
+    "actions": {
+      "login": "로그인",
+      "logout": "로그아웃",
+      "freeTrial": "무료 체험",
+      "viewDashboard": "대시보드 보기"
+    }
   }
 }
