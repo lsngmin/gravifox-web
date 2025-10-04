@@ -1,31 +1,10 @@
-import React, {useState} from "react";
-import {useNavigate} from "react-router-dom";
+import React from "react";
 import Navigation from "../features/navigation/navigation";
 import Footer from "../features/footer/footer";
 import HowItWorksSection from "../features/analyze/HowItWorksSection";
 // ErrorModal, 테스트용 업로드 API는 제거
 
 export default function MediaAnalyze() {
-    const navigate = useNavigate();
-    const [dragOver, setDragOver] = useState(false);
-    const [file, setFile] = useState(null);
-    const [faqOpenMap, setFaqOpenMap] = useState({a: false, b: false, c: false});
-    const toggle = id => setFaqOpenMap(s => ({...s, [id]: !s[id]}));
-    // 테스트용 상태/훅 제거
-
-    const onDrop = (e) => {
-        e.preventDefault();
-        setDragOver(false);
-        const f = e.dataTransfer.files?.[0];
-        if (f) setFile(f);
-    };
-    const onChange = (e) => {
-        const f = e.target.files?.[0];
-        if (f) setFile(f);
-    };
-
-    // 테스트 핸들러 제거
-
     return (
         <div className="min-h-screen bg-white font-sans flex flex-col">
             {/* 네비게이션 재사용 */}

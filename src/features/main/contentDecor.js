@@ -51,10 +51,11 @@ export default function ContentDecor({ children }) {
         <div
           className="absolute inset-0 decor-pulse"
           style={{
-            backgroundImage:
-              'radial-gradient(100rem 40rem at 120% -10%, rgba(99,102,241,0.08), transparent),\
-               radial-gradient(90rem 36rem at -10% 0%, rgba(168,85,247,0.06), transparent),\
-               radial-gradient(85rem 36rem at 50% 140%, rgba(99,102,241,0.03), transparent)'
+            backgroundImage: [
+              'radial-gradient(100rem 40rem at 120% -10%, rgba(99,102,241,0.08), transparent)',
+              'radial-gradient(90rem 36rem at -10% 0%, rgba(168,85,247,0.06), transparent)',
+              'radial-gradient(85rem 36rem at 50% 140%, rgba(99,102,241,0.03), transparent)'
+            ].join(',')
           }}
         />
         {/* Flowing sheen layer (very subtle) */}

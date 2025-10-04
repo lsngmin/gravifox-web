@@ -19,17 +19,7 @@ const IMAGE_MIMES = new Set(["image/jpeg", "image/png", "image/webp"]);
 const VIDEO_MIMES = new Set(["video/webm", "video/mp4", "video/quicktime"]); // MOV
 const IMAGE_EXTS = new Set(["jpeg", "jpg", "png", "webp"]);
 const VIDEO_EXTS = new Set(["webm", "mp4", "mov"]);
-const ALLOWED_MIMES = new Set([...IMAGE_MIMES, ...VIDEO_MIMES]);
-const ALLOWED_EXTS = new Set([...IMAGE_EXTS, ...VIDEO_EXTS]);
-const ACCEPT_MIME = [
-    "image/jpeg",
-    "image/png",
-    "image/webp",
-    "video/webm",
-    "video/mp4",
-    "video/quicktime",
-].join(",");
-
+const ACCEPT_MIME = [...IMAGE_MIMES, ...VIDEO_MIMES].join(",");
 const getExt = (file) => {
     const name = (file?.name || "").toLowerCase();
     const idx = name.lastIndexOf(".");
@@ -71,7 +61,6 @@ function TypeCounters({ files }) {
 
 export default function UploadPanel({ files = [], setFiles }) {
     const [dragOver, setDragOver] = useState(false);
-    const [error, setError] = useState(null);
     const [errorOpen, setErrorOpen] = useState(false);
     const [errorMsgs, setErrorMsgs] = useState([]);
     const [submitting, setSubmitting] = useState(false);
@@ -79,7 +68,6 @@ export default function UploadPanel({ files = [], setFiles }) {
 
 
     const addFiles = (incoming) => {
-        setError(null);
         const list = Array.from(incoming || []);
         if (!list.length) return;
 
@@ -144,11 +132,10 @@ export default function UploadPanel({ files = [], setFiles }) {
     };
 
     const removeAt = (idx) => setFiles(prev => prev.filter((_, i) => i !== idx));
-    const resetAll = () => { setFiles([]); setError(null); };
+    const resetAll = () => { setFiles([]); };
     const analyze = async (arr) => {
         if (!arr?.length || submitting) return;
         setSubmitting(true);
-        setError(null);
         try {
             const jobIds = [];
             // 순차 처리: 업로드 → 분석 생성 반복

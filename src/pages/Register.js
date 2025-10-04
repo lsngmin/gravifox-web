@@ -1,4 +1,3 @@
-import AgreementBox from "../features/register/components/agreementBox";
 import React from "react";
 import {useNavigate} from "react-router-dom";
 import RegisterBox from "../features/register/components/registerBox";
@@ -21,5 +20,5 @@ export default function Register() {
                 <RegisterBox/>
             </div>
         </div>
-    )
+    );
 }

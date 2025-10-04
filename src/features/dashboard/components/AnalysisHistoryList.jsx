@@ -1,5 +1,4 @@
 import React, { useEffect, useMemo, useRef, useState } from "react";
-import { useNavigate } from "react-router-dom";
 import AnalysisReport from "../../analyze/components/report/AnalysisReport";
 import { ANALYZE_ENDPOINTS, FASTAPI_ENDPOINTS } from "../../../api/endPointRoute";
 import { Transition } from '@headlessui/react';
@@ -33,7 +32,6 @@ function readLocalReports() {
 }
 
 export default function AnalysisHistoryList() {
-  const navigate = useNavigate();
   const [local, setLocal] = useState(() => readLocalReports());
   const [search, setSearch] = useState("");
   const [labelTab, setLabelTab] = useState("ALL"); // ALL | REAL | FAKE | UNKNOWN

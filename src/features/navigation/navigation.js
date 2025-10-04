@@ -1,4 +1,4 @@
-import React, { Fragment, useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
+import React, { Fragment, useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { PopoverGroup, Transition } from '@headlessui/react';
 import { Bars3Icon, ChevronRightIcon, XMarkIcon } from '@heroicons/react/24/outline';
@@ -121,7 +121,7 @@ const Navigation = () => {
             }
         }
         return normalized || '/';
-    };
+    }, [localePrefix]);
 
     const currentPath = normalizePath(location.pathname);
     const currentHash = location.hash || '';
@@ -138,7 +138,7 @@ const Navigation = () => {
             return true;
         });
         return match?.key || null;
-    }, [navItems, currentPath, currentHash]);
+    }, [navItems, currentPath, currentHash, normalizePath]);
 
     const highlightStrength = useMemo(() => {
         const eased = Math.max(0, Math.min(1, (shrink - 0.1) / 0.9));

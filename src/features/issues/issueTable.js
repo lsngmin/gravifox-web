@@ -16,13 +16,11 @@ function IssueTable() {
             }
         };
         loadIssuesData();
-    }, []);
-
-    console.log(issuesData)
+    }, [fetchData]);
     return (
         <>
             <div className="max-w-7xl mx-auto pt-20 px-10">
-                <h1 class="sm:text-2xl md:text-3xl pl-2 my-2 border-l-4  font-sans font-bold border-teal-400">
+                <h1 className="sm:text-2xl md:text-3xl pl-2 my-2 border-l-4  font-sans font-bold border-teal-400">
                     Overview of Current Open Issues
 
                 </h1>
@@ -68,9 +66,9 @@ function IssueTable() {
                                     </div>
 
                                     <div className="p-4 border border-gray-300 rounded-lg animate-pulse">
-                                        <h3 className="h-4 bg-gray-200 rounded w-3/4 mb-2 animate-pulse"></h3>
-                                        <p className="h-3 bg-gray-200 rounded w-2/4 mb-3 animate-pulse"></p>
-                                        <span className="h-3 bg-gray-200 rounded w-1/3 animate-pulse"></span>
+                                        <div className="h-4 bg-gray-200 rounded w-3/4 mb-2 animate-pulse" aria-hidden="true"></div>
+                                        <p className="h-3 bg-gray-200 rounded w-2/4 mb-3 animate-pulse" aria-hidden="true"></p>
+                                        <span className="h-3 bg-gray-200 rounded w-1/3 animate-pulse" aria-hidden="true"></span>
                                     </div>
                                 </div>
                             ))}

@@ -220,7 +220,6 @@ const AnalysisReport = forwardRef(function AnalysisReport({ data, mediaMeta }, r
     if (typeof window !== 'undefined') window.__reportFade = setFade;
   }, []);
   const {
-    ok,
     clips,
     prob_fake,
     prob_std,
@@ -229,10 +228,6 @@ const AnalysisReport = forwardRef(function AnalysisReport({ data, mediaMeta }, r
     label,
     latency_sec,
     sample_fps,
-    clip_len,
-    clip_stride,
-    aligned_cnt,
-    infer_cnt,
     frames_total,
     probs_timeline = [],
     stability = {},

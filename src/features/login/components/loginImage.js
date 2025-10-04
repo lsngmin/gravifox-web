@@ -1,5 +1,3 @@
-import loginImg from 'assets/login_image.webp';
-
 const LoginImage = () => {
   return (
       <div className="max-w-sm w-full">

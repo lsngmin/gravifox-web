@@ -15,7 +15,7 @@ export default function SignUpForm({changeForm}) {
      *   error: string | null
      * }} - 회원가입 함수와 에러 메시지를 반환합니다.
      */
-    const { signup, error } = signupAPI();
+    const { signup } = signupAPI();
 
     const [formState, setFormState] = useState({
         email: '',

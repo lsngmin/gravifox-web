@@ -7,7 +7,6 @@ import {
     ArrowDownTrayIcon,
     TrashIcon,
     BellIcon,
-    Cog6ToothIcon,
     SwatchIcon,
     GlobeAltIcon,
 } from "@heroicons/react/24/outline";

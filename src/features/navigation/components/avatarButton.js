@@ -1,6 +1,6 @@
 import React, { useEffect, useMemo, useState } from "react";
-import {Menu, MenuButton, MenuItem, MenuItems, Transition} from "@headlessui/react";
-import { UserIcon, GlobeAltIcon } from "@heroicons/react/24/outline";
+import {Menu, MenuButton, MenuItem, MenuItems} from "@headlessui/react";
+import { UserIcon } from "@heroicons/react/24/outline";
 import { useAuth } from "providers/authProvider";
 import { useLocation, useNavigate } from "react-router-dom";
 import {
@@ -8,8 +8,6 @@ import {
     Cog6ToothIcon,
     ArrowRightOnRectangleIcon
 } from "@heroicons/react/24/outline";
-import { Disclosure } from "@headlessui/react";
-import {ChevronDownIcon} from "@heroicons/react/20/solid";
 import LanguageMenu from "./LanguageMenu";
 import { useTranslation } from 'react-i18next';
 
@@ -149,26 +147,28 @@ export default function AvatarButton({ size = "md" }) {
                     {/* Settings */}
                     <MenuItem>
                         {({ active }) => (
-                            <a
+                            <button
+                                type="button"
                                 onClick={() => navigate('/settings')}
                                 className={`${
                                     active ? "bg-gray-100 text-gray-900" : "text-gray-700"
-                                } flex items-center gap-3 px-4 py-2 text-sm font-medium cursor-pointer`}
+                                } flex w-full items-center gap-3 px-4 py-2 text-sm font-medium text-left`}
                             >
                                 <Cog6ToothIcon className="w-5 h-5 text-indigo-500" />
                                 Settings
-                            </a>
+                            </button>
                         )}
                     </MenuItem>
 
                     {/* Dashboard */}
                     <MenuItem>
                         {({ active }) => (
-                            <a
+                            <button
+                                type="button"
                                 onClick={() => navigate("/dashboard")}
                                 className={`${
                                     active ? "bg-gray-100 text-gray-900" : "text-gray-700"
-                                } flex items-center gap-3 px-4 py-2 text-sm font-medium cursor-pointer`}
+                                } flex w-full items-center gap-3 px-4 py-2 text-sm font-medium text-left`}
                             >
                                 <svg xmlns="http://www.w3.org/2000/svg"
                                      fill="none" viewBox="0 0 24 24"
@@ -178,7 +178,7 @@ export default function AvatarButton({ size = "md" }) {
                                           d="M3 7.5l9 6 9-6M3 12.75l9 6 9-6" />
                                 </svg>
                                 Dashboard
-                            </a>
+                            </button>
                         )}
                     </MenuItem>
 
@@ -206,15 +206,16 @@ export default function AvatarButton({ size = "md" }) {
                 <div className="py-1">
                     <MenuItem>
                         {({ active }) => (
-                            <a
+                            <button
+                                type="button"
                                 onClick={logout}
                                 className={`${
                                     active ? "bg-red-100 text-red-700" : "text-red-600"
-                                } flex items-center gap-3 px-4 py-2 text-sm font-semibold cursor-pointer`}
+                                } flex w-full items-center gap-3 px-4 py-2 text-sm font-semibold text-left`}
                             >
                                 <ArrowRightOnRectangleIcon className="w-5 h-5" />
                                 Sign out
-                            </a>
+                            </button>
                         )}
                     </MenuItem>
                 </div>

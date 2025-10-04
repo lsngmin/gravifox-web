@@ -1,4 +1,4 @@
-import { Routes, Route, useLocation, useNavigate, useParams } from "react-router-dom";
+import { Routes, Route, useLocation, useNavigate } from "react-router-dom";
 import { AnimatePresence, motion } from "framer-motion";
 import { useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -75,7 +75,7 @@ function CanonicalLink() {
         const s1 = document.createElement('script'); s1.type = 'application/ld+json'; s1.id = 'ld-org'; s1.text = JSON.stringify(org);
         const s2 = document.createElement('script'); s2.type = 'application/ld+json'; s2.id = 'ld-app'; s2.text = JSON.stringify(app);
         document.head.appendChild(s1); document.head.appendChild(s2);
-    }, [i18n.language, loc.pathname, loc.search, loc.hash]);
+    }, [i18n.language, loc.pathname, loc.search, loc.hash, t]);
     return null;
 }
 
@@ -89,7 +89,7 @@ function LegacyToLocalized() {
         const stored = (typeof localStorage !== 'undefined' && localStorage.getItem('i18nextLng')) || '';
         const pick = supported.includes(stored) ? stored : (supported.includes(browser) ? browser : 'en');
         nav(`/${pick}${loc.pathname}${loc.search}${loc.hash}`, { replace: true });
-    }, []);
+    }, [loc.hash, loc.pathname, loc.search, nav]);
     return null;
 }
 
@@ -103,7 +103,7 @@ function LangRedirect() {
         const pick = supported.includes(stored) ? stored : (supported.includes(browser) ? browser : 'en');
         const path = loc.pathname === '/' ? '' : loc.pathname;
         nav(`/${pick}${path}${loc.search}${loc.hash}`, { replace: true });
-    }, []);
+    }, [loc.hash, loc.pathname, loc.search, nav]);
     return null;
 }
 

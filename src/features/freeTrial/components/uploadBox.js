@@ -5,7 +5,6 @@ import FileUploadAPI from "../api/fileUploadAPI";
 import StartAnalyzeButton from "./startAnalyzeButton";
 import Spinner from "./loadingSpinner";
 import FileAnalyzeAPI from "../api/fileAnalyzeAPI";
-import resultAnalyze from "./resultAnalyze";
 import ResultAnalyze from "./resultAnalyze";
 
 const UploadBox = () => {
