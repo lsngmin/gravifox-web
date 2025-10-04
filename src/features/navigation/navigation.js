@@ -3,6 +3,7 @@ import { createPortal } from 'react-dom';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { PopoverGroup, Transition } from '@headlessui/react';
 import { Bars3Icon, ChevronRightIcon, XMarkIcon } from '@heroicons/react/24/outline';
+import { useTranslation } from 'react-i18next';
 
 import { useAuth } from 'providers/authProvider';
 import NavigationAuthButton from 'features/navigation/components/navigationAuthButton';
@@ -20,6 +21,7 @@ const PortalPanel = React.forwardRef(function PortalPanel({ className, style, ..
 });
 
 const Navigation = () => {
+    const { t } = useTranslation('common');
     const { userInfo } = useAuth();
     const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
     const [shrink, setShrink] = useState(0);
@@ -30,14 +32,48 @@ const Navigation = () => {
     const localeMatch = location.pathname.match(/^\/([a-zA-Z-]{2,5})(?=\/|$)/);
     const localePrefix = localeMatch ? `/${localeMatch[1]}` : '';
 
-    const navItems = useMemo(() => ([
-        { key: 'analyze', label: 'Analyze', to: localePrefix ? `${localePrefix}/analyze` : '/analyze', path: '/analyze' },
-        { key: 'features', label: 'Features', to: localePrefix ? `${localePrefix}/feature` : '/feature', path: '/feature' },
-        { key: 'pricing', label: 'Pricing', to: localePrefix ? `${localePrefix}/pricing` : '/pricing', path: '/pricing' },
-        { key: 'docs', label: 'Docs', to: localePrefix ? `${localePrefix}/docs` : '/docs', path: '/docs' },
-        { key: 'blog', label: 'Blog', to: localePrefix ? `${localePrefix}/blog` : '/blog', path: '/blog', hash: '#blog' },
-        { key: 'support', label: 'Support', to: localePrefix ? `${localePrefix}/support` : '/support', path: '/support' },
-    ]), [localePrefix]);
+    const navItems = useMemo(
+        () => [
+            {
+                key: 'analyze',
+                labelKey: 'navigation.items.analyze',
+                to: localePrefix ? `${localePrefix}/analyze` : '/analyze',
+                path: '/analyze',
+            },
+            {
+                key: 'features',
+                labelKey: 'navigation.items.features',
+                to: localePrefix ? `${localePrefix}/feature` : '/feature',
+                path: '/feature',
+            },
+            {
+                key: 'pricing',
+                labelKey: 'navigation.items.pricing',
+                to: localePrefix ? `${localePrefix}/pricing` : '/pricing',
+                path: '/pricing',
+            },
+            {
+                key: 'docs',
+                labelKey: 'navigation.items.docs',
+                to: localePrefix ? `${localePrefix}/docs` : '/docs',
+                path: '/docs',
+            },
+            {
+                key: 'blog',
+                labelKey: 'navigation.items.blog',
+                to: localePrefix ? `${localePrefix}/blog` : '/blog',
+                path: '/blog',
+                hash: '#blog',
+            },
+            {
+                key: 'support',
+                labelKey: 'navigation.items.support',
+                to: localePrefix ? `${localePrefix}/support` : '/support',
+                path: '/support',
+            },
+        ],
+        [localePrefix]
+    );
 
     useEffect(() => {
         let ticking = false;
@@ -226,11 +262,12 @@ const Navigation = () => {
                                           backgroundColor: `rgba(238, 242, 255, ${(0.9 + 0.08 * highlightLevel).toFixed(2)})`,
                                       }
                                     : undefined;
+                                const label = t(item.labelKey);
 
                                 return (
                                     <Link key={item.key} to={buildLinkTarget(item)} className={linkClasses}>
                                         <span className={pillClasses} style={highlightStyle}>
-                                            {item.label}
+                                            {label}
                                         </span>
                                     </Link>
                                 );
@@ -245,7 +282,7 @@ const Navigation = () => {
                                 to={loginPath}
                                 className="rounded-full border border-slate-200 px-4 py-2 text-sm font-semibold text-slate-600 transition hover:border-indigo-200 hover:text-indigo-600 hover:bg-indigo-50"
                             >
-                                Log in
+                                {t('navigation.actions.login')}
                             </Link>
                         )}
                         <button
@@ -254,9 +291,9 @@ const Navigation = () => {
                             className="-m-2.5 inline-flex items-center justify-center rounded-md p-2.5 text-gray-700"
                             aria-expanded={mobileMenuOpen}
                             aria-controls="mobile-main-menu"
-                            aria-label={mobileMenuOpen ? 'Close main menu' : 'Open main menu'}
+                            aria-label={mobileMenuOpen ? t('navigation.closeMenu') : t('navigation.openMenu')}
                         >
-                            <span className="sr-only">{mobileMenuOpen ? 'Close main menu' : 'Open main menu'}</span>
+                            <span className="sr-only">{mobileMenuOpen ? t('navigation.closeMenu') : t('navigation.openMenu')}</span>
                             {mobileMenuOpen ? (
                                 <XMarkIcon aria-hidden="true" className="size-6" />
                             ) : (
@@ -309,32 +346,36 @@ const Navigation = () => {
                                 style={{ willChange: 'transform, opacity' }}
                             >
                                 <div className="mx-auto px-6 pb-8 pt-2">
-                                        <div className="w-full relative rounded-3xl border border-slate-200 bg-white px-5 pb-8 pt-6 shadow-[0_22px_48px_-22px_rgba(15,23,42,0.32)] sm:px-6">
-                                            <button
-                                                type="button"
-                                                onClick={() => setMobileMenuOpen(false)}
-                                                aria-label="Close menu"
-                                                className="absolute right-3 top-3 -m-2 p-2 rounded-md text-slate-500 hover:text-slate-700 hover:bg-slate-100 active:scale-95 transition"
-                                            >
-                                                <XMarkIcon aria-hidden="true" className="size-6" />
-                                            </button>
-                                            {isLoggedIn ? (
-                                                <div className="flex items-center gap-3 rounded-2xl bg-indigo-50/70 px-4 py-3 text-slate-700">
-                                                    <div className="flex h-10 w-10 items-center justify-center rounded-full bg-indigo-500 text-sm font-semibold text-white">
-                                                        {userInitials}
+                                        <div className="w-full relative rounded-3xl border border-slate-200 bg-white px-5 pb-8 pt-4 shadow-[0_22px_48px_-22px_rgba(15,23,42,0.32)] sm:px-6">
+                                            <div className="flex justify-end">
+                                                <button
+                                                    type="button"
+                                                    onClick={() => setMobileMenuOpen(false)}
+                                                    aria-label={t('navigation.closeMenu')}
+                                                    className="-m-2 p-2 rounded-md text-slate-500 transition hover:bg-slate-100 hover:text-slate-700 active:scale-95"
+                                                >
+                                                    <XMarkIcon aria-hidden="true" className="size-6" />
+                                                </button>
+                                            </div>
+                                            <div className="mt-4">
+                                                {isLoggedIn ? (
+                                                    <div className="flex items-center gap-3 rounded-2xl bg-indigo-50/70 px-4 py-3 text-slate-700">
+                                                        <div className="flex h-10 w-10 items-center justify-center rounded-full bg-indigo-500 text-sm font-semibold text-white">
+                                                            {userInitials}
+                                                        </div>
+                                                        <div className="min-w-0">
+                                                            <p className="truncate text-sm font-semibold text-slate-900">{displayName || t('navigation.welcomeBack')}</p>
+                                                            {displayEmail && (
+                                                                <p className="truncate text-xs text-slate-500">{displayEmail}</p>
+                                                            )}
+                                                        </div>
                                                     </div>
-                                                    <div className="min-w-0">
-                                                        <p className="truncate text-sm font-semibold text-slate-900">{displayName || 'Welcome back'}</p>
-                                                        {displayEmail && (
-                                                            <p className="truncate text-xs text-slate-500">{displayEmail}</p>
-                                                        )}
+                                                ) : (
+                                                    <div className="rounded-2xl bg-slate-50 px-4 py-4 text-sm text-slate-600">
+                                                        {t('navigation.ctaGuest')}
                                                     </div>
-                                                </div>
-                                            ) : (
-                                                <div className="rounded-2xl bg-slate-50 px-4 py-4 text-sm text-slate-600">
-                                                    지금 가입하고 분석 결과를 한곳에 모아 보세요.
-                                                </div>
-                                            )}
+                                                )}
+                                            </div>
 
                                             <nav className="mt-5 space-y-2">
                                                 {navItems.map((item, idx) => {
@@ -347,6 +388,7 @@ const Navigation = () => {
                                                     const itemAnimBase = reducedMotion
                                                         ? ''
                                                         : 'transform-gpu transition-all duration-[900ms] ease-[cubic-bezier(0.22,1,0.36,1)]';
+                                                    const label = t(item.labelKey);
                                                     return (
                                                         <Link
                                                             key={item.key}
@@ -356,11 +398,11 @@ const Navigation = () => {
                                                             style={{ transitionDelay: reducedMotion ? undefined : `${Math.min(idx * 120, 600)}ms` }}
                                                             data-open={mobileMenuOpen ? '' : undefined}
                                                         >
-                                                            <span className={`${itemAnimBase} truncate text-left`}>{item.label}</span>
+                                                            <span className={`${itemAnimBase} truncate text-left`}>{label}</span>
                                                             <span className={`flex items-center gap-2 text-sm font-medium ${itemAnimBase}`}>
                                                                 {isActive && (
                                                                     <span className="inline-flex items-center rounded-full bg-indigo-100/90 px-2 py-0.5 text-[11px] font-medium text-indigo-600 shadow-sm">
-                                                                        현재
+                                                                        {t('navigation.current')}
                                                                     </span>
                                                                 )}
                                                                 <ChevronRightIcon aria-hidden="true" className="size-4 text-slate-300 transition-colors group-hover:text-indigo-300" />
@@ -376,7 +418,7 @@ const Navigation = () => {
                                                     onClick={() => setMobileMenuOpen(false)}
                                                     className="flex w-full items-center justify-center rounded-xl bg-gradient-to-r from-indigo-500 to-purple-500 px-4 py-3 text-base font-semibold text-white shadow-md transition hover:from-indigo-600 hover:to-purple-600"
                                                 >
-                                                    Free Trial
+                                                    {t('navigation.actions.freeTrial')}
                                                 </Link>
                                             </div>
 

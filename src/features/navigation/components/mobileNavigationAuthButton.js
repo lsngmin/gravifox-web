@@ -1,5 +1,6 @@
 import React, {useEffect, useState} from "react";
 import {Link, useNavigate} from "react-router-dom";
+import { useTranslation } from "react-i18next";
 
 import {useAuth} from "providers/authProvider";
 
@@ -8,6 +9,7 @@ export default function MobileNavigationAuthButton({ localePrefix = "", onNaviga
     const [isLoggedIn, setIsLoggedIn] = useState(false);
     const { accessToken, logout } = useAuth();
     const navigate = useNavigate();
+    const { t } = useTranslation('common');
 
     const buildPath = (suffix) => {
         if (!suffix.startsWith("/")) {
@@ -48,14 +50,14 @@ export default function MobileNavigationAuthButton({ localePrefix = "", onNaviga
                         onClick={handleDashboard}
                         className="w-full rounded-xl border border-indigo-200 bg-indigo-50 px-4 py-3 text-base font-semibold text-indigo-700 shadow-sm transition hover:bg-indigo-100"
                     >
-                        View Dashboard
+                        {t('navigation.actions.viewDashboard')}
                     </button>
                     <button
                         type="button"
                         onClick={handleLogout}
                         className="w-full rounded-xl border border-slate-200 px-4 py-3 text-base font-semibold text-slate-600 transition hover:border-rose-200 hover:text-rose-600 hover:bg-rose-50"
                     >
-                        Log out <span aria-hidden="true">&rarr;</span>
+                        {t('navigation.actions.logout')} <span aria-hidden="true">&rarr;</span>
                     </button>
                 </>
             ) : (
@@ -64,7 +66,7 @@ export default function MobileNavigationAuthButton({ localePrefix = "", onNaviga
                     onClick={() => typeof onNavigate === "function" && onNavigate()}
                     className="flex w-full items-center justify-center rounded-xl bg-indigo-600 px-4 py-3 text-base font-semibold text-white shadow-sm transition hover:bg-indigo-700"
                 >
-                    Log in <span aria-hidden="true" className="ml-1">&rarr;</span>
+                    {t('navigation.actions.login')} <span aria-hidden="true" className="ml-1">&rarr;</span>
                 </Link>
             )}
         </div>
