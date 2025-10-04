@@ -58,7 +58,7 @@ const Navigation = () => {
         updateHeight();
         window.addEventListener('resize', updateHeight);
         return () => window.removeEventListener('resize', updateHeight);
-    }, [shrink]);
+    }, [shrink, mobileMenuOpen]);
 
     useEffect(() => {
         setMobileMenuOpen(false);
@@ -95,7 +95,10 @@ const Navigation = () => {
         if (!mobileMenuOpen) return headerStyle;
         return {
             ...headerStyle,
+            transform: 'none',
             transformOrigin: 'top center',
+            left: '0px',
+            right: '0px',
             borderBottomLeftRadius: '0px',
             borderBottomRightRadius: '0px',
             boxShadow: '0 18px 40px -12px rgba(15,23,42,0.32)',
@@ -106,14 +109,20 @@ const Navigation = () => {
         };
     }, [headerStyle, mobileMenuOpen]);
 
-    const mobileMenuContainerStyle = useMemo(
-        () => ({
+    const mobileMenuContainerStyle = useMemo(() => {
+        if (mobileMenuOpen) {
+            return {
+                top: `${navHeight}px`,
+                left: '0px',
+                right: '0px',
+            };
+        }
+        return {
             top: `${navHeight}px`,
             left: headerStyle.left ?? '0px',
             right: headerStyle.right ?? '0px',
-        }),
-        [navHeight, headerStyle.left, headerStyle.right]
-    );
+        };
+    }, [navHeight, headerStyle.left, headerStyle.right, mobileMenuOpen]);
 
     const normalizePath = useCallback(
         (path) => {
