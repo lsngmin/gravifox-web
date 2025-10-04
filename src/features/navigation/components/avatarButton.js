@@ -68,16 +68,14 @@ export default function AvatarButton({ size = "md" }) {
     return (
         <Menu as="div" className="relative">
             <div>
-                <MenuButton>
-                    <button
-                        type="button"
-                        className={`relative inline-flex items-center justify-center ${buttonSizeClass} -my-1
+                <MenuButton
+                    type="button"
+                    className={`relative inline-flex items-center justify-center ${buttonSizeClass} -my-1
              rounded-full border-2 border-gray-300 bg-indigo-500
              text-white hover:bg-indigo-600 hover:border-indigo-600
              transition-colors duration-200`}
-                    >
-                        <UserIcon className={iconSizeClass} aria-hidden="true" />
-                    </button>
+                >
+                    <UserIcon className={iconSizeClass} aria-hidden="true" />
                 </MenuButton>
             </div>
 

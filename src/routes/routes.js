@@ -111,9 +111,10 @@ function AnimatedRoutes() {
     const location = useLocation();
 
     return (
-        <AnimatePresence mode="wait">
+        <>
             <CanonicalLink />
-            <Routes location={location} key={location.pathname}>
+            <AnimatePresence mode="wait">
+                <Routes location={location} key={location.pathname}>
                 {/* Root -> language prefixed redirect */}
                 <Route path="/" element={<LangRedirect />} />
                 {/* Language-prefixed duplicates */}
@@ -152,8 +153,9 @@ function AnimatedRoutes() {
                 <Route path="/blog" element={<LegacyToLocalized />} />
 
                 <Route path="/*" element={<motion.div><CustomErrorPage status={"404"} /></motion.div>} />
-            </Routes>
-        </AnimatePresence>
+                </Routes>
+            </AnimatePresence>
+        </>
     );
 }
 
