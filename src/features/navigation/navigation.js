@@ -1,4 +1,4 @@
-import React, { Fragment, useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
+import React, { Fragment, useCallback, useEffect, useMemo, useState } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { PopoverGroup, Transition } from '@headlessui/react';
 import { Bars3Icon, ChevronRightIcon, XMarkIcon } from '@heroicons/react/24/outline';
@@ -12,8 +12,6 @@ const Navigation = () => {
     const { userInfo } = useAuth();
     const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
     const [shrink, setShrink] = useState(0);
-    const [navHeight, setNavHeight] = useState(72);
-    const navRef = useRef(null);
 
     const navigate = useNavigate();
     const location = useLocation();
@@ -46,19 +44,6 @@ const Navigation = () => {
         window.addEventListener('scroll', onScroll, { passive: true });
         return () => window.removeEventListener('scroll', onScroll);
     }, []);
-
-    useLayoutEffect(() => {
-        if (typeof window === 'undefined') return undefined;
-        const updateHeight = () => {
-            if (navRef.current) {
-                const rect = navRef.current.getBoundingClientRect();
-                setNavHeight(rect.height);
-            }
-        };
-        updateHeight();
-        window.addEventListener('resize', updateHeight);
-        return () => window.removeEventListener('resize', updateHeight);
-    }, [shrink, mobileMenuOpen]);
 
     useEffect(() => {
         setMobileMenuOpen(false);
@@ -102,33 +87,9 @@ const Navigation = () => {
             ...headerStyle,
             transform: 'none',
             transformOrigin: 'top center',
-            left: '0px',
-            right: '0px',
-            borderBottomLeftRadius: '0px',
-            borderBottomRightRadius: '0px',
-            boxShadow: '0 18px 40px -12px rgba(15,23,42,0.32)',
-            border: '1px solid rgba(226, 232, 240, 0)',
-            borderLeft: '0px',
-            borderRight: '0px',
-            borderBottom: '0px',
             zIndex: 60,
         };
     }, [headerStyle, mobileMenuOpen]);
-
-    const mobileMenuContainerStyle = useMemo(() => {
-        if (mobileMenuOpen) {
-            return {
-                top: `${navHeight}px`,
-                left: '0px',
-                right: '0px',
-            };
-        }
-        return {
-            top: `${navHeight}px`,
-            left: headerStyle.left ?? '0px',
-            right: headerStyle.right ?? '0px',
-        };
-    }, [navHeight, headerStyle.left, headerStyle.right, mobileMenuOpen]);
 
     const normalizePath = useCallback(
         (path) => {
@@ -200,7 +161,6 @@ const Navigation = () => {
         >
             <div className="relative">
                 <nav
-                    ref={navRef}
                     aria-label="Global"
                     className="mx-auto flex items-center justify-between px-6 py-4 lg:px-8"
                     style={{ paddingBlock: `${(16 - 6 * shrink).toFixed(1)}px`, paddingInline: `${(24 - 8 * shrink).toFixed(1)}px` }}
@@ -273,105 +233,84 @@ const Navigation = () => {
                     </div>
                 </nav>
 
-                <Transition show={mobileMenuOpen} as={Fragment}>
+                <Transition
+                    show={mobileMenuOpen}
+                    as={Fragment}
+                    enter="transition duration-300 ease-out"
+                    enterFrom="-translate-y-3 opacity-0"
+                    enterTo="translate-y-0 opacity-100"
+                    leave="transition duration-200 ease-in"
+                    leaveFrom="translate-y-0 opacity-100"
+                    leaveTo="-translate-y-2 opacity-0"
+                >
                     <div className="lg:hidden">
-                        <Transition.Child
-                            as={Fragment}
-                            enter="transition-opacity duration-200 ease-out"
-                            enterFrom="opacity-0"
-                            enterTo="opacity-100"
-                            leave="transition-opacity duration-150 ease-in"
-                            leaveFrom="opacity-100"
-                            leaveTo="opacity-0"
-                        >
-                            <div
-                                className="pointer-events-none fixed inset-x-0 bottom-0 z-30 bg-slate-900/25 backdrop-blur-[2px]"
-                                style={{ ...mobileMenuContainerStyle, bottom: 0, zIndex: 30 }}
-                            />
-                        </Transition.Child>
-
-                        <Transition.Child
-                            as={Fragment}
-                            enter="transition duration-300 ease-out"
-                            enterFrom="-translate-y-3 opacity-0"
-                            enterTo="translate-y-0 opacity-100"
-                            leave="transition duration-200 ease-in"
-                            leaveFrom="translate-y-0 opacity-100"
-                            leaveTo="-translate-y-2 opacity-0"
-                        >
-                            <div
-                                className="fixed inset-x-0 z-40 origin-top-right flex justify-end"
-                                style={{ ...mobileMenuContainerStyle, zIndex: 50 }}
-                            >
-                                <div className="max-h-[calc(100vh-24px)] overflow-y-auto border border-slate-200 border-t-0 bg-white px-5 pb-8 pt-6 shadow-[0_22px_48px_-22px_rgba(15,23,42,0.32)] transition-[border-radius] duration-300 ease-out sm:px-6"
-                                    style={{ borderBottomLeftRadius: '28px', borderBottomRightRadius: '28px', width: 'min(420px, 55vw)' }}
-                                >
-                                    {isLoggedIn ? (
-                                        <div className="flex items-center gap-3 rounded-2xl bg-indigo-50/70 px-4 py-3 text-slate-700">
-                                            <div className="flex h-10 w-10 items-center justify-center rounded-full bg-indigo-500 text-sm font-semibold text-white">
-                                                {userInitials}
-                                            </div>
-                                            <div className="min-w-0">
-                                                <p className="truncate text-sm font-semibold text-slate-900">{displayName || 'Welcome back'}</p>
-                                                {displayEmail && (
-                                                    <p className="truncate text-xs text-slate-500">{displayEmail}</p>
-                                                )}
-                                            </div>
+                        <div className="mx-auto px-6 pb-8 pt-2">
+                            <div className="w-full rounded-3xl border border-slate-200 bg-white px-5 pb-8 pt-6 shadow-[0_22px_48px_-22px_rgba(15,23,42,0.32)] sm:px-6">
+                                {isLoggedIn ? (
+                                    <div className="flex items-center gap-3 rounded-2xl bg-indigo-50/70 px-4 py-3 text-slate-700">
+                                        <div className="flex h-10 w-10 items-center justify-center rounded-full bg-indigo-500 text-sm font-semibold text-white">
+                                            {userInitials}
                                         </div>
-                                    ) : (
-                                        <div className="rounded-2xl bg-slate-50 px-4 py-4 text-sm text-slate-600">
-                                            Gravifox 계정으로 로그인하고 분석 결과를 저장하고 관리해 보세요.
+                                        <div className="min-w-0">
+                                            <p className="truncate text-sm font-semibold text-slate-900">{displayName || 'Welcome back'}</p>
+                                            {displayEmail && (
+                                                <p className="truncate text-xs text-slate-500">{displayEmail}</p>
+                                            )}
                                         </div>
-                                    )}
-
-                                    <nav className="mt-5 space-y-2">
-                                        {navItems.map((item) => {
-                                            const isActive = activeItemKey === item.key;
-                                            const linkClasses = `group flex items-center justify-between gap-4 rounded-2xl px-5 py-3.5 text-base font-semibold transition ${
-                                                isActive
-                                                    ? 'bg-indigo-50/95 text-indigo-600 shadow-[0_18px_36px_-24px_rgba(79,70,229,0.5)] ring-1 ring-inset ring-indigo-100'
-                                                    : 'text-slate-700 hover:bg-slate-50/95 hover:text-slate-900 hover:ring-1 hover:ring-inset hover:ring-slate-200'
-                                            }`;
-                                            return (
-                                                <Link
-                                                    key={item.key}
-                                                    to={buildLinkTarget(item)}
-                                                    onClick={() => setMobileMenuOpen(false)}
-                                                    className={linkClasses}
-                                                >
-                                                    <span className="truncate text-left">{item.label}</span>
-                                                    <span className="flex items-center gap-2 text-sm font-medium">
-                                                        {isActive && (
-                                                            <span className="inline-flex items-center rounded-full bg-indigo-100/90 px-2 py-0.5 text-[11px] font-medium text-indigo-600 shadow-sm">
-                                                                현재
-                                                            </span>
-                                                        )}
-                                                        <ChevronRightIcon aria-hidden="true" className="size-4 text-slate-300 transition-colors group-hover:text-indigo-300" />
-                                                    </span>
-                                                </Link>
-                                            );
-                                        })}
-                                    </nav>
-
-                                    <div className="mt-6">
-                                        <Link
-                                            to={freeTrialPath}
-                                            onClick={() => setMobileMenuOpen(false)}
-                                            className="flex w-full items-center justify-center rounded-xl bg-gradient-to-r from-indigo-500 to-purple-500 px-4 py-3 text-base font-semibold text-white shadow-md transition hover:from-indigo-600 hover:to-purple-600"
-                                        >
-                                            Free Trial
-                                        </Link>
                                     </div>
-
-                                    <div className="mt-6 border-t border-slate-200 pt-6">
-                                        <MobileNavigationAuthButton
-                                            localePrefix={localePrefix}
-                                            onNavigate={() => setMobileMenuOpen(false)}
-                                        />
+                                ) : (
+                                    <div className="rounded-2xl bg-slate-50 px-4 py-4 text-sm text-slate-600">
+                                        Gravifox 계정으로 로그인하고 분석 결과를 저장하고 관리해 보세요.
                                     </div>
+                                )}
+
+                                <nav className="mt-5 space-y-2">
+                                    {navItems.map((item) => {
+                                        const isActive = activeItemKey === item.key;
+                                        const linkClasses = `group flex items-center justify-between gap-4 rounded-2xl px-5 py-3.5 text-base font-semibold transition ${
+                                            isActive
+                                                ? 'bg-indigo-50/95 text-indigo-600 shadow-[0_18px_36px_-24px_rgba(79,70,229,0.5)] ring-1 ring-inset ring-indigo-100'
+                                                : 'text-slate-700 hover:bg-slate-50/95 hover:text-slate-900 hover:ring-1 hover:ring-inset hover:ring-slate-200'
+                                        }`;
+                                        return (
+                                            <Link
+                                                key={item.key}
+                                                to={buildLinkTarget(item)}
+                                                onClick={() => setMobileMenuOpen(false)}
+                                                className={linkClasses}
+                                            >
+                                                <span className="truncate text-left">{item.label}</span>
+                                                <span className="flex items-center gap-2 text-sm font-medium">
+                                                    {isActive && (
+                                                        <span className="inline-flex items-center rounded-full bg-indigo-100/90 px-2 py-0.5 text-[11px] font-medium text-indigo-600 shadow-sm">
+                                                            현재
+                                                        </span>
+                                                    )}
+                                                    <ChevronRightIcon aria-hidden="true" className="size-4 text-slate-300 transition-colors group-hover:text-indigo-300" />
+                                                </span>
+                                            </Link>
+                                        );
+                                    })}
+                                </nav>
+
+                                <div className="mt-6">
+                                    <Link
+                                        to={freeTrialPath}
+                                        onClick={() => setMobileMenuOpen(false)}
+                                        className="flex w-full items-center justify-center rounded-xl bg-gradient-to-r from-indigo-500 to-purple-500 px-4 py-3 text-base font-semibold text-white shadow-md transition hover:from-indigo-600 hover:to-purple-600"
+                                    >
+                                        Free Trial
+                                    </Link>
+                                </div>
+
+                                <div className="mt-6 border-t border-slate-200 pt-6">
+                                    <MobileNavigationAuthButton
+                                        localePrefix={localePrefix}
+                                        onNavigate={() => setMobileMenuOpen(false)}
+                                    />
                                 </div>
                             </div>
-                        </Transition.Child>
+                        </div>
                     </div>
                 </Transition>
             </div>
