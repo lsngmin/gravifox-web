@@ -92,7 +92,12 @@ const Navigation = () => {
     }, [shrink]);
 
     const composedHeaderStyle = useMemo(() => {
-        if (!mobileMenuOpen) return headerStyle;
+        if (!mobileMenuOpen) {
+            return {
+                ...headerStyle,
+                zIndex: 40,
+            };
+        }
         return {
             ...headerStyle,
             transform: 'none',
@@ -106,6 +111,7 @@ const Navigation = () => {
             borderLeft: '0px',
             borderRight: '0px',
             borderBottom: '0px',
+            zIndex: 60,
         };
     }, [headerStyle, mobileMenuOpen]);
 
@@ -280,7 +286,7 @@ const Navigation = () => {
                         >
                             <div
                                 className="pointer-events-none fixed inset-x-0 bottom-0 z-30 bg-slate-900/25 backdrop-blur-[2px]"
-                                style={{ ...mobileMenuContainerStyle, bottom: 0 }}
+                                style={{ ...mobileMenuContainerStyle, bottom: 0, zIndex: 30 }}
                             />
                         </Transition.Child>
 
@@ -293,9 +299,12 @@ const Navigation = () => {
                             leaveFrom="translate-y-0 opacity-100"
                             leaveTo="-translate-y-2 opacity-0"
                         >
-                            <div className="fixed inset-x-0 z-40 origin-top" style={mobileMenuContainerStyle}>
-                                <div className="mx-auto max-w-lg max-h-[calc(100vh-24px)] overflow-y-auto border border-slate-200 border-t-0 bg-white px-5 pb-8 pt-6 shadow-[0_22px_48px_-22px_rgba(15,23,42,0.32)] transition-[border-radius] duration-300 ease-out sm:max-w-xl sm:px-6"
-                                    style={{ borderBottomLeftRadius: '28px', borderBottomRightRadius: '28px' }}
+                            <div
+                                className="fixed inset-x-0 z-40 origin-top-right flex justify-end"
+                                style={{ ...mobileMenuContainerStyle, zIndex: 50 }}
+                            >
+                                <div className="max-h-[calc(100vh-24px)] overflow-y-auto border border-slate-200 border-t-0 bg-white px-5 pb-8 pt-6 shadow-[0_22px_48px_-22px_rgba(15,23,42,0.32)] transition-[border-radius] duration-300 ease-out sm:px-6"
+                                    style={{ borderBottomLeftRadius: '28px', borderBottomRightRadius: '28px', width: 'min(420px, 55vw)' }}
                                 >
                                     {isLoggedIn ? (
                                         <div className="flex items-center gap-3 rounded-2xl bg-indigo-50/70 px-4 py-3 text-slate-700">
