@@ -280,7 +280,7 @@ const Navigation = () => {
                         ) : (
                             <Link
                                 to={loginPath}
-                                className="rounded-full border border-slate-200 px-4 py-2 text-sm font-semibold text-slate-600 transition hover:border-indigo-200 hover:text-indigo-600 hover:bg-indigo-50"
+                                className="inline-flex items-center justify-center gap-1 rounded-full bg-gradient-to-r from-indigo-500 via-violet-500 to-purple-500 px-4 py-2 text-sm font-semibold text-white shadow-lg shadow-indigo-500/30 transition hover:shadow-indigo-500/40 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-indigo-300 focus-visible:ring-offset-2 focus-visible:ring-offset-white"
                             >
                                 {t('navigation.actions.login')}
                             </Link>
@@ -346,21 +346,12 @@ const Navigation = () => {
                                 style={{ willChange: 'transform, opacity' }}
                             >
                                 <div className="mx-auto px-6 pb-8 pt-2">
-                                        <div className="w-full relative rounded-3xl border border-slate-200 bg-white px-5 pb-8 pt-4 shadow-[0_22px_48px_-22px_rgba(15,23,42,0.32)] sm:px-6">
-                                            <div className="flex justify-end">
-                                                <button
-                                                    type="button"
-                                                    onClick={() => setMobileMenuOpen(false)}
-                                                    aria-label={t('navigation.closeMenu')}
-                                                    className="-m-2 p-2 rounded-md text-slate-500 transition hover:bg-slate-100 hover:text-slate-700 active:scale-95"
-                                                >
-                                                    <XMarkIcon aria-hidden="true" className="size-6" />
-                                                </button>
-                                            </div>
-                                            <div className="mt-4">
+                                    <div className="w-full relative rounded-3xl border border-slate-200 bg-white px-5 pb-8 pt-4 shadow-[0_22px_48px_-22px_rgba(15,23,42,0.32)] sm:px-6">
+                                        <div className="flex items-start justify-between gap-3">
+                                            <div className="min-w-0 flex-1">
                                                 {isLoggedIn ? (
                                                     <div className="flex items-center gap-3 rounded-2xl bg-indigo-50/70 px-4 py-3 text-slate-700">
-                                                        <div className="flex h-10 w-10 items-center justify-center rounded-full bg-indigo-500 text-sm font-semibold text-white">
+                                                        <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-indigo-500 text-sm font-semibold text-white">
                                                             {userInitials}
                                                         </div>
                                                         <div className="min-w-0">
@@ -371,63 +362,72 @@ const Navigation = () => {
                                                         </div>
                                                     </div>
                                                 ) : (
-                                                    <div className="rounded-2xl bg-slate-50 px-4 py-4 text-sm text-slate-600">
-                                                        {t('navigation.ctaGuest')}
+                                                    <div className="rounded-2xl bg-slate-50 px-4 py-2.5 text-[13px] font-medium leading-tight text-slate-600">
+                                                        <span className="block truncate">{t('navigation.ctaGuest')}</span>
                                                     </div>
                                                 )}
                                             </div>
+                                            <button
+                                                type="button"
+                                                onClick={() => setMobileMenuOpen(false)}
+                                                aria-label={t('navigation.closeMenu')}
+                                                className="-m-2 p-2 rounded-md text-slate-500 transition hover:bg-slate-100 hover:text-slate-700 active:scale-95"
+                                            >
+                                                <XMarkIcon aria-hidden="true" className="size-6" />
+                                            </button>
+                                        </div>
 
-                                            <nav className="mt-5 space-y-2">
-                                                {navItems.map((item, idx) => {
-                                                    const isActive = activeItemKey === item.key;
-                                                    const linkClasses = `group flex items-center justify-between gap-4 rounded-2xl px-5 py-3.5 text-base font-semibold transition ${
-                                                        isActive
-                                                            ? 'bg-indigo-50/95 text-indigo-600 shadow-[0_18px_36px_-24px_rgba(79,70,229,0.5)] ring-1 ring-inset ring-indigo-100'
-                                                            : 'text-slate-700 hover:bg-slate-50/95 hover:text-slate-900 hover:ring-1 hover:ring-inset hover:ring-slate-200'
-                                                    }`;
-                                                    const itemAnimBase = reducedMotion
-                                                        ? ''
-                                                        : 'transform-gpu transition-all duration-[900ms] ease-[cubic-bezier(0.22,1,0.36,1)]';
-                                                    const label = t(item.labelKey);
-                                                    return (
-                                                        <Link
-                                                            key={item.key}
-                                                            to={buildLinkTarget(item)}
-                                                            onClick={() => setMobileMenuOpen(false)}
-                                                            className={`${linkClasses} ${mobileMenuOpen ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-2'}`}
-                                                            style={{ transitionDelay: reducedMotion ? undefined : `${Math.min(idx * 120, 600)}ms` }}
-                                                            data-open={mobileMenuOpen ? '' : undefined}
-                                                        >
-                                                            <span className={`${itemAnimBase} truncate text-left`}>{label}</span>
-                                                            <span className={`flex items-center gap-2 text-sm font-medium ${itemAnimBase}`}>
-                                                                {isActive && (
-                                                                    <span className="inline-flex items-center rounded-full bg-indigo-100/90 px-2 py-0.5 text-[11px] font-medium text-indigo-600 shadow-sm">
-                                                                        {t('navigation.current')}
-                                                                    </span>
-                                                                )}
-                                                                <ChevronRightIcon aria-hidden="true" className="size-4 text-slate-300 transition-colors group-hover:text-indigo-300" />
-                                                            </span>
-                                                        </Link>
-                                                    );
-                                                })}
-                                            </nav>
+                                        <nav className="mt-5 space-y-2">
+                                            {navItems.map((item, idx) => {
+                                                const isActive = activeItemKey === item.key;
+                                                const linkClasses = `group flex items-center justify-between gap-4 rounded-2xl px-5 py-3.5 text-base font-semibold transition ${
+                                                    isActive
+                                                        ? 'bg-indigo-50/95 text-indigo-600 shadow-[0_18px_36px_-24px_rgba(79,70,229,0.5)] ring-1 ring-inset ring-indigo-100'
+                                                        : 'text-slate-700 hover:bg-slate-50/95 hover:text-slate-900 hover:ring-1 hover:ring-inset hover:ring-slate-200'
+                                                }`;
+                                                const itemAnimBase = reducedMotion
+                                                    ? ''
+                                                    : 'transform-gpu transition-all duration-[900ms] ease-[cubic-bezier(0.22,1,0.36,1)]';
+                                                const label = t(item.labelKey);
+                                                return (
+                                                    <Link
+                                                        key={item.key}
+                                                        to={buildLinkTarget(item)}
+                                                        onClick={() => setMobileMenuOpen(false)}
+                                                        className={`${linkClasses} ${mobileMenuOpen ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-2'}`}
+                                                        style={{ transitionDelay: reducedMotion ? undefined : `${Math.min(idx * 120, 600)}ms` }}
+                                                        data-open={mobileMenuOpen ? '' : undefined}
+                                                    >
+                                                        <span className={`${itemAnimBase} truncate text-left`}>{label}</span>
+                                                        <span className={`flex items-center gap-2 text-sm font-medium ${itemAnimBase}`}>
+                                                            {isActive && (
+                                                                <span className="inline-flex items-center rounded-full bg-indigo-100/90 px-2 py-0.5 text-[11px] font-medium text-indigo-600 shadow-sm">
+                                                                    {t('navigation.current')}
+                                                                </span>
+                                                            )}
+                                                            <ChevronRightIcon aria-hidden="true" className="size-4 text-slate-300 transition-colors group-hover:text-indigo-300" />
+                                                        </span>
+                                                    </Link>
+                                                );
+                                            })}
+                                        </nav>
 
-                                            <div className="mt-6">
-                                                <Link
-                                                    to={freeTrialPath}
-                                                    onClick={() => setMobileMenuOpen(false)}
-                                                    className="flex w-full items-center justify-center rounded-xl bg-gradient-to-r from-indigo-500 to-purple-500 px-4 py-3 text-base font-semibold text-white shadow-md transition hover:from-indigo-600 hover:to-purple-600"
-                                                >
-                                                    {t('navigation.actions.freeTrial')}
-                                                </Link>
-                                            </div>
+                                        <div className="mt-6">
+                                            <Link
+                                                to={freeTrialPath}
+                                                onClick={() => setMobileMenuOpen(false)}
+                                                className="flex w-full items-center justify-center rounded-xl bg-gradient-to-r from-indigo-500 to-purple-500 px-4 py-3 text-base font-semibold text-white shadow-md transition hover:from-indigo-600 hover:to-purple-600"
+                                            >
+                                                {t('navigation.actions.freeTrial')}
+                                            </Link>
+                                        </div>
 
-                                            <div className="mt-6 border-t border-slate-200 pt-6">
-                                                <MobileNavigationAuthButton
-                                                    localePrefix={localePrefix}
-                                                    onNavigate={() => setMobileMenuOpen(false)}
-                                                />
-                                            </div>
+                                        <div className="mt-6 border-t border-slate-200 pt-6">
+                                            <MobileNavigationAuthButton
+                                                localePrefix={localePrefix}
+                                                onNavigate={() => setMobileMenuOpen(false)}
+                                            />
+                                        </div>
                                         </div>
                                     </div>
                             </Transition.Child>

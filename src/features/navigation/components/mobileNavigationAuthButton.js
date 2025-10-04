@@ -64,7 +64,7 @@ export default function MobileNavigationAuthButton({ localePrefix = "", onNaviga
                 <Link
                     to={loginPath}
                     onClick={() => typeof onNavigate === "function" && onNavigate()}
-                    className="flex w-full items-center justify-center rounded-xl bg-indigo-600 px-4 py-3 text-base font-semibold text-white shadow-sm transition hover:bg-indigo-700"
+                    className="flex w-full items-center justify-center rounded-xl bg-gradient-to-r from-indigo-500 via-violet-500 to-purple-500 px-4 py-3 text-base font-semibold text-white shadow-lg shadow-indigo-500/30 transition hover:shadow-indigo-500/40 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-indigo-300 focus-visible:ring-offset-2 focus-visible:ring-offset-white"
                 >
                     {t('navigation.actions.login')} <span aria-hidden="true" className="ml-1">&rarr;</span>
                 </Link>
