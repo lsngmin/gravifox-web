@@ -1,7 +1,7 @@
 import React, { Fragment, useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { PopoverGroup, Transition } from '@headlessui/react';
-import { Bars3Icon, XMarkIcon } from '@heroicons/react/24/outline';
+import { Bars3Icon, ChevronRightIcon, XMarkIcon } from '@heroicons/react/24/outline';
 
 import { useAuth } from 'providers/authProvider';
 import NavigationAuthButton from 'features/navigation/components/navigationAuthButton';
@@ -64,15 +64,6 @@ const Navigation = () => {
         setMobileMenuOpen(false);
     }, [location.pathname, location.search]);
 
-    useEffect(() => {
-        if (!mobileMenuOpen || typeof document === 'undefined') return undefined;
-        const original = document.body.style.overflow;
-        document.body.style.overflow = 'hidden';
-        return () => {
-            document.body.style.overflow = original;
-        };
-    }, [mobileMenuOpen]);
-
     const headerStyle = useMemo(() => {
         const lerp = (a, b, t) => a + (b - a) * t;
         const top = lerp(0, 20, shrink);
@@ -83,11 +74,15 @@ const Navigation = () => {
         const shadowStrength = lerp(0.18, 0.12, shrink);
         const borderAlpha = lerp(0.55, 0.3, shrink);
 
+        const insetVisible = shrink > 0.06;
+        const sideInset = insetVisible ? side : 0;
+        const radiusValue = radius ? `${radius}px` : undefined;
+
         return {
-            left: side ? `${side}px` : undefined,
-            right: side ? `${side}px` : undefined,
+            left: sideInset ? `${sideInset}px` : '0px',
+            right: sideInset ? `${sideInset}px` : '0px',
             top: `${top}px`,
-            borderRadius: radius ? `${radius}px` : undefined,
+            borderRadius: radiusValue,
             transform: `scale(${scale.toFixed(3)})`,
             backgroundColor: `rgba(255,255,255,${backgroundOpacity.toFixed(2)})`,
             boxShadow: `0 18px 32px -24px rgba(15,23,42,${shadowStrength.toFixed(2)})`,
@@ -102,7 +97,9 @@ const Navigation = () => {
             ...headerStyle,
             left: '0px',
             right: '0px',
-            borderRadius: '0px',
+            borderRadius: headerStyle.borderRadius,
+            borderBottomLeftRadius: '0px',
+            borderBottomRightRadius: '0px',
             transform: 'none',
             boxShadow: '0 18px 40px -12px rgba(15,23,42,0.32)',
             border: '1px solid rgba(226, 232, 240, 0.45)',
@@ -261,9 +258,8 @@ const Navigation = () => {
                             leaveTo="opacity-0"
                         >
                             <div
-                                className="fixed inset-x-0 bottom-0 z-30 bg-slate-900/30"
+                                className="pointer-events-none fixed inset-x-0 bottom-0 z-30 bg-slate-900/25 backdrop-blur-[2px]"
                                 style={{ top: `${navHeight}px` }}
-                                onClick={() => setMobileMenuOpen(false)}
                             />
                         </Transition.Child>
 
@@ -280,7 +276,9 @@ const Navigation = () => {
                                 className="fixed inset-x-0 z-40 origin-top"
                                 style={{ top: `${navHeight}px` }}
                             >
-                                <div className="max-h-[calc(100vh-24px)] overflow-y-auto border-t border-slate-200 bg-white px-6 pb-8 pt-6 shadow-[0_18px_36px_-18px_rgba(15,23,42,0.25)]">
+                                <div className="mx-auto max-w-lg max-h-[calc(100vh-24px)] overflow-y-auto border border-slate-200 border-t-0 bg-white px-5 pb-8 pt-6 shadow-[0_22px_48px_-22px_rgba(15,23,42,0.32)] transition-[border-radius] duration-300 ease-out sm:max-w-xl sm:px-6"
+                                    style={{ borderBottomLeftRadius: '28px', borderBottomRightRadius: '28px' }}
+                                >
                                     {isLoggedIn ? (
                                         <div className="flex items-center gap-3 rounded-2xl bg-indigo-50/70 px-4 py-3 text-slate-700">
                                             <div className="flex h-10 w-10 items-center justify-center rounded-full bg-indigo-500 text-sm font-semibold text-white">
@@ -302,10 +300,10 @@ const Navigation = () => {
                                     <nav className="mt-5 space-y-2">
                                         {navItems.map((item) => {
                                             const isActive = activeItemKey === item.key;
-                                            const linkClasses = `group flex items-center gap-3 rounded-xl px-4 py-3 text-base font-semibold transition ${
+                                            const linkClasses = `group flex items-center justify-between gap-4 rounded-2xl px-5 py-3.5 text-base font-semibold transition ${
                                                 isActive
-                                                    ? 'bg-indigo-50 text-indigo-600 shadow-[0_16px_32px_-24px_rgba(79,70,229,0.45)] ring-1 ring-inset ring-indigo-100'
-                                                    : 'text-slate-700 hover:bg-slate-50/90 hover:text-slate-900 hover:ring-1 hover:ring-inset hover:ring-slate-200'
+                                                    ? 'bg-indigo-50/95 text-indigo-600 shadow-[0_18px_36px_-24px_rgba(79,70,229,0.5)] ring-1 ring-inset ring-indigo-100'
+                                                    : 'text-slate-700 hover:bg-slate-50/95 hover:text-slate-900 hover:ring-1 hover:ring-inset hover:ring-slate-200'
                                             }`;
                                             return (
                                                 <Link
@@ -315,11 +313,14 @@ const Navigation = () => {
                                                     className={linkClasses}
                                                 >
                                                     <span className="truncate text-left">{item.label}</span>
-                                                    {isActive && (
-                                                        <span className="ml-auto inline-flex items-center rounded-full bg-indigo-100/90 px-2.5 py-0.5 text-[11px] font-medium text-indigo-600 shadow-sm">
-                                                            현재
-                                                        </span>
-                                                    )}
+                                                    <span className="flex items-center gap-2 text-sm font-medium">
+                                                        {isActive && (
+                                                            <span className="inline-flex items-center rounded-full bg-indigo-100/90 px-2 py-0.5 text-[11px] font-medium text-indigo-600 shadow-sm">
+                                                                현재
+                                                            </span>
+                                                        )}
+                                                        <ChevronRightIcon aria-hidden="true" className="size-4 text-slate-300 transition-colors group-hover:text-indigo-300" />
+                                                    </span>
                                                 </Link>
                                             );
                                         })}
