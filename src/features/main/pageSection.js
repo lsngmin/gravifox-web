@@ -44,22 +44,32 @@ export default function PageSection() {
             />
             <div className="relative mx-auto max-w-6xl px-6 py-24 sm:py-28 lg:py-32">
                 <div className="mx-auto max-w-5xl">
-                    <div className="inline-flex items-center gap-2 rounded-full border border-white/20 bg-white/10 px-4 py-1 text-xs font-semibold uppercase tracking-[0.35em] text-indigo-200 shadow-lg shadow-indigo-500/20">
-                        {t('hero.ribbon', 'AI-FIRST DEFENSE STACK')}
+                    <div className="
+    inline-flex items-center gap-1.5 sm:gap-2
+    rounded-full border border-white/20 bg-white/10
+    px-2.5 py-0.5 sm:px-4 sm:py-1 md:px-5 md:py-1.5
+    text-[10px] sm:text-xs md:text-sm font-semibold uppercase
+    tracking-[0.08em] sm:tracking-[0.1em]
+    text-indigo-200 shadow-md sm:shadow-lg shadow-indigo-500/20
+  ">
+                        {t('hero.ribbon')}
                     </div>
                 </div>
 
-                <div className="mt-10 grid gap-12 lg:grid-cols-[1.25fr_0.9fr] lg:items-center">
+
+                <div className="mt-4 grid gap-12 lg:grid-cols-[1.25fr_0.9fr] lg:items-center">
                     <div className="space-y-8 text-indigo-50">
                         <div className="space-y-5">
-                            <h1 className="text-4xl font-extrabold tracking-tight sm:text-5xl lg:text-6xl">
-                                {t('hero.headline', 'AI로 조작된 콘텐츠를 걸러내 사용자 피해를 미리 막으세요')}
+                            <h1 className="text-[22px] sm:text-4xl md:text-5xl lg:text-6xl font-extrabold tracking-tight leading-tight">
+                                {t('hero.headline')}
                             </h1>
-                            <p className="text-base sm:text-lg text-indigo-100/90 max-w-3xl">
-                                {t(
-                                    'hero.subtitle',
-                                    '이미지와 영상을 올리면 몇 초 안에 진위와 위험도를 알려드려요. 심사팀이 안심하고 대응할 수 있도록 근거와 다음 행동을 함께 제공합니다.'
-                                )}
+                            <p className="
+  text-sm sm:text-base md:text-lg lg:text-xl
+  text-indigo-100/90
+  max-w-3xl
+  leading-relaxed sm:leading-normal md:leading-relaxed
+">
+                                {t('hero.subtitle')}
                             </p>
                         </div>
 
