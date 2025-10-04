@@ -236,12 +236,13 @@ const Navigation = () => {
                 <Transition
                     show={mobileMenuOpen}
                     as={Fragment}
-                    enter="transition duration-300 ease-out"
-                    enterFrom="-translate-y-3 opacity-0"
-                    enterTo="translate-y-0 opacity-100"
-                    leave="transition duration-200 ease-in"
-                    leaveFrom="translate-y-0 opacity-100"
-                    leaveTo="-translate-y-2 opacity-0"
+                    appear
+                    enter="transform-gpu transition duration-500 ease-[cubic-bezier(0.22,1,0.36,1)]"
+                    enterFrom="opacity-0 -translate-y-6 scale-[0.95]"
+                    enterTo="opacity-100 translate-y-0 scale-100"
+                    leave="transform-gpu transition duration-400 ease-[cubic-bezier(0.4,0,0.2,1)]"
+                    leaveFrom="opacity-100 translate-y-0 scale-100"
+                    leaveTo="opacity-0 -translate-y-4 scale-[0.97]"
                 >
                     <div className="lg:hidden">
                         <div className="mx-auto px-6 pb-8 pt-2">
@@ -260,7 +261,7 @@ const Navigation = () => {
                                     </div>
                                 ) : (
                                     <div className="rounded-2xl bg-slate-50 px-4 py-4 text-sm text-slate-600">
-                                        Gravifox 계정으로 로그인하고 분석 결과를 저장하고 관리해 보세요.
+                                        지금 가입하고 분석 결과를 한곳에 모아 보세요.
                                     </div>
                                 )}
 
