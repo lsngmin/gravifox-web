@@ -46,7 +46,9 @@
         "desc": "파일을 드래그하거나 링크만 넣으면 몇 초 뒤 결과와 설명을 받아요."
       }
     ],
-    "cardsLabel": "바로 써보기"
+    "cardsLabel": "바로 써보기",
+    "usageLabel": "이용 방법",
+    "usageDescription": "세 단계만으로 업로드하고 분석 결과를 확인하세요."
   },
   "cta": {
     "start": "무료로 시작하기",
@@ -302,7 +304,8 @@
     "sample": "샘플",
     "security": "보안",
     "faq": "FAQ",
-    "testimonials": "스토리"
+    "testimonials": "스토리",
+    "progressLabel": "스크롤 진행도"
   },
   "meta": {
     "title": "GraviFox — AI 이미지 진위 판별 API",

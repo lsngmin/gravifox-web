@@ -1,61 +1,14 @@
-import React, { useEffect, useMemo, useRef, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import {
-  PlayIcon,
-  SparklesIcon,
-  Squares2X2Icon,
-  BriefcaseIcon,
-  RectangleStackIcon,
-  CodeBracketIcon,
-  ShieldCheckIcon,
-  QuestionMarkCircleIcon,
-  ChatBubbleLeftRightIcon,
-} from '@heroicons/react/24/outline';
 
 export default function AnchorNav() {
   const { t } = useTranslation('home');
-  const iconMap = {
-    how: PlayIcon,
-    value: SparklesIcon,
-    feature: Squares2X2Icon,
-    'use-cases': BriefcaseIcon,
-    supported: RectangleStackIcon,
-    sample: CodeBracketIcon,
-    security: ShieldCheckIcon,
-    faq: QuestionMarkCircleIcon,
-    testimonials: ChatBubbleLeftRightIcon,
-  };
-  const items = useMemo(() => ([
-    { id: 'how', label: t('anchor.how', 'How it works') },
-    { id: 'value', label: t('anchor.value', 'Why Gravifox') },
-    { id: 'feature', label: t('anchor.feature', 'Features') },
-    { id: 'use-cases', label: t('anchor.useCases', 'Use cases') },
-    { id: 'supported', label: t('anchor.supported', 'Formats') },
-    { id: 'sample', label: t('anchor.sample', 'Sample') },
-    { id: 'security', label: t('anchor.security', 'Security') },
-    { id: 'faq', label: t('anchor.faq', 'FAQ') },
-    { id: 'testimonials', label: t('anchor.testimonials', 'Stories') },
-  ]), [t]);
-
-  const [active, setActive] = useState(items[0].id);
-  const navRef = useRef(null);
+  const sectionIds = useMemo(
+    () => ['how', 'feature', 'use-cases', 'supported', 'sample', 'security', 'faq'],
+    []
+  );
+  const [progress, setProgress] = useState(0);
   const [headerOffset, setHeaderOffset] = useState(72);
-
-  useEffect(() => {
-    const obs = new IntersectionObserver(
-      (entries) => {
-        entries.forEach((entry) => {
-          if (entry.isIntersecting) setActive(entry.target.id);
-        });
-      },
-      { rootMargin: '-40% 0px -55% 0px', threshold: 0.01 }
-    );
-    items.forEach(({ id }) => {
-      const el = document.getElementById(id);
-      if (el) obs.observe(el);
-    });
-    return () => obs.disconnect();
-  }, [items]);
 
   useEffect(() => {
     let ticking = false;
@@ -89,57 +42,72 @@ export default function AnchorNav() {
     };
   }, []);
 
-  const onClick = (e, id) => {
-    e.preventDefault();
-    const el = document.getElementById(id);
-    if (!el) return;
-    // Compute dynamic offset: header (fixed) + anchor nav (sticky) heights
-    const header = document.querySelector('header');
-    const headerRect = header ? header.getBoundingClientRect() : { top: 0, height: 64 };
-    const headerGap = window.innerWidth < 1024 ? 12 : 8;
-    const headerH = (headerRect?.top || 0) + (headerRect?.height || 64) + headerGap;
-    const anchorH = navRef.current ? navRef.current.getBoundingClientRect().height : 48;
-    const extra = window.innerWidth < 1024 ? 20 : 12; // tighter breathing room since header shrinks more
-    const y = el.getBoundingClientRect().top + window.scrollY - (headerH + anchorH + extra);
-    window.scrollTo({ top: y, behavior: 'smooth' });
-  };
+  useEffect(() => {
+    let animationFrame = null;
+    const calculateProgress = () => {
+      const elements = sectionIds
+        .map((id) => document.getElementById(id))
+        .filter(Boolean);
+      if (!elements.length) {
+        setProgress(0);
+        return;
+      }
+      const firstRect = elements[0].getBoundingClientRect();
+      const lastRect = elements[elements.length - 1].getBoundingClientRect();
+      const firstTop = firstRect.top + window.scrollY;
+      const lastBottom = lastRect.bottom + window.scrollY;
+      const range = lastBottom - window.innerHeight - firstTop;
+
+      if (range <= 0) {
+        const reachedEnd = window.scrollY + window.innerHeight >= lastBottom;
+        setProgress(reachedEnd ? 1 : 0);
+        return;
+      }
+
+      const raw = (window.scrollY - firstTop) / range;
+      const clamped = Math.min(1, Math.max(0, raw));
+      setProgress(clamped);
+    };
+
+    const handle = () => {
+      if (animationFrame) cancelAnimationFrame(animationFrame);
+      animationFrame = window.requestAnimationFrame(calculateProgress);
+    };
+
+    calculateProgress();
+    window.addEventListener('scroll', handle, { passive: true });
+    window.addEventListener('resize', handle);
+    return () => {
+      if (animationFrame) cancelAnimationFrame(animationFrame);
+      window.removeEventListener('scroll', handle);
+      window.removeEventListener('resize', handle);
+    };
+  }, [sectionIds]);
 
   return (
     <nav
-      ref={navRef}
       id="anchor-nav"
       className="sticky z-20 w-full border-b border-slate-200 bg-white/90 backdrop-blur supports-[backdrop-filter]:bg-white/70"
       style={{ top: headerOffset }}
     >
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-        <ul className="flex flex-nowrap items-center gap-2 overflow-x-auto py-3 text-sm no-scrollbar">
-          {items.map((it) => {
-            const Icon = iconMap[it.id] || PlayIcon;
-            const isActive = active === it.id;
-            return (
-              <li key={it.id}>
-                <a
-                  href={`#${it.id}`}
-                  aria-current={isActive ? 'true' : undefined}
-                  aria-label={it.label}
-                  onClick={(e) => onClick(e, it.id)}
-                  tabIndex={0}
-                  className={`relative inline-flex items-center gap-1.5 rounded-full px-3 py-1.5 transition focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-400 ${
-                    isActive
-                      ? 'bg-indigo-50 text-indigo-700 ring-1 ring-indigo-200'
-                      : 'text-slate-600 hover:text-slate-900'
-                  }`}
-                >
-                  <Icon className="h-4 w-4" aria-hidden="true" />
-                  <span className="font-medium">{it.label}</span>
-                  {isActive && (
-                    <span className="pointer-events-none absolute -bottom-1 left-1/2 h-0.5 w-8 -translate-x-1/2 rounded-full bg-indigo-500" />
-                  )}
-                </a>
-              </li>
-            );
-          })}
-        </ul>
+        <div className="flex flex-col gap-2 py-4 sm:flex-row sm:items-center sm:gap-4">
+          <div className="text-xs font-semibold uppercase tracking-[0.3em] text-slate-500">
+            {t('anchor.progressLabel', 'Scroll progress')}
+          </div>
+          <div className="flex flex-1 items-center gap-3">
+            <div className="relative h-2 flex-1 overflow-hidden rounded-full bg-slate-200/80">
+              <div
+                className="absolute inset-y-0 left-0 rounded-full bg-gradient-to-r from-indigo-500 via-indigo-400 to-indigo-600 transition-[width] duration-200"
+                style={{ width: `${Math.round(Math.min(1, Math.max(0, progress)) * 100)}%` }}
+                aria-hidden="true"
+              />
+            </div>
+            <div className="text-xs font-medium text-slate-600">
+              {`${Math.round(Math.min(1, Math.max(0, progress)) * 100)}%`}
+            </div>
+          </div>
+        </div>
       </div>
     </nav>
   );

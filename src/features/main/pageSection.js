@@ -1,8 +1,6 @@
 import { useTranslation } from 'react-i18next';
-import { ArrowOutward, HeadsetMic, CheckCircle } from '@mui/icons-material';
-import { Bug, Lightbulb, MessageSquare } from "lucide-react";
-import { Sparkles } from "lucide-react";
-import { Upload, ScanSearch, CheckCircle2 } from "lucide-react";
+import { ArrowOutward } from '@mui/icons-material';
+import { MessageSquare, Sparkles, Upload, ScanSearch, CheckCircle2 } from "lucide-react";
 
 export default function PageSection() {
     const { t, i18n } = useTranslation('home');
@@ -13,32 +11,11 @@ export default function PageSection() {
         { icon: ScanSearch, value: "분석", desc: "AI의 흔적을 찾고 주요 특징을 빠르게 분석합니다." },
         { icon: CheckCircle2, value: "판별", desc: "진위 판단과 함께 분석 근거를 보여드립니다." },
     ];
-
-
-    const bulletPoints = t('hero.bullets', {
-        returnObjects: true,
-        defaultValue: [
-            'Upload any photo to check if it looks AI-generated in seconds.',
-            'Review the highlighted clues that explain the verdict.',
-            'Share a simple link so anyone can see the result.',
-        ],
-    });
-
-    const quickGuides = t('hero.cards', {
-        returnObjects: true,
-        defaultValue: [
-            {
-                title: 'Try it first with a sample',
-                desc: 'Open a sample image to watch the analysis unfold in real time.',
-            },
-            {
-                title: 'Upload your own photo',
-                desc: 'Drag a file or paste a link and get the verdict within seconds.',
-            },
-        ],
-    }).slice(0, 2);
-
-    const cardsLabel = t('hero.cardsLabel', 'Quick start');
+    const usageLabel = t('hero.usageLabel', 'How to use');
+    const usageDescription = t(
+        'hero.usageDescription',
+        '세 단계만으로 분석을 시작하고 결과를 받아보세요.'
+    );
 
     return (
         <section className="relative isolate overflow-hidden">
@@ -65,7 +42,7 @@ export default function PageSection() {
                 </div>
 
 
-                <div className="mt-4 grid gap-12 lg:grid-cols-[1.25fr_0.9fr] lg:items-center">
+                <div className="mt-4 space-y-12">
                     <div className="space-y-8 text-indigo-50">
                         <div className="space-y-5">
                             <h1 className="text-[22px] sm:text-4xl md:text-5xl lg:text-6xl font-extrabold tracking-tight leading-tight">
@@ -135,11 +112,19 @@ export default function PageSection() {
 
                         </div>
 
-                        <div className="grid gap-4 sm:grid-cols-3">
-                            {metrics.map((metric, i) => (
-                                <div
-                                    key={metric.value}
-                                    className="
+                        <div className="space-y-4">
+                            <div className="inline-flex items-center gap-2 rounded-full border border-white/15 bg-white/10 px-4 py-1 text-[10px] sm:text-xs font-semibold uppercase tracking-[0.18em] text-indigo-200/80">
+                                <Sparkles className="h-3.5 w-3.5" />
+                                <span>{usageLabel}</span>
+                            </div>
+                            <p className="max-w-2xl text-sm sm:text-base text-indigo-100/80">
+                                {usageDescription}
+                            </p>
+                            <div className="grid gap-4 sm:grid-cols-3">
+                                {metrics.map((metric) => (
+                                    <div
+                                        key={metric.value}
+                                        className="
             group relative overflow-hidden
             rounded-2xl border border-white/10 bg-white/[0.06]
             px-5 py-5
@@ -149,59 +134,23 @@ export default function PageSection() {
             hover:bg-white/[0.12] hover:translate-y-[-2px]
             hover:shadow-[0_12px_40px_-20px_rgba(129,140,248,0.4)]
           "
-                                >
-                                    <div className="flex items-center gap-3">
-                                        <metric.icon className="h-5 w-5 text-indigo-300/90 transition-transform duration-300 group-hover:scale-110" />
-                                        <h3 className="text-base font-semibold text-white tracking-tight">
-                                            {metric.value}
-                                        </h3>
+                                    >
+                                        <div className="flex items-center gap-3">
+                                            <metric.icon className="h-5 w-5 text-indigo-300/90 transition-transform duration-300 group-hover:scale-110" />
+                                            <h3 className="text-base font-semibold text-white tracking-tight">
+                                                {metric.value}
+                                            </h3>
+                                        </div>
+                                        <p className="mt-2 text-[13px] leading-relaxed text-indigo-100/80">
+                                            {metric.desc}
+                                        </p>
+
+                                        <div className="pointer-events-none absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-300 bg-gradient-to-tr from-indigo-400/10 to-transparent" />
                                     </div>
-                                    <p className="mt-2 text-[13px] leading-relaxed text-indigo-100/80">
-                                        {metric.desc}
-                                    </p>
-
-                                    {/* subtle gradient glow */}
-                                    <div className="pointer-events-none absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-300 bg-gradient-to-tr from-indigo-400/10 to-transparent" />
-                                </div>
-                            ))}
+                                ))}
+                            </div>
                         </div>
-
-                        {/*<ul className="mt-6 space-y-3 text-sm text-indigo-100/80">*/}
-                        {/*    {bulletPoints.map((line, idx) => (*/}
-                        {/*        <li key={idx} className="flex items-start gap-2">*/}
-                        {/*            <CheckCircle className="mt-0.5 h-4 w-4 flex-shrink-0 text-emerald-300" />*/}
-                        {/*            <span>{line}</span>*/}
-                        {/*        </li>*/}
-                        {/*    ))}*/}
-                        {/*</ul>*/}
                     </div>
-
-                    {quickGuides.length > 0 && (
-                        <div className="relative flex flex-col gap-4">
-                            {quickGuides.map((card, idx) => (
-                                <article
-                                    key={`${card.title}-${idx}`}
-                                    className="relative overflow-hidden rounded-3xl border border-white/15 bg-white/10 p-6 text-indigo-100 shadow-[0_30px_60px_-35px_rgba(15,23,42,0.95)] backdrop-blur"
-                                >
-                                    <div className="absolute inset-0 bg-gradient-to-br from-white/18 via-indigo-400/10 to-white/5" aria-hidden="true" />
-                                    <div className="relative flex flex-col gap-3">
-                                        <div className="flex items-center gap-3 text-xs font-semibold uppercase tracking-[0.2em] text-indigo-200/90">
-                                            <span className="flex h-8 w-8 items-center justify-center rounded-full border border-white/20 bg-white/10 text-sm text-indigo-50">
-                                                {String(idx + 1)}
-                                            </span>
-                                            <span className="text-indigo-100/80">{cardsLabel}</span>
-                                        </div>
-                                        <div className="space-y-2">
-                                            <h3 className="text-lg font-semibold text-white">{card.title}</h3>
-                                            {card.desc && (
-                                                <p className="text-sm leading-relaxed text-indigo-100/80">{card.desc}</p>
-                                            )}
-                                        </div>
-                                    </div>
-                                </article>
-                            ))}
-                        </div>
-                    )}
                 </div>
             </div>
         </section>
