@@ -46,7 +46,9 @@
         "desc": "Drag a file or paste a link and get the verdict and explanation in seconds."
       }
     ],
-    "cardsLabel": "Quick start"
+    "cardsLabel": "Quick start",
+    "usageLabel": "How to use",
+    "usageDescription": "Start an analysis and review the verdict in just three steps."
   },
   "cta": {
     "start": "Get started free",
@@ -320,7 +322,8 @@
     "sample": "Sample",
     "security": "Security",
     "faq": "FAQ",
-    "testimonials": "Stories"
+    "testimonials": "Stories",
+    "progressLabel": "Scroll progress"
   },
   "meta": {
     "title": "GraviFox — GenAI image authenticity API",
