@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useState } from 'react';
+import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
 export default function AnchorNav() {
@@ -9,6 +9,8 @@ export default function AnchorNav() {
   );
   const [progress, setProgress] = useState(0);
   const [headerOffset, setHeaderOffset] = useState(72);
+  const [displayProgress, setDisplayProgress] = useState(0);
+  const animationRef = useRef(null);
 
   useEffect(() => {
     let ticking = false;
@@ -84,6 +86,33 @@ export default function AnchorNav() {
     };
   }, [sectionIds]);
 
+  useEffect(() => {
+    const step = () => {
+      setDisplayProgress((prev) => {
+        const diff = progress - prev;
+        if (Math.abs(diff) < 0.002) {
+          animationRef.current = null;
+          return progress;
+        }
+        const next = prev + diff * 0.15;
+        animationRef.current = window.requestAnimationFrame(step);
+        return next;
+      });
+    };
+
+    if (animationRef.current) {
+      window.cancelAnimationFrame(animationRef.current);
+    }
+    animationRef.current = window.requestAnimationFrame(step);
+
+    return () => {
+      if (animationRef.current) {
+        window.cancelAnimationFrame(animationRef.current);
+        animationRef.current = null;
+      }
+    };
+  }, [progress]);
+
   return (
     <nav
       id="anchor-nav"
@@ -91,21 +120,20 @@ export default function AnchorNav() {
       style={{ top: headerOffset }}
     >
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-        <div className="flex flex-col gap-2 py-4 sm:flex-row sm:items-center sm:gap-4">
-          <div className="text-xs font-semibold uppercase tracking-[0.3em] text-slate-500">
-            {t('anchor.progressLabel', 'Scroll progress')}
-          </div>
-          <div className="flex flex-1 items-center gap-3">
-            <div className="relative h-2 flex-1 overflow-hidden rounded-full bg-slate-200/80">
-              <div
-                className="absolute inset-y-0 left-0 rounded-full bg-gradient-to-r from-indigo-500 via-indigo-400 to-indigo-600 transition-[width] duration-200"
-                style={{ width: `${Math.round(Math.min(1, Math.max(0, progress)) * 100)}%` }}
-                aria-hidden="true"
-              />
-            </div>
-            <div className="text-xs font-medium text-slate-600">
-              {`${Math.round(Math.min(1, Math.max(0, progress)) * 100)}%`}
-            </div>
+        <div className="py-4">
+          <div
+            className="relative h-2 w-full overflow-hidden rounded-full bg-slate-200/80"
+            role="progressbar"
+            aria-valuemin={0}
+            aria-valuemax={100}
+            aria-valuenow={Math.round(Math.min(1, Math.max(0, displayProgress)) * 100)}
+            aria-label={t('anchor.progressLabel', 'Scroll progress')}
+          >
+            <div
+              className="absolute inset-y-0 left-0 rounded-full bg-gradient-to-r from-indigo-500 via-indigo-400 to-indigo-600"
+              style={{ width: `${Math.min(1, Math.max(0, displayProgress)) * 100}%` }}
+              aria-hidden="true"
+            />
           </div>
         </div>
       </div>
