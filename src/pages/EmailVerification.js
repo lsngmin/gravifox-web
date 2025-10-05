@@ -1,16 +1,24 @@
 import React, { useEffect, useMemo, useState } from "react";
-import { useLocation, useNavigate } from "react-router-dom";
+import { useLocation, useNavigate, useParams } from "react-router-dom";
 import axios from "axios";
 import { EMAIL_ENDPOINTS } from "api/endPointRoute";
 
 export default function EmailVerification() {
   const navigate = useNavigate();
   const location = useLocation();
+  const { lng } = useParams();
+  const localizedPath = (path) => {
+    const prefix = lng ? `/${lng}` : "";
+    if (path === "/" && prefix) {
+      return prefix;
+    }
+    return `${prefix}${path}`;
+  };
   const initialEmail = useMemo(() => location?.state?.email || "", [location?.state]);
   const [secondsLeft, setSecondsLeft] = useState(0);
   const [submitting, setSubmitting] = useState(false);
   const [info, setInfo] = useState("");
-  const navigateToHome = () => navigate("/");
+  const navigateToHome = () => navigate(localizedPath("/"));
 
   useEffect(() => {
     if (secondsLeft <= 0) return;
@@ -121,7 +129,7 @@ export default function EmailVerification() {
               </div>
               <button
                 type="button"
-                onClick={() => navigate('/login')}
+                onClick={() => navigate(localizedPath('/login'))}
                 className="inline-flex items-center justify-center rounded-md px-3.5 py-2 text-sm font-semibold text-indigo-600 hover:text-indigo-700"
               >
                 로그인으로 돌아가기

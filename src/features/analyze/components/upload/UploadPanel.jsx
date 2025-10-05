@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import { FASTAPI_ENDPOINTS, ANALYZE_ENDPOINTS } from "../../../../api/endPointRoute";
 import CloudUploadIcon from "./CloudUploadIcon";
 import UploadDropzone from "./UploadDropzone";
@@ -64,7 +64,16 @@ export default function UploadPanel({ files = [], setFiles }) {
     const [errorOpen, setErrorOpen] = useState(false);
     const [errorMsgs, setErrorMsgs] = useState([]);
     const [submitting, setSubmitting] = useState(false);
+    const [pendingResultPath, setPendingResultPath] = useState(null);
     const navigate = useNavigate();
+    const { lng } = useParams();
+    const localizedPath = (path) => {
+        const prefix = lng ? `/${lng}` : "";
+        if (path === "/" && prefix) {
+            return prefix;
+        }
+        return `${prefix}${path}`;
+    };
 
 
     const addFiles = (incoming) => {
@@ -135,8 +144,15 @@ export default function UploadPanel({ files = [], setFiles }) {
     const resetAll = () => { setFiles([]); };
     const analyze = async (arr) => {
         if (!arr?.length || submitting) return;
+        const localErrors = [];
         setSubmitting(true);
+        setErrorMsgs([]);
+        setErrorOpen(false);
+        setPendingResultPath(null);
         try {
+            if (!FASTAPI_ENDPOINTS.UPLOAD) {
+                throw new Error("업로드 엔드포인트가 설정되지 않았어요. 환경 변수를 확인해 주세요.");
+            }
             const jobIds = [];
             // 순차 처리: 업로드 → 분석 생성 반복
             for (let i = 0; i < arr.length; i++) {
@@ -175,24 +191,36 @@ export default function UploadPanel({ files = [], setFiles }) {
                 } catch (inner) {
                     // 파일 단위 오류는 누적해서 모달에 보여주고 계속 진행
                     const msg = inner?.message || `${file.name} 처리 중 오류가 발생했어요.`;
-                    setErrorMsgs(prev => [...prev, msg]);
+                    localErrors.push(msg);
                 }
             }
 
             if (jobIds.length === 0) {
-                if (errorMsgs.length === 0) {
-                    setErrorMsgs(["분석을 시작할 수 없어요. 다시 시도해 주세요."]);
+                if (localErrors.length === 0) {
+                    localErrors.push("분석을 시작할 수 없어요. 다시 시도해 주세요.");
                 }
+                setErrorMsgs(localErrors);
                 setErrorOpen(true);
                 return;
             }
 
+            const resultPath = localizedPath(`/analyze/result?jobIds=${encodeURIComponent(jobIds.join(","))}`);
+
+            if (localErrors.length > 0) {
+                setErrorMsgs(localErrors);
+                setErrorOpen(true);
+                setPendingResultPath(resultPath);
+                return;
+            }
+
             // 4) 결과 페이지로 이동 (다중 전용)
-            navigate(`/analyze/result?jobIds=${encodeURIComponent(jobIds.join(","))}`);
+            setPendingResultPath(null);
+            navigate(resultPath);
         } catch (e) {
             const msg = e?.message || "분석 시작 중 오류가 발생했어요.";
             setErrorMsgs([msg]);
             setErrorOpen(true);
+            setPendingResultPath(null);
         } finally {
             setSubmitting(false);
         }
@@ -203,7 +231,15 @@ export default function UploadPanel({ files = [], setFiles }) {
             <ErrorModal
                 open={errorOpen}
                 messages={errorMsgs}
-                onClose={() => setErrorOpen(false)}
+                onClose={() => {
+                    setErrorOpen(false);
+                    setErrorMsgs([]);
+                    if (pendingResultPath) {
+                        const next = pendingResultPath;
+                        setPendingResultPath(null);
+                        navigate(next);
+                    }
+                }}
                 title="업로드 오류"
             />
             {files.length === 0 && (

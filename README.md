@@ -2,6 +2,17 @@
 
 This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
 
+## Environment Variables
+
+Uploads to the FastAPI service require an explicit endpoint configuration.
+
+| Variable | Description |
+| --- | --- |
+| `REACT_APP_FASTAPI_BASE` | Base URL of the FastAPI upload service (must use `https://`). |
+
+Set the value to the fully qualified origin of the FastAPI deployment (for example, `https://upload.example.com`).
+If the variable is missing, uploads will be disabled and the console will report an error.
+
 ## Available Scripts
 
 In the project directory, you can run:

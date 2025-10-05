@@ -1,7 +1,40 @@
 // Base URLs (with fallback for legacy key)
 export const API_BASE = process.env.REACT_APP_API_BASE || process.env.REACT_APP_API_BASE_URL;
 
-export const FASTAPI_BASE = process.env.REACT_APP_FASTAPI_BASE || "http://117.17.149.66:8000";
+const resolveFastApiBase = () => {
+    const raw = (process.env.REACT_APP_FASTAPI_BASE || "").trim();
+    if (raw) {
+        return raw.replace(/\/+$/, "");
+    }
+
+    const apiBase = (API_BASE || "").trim();
+    if (apiBase) {
+        try {
+            const url = new URL(apiBase);
+            return `${url.protocol}//${url.host}`;
+        } catch {}
+    }
+
+    if (typeof window !== 'undefined' && window.location?.origin) {
+        return window.location.origin;
+    }
+
+    if (typeof console !== "undefined" && console.error) {
+        console.error("REACT_APP_FASTAPI_BASE 환경 변수가 설정되지 않았어요. 업로드 기능이 동작하지 않을 수 있어요.");
+    }
+
+    return "";
+};
+
+const ensureHttps = (value) => {
+    if (!value) return value;
+    if (value.startsWith("http://")) {
+        return value.replace(/^http:\/\//i, "https://");
+    }
+    return value;
+};
+
+export const FASTAPI_BASE = ensureHttps(resolveFastApiBase());
 
 export const FREETRIAL_ENDPOINTS = {
     ANALYZE:    `${API_BASE}/api/v1/images`
@@ -50,5 +83,5 @@ export const ANALYZE_ENDPOINTS = {
 
 // FastAPI generic media upload endpoint (image/video)
 export const FASTAPI_ENDPOINTS = {
-    UPLOAD: `${FASTAPI_BASE}/upload`,
+    UPLOAD: FASTAPI_BASE ? `${FASTAPI_BASE}/upload` : "",
 };
