@@ -32,32 +32,20 @@ export default function Feature() {
       />
       <div className="relative mx-auto grid max-w-6xl gap-10 px-6 lg:grid-cols-[1fr_1fr] lg:items-center">
         <div className="space-y-6">
-          <span className="inline-flex items-center gap-2 rounded-full bg-indigo-50 px-3 py-1 text-xs font-semibold uppercase tracking-[0.3em] text-indigo-500 ring-1 ring-indigo-100">
-            {t('feature.eyebrow', 'Experience it yourself')}
-          </span>
-          <h2 className="text-3xl font-bold leading-tight text-slate-900 sm:text-4xl">
-            {t('feature.title', 'Upload media → AI analyzes → Review & share results')}
+          <span className="inline-flex items-center gap-2 rounded-full bg-indigo-50 px-3 py-1
+  text-[10px] sm:text-xs md:text-sm font-semibold uppercase tracking-[0.25em]
+  text-indigo-500 ring-1 ring-indigo-100">
+  {t('feature.eyebrow', '직접 체험하기')}
+</span>
+
+          <h2 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold leading-tight text-slate-900">
+            {t('feature.title', '사진이나 영상을 올리면, AI가 분석해요')}
           </h2>
-          <p className="max-w-xl text-sm text-slate-600 sm:text-base">
-            {t(
-              'feature.subtitle',
-              'See how easy it is to go from sign-up to sharing verdicts in just three steps.'
-            )}
+
+          <p className="max-w-xl text-[12px] sm:text-sm md:text-base lg:text-lg text-slate-600 leading-relaxed sm:leading-normal md:leading-snug">
+            {t('feature.subtitle', '회원가입부터 결과 공유까지, 세 단계면 충분합니다.')}
           </p>
 
-          <div className="hidden gap-4 sm:grid sm:grid-cols-3">
-            {steps.map(({ key, number, titleKey }) => (
-              <div
-                key={key}
-                className="rounded-2xl border border-indigo-100 bg-white/70 px-4 py-3 text-left shadow-sm shadow-indigo-100"
-              >
-                <div className="mb-3 inline-flex h-9 w-9 items-center justify-center rounded-full bg-indigo-500 text-sm font-semibold text-white">
-                  {number}
-                </div>
-                <div className="text-sm font-semibold text-slate-900">{t(titleKey)}</div>
-              </div>
-            ))}
-          </div>
         </div>
 
         <div className="relative overflow-hidden rounded-3xl border border-indigo-100 bg-white/80 shadow-2xl shadow-indigo-200/50">
