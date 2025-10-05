@@ -379,8 +379,38 @@ const Navigation = () => {
                                             </button>
                                         </div>
 
-                                        <div className="mt-6 rounded-2xl border border-slate-200/70 bg-white/70 px-5 py-4 text-sm font-semibold leading-relaxed text-slate-700 shadow-sm">
-                                            {t('navigation.mobileHint', '주요 내비게이션은 데스크톱 화면에서 이용할 수 있어요.')}
+                                        <div className="mt-6">
+                                            <nav aria-label={t('navigation.mobileMenuLabel', '주요 내비게이션')}>
+                                                <ul className="flex flex-col gap-2">
+                                                    {navItems.map((item) => {
+                                                        const isActive = activeItemKey === item.key;
+                                                        return (
+                                                            <li key={item.key}>
+                                                                <Link
+                                                                    to={buildLinkTarget(item)}
+                                                                    onClick={() => setMobileMenuOpen(false)}
+                                                                    aria-current={isActive ? 'page' : undefined}
+                                                                    className={`flex items-center justify-between rounded-2xl border px-4 py-3 text-base font-semibold transition-all duration-200 ${
+                                                                        isActive
+                                                                            ? 'border-indigo-200 bg-indigo-50 text-indigo-600 shadow-sm'
+                                                                            : 'border-slate-200/60 bg-white text-slate-700 hover:border-indigo-100 hover:bg-indigo-50/70 hover:text-indigo-600'
+                                                                    }`}
+                                                                >
+                                                                    <span>{t(item.labelKey)}</span>
+                                                                    <span
+                                                                        aria-hidden="true"
+                                                                        className={`text-sm font-medium transition-transform duration-200 ${
+                                                                            isActive ? 'translate-x-0 text-indigo-500' : 'translate-x-1 text-slate-400'
+                                                                        }`}
+                                                                    >
+                                                                        →
+                                                                    </span>
+                                                                </Link>
+                                                            </li>
+                                                        );
+                                                    })}
+                                                </ul>
+                                            </nav>
                                         </div>
 
                                         <div className="mt-6">
