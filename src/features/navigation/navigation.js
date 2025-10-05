@@ -2,7 +2,7 @@ import React, { Fragment, useCallback, useEffect, useMemo, useState } from 'reac
 import { createPortal } from 'react-dom';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { PopoverGroup, Transition } from '@headlessui/react';
-import { Bars3Icon, ChevronRightIcon, XMarkIcon } from '@heroicons/react/24/outline';
+import { Bars3Icon, XMarkIcon } from '@heroicons/react/24/outline';
 import { useTranslation } from 'react-i18next';
 
 import { useAuth } from 'providers/authProvider';
@@ -378,41 +378,6 @@ const Navigation = () => {
                                                 <XMarkIcon aria-hidden="true" className="size-6" />
                                             </button>
                                         </div>
-
-                                        <nav className="mt-5 space-y-2">
-                                            {navItems.map((item, idx) => {
-                                                const isActive = activeItemKey === item.key;
-                                                const linkClasses = `group flex items-center justify-between gap-4 rounded-2xl px-5 py-3.5 text-base font-semibold transition ${
-                                                    isActive
-                                                        ? 'bg-indigo-50/95 text-indigo-600 shadow-[0_18px_36px_-24px_rgba(79,70,229,0.5)] ring-1 ring-inset ring-indigo-100'
-                                                        : 'text-slate-700 hover:bg-slate-50/95 hover:text-slate-900 hover:ring-1 hover:ring-inset hover:ring-slate-200'
-                                                }`;
-                                                const itemAnimBase = reducedMotion
-                                                    ? ''
-                                                    : 'transform-gpu transition-all duration-[900ms] ease-[cubic-bezier(0.22,1,0.36,1)]';
-                                                const label = t(item.labelKey);
-                                                return (
-                                                    <Link
-                                                        key={item.key}
-                                                        to={buildLinkTarget(item)}
-                                                        onClick={() => setMobileMenuOpen(false)}
-                                                        className={`${linkClasses} ${mobileMenuOpen ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-2'}`}
-                                                        style={{ transitionDelay: reducedMotion ? undefined : `${Math.min(idx * 120, 600)}ms` }}
-                                                        data-open={mobileMenuOpen ? '' : undefined}
-                                                    >
-                                                        <span className={`${itemAnimBase} whitespace-normal break-words text-left`}>{label}</span>
-                                                        <span className={`flex items-center gap-2 text-sm font-medium ${itemAnimBase}`}>
-                                                            {isActive && (
-                                                                <span className="inline-flex items-center rounded-full bg-indigo-100/90 px-2 py-0.5 text-[11px] font-medium text-indigo-600 shadow-sm">
-                                                                    {t('navigation.current')}
-                                                                </span>
-                                                            )}
-                                                            <ChevronRightIcon aria-hidden="true" className="size-4 text-slate-300 transition-colors group-hover:text-indigo-300" />
-                                                        </span>
-                                                    </Link>
-                                                );
-                                            })}
-                                        </nav>
 
                                         <div className="mt-6">
                                             <Link
