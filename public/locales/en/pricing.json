@@ -1,31 +1,35 @@
 {
   "hero": {
-    "ribbon": "Pricing that grows with you",
-    "title": "Start light, only upgrade when it feels right",
-    "subtitle": "Experiment for free and scale into Pro once your team is ready.",
+    "ribbon": "Public beta notice",
+    "title": "For now, explore everything on the Free plan",
+    "subtitle": "We're gathering feedback during our open beta, so every core capability remains free while paid plans stay paused.",
     "metrics": {
       "timeLabel": "Launch speed",
-      "timeValue": "Ship up to 14 days faster",
-      "timeCopy": "Use starter templates and sample pipelines to validate results right away.",
+      "timeValue": "Full feature access during beta",
+      "timeCopy": "Ship faster with starter templates and sample pipelines from day one.",
       "scaleLabel": "Scale ready",
-      "scaleValue": "Steady even in traffic spikes",
-      "scaleCopy": "Auto scaling keeps workloads flowing without swapping models.",
+      "scaleValue": "Model how you grow without upgrading",
+      "scaleCopy": "The Free plan lets you validate expected workloads before pricing resumes.",
       "securityLabel": "Feel secure",
-      "securityValue": "End-to-end protection",
-      "securityCopy": "Fine-grained roles and audit trails keep every team member safe."
+      "securityValue": "Beta accounts are protected the same",
+      "securityCopy": "Role controls and audit logs stay on so your team can collaborate safely."
     }
   },
-  "story": {
-    "headline": "Smarter AI every day, pricing that stays predictable",
-    "copy": "GraviFox keeps up with the latest generative trends while helping you spend only on what your team actually uses.",
-    "point1": "Every plan receives the newest models within 24 hours.",
-    "point2": "Compare accuracy and cost side-by-side before you commit.",
-    "point3": "Switch to enterprise options with a single click whenever you need more."
+  "betaNotice": {
+    "badge": "Public Beta",
+    "title": "Paid plans are on hold while we finish testing",
+    "copy": "We're temporarily disabling every upgrade path while we stabilise the platform. Only the Free plan is available during the test period.",
+    "note": "We'll notify you in the dashboard and by email the moment paid plans return.",
+    "points": {
+      "one": "Use the Free plan to try every core workflow without limits.",
+      "two": "Share your feedback so we can shape the final plan structure together.",
+      "three": "When billing resumes you'll be able to switch plans from the dashboard in one click."
+    }
   },
   "free": {
     "badge": "Free",
     "title": "Free Plan",
-    "subtitle": "Everything you need to explore comfortably",
+    "subtitle": "Enjoy unrestricted access throughout the beta",
     "price": "₩0",
     "per": "/ month",
     "cta": "Start for free",
@@ -38,44 +42,49 @@
   },
   "pro": {
     "badge": "Pro",
+    "highlight": "Coming soon",
     "title": "Pro Plan",
-    "subtitle": "Upgrade when you're ready to go live",
-    "price": "₩19,000",
-    "per": "/ month",
-    "cta": "Talk to sales",
+    "subtitle": "We're validating the launch experience right now",
+    "betaMessage": "Try the same analysis capabilities on the Free plan while we finish polishing Pro.",
+    "price": "Coming soon",
+    "per": "",
+    "ctaDisabled": "Preparing launch",
+    "notice": "We'll reach out as soon as private testing wraps up.",
     "features": {
-      "tokens": "500 image analyses each month",
-      "queue": "Priority queueing & guaranteed speed",
-      "metrics": "Advanced dashboards & alerts",
-      "models": "Extended model presets"
+      "tokens": "500 image analyses each month (planned)",
+      "queue": "Priority queueing & guaranteed speed (planned)",
+      "metrics": "Advanced dashboards & alerts (planned)",
+      "models": "Extended model presets (planned)"
     }
   },
   "enterprise": {
     "badge": "Enterprise",
     "title": "Enterprise",
     "subtitle": "Built for teams who need custom guardrails",
-    "price": "Custom quote",
-    "per": "/ month",
-    "cta": "Connect with sales",
+    "betaMessage": "Enterprise coverage will reopen alongside the formal launch.",
+    "price": "Coming soon",
+    "per": "",
+    "ctaDisabled": "Preparing launch",
+    "notice": "We'll coordinate bespoke requirements once the beta ends.",
     "features": {
-      "sso": "SSO / SAML integration",
-      "infra": "Dedicated infrastructure & region selection",
-      "sla": "SLA-backed, dedicated experts",
-      "audit": "Compliance-ready security & audit logs"
+      "sso": "SSO / SAML integration (planned)",
+      "infra": "Dedicated infrastructure & region selection (planned)",
+      "sla": "SLA-backed, dedicated experts (planned)",
+      "audit": "Compliance-ready security & audit logs (planned)"
     }
   },
   "postPlans": {
-    "headline": "Switch plans in a click and keep every setting intact",
-    "copy": "Upgrade or downgrade anytime without losing saved analyses or webhook automations.",
+    "headline": "Help us shape the roadmap while we stay in beta",
+    "copy": "Use the Free plan to validate your scenarios and tell us what you need. We'll roll out Pro and Enterprise options gradually once the beta wraps up.",
     "metrics": {
       "label": "Suggested path",
-      "step1": "Free → Understand usage patterns and how your team collaborates",
-      "step2": "Pro → Connect live alerts and monitoring to grow operational insight",
-      "step3": "Enterprise → Activate global regions, custom SLAs, and tailored workflows"
+      "step1": "Free → Test workloads for free and collect team feedback",
+      "step2": "Pro (planned) → Unlock detailed monitoring once the launch goes live",
+      "step3": "Enterprise (planned) → Finalise custom SLAs and dedicated regions after beta"
     }
   },
   "footnote": {
-    "disclaimer1": "Prices shown are examples—final billing adapts to usage and contract terms.",
-    "disclaimer2": "Enterprise onboarding includes a security review and data governance consultation."
+    "disclaimer1": "All billing is paused during the beta. We'll publish final pricing before payments restart.",
+    "disclaimer2": "No payment details are stored and enterprise consultations remain waitlist-only until plans reopen."
   }
 }
