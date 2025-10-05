@@ -35,14 +35,20 @@ export default function Pricing() {
     [t]
   );
 
-  const animateProps = isMobile ? { opacity: 1, y: [0, -6, 0] } : { opacity: 1, y: 0 };
+  const animateProps = { opacity: 1, y: 0 };
 
-  const getTransition = (delay = 0) =>
+  const getInitial = (desktopY = 20) =>
     isMobile
-      ? { duration: 3.6, repeat: Infinity, repeatType: 'mirror', ease: 'easeInOut', delay }
-      : { duration: 0.6, ease: 'easeOut', delay };
+      ? { opacity: 1, y: 0 }
+      : {
+          opacity: 0,
+          y: desktopY,
+        };
+
+  const getTransition = (delay = 0) => ({ duration: 0.6, ease: 'easeOut', delay });
 
   const buttonHoverEffect = !isMobile ? { scale: 1.02 } : undefined;
+  const buttonTapEffect = !isMobile ? { scale: 0.95 } : undefined;
 
   return (
     <div className="min-h-screen bg-white font-sans">
@@ -68,7 +74,7 @@ export default function Pricing() {
                 <motion.div
                   key={metric.label}
                   className="rounded-2xl bg-white/80 p-4 shadow-sm ring-1 ring-indigo-100/60"
-                  initial={{ opacity: 0, y: 20 }}
+                  initial={getInitial(20)}
                   animate={animateProps}
                   transition={getTransition(0.08 * index)}
                 >
@@ -128,7 +134,7 @@ export default function Pricing() {
               <div className="relative h-full rounded-2xl bg-gradient-to-br from-indigo-100/20 via-slate-50 to-purple-100/20 p-[1px]">
                 <motion.div
                   className="rounded-2xl bg-gradient-to-br from-white/96 via-slate-50/80 to-indigo-50/60 backdrop-blur-sm ring-1 ring-slate-200/60 p-6 md:p-8 shadow-sm hover:shadow-lg transition-shadow flex flex-col h-full"
-                  initial={{ opacity: 0, y: 24 }}
+                  initial={getInitial(24)}
                   animate={animateProps}
                   transition={getTransition(0.05)}
                 >
@@ -150,7 +156,7 @@ export default function Pricing() {
                     <motion.a
                       href="/login"
                       className="inline-flex w-full items-center justify-center rounded-lg bg-indigo-600 px-4 py-2.5 text-sm font-semibold text-white shadow-sm hover:bg-indigo-500"
-                      whileTap={{ scale: 0.95 }}
+                      whileTap={buttonTapEffect}
                       whileHover={buttonHoverEffect}
                     >
                       {t('free.cta', '지금 시작하기')}
@@ -165,7 +171,7 @@ export default function Pricing() {
               <div className="relative h-full rounded-2xl bg-gradient-to-br from-indigo-600/25 via-indigo-400/20 to-indigo-300/25 p-[1px]">
                 <motion.div
                   className="rounded-2xl bg-gradient-to-br from-indigo-50/90 via-white/90 to-indigo-100/85 backdrop-blur-sm ring-1 ring-indigo-200/60 p-6 md:p-8 shadow-sm hover:shadow-lg transition-shadow flex flex-col h-full"
-                  initial={{ opacity: 0, y: 24 }}
+                  initial={getInitial(24)}
                   animate={animateProps}
                   transition={getTransition(0.12)}
                 >
@@ -188,7 +194,7 @@ export default function Pricing() {
                     <motion.a
                       href="/support"
                       className="inline-flex w-full items-center justify-center rounded-lg bg-slate-900 px-4 py-2.5 text-sm font-semibold text-white shadow-sm hover:bg-slate-800"
-                      whileTap={{ scale: 0.95 }}
+                      whileTap={buttonTapEffect}
                       whileHover={buttonHoverEffect}
                     >
                       {t('pro.cta', '상담 요청하기')}
@@ -203,7 +209,7 @@ export default function Pricing() {
               <div className="relative h-full rounded-2xl bg-gradient-to-br from-slate-400/25 via-blue-300/20 to-slate-300/25 p-[1px]">
                 <motion.div
                   className="rounded-2xl bg-gradient-to-br from-white/90 via-blue-50/85 to-slate-50/85 backdrop-blur-sm ring-1 ring-blue-200/60 p-6 md:p-8 shadow-sm hover:shadow-lg transition-shadow flex flex-col h-full"
-                  initial={{ opacity: 0, y: 24 }}
+                  initial={getInitial(24)}
                   animate={animateProps}
                   transition={getTransition(0.19)}
                 >
@@ -225,7 +231,7 @@ export default function Pricing() {
                     <motion.a
                       href="/support"
                       className="inline-flex w-full items-center justify-center rounded-lg bg-blue-700 px-4 py-2.5 text-sm font-semibold text-white shadow-sm hover:bg-blue-600"
-                      whileTap={{ scale: 0.95 }}
+                      whileTap={buttonTapEffect}
                       whileHover={buttonHoverEffect}
                     >
                       {t('enterprise.cta', '세일즈 팀에 문의하기')}
