@@ -42,11 +42,11 @@ export default function HowItWorks() {
           </p>
         </div>
 
-        <div className="mt-12 flex snap-x snap-mandatory gap-4 overflow-x-auto pb-6 sm:gap-6 sm:pb-8 lg:grid lg:grid-cols-3 lg:gap-6 lg:overflow-visible lg:pb-0">
+        <div className="mt-12 grid gap-6 lg:grid-cols-3">
           {steps.map(({ key, icon: Icon, annotation, glideKey }, index) => (
             <article
               key={key}
-              className="group relative min-w-[240px] snap-start overflow-hidden rounded-3xl border border-indigo-100 bg-white/80 px-6 py-8 shadow-lg shadow-indigo-100/40 backdrop-blur transition hover:-translate-y-2 hover:shadow-2xl lg:min-w-0"
+              className="group relative overflow-hidden rounded-3xl border border-indigo-100 bg-white/80 px-6 py-8 shadow-lg shadow-indigo-100/40 backdrop-blur transition hover:-translate-y-2 hover:shadow-2xl"
             >
               <div className="absolute inset-0 bg-gradient-to-br from-white via-indigo-50/70 to-white" aria-hidden="true" />
               <div className="absolute -left-6 top-10 h-20 w-20 rounded-full bg-indigo-200/40 blur-3xl" aria-hidden="true" />

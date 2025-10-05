@@ -108,12 +108,11 @@ export default function AnchorNav() {
     <nav
       ref={navRef}
       id="anchor-nav"
-      className="hidden md:block sticky z-20 w-full border-b border-slate-200/70 bg-white/80 backdrop-blur supports-[backdrop-filter]:bg-white/70"
+      className="sticky z-20 w-full border-b border-slate-200 bg-white/90 backdrop-blur supports-[backdrop-filter]:bg-white/70"
       style={{ top: headerOffset }}
-      aria-label={t('anchor.label', 'Main section navigation')}
     >
-      <div className="mx-auto max-w-6xl px-6 lg:px-8">
-        <ul className="flex flex-nowrap items-center gap-2 overflow-x-auto py-3 text-sm no-scrollbar md:justify-center">
+      <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+        <ul className="flex flex-nowrap items-center gap-2 overflow-x-auto py-3 text-sm no-scrollbar">
           {items.map((it) => {
             const Icon = iconMap[it.id] || PlayIcon;
             const isActive = active === it.id;
