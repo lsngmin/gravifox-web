@@ -1,27 +1,39 @@
 import React from 'react';
 import { useTranslation } from 'react-i18next';
-import { VideoCameraIcon, ShieldCheckIcon, GlobeAltIcon } from '@heroicons/react/24/outline';
+import { PhotoIcon, BriefcaseIcon, ChatBubbleLeftRightIcon } from '@heroicons/react/24/outline';
 
 export default function UseCases() {
   const { t } = useTranslation('home');
   const cases = [
     {
-      icon: VideoCameraIcon,
-      title: t('useCases.items.mediaModeration.title', 'Media moderation'),
-      desc: t('useCases.items.mediaModeration.desc', 'Screen user uploads for GenAI and manipulated images.'),
-      detail: t('useCases.items.mediaModeration.detail', 'Live verdict streaming for UGC flows'),
+      icon: PhotoIcon,
+      title: t('useCases.items.secondHand.title', 'Check second-hand listing photos'),
+      desc: t(
+        'useCases.items.secondHand.desc',
+        'Verify the photos in a marketplace listing before you meet the seller.'
+      ),
+      detail: t(
+        'useCases.items.secondHand.detail',
+        'Highlights suspicious areas and gives you a shareable link.'
+      ),
     },
     {
-      icon: ShieldCheckIcon,
-      title: t('useCases.items.brandSafety.title', 'Brand safety'),
-      desc: t('useCases.items.brandSafety.desc', 'Protect campaigns and assets from deceptive media risks.'),
-      detail: t('useCases.items.brandSafety.detail', 'Evidence packs for legal & policy teams'),
+      icon: BriefcaseIcon,
+      title: t('useCases.items.jobProfile.title', 'Verify hiring profile media'),
+      desc: t(
+        'useCases.items.jobProfile.desc',
+        'Quickly check if a candidate’s profile or portfolio images were AI generated.'
+      ),
+      detail: t('useCases.items.jobProfile.detail', 'Share the verdict instantly without downloading files.'),
     },
     {
-      icon: GlobeAltIcon,
-      title: t('useCases.items.platformIntegrity.title', 'Platform integrity'),
-      desc: t('useCases.items.platformIntegrity.desc', 'Flag suspicious accounts and content at scale.'),
-      detail: t('useCases.items.platformIntegrity.detail', 'Risk-based throttling and step-up checks'),
+      icon: ChatBubbleLeftRightIcon,
+      title: t('useCases.items.community.title', 'Review community reports'),
+      desc: t(
+        'useCases.items.community.desc',
+        'Upload suspicious media from social feeds or forums to see if it is real.'
+      ),
+      detail: t('useCases.items.community.detail', 'Save summary notes and evidence captures for reports.'),
     },
   ];
 
@@ -41,27 +53,20 @@ export default function UseCases() {
         </div>
 
         <div className="mt-12 grid gap-6 lg:grid-cols-3">
-          {cases.map(({ icon: Icon, title, desc, detail }, index) => (
+          {cases.map(({ icon: Icon, title, desc, detail }) => (
             <article
               key={title}
-              className="relative overflow-hidden rounded-3xl border border-indigo-100/60 bg-white/80 p-6 shadow-lg shadow-indigo-100/40 transition duration-300 hover:-translate-y-2 hover:shadow-2xl"
+              className="relative overflow-hidden rounded-3xl border border-slate-200 bg-white/90 p-6 shadow-sm transition duration-300 hover:-translate-y-1 hover:shadow-xl"
             >
-              <div className="absolute inset-0 bg-gradient-to-br from-white via-indigo-50/70 to-slate-100" aria-hidden="true" />
-              <div className="absolute -left-8 -top-8 h-40 w-40 rounded-full bg-indigo-200/40 blur-3xl" aria-hidden="true" />
               <div className="relative flex h-full flex-col">
-                <div className="flex items-start justify-between gap-3">
-                  <span className="inline-flex h-12 w-12 items-center justify-center rounded-2xl bg-indigo-500/90 text-white shadow-lg shadow-indigo-500/30">
-                    <Icon className="h-6 w-6" aria-hidden="true" />
-                  </span>
-                  <span className="rounded-full border border-indigo-200/70 bg-white/60 px-3 py-1 text-xs font-semibold uppercase tracking-wide text-indigo-500">
-                    {`0${index + 1}`}
-                  </span>
+                <div className="inline-flex h-12 w-12 items-center justify-center rounded-2xl bg-indigo-500/90 text-white shadow-lg shadow-indigo-500/30">
+                  <Icon className="h-6 w-6" aria-hidden="true" />
                 </div>
                 <h4 className="mt-6 text-lg font-semibold text-slate-900">{title}</h4>
                 <p className="mt-3 text-sm text-slate-600 leading-relaxed">{desc}</p>
-                <div className="mt-6 rounded-2xl bg-slate-900/90 px-4 py-3 text-xs font-semibold uppercase tracking-wider text-indigo-100 shadow">
+                <p className="mt-6 rounded-2xl bg-indigo-50 px-4 py-3 text-xs font-medium text-indigo-700">
                   {detail}
-                </div>
+                </p>
               </div>
             </article>
           ))}
