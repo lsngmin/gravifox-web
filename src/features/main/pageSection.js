@@ -1,6 +1,6 @@
 import { useTranslation } from 'react-i18next';
 import { ArrowOutward } from '@mui/icons-material';
-import { MessageSquare, Sparkles, Upload, ScanSearch, CheckCircle2, Mail } from "lucide-react";
+import { MessageSquare, Sparkles, Upload, ScanSearch, CheckCircle2, Mail,Map } from "lucide-react";
 
 export default function PageSection() {
     const { t, i18n } = useTranslation('home');
@@ -201,7 +201,43 @@ export default function PageSection() {
                                 → 문의하기
                             </a>
                         </div>
-          {/*              <div className="space-y-4">*/}
+                        <div
+                            className="
+    mt-4 inline-flex flex-col sm:flex-row items-start sm:items-center gap-3
+    rounded-2xl border border-white/10 bg-white/[0.05]
+    px-4 py-3
+    text-indigo-100/90
+    backdrop-blur-sm
+    transition hover:bg-white/[0.1] hover:shadow-[0_0_30px_-10px_rgba(147,197,253,0.25)]
+  "
+                        >
+                            <div className="flex items-center gap-2">
+                                <Map className="h-4 w-4 text-indigo-300" />
+                                <span className="font-semibold text-sm">
+      {t('hero.roadmap', '로드맵 보기')}
+    </span>
+                            </div>
+
+                            <p className="text-[13px] text-indigo-200/80 leading-snug sm:ml-2">
+                                {t(
+                                    'hero.roadmapNote',
+                                    '앞으로 추가될 기능과 개선 일정을 확인해보세요. 서비스의 방향을 함께 만들어가요.'
+                                )}
+                            </p>
+
+                            <a
+                                href={`/${lng}/roadmap`}
+                                className="
+      ml-auto text-[12px] sm:text-sm font-semibold
+      text-indigo-100
+      transition-colors duration-200
+    "
+                            >
+                                → 로드맵 보기
+                            </a>
+                        </div>
+
+                        {/*              <div className="space-y-4">*/}
           {/*                  <div className="inline-flex items-center gap-2 rounded-full border border-white/15 bg-white/10 px-4 py-1 text-[10px] sm:text-xs font-semibold uppercase tracking-[0.18em] text-indigo-200/80">*/}
           {/*                      <Sparkles className="h-3.5 w-3.5" />*/}
           {/*                      <span>{usageLabel}</span>*/}
