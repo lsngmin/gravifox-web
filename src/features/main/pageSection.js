@@ -18,11 +18,27 @@ export default function PageSection() {
     const bulletPoints = t('hero.bullets', {
         returnObjects: true,
         defaultValue: [
-            '콘텐츠를 업로드하고 합성 흔적을 즉시 확인하세요.',
-            '위험 점수와 증거 이미지를 검토하고 팀에 공유하세요.',
-            '승인·차단 결과를 슬랙이나 검수 툴로 자동 전송하세요.',
+            'Upload any photo to check if it looks AI-generated in seconds.',
+            'Review the highlighted clues that explain the verdict.',
+            'Share a simple link so anyone can see the result.',
         ],
     });
+
+    const quickGuides = t('hero.cards', {
+        returnObjects: true,
+        defaultValue: [
+            {
+                title: 'Try it first with a sample',
+                desc: 'Open a sample image to watch the analysis unfold in real time.',
+            },
+            {
+                title: 'Upload your own photo',
+                desc: 'Drag a file or paste a link and get the verdict within seconds.',
+            },
+        ],
+    }).slice(0, 2);
+
+    const cardsLabel = t('hero.cardsLabel', 'Quick start');
 
     return (
         <section className="relative isolate overflow-hidden">
@@ -160,34 +176,32 @@ export default function PageSection() {
                         {/*</ul>*/}
                     </div>
 
-                    <div className="relative flex flex-col gap-4">
-                        {t('hero.cards', {
-                            returnObjects: true,
-                            defaultValue: [],
-                        }).map((card, idx) => (
-                            <article
-                                key={idx}
-                                className="relative overflow-hidden rounded-3xl border border-white/15 bg-white/10 p-6 text-indigo-100 shadow-[0_30px_60px_-35px_rgba(15,23,42,0.95)] backdrop-blur"
-                            >
-                                <div className="absolute inset-0 bg-gradient-to-br from-white/18 via-indigo-400/10 to-white/5" aria-hidden="true" />
-                                <div className="relative flex flex-col gap-4">
-                                    <div className="flex items-center justify-between text-xs font-semibold uppercase tracking-wide text-indigo-200/90">
-                                        <span>{card.pill}</span>
-                                        <span className="rounded-full bg-white/15 px-3 py-1 text-indigo-100/90">
-                                            {String(idx + 1).padStart(2, '0')}
-                                        </span>
+                    {quickGuides.length > 0 && (
+                        <div className="relative flex flex-col gap-4">
+                            {quickGuides.map((card, idx) => (
+                                <article
+                                    key={`${card.title}-${idx}`}
+                                    className="relative overflow-hidden rounded-3xl border border-white/15 bg-white/10 p-6 text-indigo-100 shadow-[0_30px_60px_-35px_rgba(15,23,42,0.95)] backdrop-blur"
+                                >
+                                    <div className="absolute inset-0 bg-gradient-to-br from-white/18 via-indigo-400/10 to-white/5" aria-hidden="true" />
+                                    <div className="relative flex flex-col gap-3">
+                                        <div className="flex items-center gap-3 text-xs font-semibold uppercase tracking-[0.2em] text-indigo-200/90">
+                                            <span className="flex h-8 w-8 items-center justify-center rounded-full border border-white/20 bg-white/10 text-sm text-indigo-50">
+                                                {String(idx + 1)}
+                                            </span>
+                                            <span className="text-indigo-100/80">{cardsLabel}</span>
+                                        </div>
+                                        <div className="space-y-2">
+                                            <h3 className="text-lg font-semibold text-white">{card.title}</h3>
+                                            {card.desc && (
+                                                <p className="text-sm leading-relaxed text-indigo-100/80">{card.desc}</p>
+                                            )}
+                                        </div>
                                     </div>
-                                    <div className="space-y-2">
-                                        <h3 className="text-base font-semibold text-white">{card.title}</h3>
-                                        <p className="text-sm text-indigo-100/80 leading-relaxed">{card.body}</p>
-                                    </div>
-                                    <div className="rounded-2xl border border-white/15 bg-indigo-500/20 px-4 py-3 text-xs font-semibold uppercase tracking-wide text-indigo-50">
-                                        {card.footer}
-                                    </div>
-                                </div>
-                            </article>
-                        ))}
-                    </div>
+                                </article>
+                            ))}
+                        </div>
+                    )}
                 </div>
             </div>
         </section>

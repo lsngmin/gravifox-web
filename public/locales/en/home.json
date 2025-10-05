@@ -1,9 +1,9 @@
 {
   "hero": {
-    "headline": "Catch AI-manipulated content before people see it",
-    "title": "GenAI image authenticity in one API call",
-    "title2": "No model ops — just results",
-    "subtitle": "Upload images or videos and get a verdict in seconds. We include plain-language evidence and next steps so your reviewers know what to do.",
+    "headline": "Know if that photo is real in just a few seconds",
+    "title": "Check image and video authenticity with ease",
+    "title2": "See instant results right in your browser",
+    "subtitle": "Drop a photo and we tell you right away if AI made it. We point out the clues so you can understand at a glance.",
     "ribbon": "AI-FIRST DEFENSE STACK",
     "feedback": "Talk to our team in under 24 hours",
     "metrics": {
@@ -32,24 +32,21 @@
       "footer": "24/7 escalation · Dedicated incident channel upon activation"
     },
     "bullets": [
-      "Upload suspect media and get instant synthetic checks.",
-      "Review the risk score and evidence snapshots, then brief your team.",
-      "Send approve or block decisions straight to Slack or your moderation tools."
+      "Upload snapshots or saved images to get an instant verdict.",
+      "See highlighted areas that look suspicious for quick review.",
+      "Share the result link so friends or communities can see it too."
     ],
     "cards": [
       {
-        "pill": "New to GraviFox?",
-        "title": "Understand how the platform protects you",
-        "body": "Spots GenAI imagery across photos and frames. Explains why it is risky and what to do next.",
-        "footer": "Designed so product, policy, and engineering teams can work together."
+        "title": "Try it first with a sample",
+        "desc": "Open a sample image to watch the analysis unfold in real time."
       },
       {
-        "pill": "Your first five minutes",
-        "title": "Try it without writing a single line of code",
-        "body": "Use sample media or upload your own, watch verdicts stream in, and invite teammates to review.",
-        "footer": "Guided walkthroughs and playbooks help non-technical teams feel confident."
+        "title": "Upload your own photo",
+        "desc": "Drag a file or paste a link and get the verdict and explanation in seconds."
       }
-    ]
+    ],
+    "cardsLabel": "Quick start"
   },
   "cta": {
     "start": "Get started free",
