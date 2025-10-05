@@ -57,25 +57,30 @@
     "link": "Contact us"
   },
   "feature": {
-    "eyebrow": "Connect without hassle",
-    "title": "Set up in minutes",
-    "subtitle": "Use vision, language, and custom checks without standing up infrastructure.",
-    "subtitle2": "Keep shipping features while we manage the ML operations.",
-    "items": {
-      "oneLine": {
-        "name": "Start with one copy-paste.",
-        "desc": "Send a link or file and we return a clear verdict with no extra config.",
-        "highlight": "Example: Flag a support ticket screenshot straight from Zendesk"
+    "eyebrow": "Experience it yourself",
+    "title": "Upload media → AI analyzes → Review & share results",
+    "subtitle": "See how easy it is to go from sign-up to sharing verdicts in just three steps.",
+    "steps": {
+      "signup": {
+        "title": "Create an account",
+        "desc": "Open the dashboard with email or SSO in under a minute."
       },
-      "security": {
-        "name": "Keep data locked down.",
-        "desc": "Every request stays encrypted in transit and we only store it long enough for review.",
-        "highlight": "Example: Limit access to just your trust & safety team"
+      "upload": {
+        "title": "Upload photos or videos",
+        "desc": "Drop in the file you want to verify and our AI begins analyzing instantly."
       },
-      "scaling": {
-        "name": "Scale with your traffic.",
-        "desc": "We auto-adjust capacity so launches and news spikes stay covered.",
-        "highlight": "Example: Handle weekend surges without paging your infra team"
+      "review": {
+        "title": "Review & share verdicts",
+        "desc": "Get a summary with evidence in seconds and copy a link to share with your team."
+      }
+    },
+    "demo": {
+      "label": "Demo preview",
+      "status": "AI is analyzing…",
+      "caption": "Once upload finishes, the result card fills in automatically.",
+      "preview": {
+        "title": "Verdict summary",
+        "desc": "This image looks authentic. Evidence and sharing controls appear alongside."
       }
     }
   },
@@ -192,10 +197,25 @@
     }
   },
   "sample": {
-    "eyebrow": "Sample Output",
-    "title": "See results before you build",
-    "subtitle": "Minimal request. Clear response. Copy and try now.",
-    "response": "Response"
+    "eyebrow": "Sample result",
+    "title": "Take a peek at the real verdict screen",
+    "subtitle": "We captured a quick example so you know exactly what shows up after analysis.",
+    "result": {
+      "badge": "AI verdict",
+      "headline": "This photo is likely real",
+      "confidence": "Confidence 87%",
+      "description": "Lighting and texture patterns matched authentic captures.",
+      "cta": "Copy link to share"
+    },
+    "insights": {
+      "title": "What the result highlights",
+      "items": [
+        "Suspicious signals appear with clear highlights.",
+        "We outline the evidence and suggested follow-up actions.",
+        "Collaborate with teammates via comments and audit history."
+      ],
+      "footnote": "Screenshots may vary slightly depending on the media you upload."
+    }
   },
   "security": {
     "eyebrow": "Security & Privacy",
