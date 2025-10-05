@@ -16,16 +16,25 @@ export default function SupportedInputs() {
       <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_top,_rgba(129,140,248,0.35),_transparent_65%)]" aria-hidden="true" />
       <div className="relative mx-auto max-w-6xl px-6 text-slate-100">
         <div className="mx-auto max-w-3xl text-center">
-          <h3 className="text-xs font-semibold uppercase tracking-[0.3em] text-indigo-300">
+          <h3 className="text-[11px] sm:text-xs font-semibold uppercase tracking-[0.3em] text-indigo-300">
             {t('supported.eyebrow', 'What you can upload')}
           </h3>
-          <p className="mt-3 text-3xl sm:text-4xl font-bold tracking-tight text-white">
+          <p className="mt-3 text-xl sm:text-3xl md:text-4xl font-bold tracking-tight text-white">
             {t('supported.title', 'Supported formats & sizes')}
           </p>
-          <p className="mt-4 text-sm sm:text-base text-indigo-100/90">
+          <p className="mt-4 text-[13px] sm:text-base md:text-lg text-indigo-100/90">
             {t('supported.subtitle', 'Just the basics you need before uploading photos or videos.')}
           </p>
         </div>
+        {/*<h3 className="text-[11px] sm:text-xs font-semibold uppercase tracking-[0.25em] text-indigo-500">*/}
+        {/*  {t('how.eyebrow', '이용방법')}*/}
+        {/*</h3>*/}
+        {/*<p className="mt-3 text-xl sm:text-3xl md:text-4xl font-bold tracking-tight text-slate-900">*/}
+        {/*  {t('how.title', '올리고 나면 바로 시작돼요')}*/}
+        {/*</p>*/}
+        {/*<p className="mt-4 text-[13px] sm:text-base md:text-lg text-slate-600">*/}
+        {/*  {t('how.subtitle', '다른 일을 하러 가도 분석은 백그라운드에서 계속돼요.')}*/}
+        {/*</p>*/}
 
         <div className="mx-auto mt-10 flex flex-wrap justify-center gap-2">
           {badges.map((label) => (

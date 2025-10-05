@@ -20,13 +20,15 @@ export default function FAQ() {
       <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_top,_rgba(79,70,229,0.18),_transparent_65%)]" aria-hidden="true" />
       <div className="relative mx-auto max-w-5xl px-6">
         <div className="text-center">
-          <h3 className="text-xs font-semibold uppercase tracking-[0.3em] text-indigo-500">
-            {t('faq.eyebrow', 'FAQ')}
+          <h3 className="text-[10px] sm:text-xs md:text-sm font-semibold uppercase tracking-[0.25em] sm:tracking-[0.3em] text-indigo-500">
+            {t('faq.eyebrow', '자주 묻는 질문')}
           </h3>
-          <p className="mt-3 text-3xl sm:text-4xl font-bold tracking-tight text-slate-900">
-            {t('faq.title', 'Answers to common questions')}
+
+          <p className="mt-2 sm:mt-3 text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold tracking-tight text-slate-900 leading-snug sm:leading-tight">
+            {t('faq.title', '자주 묻는 질문에 대한 답변')}
           </p>
         </div>
+
 
         <div className="mt-12 grid gap-4">
           {items.map((item, idx) => (

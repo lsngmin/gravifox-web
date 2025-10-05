@@ -8,16 +8,19 @@ export default function SampleOutput() {
     <section id="sample" className="relative isolate overflow-hidden bg-transparent py-12 sm:py-16 scroll-mt-40">
       <div className="mx-auto max-w-7xl px-6 lg:px-8">
         <div className="mx-auto max-w-2xl text-center">
-          <h3 className="text-sm font-semibold uppercase tracking-wide text-indigo-600">
-            {t('sample.eyebrow', 'Sample result')}
+          <h3 className="text-[11px] sm:text-xs md:text-sm font-semibold uppercase tracking-[0.25em] text-indigo-600">
+            {t('sample.eyebrow', '샘플 결과 화면')}
           </h3>
-          <p className="mt-2 text-3xl font-semibold tracking-tight text-gray-900 sm:text-4xl">
-            {t('sample.title', 'Take a peek at the real verdict screen')}
+
+          <p className="mt-2 text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-semibold tracking-tight text-gray-900 leading-tight">
+            {t('sample.title', 'AI 분석 결과 화면 미리보기')}
           </p>
-          <p className="mt-4 text-gray-600">
-            {t('sample.subtitle', 'We captured a quick example so you know exactly what shows up after analysis.')}
+
+          <p className="mt-4 text-[13px] sm:text-sm md:text-base lg:text-lg text-gray-600 leading-relaxed sm:leading-normal md:leading-snug">
+            {t('sample.subtitle', '분석 후 어떤 화면이 나오는지 미리 확인해보세요.')}
           </p>
         </div>
+
 
         <div className="mt-10 grid grid-cols-1 gap-6 md:grid-cols-[1.1fr_0.9fr]">
           <div className="relative overflow-hidden rounded-3xl border border-indigo-100 bg-gradient-to-br from-slate-900 via-indigo-900/70 to-slate-900 text-slate-100 shadow-2xl shadow-indigo-200/40">
