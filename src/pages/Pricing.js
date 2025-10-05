@@ -19,17 +19,26 @@ export default function Pricing() {
       {
         label: t('hero.metrics.timeLabel', '런칭 속도'),
         value: t('hero.metrics.timeValue', '최대 14일 빠른 시작'),
-        copy: t('hero.metrics.timeCopy', '기본 템플릿과 샘플 파이프라인으로 바로 결과를 확인하세요.'),
+        copy: t(
+          'hero.metrics.timeCopy',
+          '빠른 템플릿과 샘플 파이프라인으로 첫 결과를 바로 확인해 보세요.'
+        ),
       },
       {
         label: t('hero.metrics.scaleLabel', '확장 준비'),
         value: t('hero.metrics.scaleValue', '트래픽 급증에도 안정적'),
-        copy: t('hero.metrics.scaleCopy', '자동 스케일링과 모델 전환 없이 운영을 이어가요.'),
+        copy: t(
+          'hero.metrics.scaleCopy',
+          '팀 규모가 커져도 자동 스케일링으로 걱정 없이 운영할 수 있어요.'
+        ),
       },
       {
         label: t('hero.metrics.securityLabel', '안심 보안'),
         value: t('hero.metrics.securityValue', '엔드투엔드 보호'),
-        copy: t('hero.metrics.securityCopy', '권한 제어와 감사 로그로 팀 전체가 안심하고 협업해요.'),
+        copy: t(
+          'hero.metrics.securityCopy',
+          '권한 제어와 감사 로그를 기본으로 제공해 모든 팀원이 편하게 협업해요.'
+        ),
       },
     ],
     [t]
@@ -37,7 +46,7 @@ export default function Pricing() {
 
   const animateProps = { opacity: 1, y: 0 };
 
-  const getInitial = (desktopY = 20) =>
+  const getInitial = (desktopY = 8) =>
     isMobile
       ? { opacity: 1, y: 0 }
       : {
@@ -45,10 +54,10 @@ export default function Pricing() {
           y: desktopY,
         };
 
-  const getTransition = (delay = 0) => ({ duration: 0.6, ease: 'easeOut', delay });
+  const getTransition = (delay = 0) => ({ duration: 0.4, ease: 'easeOut', delay });
 
-  const buttonHoverEffect = !isMobile ? { scale: 1.02 } : undefined;
-  const buttonTapEffect = !isMobile ? { scale: 0.95 } : undefined;
+  const buttonHoverEffect = !isMobile ? { scale: 1.01 } : undefined;
+  const buttonTapEffect = !isMobile ? { scale: 0.99 } : undefined;
 
   return (
     <div className="min-h-screen bg-white font-sans">
@@ -64,10 +73,13 @@ export default function Pricing() {
               {t('hero.ribbon', 'PRICING THAT GROWS WITH YOU')}
             </div>
             <h1 className="mt-4 text-3xl md:text-5xl font-extrabold tracking-tight text-slate-900 leading-tight">
-              {t('hero.title', '부담 없이 시작하고, 필요할 때만 더 내세요')}
+              {t('hero.title', '가볍게 시작하고, 필요한 순간에만 확장하세요')}
             </h1>
             <p className="mt-4 text-sm md:text-base text-slate-600 max-w-3xl mx-auto">
-              {t('hero.subtitle', '무료로 실험해 보고, 팀이 성장하면 자연스럽게 확장되도록 요금제를 다듬었어요.')}
+              {t(
+                'hero.subtitle',
+                '무료로 먼저 써 본 뒤, 필요한 기능만 골라 부담 없이 이어갈 수 있도록 요금제를 준비했어요.'
+              )}
             </p>
             <div className="mt-8 grid gap-4 sm:grid-cols-3 max-w-4xl mx-auto text-left">
               {heroMetrics.map((metric, index) => (
@@ -76,7 +88,7 @@ export default function Pricing() {
                   className="rounded-2xl bg-white/80 p-4 shadow-sm ring-1 ring-indigo-100/60"
                   initial={getInitial(20)}
                   animate={animateProps}
-                  transition={getTransition(0.08 * index)}
+                  transition={getTransition(0.04 * index)}
                 >
                   <p className="text-xs font-semibold text-indigo-500">{metric.label}</p>
                   <p className="mt-1 text-lg font-semibold text-slate-900">{metric.value}</p>
@@ -136,7 +148,7 @@ export default function Pricing() {
                   className="rounded-2xl bg-gradient-to-br from-white/96 via-slate-50/80 to-indigo-50/60 backdrop-blur-sm ring-1 ring-slate-200/60 p-6 md:p-8 shadow-sm hover:shadow-lg transition-shadow flex flex-col h-full"
                   initial={getInitial(24)}
                   animate={animateProps}
-                  transition={getTransition(0.05)}
+                  transition={getTransition(0.03)}
                 >
                   <div className="mb-1 text-xs font-semibold tracking-wide text-indigo-600">{t('free.badge', 'Free')}</div>
                   <h3 className="text-xl font-semibold text-slate-900">{t('free.title', '무료 요금제')}</h3>
@@ -173,7 +185,7 @@ export default function Pricing() {
                   className="rounded-2xl bg-gradient-to-br from-indigo-50/90 via-white/90 to-indigo-100/85 backdrop-blur-sm ring-1 ring-indigo-200/60 p-6 md:p-8 shadow-sm hover:shadow-lg transition-shadow flex flex-col h-full"
                   initial={getInitial(24)}
                   animate={animateProps}
-                  transition={getTransition(0.12)}
+                  transition={getTransition(0.06)}
                 >
                   <div className="absolute -top-3 right-4 inline-flex items-center rounded-full bg-indigo-600 px-2.5 py-1 text-xs font-semibold text-white shadow-sm">가장 인기</div>
                   <div className="mb-1 text-xs font-semibold tracking-wide text-indigo-600">{t('pro.badge', 'Pro')}</div>
@@ -211,7 +223,7 @@ export default function Pricing() {
                   className="rounded-2xl bg-gradient-to-br from-white/90 via-blue-50/85 to-slate-50/85 backdrop-blur-sm ring-1 ring-blue-200/60 p-6 md:p-8 shadow-sm hover:shadow-lg transition-shadow flex flex-col h-full"
                   initial={getInitial(24)}
                   animate={animateProps}
-                  transition={getTransition(0.19)}
+                  transition={getTransition(0.09)}
                 >
                   <div className="mb-1 text-xs font-semibold tracking-wide text-blue-700">{t('enterprise.badge', 'Enterprise')}</div>
                   <h3 className="text-xl font-semibold text-slate-900">{t('enterprise.title', '엔터프라이즈')}</h3>
