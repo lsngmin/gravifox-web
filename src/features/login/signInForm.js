@@ -3,10 +3,18 @@ import React, { useState } from "react";
 import LoginErrorMessage from "features/login/loginErrorMessage";
 import SignInAPI from "features/login/api/signInAPI";
 import GoogleLoginButton from "features/login/components/googleLoginButton";
-import { Link, useNavigate } from "react-router-dom";
+import { Link, useNavigate, useParams } from "react-router-dom";
 
 export default function SignInForm() {
     const navigate = useNavigate();
+    const { lng } = useParams();
+    const localizedPath = (path) => {
+        const prefix = lng ? `/${lng}` : "";
+        if (path === "/" && prefix) {
+            return prefix;
+        }
+        return `${prefix}${path}`;
+    };
 
     // LoginErrorMessage에 전달하기 위한 에러 코드와 메세지
     const [errorStatus, setErrorStatus] = useState(null),
@@ -28,7 +36,7 @@ export default function SignInForm() {
             await signIn(formState);
         } catch (error) {
             if (error?.code === "EMAIL_NOT_VERIFIED") {
-                navigate("/verify", { state: { email: formState.userId } });
+                navigate(localizedPath("/verify"), { state: { email: formState.userId } });
                 return;
             }
             setErrorStatus(error.status);
@@ -36,7 +44,7 @@ export default function SignInForm() {
         }
     };
     const handleChangeForm = () => {
-        navigate("/agree");
+        navigate(localizedPath("/agree"));
     };
 
     /**
@@ -85,7 +93,7 @@ export default function SignInForm() {
                             <label htmlFor="password" className="block text-sm font-medium text-slate-100">
                                 Password
                             </label>
-                            <Link to="/support" className="text-xs font-semibold text-indigo-200 transition hover:text-indigo-100">
+                            <Link to={localizedPath("/support")} className="text-xs font-semibold text-indigo-200 transition hover:text-indigo-100">
                                 Forgot password?
                             </Link>
                         </div>

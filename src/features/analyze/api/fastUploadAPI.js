@@ -11,6 +11,9 @@ export function useFastUploadAPI() {
   const uploadFile = async (file) => {
     if (!file) throw new Error("파일이 없습니다.");
     const url = FASTAPI_ENDPOINTS.UPLOAD;
+    if (!url) {
+      throw new Error("업로드 엔드포인트가 설정되지 않았어요. 환경 변수를 확인해 주세요.");
+    }
     const formData = new FormData();
     formData.append("file", file);
     const res = await axios.post(url, formData, {

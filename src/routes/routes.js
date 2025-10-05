@@ -88,8 +88,8 @@ function LegacyToLocalized() {
         const browser = (navigator.language || 'en').slice(0,2);
         const stored = (typeof localStorage !== 'undefined' && localStorage.getItem('i18nextLng')) || '';
         const pick = supported.includes(stored) ? stored : (supported.includes(browser) ? browser : 'en');
-        nav(`/${pick}${loc.pathname}${loc.search}${loc.hash}`, { replace: true });
-    }, [loc.hash, loc.pathname, loc.search, nav]);
+        nav(`/${pick}${loc.pathname}${loc.search}${loc.hash}`, { replace: true, state: loc.state });
+    }, [loc.hash, loc.pathname, loc.search, loc.state, nav]);
     return null;
 }
 
@@ -102,8 +102,8 @@ function LangRedirect() {
         const stored = (typeof localStorage !== 'undefined' && localStorage.getItem('i18nextLng')) || '';
         const pick = supported.includes(stored) ? stored : (supported.includes(browser) ? browser : 'en');
         const path = loc.pathname === '/' ? '' : loc.pathname;
-        nav(`/${pick}${path}${loc.search}${loc.hash}`, { replace: true });
-    }, [loc.hash, loc.pathname, loc.search, nav]);
+        nav(`/${pick}${path}${loc.search}${loc.hash}`, { replace: true, state: loc.state });
+    }, [loc.hash, loc.pathname, loc.search, loc.state, nav]);
     return null;
 }
 
