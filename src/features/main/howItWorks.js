@@ -1,76 +1,133 @@
-import React from 'react';
+'use client';
+import React, { useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
+import { Swiper, SwiperSlide } from 'swiper/react';
+import { Navigation, Pagination, A11y } from 'swiper/modules';
 import { CloudUpload, Terminal, AutoAwesomeMotion } from '@mui/icons-material';
-
-const steps = [
-  {
-    key: 'ingest',
-    icon: CloudUpload,
-    annotation: '00:00:00',
-    glideKey: 'how.steps.upload',
-  },
-  {
-    key: 'analyze',
-    icon: Terminal,
-    annotation: '00:00:03',
-    glideKey: 'how.steps.api',
-  },
-  {
-    key: 'respond',
-    icon: AutoAwesomeMotion,
-    annotation: '00:00:09',
-    glideKey: 'how.steps.result',
-  },
-];
+import 'swiper/css';
+import 'swiper/css/navigation';
+import 'swiper/css/pagination';
 
 export default function HowItWorks() {
   const { t } = useTranslation('home');
+  const prevRef = useRef(null);
+  const nextRef = useRef(null);
+  const paginationRef = useRef(null);
+  const [swiperInstance, setSwiperInstance] = useState(null);
+
+  useEffect(() => {
+    if (!swiperInstance) return;
+
+    if (prevRef.current && nextRef.current && swiperInstance.params?.navigation && swiperInstance.navigation) {
+      swiperInstance.params.navigation.prevEl = prevRef.current;
+      swiperInstance.params.navigation.nextEl = nextRef.current;
+      swiperInstance.navigation.prevEl = prevRef.current;
+      swiperInstance.navigation.nextEl = nextRef.current;
+      swiperInstance.navigation.init();
+      swiperInstance.navigation.update();
+    }
+
+    if (paginationRef.current && swiperInstance.params?.pagination && swiperInstance.pagination) {
+      const el = paginationRef.current;
+      swiperInstance.params.pagination.el = el;
+      swiperInstance.pagination.el = el;
+      swiperInstance.pagination.init();
+      swiperInstance.pagination.render();
+      swiperInstance.pagination.update();
+
+      // Ensure pagination container stays inline with buttons
+      el.style.position = 'static';
+      el.style.width = 'auto';
+    }
+
+    const extraPaginations = swiperInstance.el?.querySelectorAll('.swiper-pagination');
+    extraPaginations?.forEach((node) => {
+      if (node !== paginationRef.current) {
+        node.remove();
+      }
+    });
+  }, [swiperInstance]);
+
+  const steps = [
+    { key: 'ingest', icon: CloudUpload, annotation: '00:00:00', glideKey: 'how.steps.upload' },
+    { key: 'analyze', icon: Terminal, annotation: '00:00:03', glideKey: 'how.steps.api' },
+    { key: 'respond', icon: AutoAwesomeMotion, annotation: '00:00:09', glideKey: 'how.steps.result' },
+  ];
 
   return (
-    <section id="how" className="relative isolate overflow-hidden py-16 sm:py-20">
-      <div className="pointer-events-none absolute inset-0 bg-gradient-to-b from-white via-slate-50 to-white" aria-hidden="true" />
-      <div className="relative mx-auto max-w-6xl px-6">
-        <div className="text-center">
-          <h3 className="text-xs font-semibold uppercase tracking-[0.3em] text-indigo-500">
-            {t('how.eyebrow', 'How It Works')}
+      <section id="how" className="py-16 sm:py-20 bg-gradient-to-b from-white via-slate-50/60 to-white">
+        <div className="mx-auto flex max-w-5xl flex-col items-center justify-center px-4 text-center sm:px-6 lg:px-8">
+          {/* Header */}
+          <h3 className="text-[11px] sm:text-xs font-semibold uppercase tracking-[0.25em] text-indigo-500">
+            {t('how.eyebrow', '이용방법')}
           </h3>
-          <p className="mt-3 text-3xl sm:text-4xl font-bold tracking-tight text-slate-900">
-            {t('how.title', 'Analyze in 3 simple steps')}
+          <p className="mt-3 text-xl sm:text-3xl md:text-4xl font-bold tracking-tight text-slate-900">
+            {t('how.title', '올리고 나면 바로 시작돼요')}
           </p>
-          <p className="mt-4 text-sm sm:text-base text-slate-600">
-            {t('how.subtitle', 'From media to insight — fast, secure, and reliable.')}
+          <p className="mt-4 text-[13px] sm:text-base md:text-lg text-slate-600">
+            {t('how.subtitle', '다른 일을 하러 가도 분석은 백그라운드에서 계속돼요.')}
           </p>
-        </div>
 
-        <div className="mt-12 grid gap-6 lg:grid-cols-3">
-          {steps.map(({ key, icon: Icon, annotation, glideKey }, index) => (
-            <article
-              key={key}
-              className="group relative overflow-hidden rounded-3xl border border-indigo-100 bg-white/80 px-6 py-8 shadow-lg shadow-indigo-100/40 backdrop-blur transition hover:-translate-y-2 hover:shadow-2xl"
+          {/* Swiper section */}
+          <div className="mt-12 w-full">
+            <Swiper
+                modules={[Navigation, Pagination, A11y]}
+                spaceBetween={40}
+                slidesPerView={1}
+                pagination={{
+                  clickable: true,
+                  bulletClass:
+                      'swiper-pagination-bullet border border-indigo-300 bg-white opacity-100 mx-1',
+                  bulletActiveClass:
+                      'swiper-pagination-bullet-active bg-indigo-500 border-indigo-500',
+                }}
+                navigation={{ prevEl: prevRef.current, nextEl: nextRef.current }}
+                onSwiper={setSwiperInstance}
+                breakpoints={{
+                  768: { slidesPerView: 2 },
+                  1024: { slidesPerView: 3 },
+                }}
+                className="pb-10"
             >
-              <div className="absolute inset-0 bg-gradient-to-br from-white via-indigo-50/70 to-white" aria-hidden="true" />
-              <div className="absolute -left-6 top-10 h-20 w-20 rounded-full bg-indigo-200/40 blur-3xl" aria-hidden="true" />
-              <div className="relative flex flex-col gap-5">
-                <div className="flex items-center justify-between">
-                  <span className="inline-flex h-12 w-12 items-center justify-center rounded-2xl bg-gradient-to-br from-indigo-500 to-indigo-400 text-white shadow-lg shadow-indigo-400/40">
-                    <Icon fontSize="small" />
-                  </span>
-                  <span className="rounded-full border border-indigo-200/60 bg-white/70 px-3 py-1 text-xs font-semibold uppercase tracking-wide text-indigo-500">
-                    {t('how.step', 'Step')} {index + 1}
-                  </span>
-                </div>
-                <div className="space-y-3">
-                  <h4 className="text-lg font-semibold text-slate-900">{t(`${glideKey}.title`)}</h4>
-                  <p className="text-sm text-slate-600 leading-relaxed">{t(`${glideKey}.desc`)}</p>
-                  <div className="rounded-2xl bg-slate-900/90 px-4 py-2 text-xs font-semibold uppercase tracking-wide text-indigo-100 shadow">
-                    {annotation}
-                  </div>
-                </div>
-              </div>
-            </article>
-          ))}
+              {steps.map(({ key, icon: Icon, annotation, glideKey }) => (
+                  <SwiperSlide key={key}>
+                    <article className="rounded-3xl border border-indigo-100 bg-white/80 backdrop-blur p-8 sm:p-10">
+                      <div className="flex flex-col gap-6 items-center">
+                    <span className="inline-flex h-14 w-14 items-center justify-center rounded-2xl bg-gradient-to-br from-indigo-500 to-indigo-400 text-white">
+                      <Icon fontSize="small" />
+                    </span>
+                        <h4 className="text-lg font-semibold text-slate-900">{t(`${glideKey}.title`)}</h4>
+                        <p className="text-sm text-slate-600 leading-relaxed">{t(`${glideKey}.desc`)}</p>
+                      </div>
+                    </article>
+                  </SwiperSlide>
+              ))}
+            </Swiper>
+
+            {/* Buttons + Indicator group (아래 배치) */}
+            <div className="mt-10 flex items-center justify-center gap-6 flex-wrap">
+              <button
+                  ref={prevRef}
+                  className="rounded-full border border-indigo-300 bg-white/80 backdrop-blur px-3 py-2 hover:bg-white transition-all duration-200"
+              >
+                ‹
+              </button>
+
+              {/* Swiper pagination dots */}
+              <div
+                  ref={paginationRef}
+                  className="custom-pagination flex shrink-0 items-center justify-center !static !w-auto"
+              />
+
+              <button
+                  ref={nextRef}
+                  className="rounded-full border border-indigo-300 bg-white/80 backdrop-blur px-3 py-2 hover:bg-white transition-all duration-200"
+              >
+                ›
+              </button>
+            </div>
+          </div>
         </div>
-      </div>
-    </section>
+      </section>
   );
 }
