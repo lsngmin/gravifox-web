@@ -7,9 +7,21 @@ export default function Testimonials() {
   const items = t('socialProof.items', {
     returnObjects: true,
     defaultValue: [
-      { quote: 'Clear API and fast results. Integration took an afternoon.', author: 'Product Lead', company: 'MediaApp' },
-      { quote: 'Confidence scores are reliable and easy to reason about.', author: 'ML Engineer', company: 'VisionLab' },
-      { quote: 'Great developer experience and responsive support.', author: 'CTO', company: 'Startify' },
+      {
+        quote: 'It told me right away whether our family photos were authentic, so I could tidy the album with peace of mind.',
+        author: 'Tester A',
+        descriptor: 'Digitising family albums',
+      },
+      {
+        quote: 'Checking listings before I pay keeps me from getting scammed on second-hand deals.',
+        author: 'Buyer B',
+        descriptor: 'Active marketplace user',
+      },
+      {
+        quote: 'I can verify videos before sharing them with my community, which keeps rumours from spreading.',
+        author: 'Community C',
+        descriptor: 'Online forum moderator',
+      },
     ],
   });
 
@@ -20,10 +32,10 @@ export default function Testimonials() {
       <div className="relative mx-auto max-w-6xl px-6 text-indigo-50">
         <div className="mx-auto max-w-3xl text-center space-y-4">
           <h3 className="text-xs font-semibold uppercase tracking-[0.3em] text-indigo-200">
-            {t('socialProof.eyebrow', 'What users say')}
+            {t('socialProof.eyebrow', 'User stories')}
           </h3>
           <p className="text-3xl sm:text-4xl font-bold leading-tight text-white">
-            {t('socialProof.title', 'Proof from teams like yours')}
+            {t('socialProof.title', 'Honest words from real people')}
           </p>
         </div>
 
@@ -38,9 +50,11 @@ export default function Testimonials() {
               <blockquote className="relative mt-4 text-sm sm:text-base leading-relaxed text-indigo-50/90">
                 “{it.quote}”
               </blockquote>
-              <figcaption className="relative mt-6 flex flex-col">
+              <figcaption className="relative mt-6 flex flex-col gap-1">
                 <span className="text-sm font-semibold text-white">{it.author}</span>
-                <span className="text-xs font-medium uppercase tracking-wide text-indigo-200/80">{it.company}</span>
+                {(it.descriptor || it.company) && (
+                  <span className="text-xs font-medium text-indigo-200/80">{it.descriptor || it.company}</span>
+                )}
               </figcaption>
             </figure>
           ))}
