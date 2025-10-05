@@ -1,48 +1,81 @@
 {
   "hero": {
-    "title": "Simple, fair pricing",
-    "subtitle": "Start free, scale with Pro — elegant and transparent."
+    "ribbon": "Pricing that grows with you",
+    "title": "Start light, only upgrade when it feels right",
+    "subtitle": "Experiment for free and scale into Pro once your team is ready.",
+    "metrics": {
+      "timeLabel": "Launch speed",
+      "timeValue": "Ship up to 14 days faster",
+      "timeCopy": "Use starter templates and sample pipelines to validate results right away.",
+      "scaleLabel": "Scale ready",
+      "scaleValue": "Steady even in traffic spikes",
+      "scaleCopy": "Auto scaling keeps workloads flowing without swapping models.",
+      "securityLabel": "Feel secure",
+      "securityValue": "End-to-end protection",
+      "securityCopy": "Fine-grained roles and audit trails keep every team member safe."
+    }
+  },
+  "story": {
+    "headline": "Smarter AI every day, pricing that stays predictable",
+    "copy": "GraviFox keeps up with the latest generative trends while helping you spend only on what your team actually uses.",
+    "point1": "Every plan receives the newest models within 24 hours.",
+    "point2": "Compare accuracy and cost side-by-side before you commit.",
+    "point3": "Switch to enterprise options with a single click whenever you need more."
   },
   "free": {
     "badge": "Free",
     "title": "Free Plan",
-    "subtitle": "A solid start with essentials",
+    "subtitle": "Everything you need to explore comfortably",
     "price": "₩0",
     "per": "/ month",
-    "cta": "Get started",
+    "cta": "Start for free",
     "features": {
-      "tokens": "20 analysis tokens per month",
-      "queue": "Low-priority processing queue",
-      "metrics": "Basic analytics",
-      "models": "Limited model access"
+      "tokens": "20 image analyses each month",
+      "queue": "Standard priority processing queue",
+      "metrics": "Core usage dashboards",
+      "models": "Flagship model access"
     }
   },
   "pro": {
     "badge": "Pro",
     "title": "Pro Plan",
-    "subtitle": "Validate quality with zero risk",
+    "subtitle": "Upgrade when you're ready to go live",
     "price": "₩19,000",
     "per": "/ month",
-    "cta": "Contact sales",
+    "cta": "Talk to sales",
     "features": {
-      "tokens": "500 analysis tokens per month",
-      "queue": "High-priority processing queue",
-      "metrics": "Advanced analytics",
-      "models": "Extended model access"
+      "tokens": "500 image analyses each month",
+      "queue": "Priority queueing & guaranteed speed",
+      "metrics": "Advanced dashboards & alerts",
+      "models": "Extended model presets"
     }
   },
   "enterprise": {
     "badge": "Enterprise",
     "title": "Enterprise",
-    "subtitle": "Security, scale, and dedicated support for enterprise.",
+    "subtitle": "Built for teams who need custom guardrails",
     "price": "Custom quote",
     "per": "/ month",
-    "cta": "Contact",
+    "cta": "Connect with sales",
     "features": {
-      "sso": "SSO / SAML support",
-      "infra": "Dedicated infra & region options",
-      "sla": "SLA & dedicated support",
-      "audit": "Security & audit logs"
+      "sso": "SSO / SAML integration",
+      "infra": "Dedicated infrastructure & region selection",
+      "sla": "SLA-backed, dedicated experts",
+      "audit": "Compliance-ready security & audit logs"
     }
+  },
+  "postPlans": {
+    "headline": "Switch plans in a click and keep every setting intact",
+    "copy": "Upgrade or downgrade anytime without losing saved analyses or webhook automations.",
+    "metrics": {
+      "label": "Suggested path",
+      "step1": "Free → Understand usage patterns and how your team collaborates",
+      "step2": "Pro → Connect live alerts and monitoring to grow operational insight",
+      "step3": "Enterprise → Activate global regions, custom SLAs, and tailored workflows"
+    }
+  },
+  "footnote": {
+    "disclaimer1": "Prices shown are examples—final billing adapts to usage and contract terms.",
+    "disclaimer2": "Enterprise onboarding includes a security review and data governance consultation."
   }
 }

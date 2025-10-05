@@ -1,27 +1,23 @@
-import { AutoAwesome, LockPerson, Hub } from '@mui/icons-material';
 import { useTranslation } from 'react-i18next';
 
-const items = [
+const steps = [
   {
-    key: 'composer',
-    titleKey: 'feature.items.oneLine.name',
-    descKey: 'feature.items.oneLine.desc',
-    highlightKey: 'feature.items.oneLine.highlight',
-    icon: AutoAwesome,
+    key: 'signup',
+    number: '1',
+    titleKey: 'feature.steps.signup.title',
+    descKey: 'feature.steps.signup.desc',
   },
   {
-    key: 'security',
-    titleKey: 'feature.items.security.name',
-    descKey: 'feature.items.security.desc',
-    highlightKey: 'feature.items.security.highlight',
-    icon: LockPerson,
+    key: 'upload',
+    number: '2',
+    titleKey: 'feature.steps.upload.title',
+    descKey: 'feature.steps.upload.desc',
   },
   {
-    key: 'hub',
-    titleKey: 'feature.items.scaling.name',
-    descKey: 'feature.items.scaling.desc',
-    highlightKey: 'feature.items.scaling.highlight',
-    icon: Hub,
+    key: 'review',
+    number: '3',
+    titleKey: 'feature.steps.review.title',
+    descKey: 'feature.steps.review.desc',
   },
 ];
 
@@ -30,41 +26,36 @@ export default function Feature() {
 
   return (
     <section id="feature" className="relative isolate overflow-hidden py-16 sm:py-20">
-      <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_top,_rgba(79,70,229,0.16),_transparent_60%)]" aria-hidden="true" />
-      <div className="relative mx-auto grid max-w-6xl gap-10 px-6 lg:grid-cols-[1fr_1.1fr] lg:items-center">
+      <div
+        className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_top,_rgba(79,70,229,0.16),_transparent_60%)]"
+        aria-hidden="true"
+      />
+      <div className="relative mx-auto grid max-w-6xl gap-10 px-6 lg:grid-cols-[1fr_1fr] lg:items-center">
         <div className="space-y-6">
           <span className="inline-flex items-center gap-2 rounded-full bg-indigo-50 px-3 py-1 text-xs font-semibold uppercase tracking-[0.3em] text-indigo-500 ring-1 ring-indigo-100">
-            {t('feature.eyebrow', '바로 연결해 보세요')}
+            {t('feature.eyebrow', 'Experience it yourself')}
           </span>
-          <h2 className="text-3xl sm:text-4xl font-bold leading-tight text-slate-900">
-            {t('feature.title', '몇 분 만에 셋업하세요')}
+          <h2 className="text-3xl font-bold leading-tight text-slate-900 sm:text-4xl">
+            {t('feature.title', 'Upload media → AI analyzes → Review & share results')}
           </h2>
-          <p className="text-sm sm:text-base text-slate-600">
-            {t('feature.subtitle', '비전·언어·맞춤 검증을 인프라 구축 없이 바로 쓸 수 있어요')}
-            <br />
-            {t('feature.subtitle2', '제품 개발에 집중하세요. ML 운영은 저희가 대신 관리해요.')}
+          <p className="max-w-xl text-sm text-slate-600 sm:text-base">
+            {t(
+              'feature.subtitle',
+              'See how easy it is to go from sign-up to sharing verdicts in just three steps.'
+            )}
           </p>
 
-          <div className="grid gap-4">
-            {items.map(({ key, titleKey, descKey, highlightKey, icon: Icon }) => (
-              <article
+          <div className="hidden gap-4 sm:grid sm:grid-cols-3">
+            {steps.map(({ key, number, titleKey }) => (
+              <div
                 key={key}
-                className="group relative overflow-hidden rounded-3xl border border-white/40 bg-white/80 px-5 py-4 shadow-[0_16px_30px_-20px_rgba(79,70,229,0.4)] backdrop-blur transition hover:-translate-y-2"
+                className="rounded-2xl border border-indigo-100 bg-white/70 px-4 py-3 text-left shadow-sm shadow-indigo-100"
               >
-                <div className="absolute inset-0 bg-gradient-to-r from-white via-indigo-50/70 to-white" aria-hidden="true" />
-                <div className="relative flex gap-4">
-                  <span className="inline-flex h-11 w-11 flex-shrink-0 items-center justify-center rounded-2xl bg-gradient-to-br from-indigo-500 to-indigo-400 text-white shadow-lg shadow-indigo-500/40">
-                    <Icon fontSize="small" />
-                  </span>
-                  <div className="flex-1 space-y-2">
-                    <h3 className="text-base font-semibold text-slate-900">{t(titleKey)}</h3>
-                    <p className="text-sm text-slate-600 leading-relaxed">{t(descKey)}</p>
-                    <div className="text-xs font-medium text-indigo-500 leading-normal">
-                      {t(highlightKey)}
-                    </div>
-                  </div>
+                <div className="mb-3 inline-flex h-9 w-9 items-center justify-center rounded-full bg-indigo-500 text-sm font-semibold text-white">
+                  {number}
                 </div>
-              </article>
+                <div className="text-sm font-semibold text-slate-900">{t(titleKey)}</div>
+              </div>
             ))}
           </div>
         </div>
@@ -72,27 +63,37 @@ export default function Feature() {
         <div className="relative overflow-hidden rounded-3xl border border-indigo-100 bg-white/80 shadow-2xl shadow-indigo-200/50">
           <div className="absolute inset-0 bg-gradient-to-br from-indigo-500/20 via-indigo-400/10 to-white" aria-hidden="true" />
           <div className="relative flex flex-col gap-6 p-6">
-            <div className="flex items-center justify-between text-xs font-semibold uppercase tracking-wide text-indigo-500">
-              <span>{t('feature.mock.session', 'Integration session')}</span>
-              <span>{t('feature.mock.timestamp', 'Live')}</span>
+            <div className="relative overflow-hidden rounded-2xl bg-slate-900/95 p-5 text-slate-100 shadow-inner shadow-black/30">
+              <div className="inline-flex items-center gap-2 rounded-full bg-white/10 px-3 py-1 text-[10px] font-semibold uppercase tracking-[0.3em] text-indigo-200">
+                {t('feature.demo.label', 'Demo preview')}
+              </div>
+              <div className="mt-4 text-lg font-semibold text-white">{t('feature.demo.status', 'AI is analyzing…')}</div>
+              <p className="mt-2 text-xs leading-relaxed text-slate-300">
+                {t('feature.demo.caption', 'Once upload finishes, the result card fills in automatically.')}
+              </p>
+              <div className="mt-6 rounded-2xl border border-white/15 bg-white/10 p-4 text-left text-xs text-slate-200">
+                <div className="text-sm font-semibold text-white">{t('feature.demo.preview.title', 'Verdict summary')}</div>
+                <p className="mt-1 leading-relaxed">
+                  {t('feature.demo.preview.desc', 'This image looks authentic. Evidence and sharing controls appear alongside.')}
+                </p>
+              </div>
             </div>
-            <pre className="overflow-auto rounded-2xl bg-slate-900/95 p-6 text-xs leading-6 text-emerald-200 shadow-inner shadow-black/40">
-{`curl --request POST \
-  https://api.gravifox.com/v1/analyze \
-  --header "Authorization: Bearer $GF_TOKEN" \
-  --header "Content-Type: application/json" \
-  --data '{
-    "media": "https://cdn.example.com/sample.mp4",
-    "callbacks": {
-      "success": "https://hooks.example.com/success",
-      "failure": "https://hooks.example.com/failure"
-    }
-  }'`}
-            </pre>
-            <div className="rounded-2xl border border-white/60 bg-white/80 p-4 text-xs text-slate-600 shadow-md">
-              <div className="font-semibold text-slate-900">{t('feature.mock.resultTitle', 'Instant verdict')}</div>
-              <p>{t('feature.mock.resultDesc', 'Risk score: 0.82 · Playback paused · webhook dispatched')}</p>
-            </div>
+            <ol className="space-y-4">
+              {steps.map(({ key, number, titleKey, descKey }) => (
+                <li
+                  key={key}
+                  className="flex gap-4 rounded-2xl border border-white/60 bg-white/80 p-4 text-left shadow-[0_18px_40px_-28px_rgba(79,70,229,0.65)] backdrop-blur"
+                >
+                  <span className="flex h-11 w-11 flex-shrink-0 items-center justify-center rounded-full bg-indigo-500 text-base font-semibold text-white shadow-lg shadow-indigo-400/50">
+                    {number}
+                  </span>
+                  <div className="space-y-1">
+                    <div className="text-sm font-semibold text-slate-900">{t(titleKey)}</div>
+                    <p className="text-sm leading-relaxed text-slate-600">{t(descKey)}</p>
+                  </div>
+                </li>
+              ))}
+            </ol>
           </div>
         </div>
       </div>
