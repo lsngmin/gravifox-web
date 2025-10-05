@@ -28,12 +28,12 @@ export default function UseCases() {
     },
     {
       icon: ChatBubbleLeftRightIcon,
-      title: t('useCases.items.community.title', 'Review community reports'),
+      title: t('useCases.items.socialMedia.title', 'Review socialMedia reports'),
       desc: t(
-        'useCases.items.community.desc',
+        'useCases.items.socialMedia.desc',
         'Upload suspicious media from social feeds or forums to see if it is real.'
       ),
-      detail: t('useCases.items.community.detail', 'Save summary notes and evidence captures for reports.'),
+      detail: t('useCases.items.socialMedia.detail', 'Save summary notes and evidence captures for reports.'),
     },
   ];
 
@@ -41,17 +41,17 @@ export default function UseCases() {
     <section id="use-cases" className="relative isolate overflow-hidden bg-transparent py-12 sm:py-16 scroll-mt-24">
       <div className="mx-auto max-w-7xl px-6 lg:px-8">
         <div className="mx-auto max-w-2xl text-center">
-          <h3 className="text-sm font-semibold uppercase tracking-wide text-indigo-600">
-            {t('useCases.eyebrow', 'Use Cases')}
-          </h3>
-          <p className="mt-2 text-3xl font-semibold tracking-tight text-gray-900 sm:text-4xl">
-            {t('useCases.title', 'Where Gravifox fits')}
-          </p>
-          <p className="mt-4 text-gray-600">
-            {t('useCases.subtitle', 'Practical scenarios where detection adds value.')}
-          </p>
-        </div>
 
+        <h3 className="text-[11px] sm:text-xs font-semibold uppercase tracking-[0.25em] text-indigo-500">
+          {t('useCases.eyebrow', 'Use Cases')}
+        </h3>
+        <p className="mt-3 text-xl sm:text-3xl md:text-4xl font-bold tracking-tight text-slate-900">
+          {t('useCases.title', 'Where Gravifox fits')}
+        </p>
+        <p className="mt-4 text-[13px] sm:text-base md:text-lg text-slate-600">
+          {t('useCases.subtitle', '다른 일을 하러 가도 분석은 백그라운드에서 계속돼요.')}
+        </p>
+        </div>
         <div className="mt-12 grid gap-6 lg:grid-cols-3">
           {cases.map(({ icon: Icon, title, desc, detail }) => (
             <article
