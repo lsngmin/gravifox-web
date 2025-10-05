@@ -1,27 +1,19 @@
 import { useTranslation } from 'react-i18next';
 import { ArrowOutward, HeadsetMic, CheckCircle } from '@mui/icons-material';
+import { Bug, Lightbulb, MessageSquare } from "lucide-react";
+import { Sparkles } from "lucide-react";
+import { Upload, ScanSearch, CheckCircle2 } from "lucide-react";
 
 export default function PageSection() {
     const { t, i18n } = useTranslation('home');
     const lng = (i18n.language || 'en').slice(0, 2);
 
     const metrics = [
-        {
-            value: t('hero.metrics.latency.value', '4.1s'),
-            label: t('hero.metrics.latency.label', 'Median verdict'),
-            desc: t('hero.metrics.latency.desc', '사용자가 보기 전에 결과를 받을 수 있도록 평균 응답 시간이 4.1초예요.'),
-        },
-        {
-            value: t('hero.metrics.accuracy.value', '99.3%'),
-            label: t('hero.metrics.accuracy.label', 'Detection precision'),
-            desc: t('hero.metrics.accuracy.desc', '실제 신고 사례로 계속 학습해 오탐을 줄였어요.'),
-        },
-        {
-            value: t('hero.metrics.uptime.value', '24/7'),
-            label: t('hero.metrics.uptime.label', 'Live response desk'),
-            desc: t('hero.metrics.uptime.desc', '주 7일 전문 인력이 대기하며 긴급 대응을 도와드려요.'),
-        },
+        { icon: Upload, value: "미디어 업로드", desc: "의심되는 이미지나 영상을 올려주세요." },
+        { icon: ScanSearch, value: "분석", desc: "AI의 흔적을 찾고 주요 특징을 빠르게 분석합니다." },
+        { icon: CheckCircle2, value: "판별", desc: "진위 판단과 함께 분석 근거를 보여드립니다." },
     ];
+
 
     const bulletPoints = t('hero.bullets', {
         returnObjects: true,
@@ -63,62 +55,109 @@ export default function PageSection() {
                             <h1 className="text-[22px] sm:text-4xl md:text-5xl lg:text-6xl font-extrabold tracking-tight leading-tight">
                                 {t('hero.headline')}
                             </h1>
-                            <p className="
-  text-sm sm:text-base md:text-lg lg:text-xl
-  text-indigo-100/90
-  max-w-3xl
-  leading-relaxed sm:leading-normal md:leading-relaxed
-">
-                                {t('hero.subtitle')}
+
+                            <p className="flex items-start gap-2 text-[13px] sm:text-base md:text-lg lg:text-xl text-indigo-100/90 max-w-3xl leading-snug sm:leading-normal md:leading-relaxed bg-indigo-300/10 ring-1 ring-inset ring-white/10 rounded-xl px-3 py-2">
+                                <Sparkles className="mt-0.5 h-4 w-4 opacity-80 flex-none" />
+                                <span>
+    {t('hero.subtitle')}
+  </span>
                             </p>
+
+
+
+
+
                         </div>
 
                         <div className="flex flex-col gap-4 sm:flex-row sm:items-center">
                             <a
                                 href={`/${lng}/analyze`}
-                                className="inline-flex items-center justify-center rounded-full bg-white px-7 py-3 text-sm font-semibold text-slate-900 shadow-[0_20px_40px_-20px_rgba(129,140,248,0.65)] transition hover:bg-indigo-50 hover:shadow-[0_28px_50px_-24px_rgba(129,140,248,0.75)]"
+                                className="
+    inline-flex items-center justify-center rounded-full
+    bg-white
+    px-5 py-2.5 sm:px-7 sm:py-3
+    text-xs sm:text-sm md:text-base
+    font-semibold text-slate-900
+    shadow-[0_16px_32px_-16px_rgba(129,140,248,0.65)]
+    sm:shadow-[0_20px_40px_-20px_rgba(129,140,248,0.65)]
+    transition
+    hover:bg-indigo-50
+    hover:shadow-[0_24px_48px_-24px_rgba(129,140,248,0.75)]
+  "
                             >
-                                {t('cta.start', '무료로 시작하기')}
-                                <ArrowOutward className="ml-2 h-5 w-5" />
+                                {t('cta.start')}
+                                <ArrowOutward className="ml-2 h-4 w-4 sm:h-5 sm:w-5" />
                             </a>
                             <a
                                 href={`/${lng}/pricing`}
-                                className="inline-flex items-center justify-center rounded-full border border-white/30 bg-transparent px-7 py-3 text-sm font-semibold text-indigo-100 transition hover:bg-white/10"
+                                className="
+    inline-flex items-center justify-center rounded-full
+    border border-white/25 sm:border-white/30
+    bg-transparent
+    px-5 py-2.5 sm:px-7 sm:py-3
+    text-xs sm:text-sm md:text-base
+    font-semibold text-indigo-100
+    transition
+    hover:bg-white/10 hover:border-white/40
+  "
                             >
                                 {t('cta.pricing', '요금제 보기')}
                             </a>
                             <a
                                 href={`/${lng}/support`}
-                                className="inline-flex items-center gap-2 text-xs font-semibold uppercase tracking-wide text-indigo-200"
+                                className="
+    inline-flex items-center gap-2
+    text-sm font-semibold
+    text-indigo-300 hover:text-indigo-100
+    transition-all duration-200
+    hover:translate-x-0.5
+  "
                             >
-                                <HeadsetMic className="h-4 w-4" />
-                                {t('hero.talkToTeam', 'Talk to our team in under 24 hours')}
+                                <MessageSquare className="h-4 w-4 text-indigo-300 group-hover:text-indigo-100 transition-colors duration-200" />
+                                {t('hero.feedback', '버그 제보 및 기능 제안하기')}
                             </a>
+
                         </div>
 
                         <div className="grid gap-4 sm:grid-cols-3">
-                            {metrics.map((metric) => (
+                            {metrics.map((metric, i) => (
                                 <div
-                                    key={metric.label}
-                                    className="rounded-2xl border border-white/20 bg-white/10 px-5 py-4 text-indigo-100/90 shadow-[0_24px_40px_-28px_rgba(15,23,42,0.9)]"
+                                    key={metric.value}
+                                    className="
+            group relative overflow-hidden
+            rounded-2xl border border-white/10 bg-white/[0.06]
+            px-5 py-5
+            text-indigo-100/90
+            backdrop-blur-sm
+            transition-all duration-300
+            hover:bg-white/[0.12] hover:translate-y-[-2px]
+            hover:shadow-[0_12px_40px_-20px_rgba(129,140,248,0.4)]
+          "
                                 >
-                                    <div className="text-2xl font-bold text-white">{metric.value}</div>
-                                    <div className="text-xs font-semibold uppercase tracking-wide text-indigo-200/80">
-                                        {metric.label}
+                                    <div className="flex items-center gap-3">
+                                        <metric.icon className="h-5 w-5 text-indigo-300/90 transition-transform duration-300 group-hover:scale-110" />
+                                        <h3 className="text-base font-semibold text-white tracking-tight">
+                                            {metric.value}
+                                        </h3>
                                     </div>
-                                    <div className="mt-2 text-xs text-indigo-100/70">{metric.desc}</div>
+                                    <p className="mt-2 text-[13px] leading-relaxed text-indigo-100/80">
+                                        {metric.desc}
+                                    </p>
+
+                                    {/* subtle gradient glow */}
+                                    <div className="pointer-events-none absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-300 bg-gradient-to-tr from-indigo-400/10 to-transparent" />
                                 </div>
                             ))}
                         </div>
 
-                        <ul className="mt-6 space-y-3 text-sm text-indigo-100/80">
-                            {bulletPoints.map((line, idx) => (
-                                <li key={idx} className="flex items-start gap-2">
-                                    <CheckCircle className="mt-0.5 h-4 w-4 flex-shrink-0 text-emerald-300" />
-                                    <span>{line}</span>
-                                </li>
-                            ))}
-                        </ul>
+                        {/*<ul className="mt-6 space-y-3 text-sm text-indigo-100/80">*/}
+                        {/*    {bulletPoints.map((line, idx) => (*/}
+                        {/*        <li key={idx} className="flex items-start gap-2">*/}
+                        {/*            <CheckCircle className="mt-0.5 h-4 w-4 flex-shrink-0 text-emerald-300" />*/}
+                        {/*            <span>{line}</span>*/}
+                        {/*        </li>*/}
+                        {/*    ))}*/}
+                        {/*</ul>*/}
                     </div>
 
                     <div className="relative flex flex-col gap-4">

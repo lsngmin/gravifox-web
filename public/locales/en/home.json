@@ -5,7 +5,7 @@
     "title2": "No model ops — just results",
     "subtitle": "Upload images or videos and get a verdict in seconds. We include plain-language evidence and next steps so your reviewers know what to do.",
     "ribbon": "AI-FIRST DEFENSE STACK",
-    "talkToTeam": "Talk to our team in under 24 hours",
+    "feedback": "Talk to our team in under 24 hours",
     "metrics": {
       "latency": {
         "value": "4.1s",
