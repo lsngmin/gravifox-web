@@ -57,17 +57,20 @@ export default function SignInForm() {
     };
 
     return (
-        <div className="mx-auto w-full rounded-3xl border border-white/12 bg-slate-950/80 px-6 py-8 shadow-[0_24px_64px_-32px_rgba(15,23,42,0.8)] backdrop-blur-xl sm:px-10 sm:py-10">
-            <div className="text-center text-white">
-                <h2 className="text-2xl font-semibold sm:text-3xl">로그인</h2>
-                <p className="mt-2 text-[11px] font-semibold uppercase tracking-[0.35em] text-indigo-200/70">Gravifox secure</p>
-            </div>
-            <form onSubmit={handleSubmit} className="mt-10 space-y-6">
-                <div className="space-y-2">
-                    <label htmlFor="userId" className="block text-sm font-medium text-slate-100">
-                        Email address
-                    </label>
-                    <input
+        <div className="relative mx-auto w-full max-w-md overflow-hidden rounded-3xl border border-white/10 bg-white/5 shadow-2xl backdrop-blur-xl">
+            <div className="absolute inset-0 bg-gradient-to-br from-white/10 via-transparent to-transparent" aria-hidden="true" />
+            <div className="relative px-6 py-8 sm:px-10 sm:py-10">
+                <div className="space-y-2 text-center text-white">
+                    <p className="text-xs font-semibold uppercase tracking-[0.4em] text-indigo-200">Welcome back</p>
+                    <h2 className="text-2xl font-semibold sm:text-3xl">계정으로 로그인하세요</h2>
+                    <p className="text-sm text-slate-200/80">보안을 강화한 싱글 사인온으로 더 빠르고 안전하게 접근할 수 있어요.</p>
+                </div>
+                <form onSubmit={handleSubmit} className="mt-10 space-y-6">
+                    <div className="space-y-2">
+                        <label htmlFor="userId" className="block text-sm font-medium text-slate-100">
+                            Email address
+                        </label>
+                        <input
                             id="userId"
                             name="userId"
                             type="text"
@@ -133,6 +136,7 @@ export default function SignInForm() {
                         지금 가입하기
                     </button>
                 </p>
+            </div>
         </div>
     );
 }
