@@ -57,15 +57,14 @@ export default function SignInForm() {
     };
 
     return (
-        <div className="relative mx-auto w-full max-w-md overflow-hidden rounded-3xl border border-white/10 bg-white/5 shadow-2xl backdrop-blur-xl">
-            <div className="absolute inset-0 bg-gradient-to-br from-white/10 via-transparent to-transparent" aria-hidden="true" />
+        <div className="relative mx-auto w-full max-w-md overflow-hidden rounded-[28px] border border-white/15 bg-white/8 shadow-[0_24px_60px_-28px_rgba(15,23,42,0.85)] backdrop-blur-2xl">
+            <div className="absolute inset-0 bg-[linear-gradient(135deg,rgba(148,163,255,0.18),transparent_45%),linear-gradient(225deg,rgba(56,189,248,0.12),transparent_55%)]" aria-hidden="true" />
             <div className="relative px-6 py-8 sm:px-10 sm:py-10">
-                <div className="space-y-2 text-center text-white">
-                    <p className="text-xs font-semibold uppercase tracking-[0.4em] text-indigo-200">Welcome back</p>
-                    <h2 className="text-2xl font-semibold sm:text-3xl">계정으로 로그인하세요</h2>
-                    <p className="text-sm text-slate-200/80">보안을 강화한 싱글 사인온으로 더 빠르고 안전하게 접근할 수 있어요.</p>
+                <div className="space-y-3 text-center text-white">
+                    <h2 className="text-2xl font-semibold sm:text-3xl">계정으로 로그인</h2>
+                    <p className="text-sm text-slate-200/80">보안 토큰을 입력하고 즉시 콘솔을 시작하세요.</p>
                 </div>
-                <form onSubmit={handleSubmit} className="mt-10 space-y-6">
+                <form onSubmit={handleSubmit} className="mt-8 space-y-6">
                     <div className="space-y-2">
                         <label htmlFor="userId" className="block text-sm font-medium text-slate-100">
                             Email address
@@ -77,7 +76,7 @@ export default function SignInForm() {
                             autoComplete="email"
                             value={formState.userId}
                             onChange={handleInputChange("userId")}
-                            className="block w-full rounded-2xl border border-white/20 bg-white/90 px-4 py-3 text-sm font-medium text-slate-900 shadow-sm outline-none transition focus:border-indigo-400 focus:ring-2 focus:ring-indigo-300/80"
+                            className="block w-full rounded-2xl border border-white/30 bg-white/90 px-4 py-3 text-sm font-medium text-slate-900 shadow-sm outline-none transition focus:border-sky-300 focus:ring-2 focus:ring-sky-200"
                         />
                     </div>
 
@@ -97,13 +96,13 @@ export default function SignInForm() {
                             autoComplete="current-password"
                             value={formState.password}
                             onChange={handleInputChange("password")}
-                            className="block w-full rounded-2xl border border-white/20 bg-white/90 px-4 py-3 text-sm font-medium text-slate-900 shadow-sm outline-none transition focus:border-indigo-400 focus:ring-2 focus:ring-indigo-300/80"
+                            className="block w-full rounded-2xl border border-white/30 bg-white/90 px-4 py-3 text-sm font-medium text-slate-900 shadow-sm outline-none transition focus:border-sky-300 focus:ring-2 focus:ring-sky-200"
                         />
                     </div>
 
                     <button
                         type="submit"
-                        className="flex w-full justify-center rounded-2xl bg-gradient-to-r from-indigo-500 via-indigo-400 to-indigo-600 px-4 py-3 text-sm font-semibold text-white shadow-lg shadow-indigo-900/40 transition hover:from-indigo-400 hover:via-indigo-500 hover:to-indigo-600 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-200"
+                        className="flex w-full justify-center rounded-2xl bg-gradient-to-r from-indigo-400 via-sky-500 to-emerald-400 px-4 py-3 text-sm font-semibold text-white shadow-[0_18px_42px_-20px_rgba(79,70,229,0.55)] transition hover:from-indigo-300 hover:via-sky-400 hover:to-emerald-300 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-200"
                     >
                         Sign in
                     </button>
@@ -122,7 +121,7 @@ export default function SignInForm() {
 
                 <div className="relative mt-8 flex items-center">
                     <span className="h-px flex-1 bg-white/10" />
-                    <span className="px-3 text-xs font-medium uppercase tracking-[0.3em] text-slate-200/80">or</span>
+                    <span className="px-3 text-xs font-semibold tracking-[0.25em] text-slate-200/70">OR</span>
                     <span className="h-px flex-1 bg-white/10" />
                 </div>
 
@@ -130,10 +129,10 @@ export default function SignInForm() {
                     <GoogleLoginButton />
                 </div>
 
-                <p className="mt-10 text-center text-sm text-slate-200/80">
+                <p className="mt-8 text-center text-sm text-slate-200/80">
                     아직 멤버가 아니신가요?{' '}
                     <button className="font-semibold text-indigo-200 transition hover:text-indigo-100" onClick={handleChangeForm}>
-                        지금 가입하기
+                        가입하기
                     </button>
                 </p>
             </div>
