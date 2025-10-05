@@ -18,23 +18,23 @@ export default function Pricing() {
     () => [
       {
         label: t('hero.metrics.timeLabel', '런칭 속도'),
-        value: t('hero.metrics.timeValue', '최대 14일 빠른 시작'),
+        value: t('hero.metrics.timeValue', '테스트 기간에도 전 기능 개방'),
         copy: t(
           'hero.metrics.timeCopy',
-          '빠른 템플릿과 샘플 파이프라인으로 첫 결과를 바로 확인해 보세요.'
+          '빠른 템플릿과 샘플 파이프라인으로 첫 결과를 바로 확인할 수 있어요.'
         ),
       },
       {
         label: t('hero.metrics.scaleLabel', '확장 준비'),
-        value: t('hero.metrics.scaleValue', '트래픽 급증에도 안정적'),
+        value: t('hero.metrics.scaleValue', '유료 전환 없이도 확장 시뮬레이션'),
         copy: t(
           'hero.metrics.scaleCopy',
-          '팀 규모가 커져도 자동 스케일링으로 걱정 없이 운영할 수 있어요.'
+          '현재는 Free 플랜으로도 예상 워크로드를 충분히 검증할 수 있어요.'
         ),
       },
       {
         label: t('hero.metrics.securityLabel', '안심 보안'),
-        value: t('hero.metrics.securityValue', '엔드투엔드 보호'),
+        value: t('hero.metrics.securityValue', '테스트 계정도 동일한 보호'),
         copy: t(
           'hero.metrics.securityCopy',
           '권한 제어와 감사 로그를 기본으로 제공해 모든 팀원이 편하게 협업해요.'
@@ -70,15 +70,15 @@ export default function Pricing() {
           <div className="pointer-events-none absolute inset-x-0 top-0 h-24 bg-gradient-to-b from-white/80 to-transparent" aria-hidden="true" />
           <div className="relative max-w-6xl mx-auto px-6 text-center">
             <div className="inline-flex items-center gap-2 rounded-full bg-white/70 px-4 py-1 text-xs font-semibold uppercase tracking-[0.3em] text-indigo-600 shadow-sm ring-1 ring-indigo-200/60">
-              {t('hero.ribbon', 'PRICING THAT GROWS WITH YOU')}
+              {t('hero.ribbon', 'PUBLIC BETA NOTICE')}
             </div>
             <h1 className="mt-4 text-3xl md:text-5xl font-extrabold tracking-tight text-slate-900 leading-tight">
-              {t('hero.title', '가볍게 시작하고, 필요한 순간에만 확장하세요')}
+              {t('hero.title', '지금은 무료 요금제로만 체험해 주세요')}
             </h1>
             <p className="mt-4 text-sm md:text-base text-slate-600 max-w-3xl mx-auto">
               {t(
                 'hero.subtitle',
-                '무료로 먼저 써 본 뒤, 필요한 기능만 골라 부담 없이 이어갈 수 있도록 요금제를 준비했어요.'
+                '공개 테스트 기간 동안 모든 핵심 기능을 무료로 제공하며, 유료 요금제는 준비 중이에요.'
               )}
             </p>
             <div className="mt-8 grid gap-4 sm:grid-cols-3 max-w-4xl mx-auto text-left">
@@ -100,37 +100,43 @@ export default function Pricing() {
           <div className="pointer-events-none absolute inset-x-0 bottom-0 h-32 bg-gradient-to-b from-transparent via-white/60 to-white" aria-hidden="true" />
         </section>
 
-        {/* Narrative CTA */}
+        {/* Beta notice */}
         <section className="relative -mt-6 max-w-6xl mx-auto px-6 pb-12">
           <div className="pointer-events-none absolute inset-x-0 top-0 h-12 bg-gradient-to-b from-white via-white/70 to-transparent" aria-hidden="true" />
           <div className="rounded-3xl bg-gradient-to-r from-slate-900 via-indigo-900 to-slate-800 px-6 py-8 md:px-10 md:py-12 text-slate-200 shadow-xl overflow-hidden relative">
             <div className="absolute inset-y-0 right-0 w-1/3 bg-[radial-gradient(circle_at_top,rgba(99,102,241,0.35),transparent)] opacity-70" aria-hidden="true" />
             <div className="relative grid gap-8 md:grid-cols-2 md:items-center">
               <div>
-                <h2 className="text-2xl md:text-3xl font-bold text-white leading-tight">
-                  {t('story.headline', '매일 좋아지는 AI, 요금은 예상 그대로')}
+                <p className="inline-flex items-center gap-2 rounded-full bg-white/10 px-3 py-1 text-[0.65rem] font-semibold uppercase tracking-[0.35em] text-indigo-200">
+                  {t('betaNotice.badge', 'Public Beta')}
+                </p>
+                <h2 className="mt-4 text-2xl md:text-3xl font-bold text-white leading-tight">
+                  {t('betaNotice.title', '현재 유료 요금제는 준비 중이에요')}
                 </h2>
                 <p className="mt-4 text-sm md:text-base text-slate-300">
-                  {t('story.copy', 'GraviFox는 새로 등장하는 GenAI 트렌드를 빠르게 반영하면서도, 복잡한 옵션 없이 필요한 만큼만 비용을 쓰도록 도와드려요.')}
+                  {t('betaNotice.copy', '안정화와 피드백 수집을 위해 공개 테스트를 진행 중이에요. 지금은 Free 플랜만 제공하며, 유료 전환 경로는 모두 비활성화했어요.')}
+                </p>
+                <p className="mt-3 text-xs md:text-sm text-indigo-200/90">
+                  {t('betaNotice.note', '정식 플랜이 열리면 대시보드와 이메일 알림을 통해 가장 먼저 알려드릴게요.')}
                 </p>
               </div>
               <div className="grid gap-4">
                 <div className="flex items-start gap-3">
                   <span className="mt-1 inline-flex h-6 w-6 items-center justify-center rounded-full bg-white/10 text-xs font-semibold text-indigo-200">01</span>
                   <p className="text-sm text-slate-200">
-                    {t('story.point1', '모든 요금제에 24시간 내 최신 모델을 반영해 드려요.')}
+                    {t('betaNotice.points.one', 'Free 플랜으로 모든 핵심 기능을 제한 없이 체험해 보세요.')}
                   </p>
                 </div>
                 <div className="flex items-start gap-3">
                   <span className="mt-1 inline-flex h-6 w-6 items-center justify-center rounded-full bg-white/10 text-xs font-semibold text-indigo-200">02</span>
                   <p className="text-sm text-slate-200">
-                    {t('story.point2', '정확도와 비용의 균형을 직접 비교하며 선택할 수 있어요.')}
+                    {t('betaNotice.points.two', '피드백을 보내 주시면 정식 요금제 구성에 적극 반영할게요.')}
                   </p>
                 </div>
                 <div className="flex items-start gap-3">
                   <span className="mt-1 inline-flex h-6 w-6 items-center justify-center rounded-full bg-white/10 text-xs font-semibold text-indigo-200">03</span>
                   <p className="text-sm text-slate-200">
-                    {t('story.point3', '버튼 한 번으로 엔터프라이즈 옵션까지 전환할 수 있어요.')}
+                    {t('betaNotice.points.three', '유료 플랜이 다시 열리면 대시보드에서 안전하게 전환할 수 있어요.')}
                   </p>
                 </div>
               </div>
@@ -152,7 +158,7 @@ export default function Pricing() {
                 >
                   <div className="mb-1 text-xs font-semibold tracking-wide text-indigo-600">{t('free.badge', 'Free')}</div>
                   <h3 className="text-xl font-semibold text-slate-900">{t('free.title', '무료 요금제')}</h3>
-                  <p className="mt-1 text-sm text-slate-600">{t('free.subtitle', '필수 기능으로 충분한 시작')}</p>
+                  <p className="mt-1 text-sm text-slate-600">{t('free.subtitle', '베타 기간에도 제한 없이 활용해 보세요')}</p>
                   <div className="mt-5 flex items-end gap-2">
                     <span className="text-3xl font-extrabold text-slate-900">{t('free.price', '₩0')}</span>
                     <span className="text-sm text-slate-500">{t('free.per', '/ 월')}</span>
@@ -187,30 +193,32 @@ export default function Pricing() {
                   animate={animateProps}
                   transition={getTransition(0.06)}
                 >
-                  <div className="absolute -top-3 right-4 inline-flex items-center rounded-full bg-indigo-600 px-2.5 py-1 text-xs font-semibold text-white shadow-sm">가장 인기</div>
+                  <div className="absolute -top-3 right-4 inline-flex items-center rounded-full bg-indigo-600 px-2.5 py-1 text-xs font-semibold text-white shadow-sm">{t('pro.highlight', '준비 중')}</div>
                   <div className="mb-1 text-xs font-semibold tracking-wide text-indigo-600">{t('pro.badge', 'Pro')}</div>
                   <h3 className="text-xl font-semibold text-slate-900">{t('pro.title', '프로 요금제')}</h3>
-                  <p className="mt-1 text-sm text-slate-600">{t('pro.subtitle', '서비스에 바로 적용할 준비가 됐을 때')}</p>
+                  <p className="mt-1 text-sm text-slate-600">{t('pro.subtitle', '정식 출시 준비를 위해 내부 검증 중이에요')}</p>
+                  <div className="mt-3 rounded-lg bg-white/70 px-3 py-2 text-xs font-medium text-indigo-600 ring-1 ring-indigo-200/70">
+                    {t('pro.betaMessage', '현재는 Free 플랜에서 동일한 분석 기능을 체험해 주세요.')}
+                  </div>
                   <div className="mt-5 flex items-end gap-2">
-                    <span className="text-3xl font-extrabold text-slate-900">{t('pro.price', '₩19,000')}</span>
-                    <span className="text-sm text-slate-500">{t('pro.per', '/ 월')}</span>
+                    <span className="text-3xl font-extrabold text-slate-900">{t('pro.price', '준비 중')}</span>
+                    <span className="text-sm text-slate-500">{t('pro.per', '')}</span>
                   </div>
                   <div className="mt-5 h-px w-full bg-slate-200" />
                   <ul className="mt-5 space-y-3.5 text-base text-slate-700">
-                    <li className="flex items-center gap-3"><Check className="text-indigo-600" size={12} /> <span>{t('pro.features.tokens', '월 500회 이미지 분석 제공')}</span></li>
-                    <li className="flex items-center gap-3"><Check className="text-indigo-600" size={12} /> <span>{t('pro.features.queue', '우선 처리 큐 & 속도 보장')}</span></li>
-                    <li className="flex items-center gap-3"><Check className="text-indigo-600" size={12} /> <span>{t('pro.features.metrics', '고급 활용 지표 & 알림')}</span></li>
-                    <li className="flex items-center gap-3"><Check className="text-indigo-600" size={12} /> <span>{t('pro.features.models', '확장된 모델 & 프리셋')}</span></li>
+                    <li className="flex items-center gap-3"><Check className="text-indigo-600" size={12} /> <span>{t('pro.features.tokens', '월 500회 이미지 분석 제공 (예정)')}</span></li>
+                    <li className="flex items-center gap-3"><Check className="text-indigo-600" size={12} /> <span>{t('pro.features.queue', '우선 처리 큐 & 속도 보장 (예정)')}</span></li>
+                    <li className="flex items-center gap-3"><Check className="text-indigo-600" size={12} /> <span>{t('pro.features.metrics', '고급 활용 지표 & 알림 (예정)')}</span></li>
+                    <li className="flex items-center gap-3"><Check className="text-indigo-600" size={12} /> <span>{t('pro.features.models', '확장된 모델 & 프리셋 (예정)')}</span></li>
                   </ul>
                   <div className="mt-auto pt-6">
-                    <motion.a
-                      href="/support"
-                      className="inline-flex w-full items-center justify-center rounded-lg bg-slate-900 px-4 py-2.5 text-sm font-semibold text-white shadow-sm hover:bg-slate-800"
-                      whileTap={buttonTapEffect}
-                      whileHover={buttonHoverEffect}
+                    <div
+                      className="inline-flex w-full items-center justify-center rounded-lg bg-slate-900/40 px-4 py-2.5 text-sm font-semibold text-slate-200 shadow-sm cursor-not-allowed"
+                      aria-disabled="true"
                     >
-                      {t('pro.cta', '상담 요청하기')}
-                    </motion.a>
+                      {t('pro.ctaDisabled', '출시 준비 중')}
+                    </div>
+                    <p className="mt-2 text-xs text-slate-500 text-center">{t('pro.notice', '비공개 테스트가 완료되면 바로 안내드릴게요.')}</p>
                   </div>
                 </motion.div>
               </div>
@@ -228,26 +236,28 @@ export default function Pricing() {
                   <div className="mb-1 text-xs font-semibold tracking-wide text-blue-700">{t('enterprise.badge', 'Enterprise')}</div>
                   <h3 className="text-xl font-semibold text-slate-900">{t('enterprise.title', '엔터프라이즈')}</h3>
                   <p className="mt-1 text-sm text-slate-600">{t('enterprise.subtitle', '보안·확장성·전담 지원이 필요한 기업을 위해')}</p>
+                  <div className="mt-3 rounded-lg bg-blue-50 px-3 py-2 text-xs font-medium text-blue-700 ring-1 ring-blue-200/70">
+                    {t('enterprise.betaMessage', '엔터프라이즈 커버리지는 정식 론칭과 함께 공개될 예정이에요.')}
+                  </div>
                   <div className="mt-5 flex items-end gap-2">
-                    <span className="text-3xl font-extrabold text-slate-900">{t('enterprise.price', '맞춤 견적')}</span>
-                    <span className="text-sm text-slate-500">{t('enterprise.per', '/ 월')}</span>
+                    <span className="text-3xl font-extrabold text-slate-900">{t('enterprise.price', '준비 중')}</span>
+                    <span className="text-sm text-slate-500">{t('enterprise.per', '')}</span>
                   </div>
                   <div className="mt-5 h-px w-full bg-slate-200" />
                   <ul className="mt-5 space-y-3.5 text-base text-slate-700">
-                    <li className="flex items-center gap-3"><Check className="text-blue-600" size={12} /> <span>{t('enterprise.features.sso', 'SSO / SAML 연동')}</span></li>
-                    <li className="flex items-center gap-3"><Check className="text-blue-600" size={12} /> <span>{t('enterprise.features.infra', '전용 인프라와 리전 선택')}</span></li>
-                    <li className="flex items-center gap-3"><Check className="text-blue-600" size={12} /> <span>{t('enterprise.features.sla', 'SLA & 전담 기술 지원')}</span></li>
-                    <li className="flex items-center gap-3"><Check className="text-blue-600" size={12} /> <span>{t('enterprise.features.audit', '보안·감사 로그 및 컴플라이언스')}</span></li>
+                    <li className="flex items-center gap-3"><Check className="text-blue-600" size={12} /> <span>{t('enterprise.features.sso', 'SSO / SAML 연동 (예정)')}</span></li>
+                    <li className="flex items-center gap-3"><Check className="text-blue-600" size={12} /> <span>{t('enterprise.features.infra', '전용 인프라와 리전 선택 (예정)')}</span></li>
+                    <li className="flex items-center gap-3"><Check className="text-blue-600" size={12} /> <span>{t('enterprise.features.sla', 'SLA & 전담 기술 지원 (예정)')}</span></li>
+                    <li className="flex items-center gap-3"><Check className="text-blue-600" size={12} /> <span>{t('enterprise.features.audit', '보안·감사 로그 및 컴플라이언스 (예정)')}</span></li>
                   </ul>
                   <div className="mt-auto pt-6">
-                    <motion.a
-                      href="/support"
-                      className="inline-flex w-full items-center justify-center rounded-lg bg-blue-700 px-4 py-2.5 text-sm font-semibold text-white shadow-sm hover:bg-blue-600"
-                      whileTap={buttonTapEffect}
-                      whileHover={buttonHoverEffect}
+                    <div
+                      className="inline-flex w-full items-center justify-center rounded-lg bg-blue-700/40 px-4 py-2.5 text-sm font-semibold text-slate-200 shadow-sm cursor-not-allowed"
+                      aria-disabled="true"
                     >
-                      {t('enterprise.cta', '세일즈 팀에 문의하기')}
-                    </motion.a>
+                      {t('enterprise.ctaDisabled', '출시 준비 중')}
+                    </div>
+                    <p className="mt-2 text-xs text-slate-500 text-center">{t('enterprise.notice', '엔터프라이즈 요구사항은 베타 종료 후 맞춤으로 안내드릴 예정이에요.')}</p>
                   </div>
                 </motion.div>
               </div>
@@ -259,10 +269,10 @@ export default function Pricing() {
             <div className="grid gap-8 md:grid-cols-[1.2fr_0.8fr] md:items-center">
               <div>
                 <h3 className="text-xl md:text-2xl font-semibold text-slate-900">
-                  {t('postPlans.headline', '플랜 전환은 클릭 한 번, 데이터는 그대로 남아요')}
+                  {t('postPlans.headline', '베타 기간 로드맵을 함께 만들어 가고 있어요')}
                 </h3>
                 <p className="mt-4 text-sm md:text-base text-slate-600">
-                  {t('postPlans.copy', '언제든지 업그레이드하거나 다운그레이드해도 저장된 분석과 웹훅 설정은 유지돼요. PoC부터 전면 도입까지 한 흐름으로 이어집니다.')}
+                  {t('postPlans.copy', 'Free 플랜으로 기능을 충분히 체험하고, 필요한 시나리오를 알려 주세요. 정식 Pro · Enterprise 옵션은 베타 종료와 함께 순차적으로 공개될 예정이에요.')}
                 </p>
               </div>
               <div className="rounded-2xl bg-white p-5 shadow-sm ring-1 ring-indigo-100/70">
@@ -270,15 +280,15 @@ export default function Pricing() {
                 <div className="mt-3 space-y-3 text-sm text-slate-600">
                   <div className="flex items-start gap-3">
                     <span className="mt-1 h-6 w-6 flex items-center justify-center rounded-full bg-indigo-100 text-xs font-semibold text-indigo-600">1</span>
-                    <p>{t('postPlans.metrics.step1', 'Free → 토큰 사용 패턴과 팀 협업 방식 확인')}</p>
+                    <p>{t('postPlans.metrics.step1', 'Free → 현재는 전 기능을 무료로 체험하며 워크로드를 검증')}</p>
                   </div>
                   <div className="flex items-start gap-3">
                     <span className="mt-1 h-6 w-6 flex items-center justify-center rounded-full bg-indigo-100 text-xs font-semibold text-indigo-600">2</span>
-                    <p>{t('postPlans.metrics.step2', 'Pro → 실서비스 알림과 모니터링을 연결해 운영 지표 쌓기')}</p>
+                    <p>{t('postPlans.metrics.step2', 'Pro (예정) → 베타 피드백을 바탕으로 정식 출시 시 세밀한 운영 지표 제공')}</p>
                   </div>
                   <div className="flex items-start gap-3">
                     <span className="mt-1 h-6 w-6 flex items-center justify-center rounded-full bg-indigo-100 text-xs font-semibold text-indigo-600">3</span>
-                    <p>{t('postPlans.metrics.step3', 'Enterprise → 글로벌 리전과 맞춤 SLA, 커스텀 워크플로 적용')}</p>
+                    <p>{t('postPlans.metrics.step3', 'Enterprise (예정) → 맞춤 SLA와 전용 인프라는 베타 종료 후 협의')}</p>
                   </div>
                 </div>
               </div>
@@ -287,8 +297,8 @@ export default function Pricing() {
 
           {/* Footnote */}
           <div className="mt-10 space-y-2 text-center text-xs text-slate-500">
-            <p>{t('footnote.disclaimer1', '표시된 금액은 예시이며, 실제 가격은 사용량과 계약 조건에 따라 조정될 수 있어요.')}</p>
-            <p>{t('footnote.disclaimer2', 'Enterprise 고객에게는 온보딩 시 보안 점검과 데이터 거버넌스 컨설팅을 함께 제공해요.')}</p>
+            <p>{t('footnote.disclaimer1', '현재는 테스트 기간으로 모든 과금이 중단된 상태예요. 정식 요금은 출시 시점에 투명하게 공개할게요.')}</p>
+            <p>{t('footnote.disclaimer2', '유료 플랜 재개 전까지는 결제 정보가 저장되지 않으며, Enterprise 상담도 사전 예약만 받고 있어요.')}</p>
           </div>
         </section>
       </main>
