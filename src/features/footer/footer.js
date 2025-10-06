@@ -31,45 +31,46 @@ const Footer = ({ transparent = false }) => {
     return (
         <section className={transparent ? "bg-transparent" : "bg-white"}>
             <div className="max-w-screen-xl px-4 py-12 mx-auto space-y-6 overflow-hidden sm:px-6 lg:px-8">
-                <nav className="flex flex-wrap items-center justify-center gap-4 text-sm">
-                    <button
-                        type="button"
-                        onClick={() => goTo('/feature')}
-                        className="text-sm leading-6 text-gray-500 hover:text-gray-900"
-                    >
-                        About
-                    </button>
-                    <span className="text-gray-300">·</span>
-                    <button
-                        type="button"
-                        onClick={() => goTo('/support')}
-                        className="text-sm leading-6 text-gray-500 hover:text-gray-900"
-                    >
-                        Contact
-                    </button>
-                    <span className="text-gray-300">·</span>
-                    <button
-                        type="button"
-                        onClick={() => goTo('/docs')}
-                        className="text-sm leading-6 text-gray-500 hover:text-gray-900"
-                    >
-                        Terms
-                    </button>
-                    <span className="text-gray-300">·</span>
-                    <div className="inline-flex items-center gap-2">
+                <nav className="flex flex-col items-center gap-6 text-sm sm:flex-row sm:flex-wrap sm:justify-center">
+                    <div className="flex flex-col items-center gap-4 text-sm sm:flex-row sm:items-center">
+                        <button
+                            type="button"
+                            onClick={() => goTo('/feature')}
+                            className="text-sm leading-6 text-gray-500 hover:text-gray-900"
+                        >
+                            About
+                        </button>
+                        <span className="hidden text-gray-300 sm:inline">·</span>
+                        <button
+                            type="button"
+                            onClick={() => goTo('/support')}
+                            className="text-sm leading-6 text-gray-500 hover:text-gray-900"
+                        >
+                            Contact
+                        </button>
+                        <span className="hidden text-gray-300 sm:inline">·</span>
+                        <button
+                            type="button"
+                            onClick={() => goTo('/docs')}
+                            className="text-sm leading-6 text-gray-500 hover:text-gray-900"
+                        >
+                            Terms
+                        </button>
+                    </div>
+                    <div className="flex flex-col items-center gap-2 sm:flex-row">
                         <span className="text-sm text-gray-500">Language</span>
                         <div className="inline-flex rounded-md ring-1 ring-gray-200 overflow-hidden">
                             <button
                                 type="button"
                                 onClick={() => changeLanguage('en')}
-                            className={`px-3 py-1.5 text-sm font-medium ${currentLng === 'en' ? 'bg-indigo-600 text-white' : 'bg-white text-gray-600 hover:bg-gray-50'}`}
+                                className={`px-3 py-1.5 text-sm font-medium ${currentLng === 'en' ? 'bg-indigo-600 text-white' : 'bg-white text-gray-600 hover:bg-gray-50'}`}
                             >
                                 EN
                             </button>
                             <button
                                 type="button"
                                 onClick={() => changeLanguage('ko')}
-                            className={`px-3 py-1.5 text-sm font-medium ${currentLng === 'ko' ? 'bg-indigo-600 text-white' : 'bg-white text-gray-600 hover:bg-gray-50'}`}
+                                className={`px-3 py-1.5 text-sm font-medium ${currentLng === 'ko' ? 'bg-indigo-600 text-white' : 'bg-white text-gray-600 hover:bg-gray-50'}`}
                             >
                                 KO
                             </button>
