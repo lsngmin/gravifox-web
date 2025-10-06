@@ -31,8 +31,8 @@ const Footer = ({ transparent = false }) => {
     return (
         <section className={transparent ? "bg-transparent" : "bg-white"}>
             <div className="max-w-screen-xl px-4 py-12 mx-auto space-y-6 overflow-hidden sm:px-6 lg:px-8">
-                <nav className="flex flex-col items-center gap-6 text-sm sm:flex-row sm:flex-wrap sm:justify-center">
-                    <div className="flex flex-col items-center gap-4 text-sm sm:flex-row sm:items-center">
+                <nav className="flex flex-wrap items-center justify-center gap-x-6 gap-y-4 text-sm">
+                    <div className="flex flex-wrap items-center justify-center gap-x-4 gap-y-2 text-sm">
                         <button
                             type="button"
                             onClick={() => goTo('/feature')}
@@ -40,7 +40,7 @@ const Footer = ({ transparent = false }) => {
                         >
                             About
                         </button>
-                        <span className="hidden text-gray-300 sm:inline">·</span>
+                        <span className="text-gray-300">·</span>
                         <button
                             type="button"
                             onClick={() => goTo('/support')}
@@ -48,7 +48,7 @@ const Footer = ({ transparent = false }) => {
                         >
                             Contact
                         </button>
-                        <span className="hidden text-gray-300 sm:inline">·</span>
+                        <span className="text-gray-300">·</span>
                         <button
                             type="button"
                             onClick={() => goTo('/docs')}
@@ -57,9 +57,9 @@ const Footer = ({ transparent = false }) => {
                             Terms
                         </button>
                     </div>
-                    <div className="flex flex-col items-center gap-2 sm:flex-row">
+                    <div className="flex flex-wrap items-center justify-center gap-2">
                         <span className="text-sm text-gray-500">Language</span>
-                        <div className="inline-flex rounded-md ring-1 ring-gray-200 overflow-hidden">
+                        <div className="inline-flex overflow-hidden rounded-md ring-1 ring-gray-200">
                             <button
                                 type="button"
                                 onClick={() => changeLanguage('en')}
