@@ -65,85 +65,82 @@ export default function SignInForm() {
     };
 
     return (
-        <div className="relative mx-auto w-full max-w-md overflow-hidden rounded-[28px] border border-white/15 bg-white/8 shadow-[0_24px_60px_-28px_rgba(15,23,42,0.85)] backdrop-blur-2xl">
-            <div className="absolute inset-0 bg-[linear-gradient(135deg,rgba(148,163,255,0.18),transparent_45%),linear-gradient(225deg,rgba(56,189,248,0.12),transparent_55%)]" aria-hidden="true" />
-            <div className="relative px-6 py-8 sm:px-10 sm:py-10">
-                <div className="space-y-3 text-center text-white">
-                    <h2 className="text-2xl font-semibold sm:text-3xl">계정으로 로그인</h2>
-                    <p className="text-sm text-slate-200/80">보안 토큰을 입력하고 즉시 콘솔을 시작하세요.</p>
-                </div>
-                <form onSubmit={handleSubmit} className="mt-8 space-y-6">
-                    <div className="space-y-2">
-                        <label htmlFor="userId" className="block text-sm font-medium text-slate-100">
-                            Email address
-                        </label>
-                        <input
-                            id="userId"
-                            name="userId"
-                            type="text"
-                            autoComplete="email"
-                            value={formState.userId}
-                            onChange={handleInputChange("userId")}
-                            className="block w-full rounded-2xl border border-white/30 bg-white/90 px-4 py-3 text-sm font-medium text-slate-900 shadow-sm outline-none transition focus:border-sky-300 focus:ring-2 focus:ring-sky-200"
-                        />
-                    </div>
-
-                    <div className="space-y-2">
-                        <div className="flex items-center justify-between">
-                            <label htmlFor="password" className="block text-sm font-medium text-slate-100">
-                                Password
-                            </label>
-                            <Link to={localizedPath("/support")} className="text-xs font-semibold text-indigo-200 transition hover:text-indigo-100">
-                                Forgot password?
-                            </Link>
-                        </div>
-                        <input
-                            id="password"
-                            name="password"
-                            type="password"
-                            autoComplete="current-password"
-                            value={formState.password}
-                            onChange={handleInputChange("password")}
-                            className="block w-full rounded-2xl border border-white/30 bg-white/90 px-4 py-3 text-sm font-medium text-slate-900 shadow-sm outline-none transition focus:border-sky-300 focus:ring-2 focus:ring-sky-200"
-                        />
-                    </div>
-
-                    <button
-                        type="submit"
-                        className="flex w-full justify-center rounded-2xl bg-gradient-to-r from-indigo-400 via-sky-500 to-emerald-400 px-4 py-3 text-sm font-semibold text-white shadow-[0_18px_42px_-20px_rgba(79,70,229,0.55)] transition hover:from-indigo-300 hover:via-sky-400 hover:to-emerald-300 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-200"
-                    >
-                        Sign in
-                    </button>
-
-                    <div>
-                        <LoginErrorMessage
-                            status={errorStatus}
-                            message={errorMessage}
-                            onClose={() => {
-                                setErrorStatus(null);
-                                setErrorMessage(null);
-                            }}
-                        />
-                    </div>
-                </form>
-
-                <div className="relative mt-8 flex items-center">
-                    <span className="h-px flex-1 bg-white/10" />
-                    <span className="px-3 text-xs font-semibold tracking-[0.25em] text-slate-200/70">OR</span>
-                    <span className="h-px flex-1 bg-white/10" />
-                </div>
-
-                <div className="mt-6">
-                    <GoogleLoginButton />
-                </div>
-
-                <p className="mt-8 text-center text-sm text-slate-200/80">
-                    아직 멤버가 아니신가요?{' '}
-                    <button className="font-semibold text-indigo-200 transition hover:text-indigo-100" onClick={handleChangeForm}>
-                        가입하기
-                    </button>
-                </p>
+        <div className="mx-auto w-full max-w-sm rounded-2xl bg-white px-6 py-10 text-slate-900 shadow-lg sm:px-8">
+            <div className="space-y-2 text-center">
+                <h2 className="text-2xl font-semibold">계정으로 로그인</h2>
+                <p className="text-sm text-slate-500">보안 토큰을 입력하고 즉시 콘솔을 시작하세요.</p>
             </div>
+            <form onSubmit={handleSubmit} className="mt-8 space-y-5">
+                <div className="space-y-2">
+                    <label htmlFor="userId" className="block text-sm font-medium text-slate-700">
+                        Email address
+                    </label>
+                    <input
+                        id="userId"
+                        name="userId"
+                        type="text"
+                        autoComplete="email"
+                        value={formState.userId}
+                        onChange={handleInputChange("userId")}
+                        className="block w-full rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm font-medium text-slate-900 outline-none transition focus:border-indigo-400 focus:ring-2 focus:ring-indigo-200"
+                    />
+                </div>
+
+                <div className="space-y-2">
+                    <div className="flex items-center justify-between">
+                        <label htmlFor="password" className="block text-sm font-medium text-slate-700">
+                            Password
+                        </label>
+                        <Link to={localizedPath("/support")} className="text-xs font-semibold text-indigo-500 transition hover:text-indigo-400">
+                            Forgot password?
+                        </Link>
+                    </div>
+                    <input
+                        id="password"
+                        name="password"
+                        type="password"
+                        autoComplete="current-password"
+                        value={formState.password}
+                        onChange={handleInputChange("password")}
+                        className="block w-full rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm font-medium text-slate-900 outline-none transition focus:border-indigo-400 focus:ring-2 focus:ring-indigo-200"
+                    />
+                </div>
+
+                <button
+                    type="submit"
+                    className="flex w-full justify-center rounded-xl bg-indigo-500 px-4 py-3 text-sm font-semibold text-white transition hover:bg-indigo-400 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-300"
+                >
+                    Sign in
+                </button>
+
+                <div>
+                    <LoginErrorMessage
+                        status={errorStatus}
+                        message={errorMessage}
+                        onClose={() => {
+                            setErrorStatus(null);
+                            setErrorMessage(null);
+                        }}
+                    />
+                </div>
+            </form>
+
+            <div className="relative mt-8 flex items-center">
+                <span className="h-px flex-1 bg-slate-200" />
+                <span className="px-3 text-xs font-semibold tracking-[0.25em] text-slate-400">OR</span>
+                <span className="h-px flex-1 bg-slate-200" />
+            </div>
+
+            <div className="mt-6">
+                <GoogleLoginButton />
+            </div>
+
+            <p className="mt-8 text-center text-sm text-slate-600">
+                아직 멤버가 아니신가요?{' '}
+                <button className="font-semibold text-indigo-500 transition hover:text-indigo-400" onClick={handleChangeForm}>
+                    가입하기
+                </button>
+            </p>
         </div>
     );
 }
