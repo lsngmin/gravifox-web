@@ -15,18 +15,18 @@ export default function Login() {
             <div className="relative z-10 flex min-h-screen flex-col">
                 <Navigation />
 
-                <main className="flex flex-1 flex-col items-center px-6 pb-16 pt-28 sm:px-8 sm:pt-32 lg:px-12">
-                    <section className="w-full max-w-xl space-y-6 text-center lg:space-y-8">
-                        <div className="space-y-4">
-                            <h1 className="text-3xl font-semibold leading-tight text-white sm:text-4xl">콘솔 로그인</h1>
-                            <p className="text-sm leading-relaxed text-slate-200/80 sm:text-base">
-                                팀 인증을 완료하고 작업을 계속하세요.
-                            </p>
-                        </div>
-                    </section>
+                <main className="flex flex-1 flex-col items-center justify-center px-6 pb-16 pt-28 sm:px-8 sm:pt-32 lg:px-12">
+                    <section className="w-full max-w-md">
+                        <div className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-white/20 via-white/10 to-white/5 p-[1px] shadow-[0_25px_80px_-20px_rgba(56,189,248,0.35)]">
+                            <div className="relative rounded-[calc(1.5rem-1px)] bg-slate-950/75 px-8 py-10 backdrop-blur-xl sm:px-10 sm:py-12">
+                                <div className="pointer-events-none absolute inset-x-10 -top-24 h-40 rounded-full bg-gradient-to-br from-indigo-400/50 via-cyan-300/40 to-transparent blur-3xl" />
+                                <div className="absolute inset-0 rounded-[calc(1.5rem-1px)] border border-white/10" />
 
-                    <section className="mt-12 w-full max-w-md sm:mt-14">
-                        <SignInForm />
+                                <div className="relative z-10">
+                                    <SignInForm />
+                                </div>
+                            </div>
+                        </div>
                     </section>
                 </main>
 
