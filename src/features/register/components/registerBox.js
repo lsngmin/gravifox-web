@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import {useNavigate, useSearchParams} from "react-router-dom";
 import signupAPI from "../../login/api/signupAPI";
 
-const RegisterBox = () => {
+const RegisterBox = ({ variant = 'default' }) => {
     const [searchParams] = useSearchParams();
     const navigate = useNavigate();
 
@@ -24,6 +24,12 @@ const RegisterBox = () => {
         password: null,
         name: null,
         dob: null,
+    });
+    const [touched, setTouched] = useState({
+        email: false,
+        password: false,
+        name: false,
+        dob: false,
     });
     const [canSubmit, setCanSubmit] = useState(false);
 
@@ -52,9 +58,11 @@ const RegisterBox = () => {
 
     const validatePassword = (value) => {
         if (!value) return "Password is required.";
-        return value.length >= 8
+        // 서버 정책과 동일: 8~20자, 대문자 1+ 소문자/영문 1+, 숫자 1+, 특수문자 1+
+        const re = /^(?=.*[A-Za-z])(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*()_+\-={}\[\]:";'<>?,./]).{8,20}$/;
+        return re.test(value)
             ? null
-            : "Password must be at least 8 characters.";
+            : "8~20자, 영문 대문자/영문/숫자/특수문자를 모두 포함해 주세요.";
     };
 
     const validateName = (value) => {
@@ -62,11 +70,19 @@ const RegisterBox = () => {
     };
 
     const validateDob = (value) => {
-        // YYYY-MM-DD 형식 체크 (simple)
-        if (!value) return "Date of Birth is required.";
-        // 최소한 “YYYY-MM-DD” 체크
-        const re = /^\d{8}$/;
-        return re.test(value) ? null : "Use YYYYMMDD format.";
+        // YYYYMMDD (8 digits) with basic range checks
+        const raw = String(value || '').trim();
+        if (!raw) return "Date of Birth is required.";
+        const digits = raw.replace(/\D/g, '');
+        if (digits.length !== 8) return "Use YYYYMMDD format.";
+        const yyyy = Number(digits.slice(0, 4));
+        const mm = Number(digits.slice(4, 6));
+        const dd = Number(digits.slice(6, 8));
+        if (Number.isNaN(yyyy) || Number.isNaN(mm) || Number.isNaN(dd)) return "Use YYYYMMDD format.";
+        if (mm < 1 || mm > 12) return "Use YYYYMMDD format.";
+        const daysInMonth = [31, (yyyy % 4 === 0 && yyyy % 100 !== 0) || (yyyy % 400 === 0) ? 29 : 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31];
+        if (dd < 1 || dd > daysInMonth[mm - 1]) return "Use YYYYMMDD format.";
+        return null;
     };
 
     // ─── onChange 핸들러 (필드마다 검증) ───────────────────────────────────────────
@@ -74,27 +90,66 @@ const RegisterBox = () => {
     const handleInputChange = (field) => (e) => {
         const newValue = e.target.value;
         // 1) 값 갱신
-        setFormState((prev) => ({ ...prev, [field]: newValue }));
+        if (field === 'dob') {
+            // 숫자만 허용하고 최대 8자리로 제한
+            const digits = String(newValue || '').replace(/\D/g, '').slice(0, 8);
+            setFormState((prev) => ({ ...prev, [field]: digits }));
+        } else {
+            setFormState((prev) => ({ ...prev, [field]: newValue }));
+        }
 
         // 2) 해당 필드 검증
         let errorMsg = null;
         switch (field) {
             case "email":
-                errorMsg = validateEmail(newValue);
+                // 입력 중에는 터치된 상태에서만 에러 표시
+                errorMsg = touched.email ? validateEmail(newValue) : null;
                 break;
             case "password":
-                errorMsg = validatePassword(newValue);
-                // 패스워드가 바뀌면 confirmPassword도 재검증
+                errorMsg = touched.password ? validatePassword(newValue) : null;
                 setErrors((prev) => ({
                     ...prev,
                     password: errorMsg,
                 }));
                 return; // 이미 에러 상태를 한 번에 처리했으니 return
             case "name":
-                errorMsg = validateName(newValue);
+                errorMsg = touched.name ? validateName(newValue) : null;
                 break;
             case "dob":
-                errorMsg = validateDob(newValue);
+                // DOB는 8자리에 도달하기 전에는 에러 숨김, 터치된 뒤에는 즉시 검증
+                if (touched.dob) {
+                    errorMsg = validateDob(newValue);
+                } else {
+                    const digits = String(newValue || '').replace(/\D/g, '');
+                    errorMsg = digits.length === 8 ? validateDob(digits) : null;
+                }
+                break;
+            default:
+                errorMsg = null;
+        }
+        setErrors((prev) => ({ ...prev, [field]: errorMsg }));
+    };
+
+    const handleBlur = (field) => (e) => {
+        setTouched((prev) => ({ ...prev, [field]: true }));
+        // blur 시에는 무조건 검증 결과를 반영해 보이게 함
+        let value = e.target.value;
+        if (field === 'dob') {
+            value = String(value || '').replace(/\D/g, '').slice(0, 8);
+        }
+        let errorMsg = null;
+        switch (field) {
+            case 'email':
+                errorMsg = validateEmail(value);
+                break;
+            case 'password':
+                errorMsg = validatePassword(value);
+                break;
+            case 'name':
+                errorMsg = validateName(value);
+                break;
+            case 'dob':
+                errorMsg = validateDob(value);
                 break;
             default:
                 errorMsg = null;
@@ -105,16 +160,15 @@ const RegisterBox = () => {
     // ─── 전체 제출 가능 여부 계산(useEffect) ────────────────────────────────────
 
     useEffect(() => {
-        // errors 중 하나라도 존재하면 제출 불가
-        const hasError = Object.values(errors).some((msg) => msg !== null);
-        // 모든 필수 필드가 채워졌는지 확인
-        const allFilled =
-            formState.email &&
-            formState.password &&
-            formState.name &&
-            formState.dob;
+        // 현재 값 기준 실검증(터치 여부 무관)으로 제출 가능 여부 계산
+        const emailErr = validateEmail(formState.email);
+        const pwErr = validatePassword(formState.password);
+        const nameErr = validateName(formState.name);
+        const dobErr = validateDob(formState.dob);
+        const hasError = [emailErr, pwErr, nameErr, dobErr].some((msg) => msg !== null);
+        const allFilled = formState.email && formState.password && formState.name && formState.dob;
         setCanSubmit(!hasError && allFilled);
-    }, [errors, formState]);
+    }, [formState]);
 
     // ─── 폼 제출 핸들러 ─────────────────────────────────────────────────────────
 
@@ -131,15 +185,19 @@ const RegisterBox = () => {
         }
     };
 
+    const isMobileDark = variant === 'mobile-dark';
+
     return (
-        <div className="w-full max-w-lg mx-auto mb-14">
-            <form onSubmit={handleSubmit} className="space-y-6 px-10 w-[32rem]">
+        <div className={`w-full mx-auto mb-14 ${isMobileDark ? 'max-w-none' : 'max-w-lg'}`}>
+            <form onSubmit={handleSubmit} className={`space-y-6 ${isMobileDark ? '' : 'px-10 w-[32rem]'}`}>
                 {/* ───────── Required Information ──────────────────────────────────── */}
-                <div className="pt-2">
-                    <div className="inline-block select-none whitespace-nowrap rounded-lg bg-blue-500 py-2 px-3.5 font-sans text-xs font-bold uppercase text-white">
-                        <div className="mt-px">Required Information</div>
+                {!isMobileDark && (
+                    <div className="pt-2">
+                        <div className="inline-block select-none whitespace-nowrap rounded-lg bg-blue-500 py-2 px-3.5 font-sans text-xs font-bold uppercase text-white">
+                            <div className="mt-px">Required Information</div>
+                        </div>
                     </div>
-                </div>
+                )}
 
                 {/* Email */}
                 <div className="relative">
@@ -148,17 +206,24 @@ const RegisterBox = () => {
                         id="email"
                         value={formState.email}
                         onChange={handleInputChange("email")}
-                        className="block rounded-t-lg px-2.5 pb-2.5 pt-5 w-full text-sm text-gray-900 bg-gray-50 border-0 border-b-2 border-gray-300 focus:outline-none focus:ring-0 focus:border-blue-600 peer"
+                        autoComplete="email"
+                        inputMode="email"
+                        autoCapitalize="none"
+                        autoCorrect="off"
+                        enterKeyHint="next"
+                        aria-invalid={!!errors.email}
+                        aria-describedby={errors.email ? 'email-error' : undefined}
+                        className={`block w-full rounded-2xl px-3 pb-2.5 pt-5 text-sm peer transition ${isMobileDark ? 'text-slate-100 bg-slate-900/60 ring-1 ring-slate-700 focus:outline-none focus:ring-2 focus:ring-indigo-400/30 focus:border-transparent' : 'text-gray-900 bg-gray-50 border-0 border-b-2 border-gray-300 focus:outline-none focus:ring-0 focus:border-blue-600'}`}
                         placeholder=" "
                     />
                     <label
                         htmlFor="email"
-                        className="absolute text-sm text-gray-500 transform -translate-y-4 scale-75 top-4 origin-[0] start-2.5 peer-focus:text-blue-600 peer-placeholder-shown:scale-100 peer-placeholder-shown:translate-y-0 peer-focus:scale-75 peer-focus:-translate-y-4"
+                        className={`absolute text-sm transform -translate-y-4 scale-75 top-4 origin-[0] start-2.5 peer-placeholder-shown:scale-100 peer-placeholder-shown:translate-y-0 peer-focus:scale-75 peer-focus:-translate-y-4 ${isMobileDark ? 'text-slate-400 peer-focus:text-indigo-300' : 'text-gray-500 peer-focus:text-blue-600'}`}
                     >
-                        *Email Address
+                        {isMobileDark ? '*이메일' : '*Email Address'}
                     </label>
                     {errors.email && (
-                        <p className="mt-1 text-xs text-red-500">{errors.email}</p>
+                        <p id="email-error" className="mt-1 text-xs text-red-400">{errors.email}</p>
                     )}
                 </div>
 
@@ -169,39 +234,26 @@ const RegisterBox = () => {
                         id="password"
                         value={formState.password}
                         onChange={handleInputChange("password")}
-                        className="
-        block w-full
-        rounded-t-lg px-2.5 pb-2.5 pt-5 pr-10   /* pr-10으로 아이콘 공간 확보 */
-        text-sm text-gray-900 bg-gray-50
-        border-0 border-b-2 border-gray-300 appearance-none
-        focus:outline-none focus:ring-0 focus:border-blue-600
-        peer
-      "
+                        autoComplete="new-password"
+                        enterKeyHint="next"
+                        aria-invalid={!!errors.password}
+                        aria-describedby={errors.password ? 'password-error' : undefined}
+                        className={`block w-full rounded-2xl px-3 pb-2.5 pt-5 pr-10 text-sm appearance-none peer transition ${isMobileDark ? 'text-slate-100 bg-slate-900/60 ring-1 ring-slate-700 focus:outline-none focus:ring-2 focus:ring-indigo-400/30 focus:border-transparent' : 'text-gray-900 bg-gray-50 border-0 border-b-2 border-gray-300 focus:outline-none focus:ring-0 focus:border-blue-600'}`}
                         placeholder=" "
                     />
 
                     <label
                         htmlFor="password"
-                        className="
-        absolute left-2 top-4
-        text-sm text-gray-500
-        transform -translate-y-4 scale-75 origin-[0]
-        peer-focus:text-blue-600
-        peer-placeholder-shown:translate-y-0 peer-placeholder-shown:scale-100
-        peer-focus:scale-75 peer-focus:-translate-y-4
-      "
+                        className={`absolute left-2 top-4 text-sm transform -translate-y-4 scale-75 origin-[0] peer-placeholder-shown:translate-y-0 peer-placeholder-shown:scale-100 peer-focus:scale-75 peer-focus:-translate-y-4 ${isMobileDark ? 'text-slate-400 peer-focus:text-indigo-300' : 'text-gray-500 peer-focus:text-blue-600'}`}
                     >
-                        *Password
+                        {isMobileDark ? '*비밀번호' : '*Password'}
                     </label>
 
                     {/* 2) 아이콘만 이 wrapper 내부에서 절대 위치 */}
                     <button
                         type="button"
                         onClick={() => setShowPassword((prev) => !prev)}
-                        className="
-        absolute right-2 top-1/2 transform -translate-y-1/2
-        text-gray-500 hover:text-gray-700 focus:outline-none
-      "
+                        className={`absolute right-2 top-1/2 transform -translate-y-1/2 focus:outline-none ${isMobileDark ? 'text-slate-400 hover:text-slate-200' : 'text-gray-500 hover:text-gray-700'}`}
                     >
                         {showPassword ? (
                             /* 눈 감긴 아이콘 */
@@ -217,8 +269,7 @@ const RegisterBox = () => {
                         )}
                     </button>
                     {errors.password && (
-                        <div>
-                            <p className="mt-1 text-xs text-red-500">{errors.password}</p></div>
+                        <p id="password-error" className="mt-1 text-xs text-red-400">{errors.password}</p>
                     )}
                 </div>
 
@@ -237,17 +288,21 @@ const RegisterBox = () => {
                         id="name"
                         value={formState.name}
                         onChange={handleInputChange("name")}
-                        className="block rounded-t-lg px-2.5 pb-2.5 pt-5 w-full text-sm text-gray-900 bg-gray-50 border-0 border-b-2 border-gray-300 focus:outline-none focus:ring-0 focus:border-blue-600 peer"
+                        autoComplete="name"
+                        enterKeyHint="next"
+                        aria-invalid={!!errors.name}
+                        aria-describedby={errors.name ? 'name-error' : undefined}
+                        className={`block w-full rounded-2xl px-3 pb-2.5 pt-5 text-sm peer transition ${isMobileDark ? 'text-slate-100 bg-slate-900/60 ring-1 ring-slate-700 focus:outline-none focus:ring-2 focus:ring-indigo-400/30 focus:border-transparent' : 'text-gray-900 bg-gray-50 border-0 border-b-2 border-gray-300 focus:outline-none focus:ring-0 focus:border-blue-600'}`}
                         placeholder=" "
                     />
                     <label
                         htmlFor="name"
-                        className="absolute text-sm text-gray-500 transform -translate-y-4 scale-75 top-4 origin-[0] start-2.5 peer-focus:text-blue-600 peer-placeholder-shown:scale-100 peer-placeholder-shown:translate-y-0 peer-focus:scale-75 peer-focus:-translate-y-4"
+                        className={`absolute text-sm transform -translate-y-4 scale-75 top-4 origin-[0] start-2.5 peer-placeholder-shown:scale-100 peer-placeholder-shown:translate-y-0 peer-focus:scale-75 peer-focus:-translate-y-4 ${isMobileDark ? 'text-slate-400 peer-focus:text-indigo-300' : 'text-gray-500 peer-focus:text-blue-600'}`}
                     >
-                        *Name
+                        {isMobileDark ? '*이름' : '*Name'}
                     </label>
                     {errors.name && (
-                        <p className="mt-1 text-xs text-red-500">{errors.name}</p>
+                        <p id="name-error" className="mt-1 text-xs text-red-400">{errors.name}</p>
                     )}
                 </div>
 
@@ -259,17 +314,23 @@ const RegisterBox = () => {
                         value={formState.dob}
                         onChange={handleInputChange("dob")}
                         maxLength={8}
-                        className="block rounded-t-lg px-2.5 pb-2.5 pt-5 w-full text-sm text-gray-900 bg-gray-50 border-0 border-b-2 border-gray-300 focus:outline-none focus:ring-0 focus:border-blue-600 peer"
+                        inputMode="numeric"
+                        pattern="[0-9]{8}"
+                        autoComplete="bday"
+                        enterKeyHint="done"
+                        aria-invalid={!!errors.dob}
+                        aria-describedby={errors.dob ? 'dob-error' : undefined}
+                        className={`block w-full rounded-2xl px-3 pb-2.5 pt-5 text-sm tracking-wider peer transition ${isMobileDark ? 'text-slate-100 bg-slate-900/60 ring-1 ring-slate-700 focus:outline-none focus:ring-2 focus:ring-indigo-400/30 focus:border-transparent' : 'text-gray-900 bg-gray-50 border-0 border-b-2 border-gray-300 focus:outline-none focus:ring-0 focus:border-blue-600'}`}
                         placeholder=""
                     />
                     <label
                         htmlFor="dob"
-                        className="absolute text-sm text-gray-500 transform -translate-y-4 scale-75 top-4 origin-[0] start-2.5 peer-focus:text-blue-600 peer-placeholder-shown:scale-100 peer-placeholder-shown:translate-y-0 peer-focus:scale-75 peer-focus:-translate-y-4"
+                        className={`absolute text-sm transform -translate-y-4 scale-75 top-4 origin-[0] start-2.5 peer-placeholder-shown:scale-100 peer-placeholder-shown:translate-y-0 peer-focus:scale-75 peer-focus:-translate-y-4 ${isMobileDark ? 'text-slate-400 peer-focus:text-indigo-300' : 'text-gray-500 peer-focus:text-blue-600'}`}
                     >
-                        Date of Birth (YYYYMMDD)
+                        {isMobileDark ? '생년월일 (YYYYMMDD)' : 'Date of Birth (YYYYMMDD)'}
                     </label>
                     {errors.dob && (
-                        <p className="mt-1 text-xs text-red-500">{errors.dob}</p>
+                        <p id="dob-error" className="mt-1 text-xs text-red-400">{errors.dob}</p>
                     )}
                 </div>
 
@@ -278,13 +339,13 @@ const RegisterBox = () => {
                     <button
                         type="submit"
                         disabled={!canSubmit}
-                        className={`
-              flex w-full h-14 items-center justify-center rounded-md bg-indigo-600 px-3 py-1.5 text-sm/6 font-semibold text-white shadow-sm
-              hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600
-              disabled:bg-gray-400 disabled:cursor-not-allowed
-            `}
+                        className={`flex w-full h-12 items-center justify-center rounded-xl px-3 text-sm font-semibold transition ${
+                            canSubmit
+                                ? 'bg-gradient-to-r from-indigo-500 via-indigo-400 to-sky-400 text-white shadow-[0_18px_36px_-22px_rgba(59,130,246,0.55)] active:scale-[0.99] focus-visible:outline focus-visible:outline-2 focus-visible:outline-indigo-400/40'
+                                : 'bg-slate-800/70 text-slate-200/90 ring-1 ring-slate-600/60 cursor-not-allowed'
+                        }`}
                     >
-                        Sign Up
+                        {isMobileDark ? '가입하기' : 'Sign Up'}
                     </button>
                 </div>
 

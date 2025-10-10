@@ -1,4 +1,4 @@
-import {createContext, useContext, useEffect, useState} from "react";
+import {createContext, useCallback, useContext, useEffect, useRef, useState} from "react";
 
 import axios from "axios";
 import { setHttpAccessToken, setHttpHandlers } from "../api/http";
@@ -33,20 +33,34 @@ const withTimeout = (promise, timeoutMs) => new Promise((resolve, reject) => {
 });
 
 export const AuthProvider = ({ children }) => {
-    const [accessToken, setAccessToken] = useState(null);
+    const [accessToken, setAccessTokenState] = useState(null);
     const [userInfo, setUserInfo] = useState(null);
     const [isLoading, setIsLoading] = useState(true);
     // 앱 시작 시 로그인 확인이 끝날 때까지 화면을 가리기 위한 게이트
     const [isChecking, setIsChecking] = useState(true);
     const [bootstrapError, setBootstrapError] = useState(null);
     const [bootstrapKey, setBootstrapKey] = useState(0);
+    const [autoRefreshEnabled, setAutoRefreshEnabled] = useState(true);
+    const unauthorizedCountRef = useRef(0);
 
-    const logout = () => {
-        setAccessToken(null);
+    const clearSession = useCallback(() => {
+        setAccessTokenState(null);
         if (userInfo?.userNo) {
             try { clearProfileCache(userInfo.userNo); } catch {}
         }
         setUserInfo(null);
+    }, [userInfo]);
+
+    const updateAccessToken = useCallback((token) => {
+        unauthorizedCountRef.current = 0;
+        setAutoRefreshEnabled(true);
+        setAccessTokenState(token);
+    }, []);
+
+    const logout = () => {
+        setAutoRefreshEnabled(false);
+        unauthorizedCountRef.current = 0;
+        clearSession();
 
         axios.post(AUTH_ENDPOINTS.SIGNOUT, {}, {
             withCredentials: true
@@ -59,13 +73,19 @@ export const AuthProvider = ({ children }) => {
     useEffect(() => {
         // Provide hooks for axios interceptors
         setHttpHandlers({
-            onTokenUpdated: (t) => setAccessToken(t),
+            onTokenUpdated: (t) => updateAccessToken(t),
             onUnauthorized: () => {
-                setAccessToken(null);
-                setUserInfo(null);
+                unauthorizedCountRef.current += 1;
+                if (unauthorizedCountRef.current >= 2) {
+                    setAutoRefreshEnabled(false);
+                    setBootstrapError((prev) => prev || 'unauthorized');
+                    setIsLoading(false);
+                    setIsChecking(false);
+                }
+                clearSession();
             }
         });
-    }, []);
+    }, [clearSession, updateAccessToken]);
 
     useEffect(() => {
         // Keep axios layer in sync with current token
@@ -75,7 +95,6 @@ export const AuthProvider = ({ children }) => {
     useEffect(() => {
         const bootstrap = async () => {
             try {
-                setBootstrapError(null);
                 // 게스트는 초기 체크만 끝내고 진행
                 const isGuest = (() => {
                     try { return typeof document !== 'undefined' && document.cookie && document.cookie.includes('guest=1'); } catch { return false; }
@@ -83,6 +102,12 @@ export const AuthProvider = ({ children }) => {
                 if (isGuest) {
                     return;
                 }
+
+                if (!autoRefreshEnabled && !accessToken) {
+                    return;
+                }
+
+                setBootstrapError(null);
 
                 // 1) AccessToken 확보 (없으면 refresh 시도)
                 let at = accessToken;
@@ -93,7 +118,7 @@ export const AuthProvider = ({ children }) => {
                     );
                     const next = response?.data?.accessToken;
                     if (next && isTokenValid(next)) {
-                        setAccessToken(next);
+                        updateAccessToken(next);
                         at = next;
                         // Ensure request interceptor sees the token immediately
                         setHttpAccessToken(next);
@@ -153,7 +178,7 @@ export const AuthProvider = ({ children }) => {
             }
         };
         bootstrap();
-    }, [accessToken, bootstrapKey]);
+    }, [accessToken, autoRefreshEnabled, bootstrapKey, updateAccessToken]);
 
     // 사전 만료 갱신 타이머: exp - 30초에 refresh 시도
     useEffect(() => {
@@ -169,22 +194,22 @@ export const AuthProvider = ({ children }) => {
                 const resp = await axios.post(AUTH_ENDPOINTS.REFRESH, {}, { withCredentials: true });
                 const at = resp?.data?.accessToken;
                 if (at && isTokenValid(at)) {
-                    setAccessToken(at);
+                    updateAccessToken(at);
                 } else {
-                    setAccessToken(null);
-                    setUserInfo(null);
+                    clearSession();
                 }
             } catch {
-                setAccessToken(null);
-                setUserInfo(null);
+                clearSession();
             }
         }, delay);
         return () => clearTimeout(id);
-    }, [accessToken]);
+    }, [accessToken, clearSession, updateAccessToken]);
     const retryBootstrap = () => {
         setIsChecking(true);
         setIsLoading(true);
         setBootstrapError(null);
+        setAutoRefreshEnabled(true);
+        unauthorizedCountRef.current = 0;
         setBootstrapKey((key) => key + 1);
     };
 
@@ -254,7 +279,7 @@ export const AuthProvider = ({ children }) => {
     }
 
     return (
-        <AuthContext.Provider value={{ accessToken, setAccessToken, userInfo, setUserInfo, logout, isLoading, isChecking, bootstrapError, retryBootstrap }}>
+        <AuthContext.Provider value={{ accessToken, setAccessToken: updateAccessToken, userInfo, setUserInfo, logout, isLoading, isChecking, bootstrapError, retryBootstrap }}>
             {gateContent || children}
         </AuthContext.Provider>
     );

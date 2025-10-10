@@ -40,12 +40,22 @@
       "models": "Flagship model access"
     }
   },
+  "plus": {
+    "badge": "Plus",
+    "title": "Plus Plan",
+    "subtitle": "Enhanced performance is coming soon—during beta it mirrors the Free plan.",
+    "betaMessage": "We're finalising faster processing and collaboration perks before launch.",
+    "price": "₩1,900",
+    "per": "/ month",
+    "ctaDisabled": "Preparing launch",
+    "notice": "We'll let you know as soon as Plus is available."
+  },
   "pro": {
     "badge": "Pro",
     "highlight": "Coming soon",
     "title": "Pro Plan",
-    "subtitle": "We're validating the launch experience right now",
-    "betaMessage": "Try the same analysis capabilities on the Free plan while we finish polishing Pro.",
+    "subtitle": "We're wrapping up final checks before launch.",
+    "betaMessage": "Use the Free plan while we finish polishing the Pro experience.",
     "price": "Coming soon",
     "per": "",
     "ctaDisabled": "Preparing launch",

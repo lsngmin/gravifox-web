@@ -1,12 +1,18 @@
 import React, { useEffect, useMemo, useState } from "react";
 import { useLocation, useNavigate, useParams } from "react-router-dom";
+import Navigation from "../features/navigation/navigation";
+import Footer from "../features/footer/footer";
 import axios from "axios";
 import { EMAIL_ENDPOINTS } from "api/endPointRoute";
+import { useAuth } from "providers/authProvider";
 
 export default function EmailVerification() {
   const navigate = useNavigate();
   const location = useLocation();
   const { lng } = useParams();
+  const { userInfo, isLoading } = useAuth();
+  const [redirecting, setRedirecting] = useState(false);
+
   const localizedPath = (path) => {
     const prefix = lng ? `/${lng}` : "";
     if (path === "/" && prefix) {
@@ -14,11 +20,22 @@ export default function EmailVerification() {
     }
     return `${prefix}${path}`;
   };
+
   const initialEmail = useMemo(() => location?.state?.email || "", [location?.state]);
   const [secondsLeft, setSecondsLeft] = useState(0);
   const [submitting, setSubmitting] = useState(false);
   const [info, setInfo] = useState("");
-  const navigateToHome = () => navigate(localizedPath("/"));
+
+  useEffect(() => {
+    try { window.scrollTo({ top: 0, left: 0, behavior: 'instant' }); } catch (_) { window.scrollTo(0, 0); }
+  }, []);
+
+  useEffect(() => {
+    if (isLoading || !userInfo?.userNo) return;
+    setRedirecting(true);
+    const target = lng ? `/${lng}` : "/";
+    navigate(target, { replace: true });
+  }, [isLoading, userInfo?.userNo, navigate, lng]);
 
   useEffect(() => {
     if (secondsLeft <= 0) return;
@@ -46,104 +63,89 @@ export default function EmailVerification() {
     }
   };
 
-  return (
-    <div className="p-6 md:p-12 lg:p-20">
-      {/* 상단 브랜드 */}
-      <div className="mt-8 md:mt-14">
-        <div className="flex justify-center items-center">
-          <h2
-            onClick={navigateToHome}
-            translate="no"
-            className="cursor-pointer select-none text-[clamp(28px,5vw,60px)] font-extrabold tracking-tight leading-none text-indigo-500 drop-shadow-md mb-10"
-          >
-            GRAVIFOX.
-          </h2>
-        </div>
+  const steps = [
+    '메일함을 열고 “[GraviFox] 이메일 인증” 메일을 확인해 주세요.',
+    '메일 본문에서 ‘인증하기’ 버튼을 한 번 눌러 주세요.',
+    '완료되면 로그인 화면으로 돌아가 다시 로그인하면 준비 끝이에요.',
+  ];
 
-        {/* 본문 카드 */}
-        <div className="flex justify-center items-center">
-          <div className="w-full max-w-xl rounded-2xl border border-slate-200 bg-white shadow-sm p-6 md:p-8">
-            {/* 헤더 */}
-            <div className="flex items-center gap-3 mb-4">
-              <span className="inline-flex h-9 w-9 items-center justify-center rounded-full bg-indigo-50 text-indigo-600">
-                {/* mail icon */}
+  if (redirecting) {
+    return (
+      <div className="min-h-screen bg-slate-950 text-slate-100 flex flex-col">
+        <Navigation variant="dark" />
+        <main className="flex-1 flex justify-center">
+          <div className="w-full max-w-sm px-5 pt-24 pb-16 text-center space-y-4">
+            <h2 className="text-xl font-semibold text-indigo-200">인증이 완료되었어요!</h2>
+            <p className="text-sm text-slate-300">잠시 후 홈으로 이동합니다.</p>
+          </div>
+        </main>
+        <Footer transparent variant="dark" showLinks={false} inline />
+      </div>
+    );
+  }
+
+  return (
+    <div className="min-h-screen bg-slate-950 text-slate-100 flex flex-col">
+      <Navigation variant="dark" />
+      <main className="flex-1 flex justify-center">
+        <div className="w-full max-w-sm px-5 pt-24 pb-16">
+          <header className="text-center mb-6">
+            <h2
+              onClick={() => navigate(localizedPath('/'))}
+              translate="no"
+              className="cursor-pointer select-none text-[clamp(22px,5vw,36px)] font-extrabold tracking-tight leading-none text-indigo-400 drop-shadow mb-2"
+            >
+              GRAVIFOX.
+            </h2>
+            <p className="text-sm text-slate-300">가입을 마무리하려면 이메일을 확인해 주세요.</p>
+          </header>
+
+          <section className="rounded-3xl border border-slate-800/70 bg-slate-900/70 p-6 shadow-[0_24px_48px_-28px_rgba(15,23,42,0.85)] space-y-6">
+            <div className="flex items-start gap-4">
+              <span className="inline-flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl bg-indigo-500/15 text-indigo-200">
                 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" className="h-5 w-5"><path d="M1.5 8.67v8.58A2.25 2.25 0 0 0 3.75 19.5h16.5A2.25 2.25 0 0 0 22.5 17.25V8.67l-8.69 5.25a3.75 3.75 0 0 1-3.62 0L1.5 8.67Z"/><path d="M22.5 6.75v-.375A2.25 2.25 0 0 0 20.25 4.125H3.75A2.25 2.25 0 0 0 1.5 6.375V6.75l9.19 5.55a2.25 2.25 0 0 0 2.12 0L22.5 6.75Z"/></svg>
               </span>
-              <div>
-                <h1 className="text-base md:text-lg font-semibold text-slate-900">이메일 인증 안내</h1>
-                <p className="text-xs md:text-sm text-slate-600">가입한 이메일로 인증 링크를 보냈습니다.</p>
+              <div className="space-y-2">
+                <h1 className="text-lg font-semibold text-slate-100">이메일 인증을 완료해 주세요</h1>
+                <p className="text-sm text-slate-300">회원가입 시 입력한 이메일로 인증 링크를 전송했어요.</p>
               </div>
             </div>
 
-            {/* 구분선 */}
-            <div className="h-px w-full bg-slate-100 mb-6" />
+            <p className="text-sm text-slate-300">
+              인증 메일의 ‘인증하기’만 한 번 눌러 주시면 가입이 완료됩니다.
+            </p>
 
-            {/* 안내 1: 인증 방법 */}
-            <div className="space-y-3 mb-6">
-              <h2 className="text-sm font-medium text-slate-900">인증 방법</h2>
-              <ol className="space-y-2">
-                {[
-                  '메일함에서 “[GraviFox] 이메일 인증 요청”을 엽니다.',
-                  '메일 본문에서 ‘인증하기’ 버튼을 클릭합니다.',
-                  '완료 후 로그인 화면으로 돌아가 다시 로그인합니다.',
-                ].map((item, idx) => (
-                  <li key={idx} className="flex items-start gap-3 text-sm text-slate-700">
-                    <span className="mt-0.5 inline-flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-slate-100 text-slate-600 text-[11px] font-semibold">
-                      {idx + 1}
-                    </span>
-                    <span>{item}</span>
-                  </li>
-                ))}
-              </ol>
-            </div>
-
-            {/* 안내 2: 메일 미수신 시 */}
             <div className="space-y-3">
-              <h2 className="text-sm font-medium text-slate-900">메일이 오지 않았나요?</h2>
-              <ul className="list-disc pl-5 space-y-1 text-sm text-slate-700">
-                <li>스팸/프로모션/광고함을 확인해 주세요.</li>
-                <li>1–2분 기다렸다가 새로고침해 주세요.</li>
-                <li>가입한 이메일 주소가 맞는지 확인해 주세요.</li>
-              </ul>
-              <p className="text-xs text-slate-500">재발송은 보안을 위해 약 60초 간격으로 제한됩니다.</p>
-            </div>
+              <button
+                type="button"
+                onClick={handleResend}
+                disabled={secondsLeft > 0 || submitting}
+                className={`w-full rounded-2xl px-4 py-3 text-sm font-semibold transition ${
+                  secondsLeft > 0 || submitting
+                    ? 'bg-slate-800/70 text-slate-300 cursor-not-allowed'
+                    : 'bg-gradient-to-r from-indigo-500 via-indigo-400 to-sky-400 text-white shadow-[0_18px_36px_-22px_rgba(59,130,246,0.55)] active:scale-[0.99]'
+                }`}
+                aria-live="polite"
+              >
+                인증 메일 다시 보내기
+              </button>
+              {secondsLeft > 0 && (
+                <p className="text-xs text-slate-400">{secondsLeft}초 후 재발송이 가능해요.</p>
+              )}
+              {info && <p className="text-xs text-indigo-200">{info}</p>}
 
-            {/* 액션 */}
-            <div className="mt-8 flex flex-wrap items-center gap-3">
-              <div className="inline-flex">
-                <button
-                  type="button"
-                  onClick={handleResend}
-                  disabled={secondsLeft > 0 || submitting}
-                  className={
-                    `inline-flex items-center justify-center rounded-md px-3.5 py-2 text-sm
-                     font-semibold text-white shadow-sm transition-colors
-                     bg-indigo-600 hover:bg-indigo-500
-                     disabled:bg-indigo-300 disabled:hover:bg-indigo-300
-                     disabled:text-white disabled:opacity-100 disabled:cursor-default`
-                  }
-                  aria-live="polite"
-                >
-                  인증 메일 다시 보내기
-                </button>
-              </div>
               <button
                 type="button"
                 onClick={() => navigate(localizedPath('/login'))}
-                className="inline-flex items-center justify-center rounded-md px-3.5 py-2 text-sm font-semibold text-indigo-600 hover:text-indigo-700"
+                className="w-full rounded-2xl border border-slate-700 bg-slate-900/60 px-4 py-3 text-sm font-semibold text-slate-200 transition hover:border-indigo-400/50 hover:text-white"
               >
-                로그인으로 돌아가기
+                로그인 화면으로 돌아가기
               </button>
             </div>
-            {secondsLeft > 0 && (
-              <p className="mt-2 text-xs text-slate-700">{secondsLeft}초 후 재발송 가능</p>
-            )}
-            {info && (
-              <p className="mt-1 text-xs text-slate-600">{info}</p>
-            )}
-          </div>
+          </section>
         </div>
-      </div>
+      </main>
+      <Footer transparent variant="dark" showLinks={false} inline />
     </div>
   );
 }

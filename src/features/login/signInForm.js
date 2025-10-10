@@ -65,15 +65,15 @@ export default function SignInForm() {
     };
 
     return (
-        <div className="mx-auto w-full max-w-sm rounded-2xl bg-white px-6 py-10 text-slate-900 shadow-lg sm:px-8">
+        <div className="mx-auto w-full max-w-sm rounded-3xl border border-slate-800 bg-slate-900/70 px-6 py-10 text-slate-100 shadow-[0_24px_48px_-24px_rgba(15,23,42,0.8)] sm:px-8">
             <div className="space-y-2 text-center">
-                <h2 className="text-2xl font-semibold">계정으로 로그인</h2>
-                <p className="text-sm text-slate-500">보안 토큰을 입력하고 즉시 콘솔을 시작하세요.</p>
+                <h2 className="text-2xl font-semibold tracking-tight">계정으로 로그인</h2>
+                <p className="text-sm text-slate-400">로그인하면 바로 이용할 수 있어요.</p>
             </div>
             <form onSubmit={handleSubmit} className="mt-8 space-y-5">
                 <div className="space-y-2">
-                    <label htmlFor="userId" className="block text-sm font-medium text-slate-700">
-                        Email address
+                    <label htmlFor="userId" className="block text-sm font-medium text-slate-300">
+                        이메일
                     </label>
                     <input
                         id="userId"
@@ -82,17 +82,18 @@ export default function SignInForm() {
                         autoComplete="email"
                         value={formState.userId}
                         onChange={handleInputChange("userId")}
-                        className="block w-full rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm font-medium text-slate-900 outline-none transition focus:border-indigo-400 focus:ring-2 focus:ring-indigo-200"
+                        placeholder="you@example.com"
+                        className="block w-full rounded-xl border border-slate-700 bg-slate-900/60 px-4 py-3 text-sm font-medium text-slate-100 placeholder-slate-500 outline-none transition focus:border-indigo-400/70 focus:ring-2 focus:ring-indigo-400/20"
                     />
                 </div>
 
                 <div className="space-y-2">
                     <div className="flex items-center justify-between">
-                        <label htmlFor="password" className="block text-sm font-medium text-slate-700">
-                            Password
+                        <label htmlFor="password" className="block text-sm font-medium text-slate-300">
+                            비밀번호
                         </label>
-                        <Link to={localizedPath("/support")} className="text-xs font-semibold text-indigo-500 transition hover:text-indigo-400">
-                            Forgot password?
+                        <Link to={localizedPath("/support")} className="text-xs font-semibold text-indigo-300 transition hover:text-indigo-200">
+                            비밀번호 찾기
                         </Link>
                     </div>
                     <input
@@ -102,15 +103,16 @@ export default function SignInForm() {
                         autoComplete="current-password"
                         value={formState.password}
                         onChange={handleInputChange("password")}
-                        className="block w-full rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm font-medium text-slate-900 outline-none transition focus:border-indigo-400 focus:ring-2 focus:ring-indigo-200"
+                        placeholder="••••••••"
+                        className="block w-full rounded-xl border border-slate-700 bg-slate-900/60 px-4 py-3 text-sm font-medium text-slate-100 placeholder-slate-500 outline-none transition focus:border-indigo-400/70 focus:ring-2 focus:ring-indigo-400/20"
                     />
                 </div>
 
                 <button
                     type="submit"
-                    className="flex w-full justify-center rounded-xl bg-indigo-500 px-4 py-3 text-sm font-semibold text-white transition hover:bg-indigo-400 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-300"
+                    className="flex w-full justify-center rounded-xl bg-gradient-to-r from-indigo-500 via-indigo-400 to-sky-400 px-4 py-3 text-sm font-semibold text-white shadow-[0_18px_36px_-22px_rgba(59,130,246,0.55)] transition active:scale-[0.99]"
                 >
-                    Sign in
+                    로그인
                 </button>
 
                 <div>
@@ -126,18 +128,18 @@ export default function SignInForm() {
             </form>
 
             <div className="relative mt-8 flex items-center">
-                <span className="h-px flex-1 bg-slate-200" />
-                <span className="px-3 text-xs font-semibold tracking-[0.25em] text-slate-400">OR</span>
-                <span className="h-px flex-1 bg-slate-200" />
+                <span className="h-px flex-1 bg-slate-800" />
+                <span className="px-3 text-xs font-semibold tracking-[0.25em] text-slate-500">OR</span>
+                <span className="h-px flex-1 bg-slate-800" />
             </div>
 
             <div className="mt-6">
-                <GoogleLoginButton />
+                <GoogleLoginButton variant="dark" />
             </div>
 
-            <p className="mt-8 text-center text-sm text-slate-600">
+            <p className="mt-8 text-center text-sm text-slate-400">
                 아직 멤버가 아니신가요?{' '}
-                <button className="font-semibold text-indigo-500 transition hover:text-indigo-400" onClick={handleChangeForm}>
+                <button className="font-semibold text-indigo-300 transition hover:text-indigo-200" onClick={handleChangeForm}>
                     가입하기
                 </button>
             </p>

@@ -20,7 +20,122 @@
       "login": "로그인",
       "logout": "로그아웃",
       "freeTrial": "무료 체험",
-      "viewDashboard": "대시보드 보기"
+      "viewDashboard": "대시보드 보기",
+      "settings": "설정"
     }
+  },
+  "mobileAnalyze": {
+    "badge": "",
+    "heading": "새로운 분석을 시작할게요",
+    "subheading": "로그인하지 않고도 바로 검사할 수 있어요.",
+    "guidance": "AI가 만든 것처럼 헷갈리는 이미지를 올려 보세요.",
+    "guidance2": "흐릿한 사진이나 흔들린 장면은 정확도가 낮아질 수 있어요.",
+    "sampleNotice": "샘플 파일로 먼저 테스트해 보세요. 1회 한정으로 횟수가 차감되지 않아요.",
+    "actions": {
+      "upload": {
+        "title": "파일 선택하기",
+        "caption": "의심되는 부분의 장면을 스크린샷으로 저장 후 올려주세요."
+      },
+      "verify": {
+        "title": "AI 정밀 검증",
+        "caption": "눈에 보이지 않는 단서까지 살펴 진짜인지 확인해요."
+      }
+    },
+    "sampleTitle": "샘플 실행 제공",
+    "summary": {
+      "label": "최근 보고서",
+      "timestamp": "오늘 • 14:23",
+      "hint": "분석 결과는 암호화되어 48시간 동안만 보관돼요."
+    },
+    "videoNotice": "동영상 분석은 준비 중이에요. 곧 안내드릴게요.",
+    "videoNoticeTitle": "동영상 분석 준비 중",
+    "supportNotice": {
+      "title": "도움이 필요하신가요?",
+      "body": "진행 중 불편한 점이 있다면 알려 주세요."
+    },
+    "sessions": {
+      "title": "Sessions",
+      "memberDescription": "오늘 {{remaining}}회 더 이용할 수 있어요.",
+      "guestDescription": "오늘 무료 분석 {{remaining}}회 남았어요. 가입하면 하루 {{upgrade}}회까지 이용 가능해요.",
+      "resetHint": "횟수는 매일 자정에 초기화돼요."
+    },
+    "primary": "이미지 업로드하기",
+    "secondary": "최근 보고서 보기",
+    "secondaryAuthed": "최근 보고서 열기",
+    "footer": "Wi-Fi 환경 권장 • 평균 분석 시간 30초",
+    "uploadPage": {
+      "back": "뒤로가기",
+      "heading": "이미지를 올려주세요",
+      "subheading": "AI가 생성한 것 같은 이미지를 올려주세요.",
+      "hint": "이미지 3장까지 한 번에 업로드할 수 있어요.",
+      "actions": {
+        "album": "앨범에서 선택",
+        "camera": "카메라로 촬영"
+      },
+      "steps": {
+        "select": "앨범에서 선택",
+        "selectHint": "PNG, JPG, WEBP 형식을 지원해요.",
+        "capture": "카메라로 촬영",
+        "captureHint": "촬영 시 EXIF 메타데이터도 함께 분석해요.",
+        "review": "썸네일과 메타 확인",
+        "reviewHint": "해상도, 용량, 비율을 한눈에 확인해 보세요."
+      },
+      "emptyState": "아직 선택한 파일이 없어요.",
+      "emptyHint": "아래 버튼을 눌러 바로 시작해 보세요.",
+      "counter": {
+        "images": "이미지 {{count}}/{{max}}",
+        "videos": "동영상 {{count}}/{{max}}"
+      },
+      "meta": {
+        "type": "TYPE",
+        "size": "SIZE",
+        "resolution": "해상도",
+        "megapixel": "화소",
+        "aspect": "화면 비율",
+        "duration": "길이",
+        "remove": "선택한 파일 제거",
+        "untitled": "이름 없음",
+        "unknown": "형식 미상"
+      },
+      "errors": {
+        "title": "업로드 오류",
+        "duplicate": "이미 추가한 파일이에요.",
+        "type": "지원하지 않는 파일 형식이에요.",
+      "size": "파일 용량 제한을 초과했어요.",
+        "sizeHint": "이미지는 최대 5MB까지만 업로드할 수 있어요.",
+        "imageLimit": "이미지는 최대 {{max}}장까지만 업로드할 수 있어요.",
+        "videoLimit": "동영상은 최대 {{max}}개까지만 업로드할 수 있어요."
+      },
+      "primaryAction": "이미지 업로드하기",
+      "moreHint": "추가로 업로드할 이미지가 있으신가요?",
+      "moreAction": "이미지 더 올리기",
+      "reset": "모든 파일 비우기",
+      "cta": "분석 시작하기",
+      "footer": "Wi-Fi 환경 권장 • 평균 분석 시간 30초"
+    },
+    "processing": {
+      "title": "분석 중입니다…",
+      "subtitle": "평균 30초 내에 결과가 준비돼요. 페이지를 닫지 말고 잠시만 기다려 주세요.",
+      "previewTitle": "확인 중인 파일",
+      "previewHint": "{{count}}개 파일을 분석하고 있어요.",
+      "statusLabel": "AI 흔적을 분석하는 중이에요",
+      "statusHint": "워터마크, EXIF, 노이즈 패턴을 정밀 비교 중입니다.",
+      "progressLabel": "진행률",
+      "steps": {
+        "upload": "업로드 중",
+        "verify": "메타 검증 중",
+        "analyze": "AI 패턴 분석 중"
+      },
+      "footer": "분석이 완료되면 결과 페이지로 자동 이동합니다."
+    },
+    "resultCard": {
+      "badge": "AI 판정",
+      "title": "이 업로드는 진짜 같아요",
+      "confidence": "신뢰도 87%",
+      "summary": "텍스처와 조명 패턴이 자연스러운 촬영과 일치했어요. 워터마크나 GAN 노이즈는 감지되지 않았습니다.",
+      "cta": "공유 링크 복사",
+      "note": "베타 기능: 모델이 개선되면서 결과가 달라질 수 있어요."
+    },
+    "secondaryAuthed": "최근 보고서 보기"
   }
 }

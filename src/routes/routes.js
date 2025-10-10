@@ -20,6 +20,9 @@ import MediaAnalyze from "pages/MediaAnalyze";
 import EmailVerification from "pages/EmailVerification";
 import AnalyzeResult from "pages/AnalyzeResult";
 import Blog from "../pages/Blog";
+import MobileAnalyzeStart from "../pages/MobileAnalyzeStart";
+import MobileAnalyzeUpload from "../pages/MobileAnalyzeUpload";
+import MobileAnalyzeResult from "../pages/MobileAnalyzeResult";
 
 // Create/update canonical link to point to language-prefixed URL
 function CanonicalLink() {
@@ -88,7 +91,14 @@ function LegacyToLocalized() {
         const browser = (navigator.language || 'en').slice(0,2);
         const stored = (typeof localStorage !== 'undefined' && localStorage.getItem('i18nextLng')) || '';
         const pick = supported.includes(stored) ? stored : (supported.includes(browser) ? browser : 'en');
-        nav(`/${pick}${loc.pathname}${loc.search}${loc.hash}`, { replace: true, state: loc.state });
+        const remapPath = (pathname) => {
+            if (pathname.startsWith('/analyze/mobile/upload')) return '/analyze/upload';
+            if (pathname.startsWith('/analyze/mobile/result')) return '/analyze/result';
+            if (pathname.startsWith('/analyze/mobile')) return '/analyze';
+            return pathname;
+        };
+        const nextPath = remapPath(loc.pathname);
+        nav(`/${pick}${nextPath}${loc.search}${loc.hash}`, { replace: true, state: loc.state });
     }, [loc.hash, loc.pathname, loc.search, loc.state, nav]);
     return null;
 }
@@ -128,8 +138,11 @@ function AnimatedRoutes() {
                 <Route path=":lng/agree" element={<motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -20 }} transition={{ duration: 0.3 }}><Agree /></motion.div>} />
                 <Route path=":lng/register" element={<motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -20 }} transition={{ duration: 0.3 }}><Register /></motion.div>} />
                 <Route path=":lng/verify" element={<motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -20 }} transition={{ duration: 0.3 }}><EmailVerification /></motion.div>} />
-                <Route path=":lng/analyze" element={<motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -20 }} transition={{ duration: 0.3 }}><MediaAnalyze /></motion.div>} />
-                <Route path=":lng/analyze/result" element={<motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -20 }} transition={{ duration: 0.3 }}><AnalyzeResult /></motion.div>} />
+                <Route path=":lng/analyze/desktop" element={<motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -20 }} transition={{ duration: 0.3 }}><MediaAnalyze /></motion.div>} />
+                <Route path=":lng/analyze/desktop/result" element={<motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -20 }} transition={{ duration: 0.3 }}><AnalyzeResult /></motion.div>} />
+                <Route path=":lng/analyze" element={<motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -20 }} transition={{ duration: 0.3 }}><MobileAnalyzeStart /></motion.div>} />
+                <Route path=":lng/analyze/upload" element={<motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -20 }} transition={{ duration: 0.3 }}><MobileAnalyzeUpload /></motion.div>} />
+                <Route path=":lng/analyze/result" element={<motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -20 }} transition={{ duration: 0.3 }}><MobileAnalyzeResult /></motion.div>} />
                 <Route path=":lng/pricing" element={<motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -20 }} transition={{ duration: 0.3 }}><Pricing /></motion.div>} />
                 <Route path=":lng/feature" element={<motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -20 }} transition={{ duration: 0.3 }}><Feature /></motion.div>} />
                 <Route path=":lng/support" element={<motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -20 }} transition={{ duration: 0.3 }}><Support /></motion.div>} />
@@ -146,7 +159,13 @@ function AnimatedRoutes() {
                 <Route path="/register" element={<LegacyToLocalized />} />
                 <Route path="/verify" element={<LegacyToLocalized />} />
                 <Route path="/analyze" element={<LegacyToLocalized />} />
+                <Route path="/analyze/mobile" element={<LegacyToLocalized />} />
+                <Route path="/analyze/mobile/upload" element={<LegacyToLocalized />} />
+                <Route path="/analyze/mobile/result" element={<LegacyToLocalized />} />
+                <Route path="/analyze/upload" element={<LegacyToLocalized />} />
                 <Route path="/analyze/result" element={<LegacyToLocalized />} />
+                <Route path="/analyze/desktop" element={<LegacyToLocalized />} />
+                <Route path="/analyze/desktop/result" element={<LegacyToLocalized />} />
                 <Route path="/pricing" element={<LegacyToLocalized />} />
                 <Route path="/support" element={<LegacyToLocalized />} />
                 <Route path="/feature" element={<LegacyToLocalized />} />

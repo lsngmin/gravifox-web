@@ -1,4 +1,4 @@
-import React, {useState} from "react";
+import React, {useEffect, useRef, useState} from "react";
 import HowItWorksHeader from "./components/HowItworksHeader";
 import SampleChoiceBox from "./components/SampleChoiceBox";
 import StepsGrid from "./components/StepsGrid";
@@ -18,6 +18,14 @@ import UploadPanel from "./components/upload/UploadPanel";
 export default function HowItWorksSection() {
     const [files, setFiles] = useState([]);
     const [picking, setPicking] = useState(null);
+    const uploadRef = useRef(null);
+    useEffect(() => {
+        try {
+            if (typeof window !== 'undefined' && window.location?.hash === '#upload') {
+                uploadRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            }
+        } catch (_) {}
+    }, []);
     async function handleSamplePick(kind) {
         try {
             setPicking(kind);
@@ -51,7 +59,9 @@ export default function HowItWorksSection() {
             <SampleChoiceBox onPick={handleSamplePick} picking={picking}/>
             <StepsGrid/>
             <ToolTip/>
-            <UploadPanel files={files} setFiles={setFiles} />
+            <div id="upload" ref={uploadRef}>
+                <UploadPanel files={files} setFiles={setFiles} />
+            </div>
             <Faq/>
 
 

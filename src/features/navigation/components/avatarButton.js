@@ -13,12 +13,12 @@ import { useTranslation } from 'react-i18next';
 
 const BUTTON_DIMENSIONS = {
     sm: {
-        button: "w-10 h-10",
-        icon: "w-7 h-7",
+        button: "w-9 h-9 sm:w-10 sm:h-10",
+        icon: "w-5 h-5 sm:w-6 sm:h-6",
     },
     md: {
-        button: "w-12 h-12",
-        icon: "w-8 h-8",
+        button: "w-10 h-10 sm:w-12 sm:h-12",
+        icon: "w-6 h-6 sm:w-7 sm:h-7",
     },
 };
 
@@ -91,7 +91,7 @@ export default function AvatarButton({ size = "md" }) {
                 <div className="px-4 py-3 border-b border-gray-100">
                     <div className="flex items-center gap-3">
                         {/* 아바타 */}
-                        <div className="w-10 h-10 rounded-full bg-indigo-500 flex items-center justify-center text-white font-semibold">
+                        <div className="w-9 h-9 sm:w-10 sm:h-10 rounded-full bg-indigo-500 flex items-center justify-center text-white font-semibold text-sm sm:text-base">
                             {initials}
                         </div>
                         <div>

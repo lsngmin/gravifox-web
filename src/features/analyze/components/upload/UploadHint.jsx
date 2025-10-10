@@ -12,6 +12,8 @@ export default function UploadHint({
                                        multiple = false,
                                        label = "파일 선택",
                                        className = "",
+                                       textClassName = "",
+                                       labelClassName = "",
                                        hintRight = null, // 오른쪽에 붙일 보조 텍스트
                                    }) {
     const inputId = useId();
@@ -27,11 +29,11 @@ export default function UploadHint({
 
     return (
         <div className={`flex items-center ${className}`}>
-            <p className="text-sm text-slate-700 text-center">
+            <p className={`text-sm text-slate-700 text-center ${textClassName}`}>
                 여기에 파일을 끌어다 놓거나
                 <label
                     htmlFor={inputId}
-                    className="ml-1 font-semibold text-indigo-600 hover:text-indigo-700 cursor-pointer"
+                    className={`ml-1 font-semibold text-indigo-600 hover:text-indigo-700 cursor-pointer ${labelClassName}`}
                 >
                     {label}
                 </label>

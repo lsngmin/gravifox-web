@@ -2,7 +2,7 @@ import React, { Fragment, useCallback, useEffect, useMemo, useState } from 'reac
 import { createPortal } from 'react-dom';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { PopoverGroup, Transition } from '@headlessui/react';
-import { Bars3Icon, XMarkIcon } from '@heroicons/react/24/outline';
+import { Bars3Icon, XMarkIcon, Cog6ToothIcon } from '@heroicons/react/24/outline';
 import { useTranslation } from 'react-i18next';
 
 import { useAuth } from 'providers/authProvider';
@@ -20,7 +20,7 @@ const PortalPanel = React.forwardRef(function PortalPanel({ className, style, ..
     return createPortal(<div ref={ref} className={className} style={style} {...props} />, document.body);
 });
 
-const Navigation = () => {
+const Navigation = ({ variant = 'light' }) => {
     const { t } = useTranslation('common');
     const { userInfo } = useAuth();
     const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
@@ -37,8 +37,8 @@ const Navigation = () => {
             {
                 key: 'analyze',
                 labelKey: 'navigation.items.analyze',
-                to: localePrefix ? `${localePrefix}/analyze` : '/analyze',
-                path: '/analyze',
+                to: localePrefix ? `${localePrefix}/analyze/desktop` : '/analyze/desktop',
+                path: '/analyze/desktop',
             },
             {
                 key: 'features',
@@ -126,19 +126,25 @@ const Navigation = () => {
         return () => window.removeEventListener('keydown', onKeyDown);
     }, [mobileMenuOpen]);
 
+    const isDark = variant === 'dark';
+
     const headerStyle = useMemo(() => {
         const lerp = (a, b, t) => a + (b - a) * t;
         const top = lerp(0, 20, shrink);
         const side = lerp(0, 16, shrink);
         const radius = lerp(0, 20, shrink);
         const scale = lerp(1, 0.95, shrink);
-        const backgroundOpacity = lerp(0.98, 0.94, shrink);
-        const shadowStrength = lerp(0.18, 0.12, shrink);
-        const borderAlpha = lerp(0.55, 0.3, shrink);
+        const backgroundOpacity = lerp(isDark ? 0.9 : 0.98, isDark ? 0.86 : 0.94, shrink);
+        const shadowStrength = lerp(isDark ? 0.4 : 0.18, isDark ? 0.2 : 0.12, shrink);
+        const borderAlpha = lerp(isDark ? 0.35 : 0.55, isDark ? 0.2 : 0.3, shrink);
 
         const insetVisible = shrink > 0.06;
         const sideInset = insetVisible ? side : 0;
         const radiusValue = radius ? `${radius}px` : undefined;
+
+        const baseColor = isDark ? [15, 23, 42] : [255, 255, 255];
+        const shadowColor = isDark ? [8, 11, 24] : [15, 23, 42];
+        const borderColor = isDark ? [51, 65, 85] : [226, 232, 240];
 
         return {
             left: sideInset ? `${sideInset}px` : '0px',
@@ -146,12 +152,12 @@ const Navigation = () => {
             top: `${top}px`,
             borderRadius: radiusValue,
             transform: `scale(${scale.toFixed(3)})`,
-            backgroundColor: `rgba(255,255,255,${backgroundOpacity.toFixed(2)})`,
-            boxShadow: `0 18px 32px -24px rgba(15,23,42,${shadowStrength.toFixed(2)})`,
-            border: `1px solid rgba(226, 232, 240, ${borderAlpha.toFixed(2)})`,
+            backgroundColor: `rgba(${baseColor[0]},${baseColor[1]},${baseColor[2]},${backgroundOpacity.toFixed(2)})`,
+            boxShadow: `0 18px 32px -24px rgba(${shadowColor[0]},${shadowColor[1]},${shadowColor[2]},${shadowStrength.toFixed(2)})`,
+            border: `1px solid rgba(${borderColor[0]}, ${borderColor[1]}, ${borderColor[2]}, ${borderAlpha.toFixed(2)})`,
             willChange: 'left,right,top,border-radius,box-shadow,transform,background-color,border',
         };
-    }, [shrink]);
+    }, [shrink, isDark]);
 
     const composedHeaderStyle = useMemo(() => {
         if (!mobileMenuOpen) {
@@ -216,6 +222,7 @@ const Navigation = () => {
 
     const loginPath = localePrefix ? `${localePrefix}/login` : '/login';
     const freeTrialPath = localePrefix ? `${localePrefix}/free-trial` : '/free-trial';
+    const settingsPath = localePrefix ? `${localePrefix}/settings` : '/settings';
 
     const buildLinkTarget = (item) => {
         if (item.hash) {
@@ -226,13 +233,15 @@ const Navigation = () => {
 
     return (
         <header
-            className="fixed inset-x-0 top-0 z-40 transition-[padding,top,border-radius,transform,background,backdrop-filter,box-shadow,left,right] duration-400 ease-out"
+            className={`fixed inset-x-0 top-0 z-40 transition-[padding,top,border-radius,transform,background,backdrop-filter,box-shadow,left,right] duration-400 ease-out ${
+                isDark ? 'text-slate-100' : ''
+            }`}
             style={composedHeaderStyle}
         >
             <div className="relative">
                 <nav
                     aria-label="Global"
-                    className="mx-auto flex items-center justify-between px-6 py-4 lg:px-8"
+                    className={`mx-auto flex items-center justify-between px-6 py-4 lg:px-8 ${isDark ? 'text-slate-100' : ''}`}
                     style={{ paddingBlock: `${(16 - 6 * shrink).toFixed(1)}px`, paddingInline: `${(24 - 8 * shrink).toFixed(1)}px` }}
                 >
                     <div className="flex items-center gap-x-6 lg:gap-x-10 lg:flex-1">
@@ -253,14 +262,36 @@ const Navigation = () => {
                                 const isActive = activeItemKey === item.key;
                                 const highlightLevel = isActive ? highlightStrength : 0;
                                 const showHighlight = highlightLevel > 0;
-                                const linkClasses = `group relative inline-flex text-[1.05rem] font-bold tracking-wide transition-colors duration-200 ${isActive ? 'text-indigo-600' : 'text-gray-700 hover:text-gray-900'}`;
-                                const pillClasses = `inline-flex items-center justify-center rounded-full border px-3.5 py-1.5 text-current transition-all duration-300 leading-tight ${showHighlight ? 'bg-indigo-50/90 border-indigo-200' : 'border-transparent group-hover:border-indigo-100 group-hover:bg-indigo-50/70'}`;
+                                const linkClasses = `group relative inline-flex text-[1.05rem] font-bold tracking-wide transition-colors duration-200 ${
+                                    isDark
+                                        ? isActive
+                                            ? 'text-indigo-200'
+                                            : 'text-slate-300 hover:text-white'
+                                        : isActive
+                                              ? 'text-indigo-600'
+                                              : 'text-gray-700 hover:text-gray-900'
+                                }`;
+                                const pillClasses = `inline-flex items-center justify-center rounded-full border px-3.5 py-1.5 text-current transition-all duration-300 leading-tight ${
+                                    showHighlight
+                                        ? isDark
+                                            ? 'bg-indigo-500/15 border-indigo-400/50'
+                                            : 'bg-indigo-50/90 border-indigo-200'
+                                        : isDark
+                                            ? 'border-slate-700/70 group-hover:border-indigo-500/40 group-hover:bg-indigo-500/10'
+                                            : 'border-transparent group-hover:border-indigo-100 group-hover:bg-indigo-50/70'
+                                }`;
                                 const highlightStyle = showHighlight
-                                    ? {
-                                          boxShadow: `0 12px 28px -18px rgba(79, 70, 229, ${(0.35 + 0.2 * highlightLevel).toFixed(2)})`,
-                                          borderColor: `rgba(129, 140, 248, ${(0.6 + 0.25 * highlightLevel).toFixed(2)})`,
-                                          backgroundColor: `rgba(238, 242, 255, ${(0.9 + 0.08 * highlightLevel).toFixed(2)})`,
-                                      }
+                                    ? isDark
+                                        ? {
+                                              boxShadow: `0 12px 28px -18px rgba(99, 102, 241, ${(0.28 + 0.15 * highlightLevel).toFixed(2)})`,
+                                              borderColor: `rgba(99, 102, 241, ${(0.55 + 0.25 * highlightLevel).toFixed(2)})`,
+                                              backgroundColor: `rgba(76, 81, 191, ${(0.18 + 0.1 * highlightLevel).toFixed(2)})`,
+                                          }
+                                        : {
+                                              boxShadow: `0 12px 28px -18px rgba(79, 70, 229, ${(0.35 + 0.2 * highlightLevel).toFixed(2)})`,
+                                              borderColor: `rgba(129, 140, 248, ${(0.6 + 0.25 * highlightLevel).toFixed(2)})`,
+                                              backgroundColor: `rgba(238, 242, 255, ${(0.9 + 0.08 * highlightLevel).toFixed(2)})`,
+                                          }
                                     : undefined;
                                 const label = t(item.labelKey);
 
@@ -275,9 +306,7 @@ const Navigation = () => {
                         </PopoverGroup>
                     </div>
                     <div className="flex items-center gap-3 lg:hidden relative z-20">
-                        {isLoggedIn ? (
-                            <AvatarButton size="sm" />
-                        ) : (
+                        {!mobileMenuOpen && !isLoggedIn && (
                             <Link
                                 to={loginPath}
                                 className="inline-flex items-center justify-center gap-1 rounded-full bg-gradient-to-r from-indigo-500 via-violet-500 to-purple-500 px-4 py-2 text-sm font-semibold text-white shadow-lg shadow-indigo-500/30 transition hover:shadow-indigo-500/40 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-indigo-300 focus-visible:ring-offset-2 focus-visible:ring-offset-white"
@@ -288,7 +317,9 @@ const Navigation = () => {
                         <button
                             type="button"
                             onClick={() => setMobileMenuOpen((prev) => !prev)}
-                            className="-m-2.5 inline-flex items-center justify-center rounded-md p-2.5 text-gray-700"
+                            className={`-m-2.5 inline-flex items-center justify-center rounded-md p-2.5 transition ${
+                                isDark ? 'text-slate-300 hover:text-white hover:bg-slate-800/80' : 'text-gray-700'
+                            }`}
                             aria-expanded={mobileMenuOpen}
                             aria-controls="mobile-main-menu"
                             aria-label={mobileMenuOpen ? t('navigation.closeMenu') : t('navigation.openMenu')}
@@ -351,7 +382,7 @@ const Navigation = () => {
                                             <div className="min-w-0 flex-1">
                                                 {isLoggedIn ? (
                                                     <div className="flex items-center gap-3 rounded-2xl bg-indigo-50/70 px-4 py-3 text-slate-700">
-                                                        <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-indigo-500 text-sm font-semibold text-white">
+                                                    <div className="flex h-9 w-9 sm:h-10 sm:w-10 shrink-0 items-center justify-center rounded-full bg-indigo-500 text-xs sm:text-sm font-semibold text-white">
                                                             {userInitials}
                                                         </div>
                                                         <div className="min-w-0">
@@ -369,14 +400,24 @@ const Navigation = () => {
                                                     </div>
                                                 )}
                                             </div>
-                                            <button
-                                                type="button"
-                                                onClick={() => setMobileMenuOpen(false)}
-                                                aria-label={t('navigation.closeMenu')}
-                                                className="-m-2 flex h-10 w-10 items-center justify-center rounded-md text-slate-500 transition hover:bg-slate-100 hover:text-slate-700 active:scale-95"
-                                            >
-                                                <XMarkIcon aria-hidden="true" className="size-6" />
-                                            </button>
+                                            <div className="flex items-center gap-2">
+                                                <Link
+                                                    to={settingsPath}
+                                                    onClick={() => setMobileMenuOpen(false)}
+                                                    aria-label={t('navigation.actions.settings', 'Settings')}
+                                                    className="-m-2 flex h-10 w-10 items-center justify-center rounded-md text-slate-500 transition hover:bg-slate-100 hover:text-slate-700 active:scale-95"
+                                                >
+                                                    <Cog6ToothIcon aria-hidden="true" className="size-6" />
+                                                </Link>
+                                                <button
+                                                    type="button"
+                                                    onClick={() => setMobileMenuOpen(false)}
+                                                    aria-label={t('navigation.closeMenu')}
+                                                    className="-m-2 flex h-10 w-10 items-center justify-center rounded-md text-slate-500 transition hover:bg-slate-100 hover:text-slate-700 active:scale-95"
+                                                >
+                                                    <XMarkIcon aria-hidden="true" className="size-6" />
+                                                </button>
+                                            </div>
                                         </div>
 
                                         <div className="mt-6">

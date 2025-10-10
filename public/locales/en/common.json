@@ -20,7 +20,121 @@
       "login": "Log in",
       "logout": "Log out",
       "freeTrial": "Free Trial",
-      "viewDashboard": "View Dashboard"
+      "viewDashboard": "View Dashboard",
+      "settings": "Settings"
+    }
+  },
+  "mobileAnalyze": {
+    "badge": "Beta",
+    "heading": "Start a new authenticity check",
+    "subheading": "Upload up to 5 images. We detect synthetic traces in seconds.",
+    "guidance": "Stuck between real or AI-made? Drop those tricky files here.",
+    "guidance2": "Blurry or low-light images may reduce detection quality.",
+    "sampleNotice": "Try our sample file first—this one-time test does not count against your daily quota.",
+    "actions": {
+      "upload": {
+        "title": "Upload from device",
+        "caption": "Supports PNG, JPG, and HEIC up to 25MB each."
+      },
+      "verify": {
+        "title": "Trusted verification",
+        "caption": "We cross-check watermark, EXIF, and neural noise patterns."
+      }
+    },
+    "sampleTitle": "Sample run available",
+    "summary": {
+      "label": "Last report",
+      "timestamp": "Today • 14:23",
+      "hint": "History is encrypted and retained for 48 hours after each analysis."
+    },
+    "videoNotice": "Video analysis is being prepared. We'll notify you as soon as it's ready.",
+    "videoNoticeTitle": "Video analysis coming soon",
+    "supportNotice": {
+      "title": "Need assistance?",
+      "body": "If something feels off during the process, reach out and we’ll help you right away."
+    },
+    "sessions": {
+      "title": "Sessions left today",
+      "memberDescription": "{{remaining}} of {{total}} analyses left today.",
+      "guestDescription": "{{remaining}} free analyses left today. Sign up to unlock {{upgrade}} per day.",
+      "resetHint": "Usage resets at midnight."
+    },
+    "primary": "Upload images",
+    "secondary": "View recent reports",
+    "secondaryAuthed": "Open recent reports",
+    "footer": "Works best on Wi-Fi • Avg. analysis time 8s",
+    "uploadPage": {
+      "back": "Back to mobile hub",
+      "heading": "Upload from your device",
+      "subheading": "Pick from your gallery or take a fresh shot to scan for AI traces.",
+      "hint": "Upload up to 3 images and 2 videos at once.",
+      "actions": {
+        "album": "Choose from gallery",
+        "camera": "Capture with camera"
+      },
+      "steps": {
+        "select": "Choose from gallery",
+        "selectHint": "Supports PNG, JPG, WEBP.",
+        "capture": "Capture with camera",
+        "captureHint": "We analyse EXIF metadata when available.",
+        "review": "Review thumbnails & metadata",
+        "reviewHint": "Check resolution, size, and aspect ratio instantly."
+      },
+      "emptyState": "No files selected yet.",
+      "emptyHint": "Use the button below to get started.",
+      "counter": {
+        "images": "Images {{count}}/{{max}}",
+        "videos": "Videos {{count}}/{{max}}"
+      },
+      "meta": {
+        "type": "TYPE",
+        "size": "SIZE",
+        "resolution": "Resolution",
+        "megapixel": "Mega pixel",
+        "aspect": "Aspect",
+        "duration": "Duration",
+        "remove": "Remove file",
+        "untitled": "Untitled",
+        "unknown": "Unknown"
+      },
+      "errors": {
+        "title": "Upload error",
+        "duplicate": "That file is already in the list.",
+        "type": "This file type is not supported.",
+      "size": "File size exceeds the limit.",
+        "sizeHint": "Images can be up to 5MB each.",
+        "imageLimit": "You can add up to {{max}} images.",
+        "videoLimit": "You can add up to {{max}} videos."
+      },
+      "primaryAction": "Upload images",
+      "moreHint": "Need to add more images?",
+      "moreAction": "Upload another file",
+      "reset": "Clear all files",
+      "cta": "Start analysis",
+      "footer": "Works best on Wi-Fi • Avg. analysis time 30s"
+    },
+    "processing": {
+      "title": "Processing…",
+      "subtitle": "Most analyses finish within 30 seconds. Keep this page open while we work.",
+      "previewTitle": "Files in queue",
+      "previewHint": "Analyzing {{count}} file(s).",
+      "statusLabel": "Detecting synthetic artefacts",
+      "statusHint": "Comparing watermark, EXIF, and neural noise signatures.",
+      "progressLabel": "Progress",
+      "steps": {
+        "upload": "Uploading",
+        "verify": "Verifying metadata",
+        "analyze": "Running AI analysis"
+      },
+      "footer": "You'll be redirected automatically when results are ready."
+    },
+    "resultCard": {
+      "badge": "AI Verdict",
+      "title": "This upload looks authentic",
+      "confidence": "Confidence 87%",
+      "summary": "Texture and lighting patterns align with natural captures. No watermark or GAN noise detected.",
+      "cta": "Copy share link",
+      "note": "Beta feature: verdicts may evolve as the model improves."
     }
   }
 }

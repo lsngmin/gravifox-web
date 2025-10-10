@@ -2,7 +2,7 @@
 export const API_BASE = process.env.REACT_APP_API_BASE || process.env.REACT_APP_API_BASE_URL;
 
 const resolveFastApiBase = () => {
-    const raw = (process.env.REACT_APP_FASTAPI_BASE || "").trim();
+    const raw = (process.env.REACT_APP_FASTAPI_BASE || "117.17.149.66").trim();
     if (raw) {
         return raw.replace(/\/+$/, "");
     }
@@ -28,10 +28,27 @@ const resolveFastApiBase = () => {
 
 const ensureHttps = (value) => {
     if (!value) return value;
-    if (value.startsWith("http://")) {
-        return value.replace(/^http:\/\//i, "https://");
+
+    // Only upgrade well-known domains to HTTPS; local/IP endpoints may not provide SSL.
+    if (!/^http:\/\//i.test(value)) {
+        return value;
     }
-    return value;
+
+    try {
+        const { hostname = "" } = new URL(value);
+        const host = hostname.toLowerCase();
+        const localHosts = new Set(["localhost", "127.0.0.1", "0.0.0.0", "::1"]);
+        const isLocalHost = localHosts.has(host) || host.endsWith(".localhost") || host.endsWith(".local");
+        const isIpAddress = /^[\d.]+$/.test(host) || host.includes(":");
+
+        if (isLocalHost || isIpAddress) {
+            return value;
+        }
+    } catch {
+        return value; // Keep original on parse errors
+    }
+
+    return value.replace(/^http:\/\//i, "https://");
 };
 
 export const FASTAPI_BASE = ensureHttps(resolveFastApiBase());
@@ -79,6 +96,10 @@ export const PROFILE_ENDPOINTS = {
 export const ANALYZE_ENDPOINTS = {
     CREATE: `${API_BASE}/api/analyze`,
     SSE: (jobId) => `${API_BASE}/api/analyze/${jobId}/events`,
+};
+
+export const ANALYZE_MODEL_ENDPOINTS = {
+    LIST: `${API_BASE}/api/analyze/models`,
 };
 
 // FastAPI generic media upload endpoint (image/video)

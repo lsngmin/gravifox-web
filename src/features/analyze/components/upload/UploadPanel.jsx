@@ -1,11 +1,12 @@
 import React, { useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
-import { FASTAPI_ENDPOINTS, ANALYZE_ENDPOINTS } from "../../../../api/endPointRoute";
+import submitAnalyzeFiles from "../../api/submitAnalyze";
 import CloudUploadIcon from "./CloudUploadIcon";
 import UploadDropzone from "./UploadDropzone";
 import UploadHint from "./UploadHint";
 import UploadActions from "./UploadActions";
 import FilePreviewCard from "./FilePreviewCard";
+import MobileFilePreviewItem from "../mobile/MobileFilePreviewItem";
 import UploadMoreNote from "./UploadMoreNote";
 import ErrorModal from "../ErrorModal";
 
@@ -42,24 +43,42 @@ function isAllowedFile(file) {
     return isImage(file) || isVideo(file);
 }
 
-function TypeCounters({ files }) {
+function TypeCounters({ files, dark = false }) {
     const imgCount = files.filter(isImage).length;
     const vidCount = files.filter(isVideo).length;
+    const wrap = 'mb-2 flex items-center gap-2';
+    const pill = dark
+        ? 'inline-flex items-center gap-2 rounded-full border border-slate-700 bg-slate-800/70 px-3 py-1 text-xs font-medium text-slate-200'
+        : 'inline-flex items-center gap-2 rounded-full bg-slate-100 px-3 py-1 text-xs font-medium text-slate-700';
+    const count = dark
+        ? 'rounded-full border border-slate-600 bg-slate-900/70 px-2 py-0.5 text-[11px] text-slate-100'
+        : 'rounded-full bg-slate-200 px-2 py-0.5 text-[11px] text-slate-800';
     return (
-        <div className="mb-2 flex items-center gap-2">
-            <div className="inline-flex items-center gap-2 rounded-full bg-slate-100 px-3 py-1 text-xs font-medium text-slate-700">
+        <div className={wrap}>
+            <div className={pill}>
                 <span>이미지</span>
-                <span className="rounded-full bg-slate-200 px-2 py-0.5 text-[11px] text-slate-800">{imgCount}/{MAX_IMAGE_FILES}</span>
+                <span className={count}>{imgCount}/{MAX_IMAGE_FILES}</span>
             </div>
-            <div className="inline-flex items-center gap-2 rounded-full bg-slate-100 px-3 py-1 text-xs font-medium text-slate-700">
+            <div className={pill}>
                 <span>동영상</span>
-                <span className="rounded-full bg-slate-200 px-2 py-0.5 text-[11px] text-slate-800">{vidCount}/{MAX_VIDEO_FILES}</span>
+                <span className={count}>{vidCount}/{MAX_VIDEO_FILES}</span>
             </div>
         </div>
     );
 }
 
-export default function UploadPanel({ files = [], setFiles }) {
+export default function UploadPanel({
+    files = [],
+    setFiles,
+    className = "",
+    dropzoneClassName = "",
+    hintClassName = "",
+    variant = 'default', // 'default' | 'mobile'
+    analyzeLabel,
+    onAnalyzeOverride = null,
+    hideReset = false,
+    selectedModelKey,
+}) {
     const [dragOver, setDragOver] = useState(false);
     const [errorOpen, setErrorOpen] = useState(false);
     const [errorMsgs, setErrorMsgs] = useState([]);
@@ -143,77 +162,48 @@ export default function UploadPanel({ files = [], setFiles }) {
     const removeAt = (idx) => setFiles(prev => prev.filter((_, i) => i !== idx));
     const resetAll = () => { setFiles([]); };
     const analyze = async (arr) => {
+        if (typeof onAnalyzeOverride === 'function') {
+            try {
+                await Promise.resolve(onAnalyzeOverride(arr));
+            } catch (e) {
+                const msg = e?.message || "분석을 시작할 수 없어요. 다시 시도해 주세요.";
+                setErrorMsgs([msg]);
+                setErrorOpen(true);
+            }
+            return;
+        }
+
         if (!arr?.length || submitting) return;
-        const localErrors = [];
         setSubmitting(true);
         setErrorMsgs([]);
         setErrorOpen(false);
         setPendingResultPath(null);
         try {
-            if (!FASTAPI_ENDPOINTS.UPLOAD) {
-                throw new Error("업로드 엔드포인트가 설정되지 않았어요. 환경 변수를 확인해 주세요.");
-            }
-            const jobIds = [];
-            // 순차 처리: 업로드 → 분석 생성 반복
-            for (let i = 0; i < arr.length; i++) {
-                const file = arr[i];
-                try {
-                    // 1) 업로드
-                    const form = new FormData();
-                    form.append("file", file, file.name || "media");
-                    const upRes = await fetch(FASTAPI_ENDPOINTS.UPLOAD, { method: "POST", body: form });
-                    if (!upRes.ok) throw new Error("업로드에 실패했어요.");
-                    const upJson = await upRes.json();
-                    const uploadId = upJson?.uploadId;
-                    if (!uploadId) throw new Error("uploadId를 받지 못했어요.");
+            const { jobIds, errors: uploadErrors } = await submitAnalyzeFiles(arr, {
+                modelKey: selectedModelKey,
+                buildMeta: (file) => ({
+                    name: file?.name,
+                    size: file?.size,
+                    type: file?.type,
+                }),
+            });
 
-                    // 2) 분석 생성
-                    const anRes = await fetch(ANALYZE_ENDPOINTS.CREATE, {
-                        method: "POST",
-                        headers: { "Content-Type": "application/json" },
-                        body: JSON.stringify({ uploadId }),
-                    });
-                    if (!anRes.ok) throw new Error("분석 생성에 실패했어요.");
-                    const anJson = await anRes.json();
-                    const { jobId, sseToken } = anJson || {};
-                    if (!jobId || !sseToken) throw new Error("jobId 또는 sseToken이 없어요.");
-
-                    // 3) 토큰/메타 저장 (URL에는 토큰 노출 X)
-                    try {
-                        sessionStorage.setItem(`sse:${jobId}`, sseToken);
-                        sessionStorage.setItem(`sse:meta:${jobId}`, JSON.stringify({
-                            name: file.name,
-                            size: file.size,
-                            type: file.type,
-                        }));
-                    } catch {}
-                    jobIds.push(jobId);
-                } catch (inner) {
-                    // 파일 단위 오류는 누적해서 모달에 보여주고 계속 진행
-                    const msg = inner?.message || `${file.name} 처리 중 오류가 발생했어요.`;
-                    localErrors.push(msg);
-                }
-            }
-
-            if (jobIds.length === 0) {
-                if (localErrors.length === 0) {
-                    localErrors.push("분석을 시작할 수 없어요. 다시 시도해 주세요.");
-                }
-                setErrorMsgs(localErrors);
+            if (!jobIds.length) {
+                const fallback = uploadErrors.length > 0 ? uploadErrors : ["분석을 시작할 수 없어요. 다시 시도해 주세요."];
+                setErrorMsgs(fallback);
                 setErrorOpen(true);
                 return;
             }
 
-            const resultPath = localizedPath(`/analyze/result?jobIds=${encodeURIComponent(jobIds.join(","))}`);
+            const resultPath = localizedPath(`/analyze/desktop/result?jobIds=${encodeURIComponent(jobIds.join(","))}`);
 
-            if (localErrors.length > 0) {
-                setErrorMsgs(localErrors);
+            if (uploadErrors.length > 0) {
+                setErrorMsgs(uploadErrors);
                 setErrorOpen(true);
                 setPendingResultPath(resultPath);
                 return;
             }
 
-            // 4) 결과 페이지로 이동 (다중 전용)
             setPendingResultPath(null);
             navigate(resultPath);
         } catch (e) {
@@ -227,7 +217,7 @@ export default function UploadPanel({ files = [], setFiles }) {
     };
 
     return (
-        <div className="mx-auto mt-6 rounded-2xl border border-slate-200 bg-white p-4">
+        <div className={`mx-auto mt-6 rounded-2xl border bg-white p-4 border-slate-200 ${className}`}>
             <ErrorModal
                 open={errorOpen}
                 messages={errorMsgs}
@@ -241,31 +231,49 @@ export default function UploadPanel({ files = [], setFiles }) {
                     }
                 }}
                 title="업로드 오류"
+                theme={className?.includes('bg-slate-') ? 'dark' : 'light'}
             />
             {files.length === 0 && (
                 <UploadDropzone
                     dragOver={dragOver}
                     setDragOver={setDragOver}
                     onDropFiles={(fl) => addFiles(fl)}
+                    className={dropzoneClassName}
                 >
                     <CloudUploadIcon />
                     <UploadHint
                         multiple
                         onFiles={(fl) => addFiles(fl)}
                         accept={ACCEPT_MIME}
+                        className={hintClassName}
+                        textClassName={hintClassName}
+                        labelClassName={hintClassName}
                     />
                 </UploadDropzone>
             )}
             {files.length > 0 && (
                 <>
                     {/* 선택 파일 카운터 (타입별) */}
-                    <TypeCounters files={files} />
+                    <TypeCounters files={files} dark={className?.includes('bg-slate-')} />
 
-                    <div className="grid grid-cols-1 gap-4">
-                        {files.map((f, i) => (
-                            <FilePreviewCard key={`${f.name}_${f.size}_${i}`} file={f} onRemove={() => removeAt(i)} />
-                        ))}
-                    </div>
+                    {variant === 'mobile' ? (
+                        <div className="grid grid-cols-1 gap-4">
+                            {files.map((f, i) => (
+                                <MobileFilePreviewItem key={`${f.name}_${f.size}_${i}`} file={f} onRemove={() => removeAt(i)} />
+                            ))}
+                        </div>
+                    ) : (
+                        <div className="grid grid-cols-1 gap-4">
+                            {files.map((f, i) => (
+                                <FilePreviewCard
+                                    key={`${f.name}_${f.size}_${i}`}
+                                    file={f}
+                                    onRemove={() => removeAt(i)}
+                                    variant={className?.includes('bg-slate-') ? 'dark' : 'light'}
+                                />
+                            ))}
+                        </div>
+                    )}
 
                     {/* 추가 업로드 안내 + 버튼 */}
                     <UploadMoreNote
@@ -280,6 +288,8 @@ export default function UploadPanel({ files = [], setFiles }) {
                 files={files}
                 onAnalyze={analyze}
                 onReset={resetAll}
+                analyzeLabel={analyzeLabel}
+                hideReset={hideReset}
                 className="mt-6"
             />
             {submitting && (
