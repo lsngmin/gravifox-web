@@ -56,7 +56,7 @@
     "sessions": {
       "title": "Sessions left today",
       "memberDescription": "{{remaining}} of {{total}} analyses left today.",
-      "guestDescription": "{{remaining}} free analyses left today. Sign up to unlock {{upgrade}} per day.",
+      "guestDescription": "{{remaining}} analyses left today. Sign up to unlock {{upgrade}} per day.",
       "resetHint": "Usage resets at midnight."
     },
     "primary": "Upload images",

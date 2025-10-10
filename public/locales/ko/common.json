@@ -56,7 +56,7 @@
     "sessions": {
       "title": "Sessions",
       "memberDescription": "오늘 {{remaining}}회 더 이용할 수 있어요.",
-      "guestDescription": "오늘 무료 분석 {{remaining}}회 남았어요.",
+      "guestDescription": "오늘 {{remaining}}회 남았어요.",
       "resetHint": "횟수는 매일 자정에 초기화돼요."
     },
     "primary": "이미지 업로드하기",

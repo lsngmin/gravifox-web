@@ -104,29 +104,29 @@ export default function MobileAnalyzeStart() {
             </div>
           </header>
 
-          <div className="rounded-3xl border border-indigo-500/25 bg-gradient-to-br from-indigo-600/20 via-slate-900/70 to-slate-900/60 p-5 shadow-[0_22px_50px_-30px_rgba(99,102,241,0.6)]">
-            <div className="flex items-center gap-4">
-              <div>
-                <p className="text-xs uppercase tracking-[0.25em] text-slate-500">
-                  {t('mobileAnalyze.sessions.title', 'Sessions left today')}
-                </p>
-                <p className="mt-2 text-sm font-medium text-slate-200">
-                  {isLoggedIn
-                    ? t('mobileAnalyze.sessions.memberDescription', {
-                        remaining: formattedRemaining,
-                        total: formattedTotal,
-                      })
-                    : t('mobileAnalyze.sessions.guestDescription', {
-                        remaining: formattedRemaining,
-                        upgrade: formattedUpgrade,
-                      })}
-                </p>
-              </div>
-            </div>
-            <p className="mt-3 text-[11px] text-slate-500">
-              {t('mobileAnalyze.sessions.resetHint', 'Usage resets every midnight.')}
-            </p>
-          </div>
+          {/*<div className="rounded-3xl border border-indigo-500/25 bg-gradient-to-br from-indigo-600/20 via-slate-900/70 to-slate-900/60 p-5 shadow-[0_22px_50px_-30px_rgba(99,102,241,0.6)]">*/}
+          {/*  <div className="flex items-center gap-4">*/}
+          {/*    <div>*/}
+          {/*      <p className="text-xs uppercase tracking-[0.25em] text-slate-500">*/}
+          {/*        {t('mobileAnalyze.sessions.title', 'Sessions left today')}*/}
+          {/*      </p>*/}
+          {/*      <p className="mt-2 text-sm font-medium text-slate-200">*/}
+          {/*        {isLoggedIn*/}
+          {/*          ? t('mobileAnalyze.sessions.memberDescription', {*/}
+          {/*              remaining: formattedRemaining,*/}
+          {/*              total: formattedTotal,*/}
+          {/*            })*/}
+          {/*          : t('mobileAnalyze.sessions.guestDescription', {*/}
+          {/*              remaining: formattedRemaining,*/}
+          {/*              upgrade: formattedUpgrade,*/}
+          {/*            })}*/}
+          {/*      </p>*/}
+          {/*    </div>*/}
+          {/*  </div>*/}
+          {/*  <p className="mt-3 text-[11px] text-slate-500">*/}
+          {/*    {t('mobileAnalyze.sessions.resetHint', 'Usage resets every midnight.')}*/}
+          {/*  </p>*/}
+          {/*</div>*/}
 
           <section className="space-y-4">
             <article className="rounded-3xl border border-slate-800/70 bg-slate-900/70 p-5 shadow-[0_20px_44px_-26px_rgba(15,23,42,0.9)]">
@@ -165,31 +165,7 @@ export default function MobileAnalyzeStart() {
                   </div>
                 </div>
 
-                <button
-                  type="button"
-                  onClick={handleSampleStart}
-                  className="flex items-center justify-between gap-3 rounded-2xl border border-indigo-400/40 bg-indigo-500/15 px-3 py-3 text-indigo-100 transition hover:border-indigo-300 hover:bg-indigo-500/25"
-                >
-                  <span className="inline-flex h-10 w-10 items-center justify-center rounded-full bg-indigo-500/25 text-white">
-                    <svg viewBox="0 0 24 24" className="h-5 w-5" fill="none" stroke="currentColor" strokeWidth="1.8">
-                      <path strokeLinecap="round" strokeLinejoin="round" d="M12 16l4-4m0 0l-4-4m4 4H4" />
-                      <path strokeLinecap="round" strokeLinejoin="round" d="M16 20h1.25A2.75 2.75 0 0 0 20 17.25v-10.5A2.75 2.75 0 0 0 17.25 4H16" />
-                    </svg>
-                  </span>
-                  <div className="flex-1 text-left">
-                    <p className="text-[11px] font-semibold uppercase tracking-[0.12em] text-indigo-200">
-                      {t('mobileAnalyze.sampleTitle', 'Sample run available')}
-                    </p>
-                    <p className="mt-1 text-[11px] text-indigo-100/80">
-                      {t('mobileAnalyze.sampleNotice', 'Try our sample file first—this one-time test does not count against your daily quota.')}
-                    </p>
-                  </div>
-                  <span className="inline-flex h-6 w-6 items-center justify-center rounded-full border border-indigo-300/50 bg-indigo-500/10 text-indigo-100">
-                    <svg viewBox="0 0 24 24" className="h-3.5 w-3.5" fill="none" stroke="currentColor" strokeWidth="2">
-                      <path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" />
-                    </svg>
-                  </span>
-                </button>
+                {/* Sample button moved below near the primary CTA */}
               </div>
             </article>
 
@@ -232,24 +208,45 @@ export default function MobileAnalyzeStart() {
               </span>
             </button>
           </section>
-
+          <button
+              type="button"
+              onClick={handleSampleStart}
+              className="flex items-center justify-between gap-3 rounded-2xl border border-indigo-400/40 bg-indigo-500/15 px-3 py-3 text-indigo-100 transition hover:border-indigo-300 hover:bg-indigo-500/25"
+          >
+              <span className="inline-flex h-10 w-10 items-center justify-center rounded-full bg-indigo-500/25 text-white">
+                <svg viewBox="0 0 24 24" className="h-5 w-5" fill="none" stroke="currentColor" strokeWidth="1.8">
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M12 16l4-4m0 0l-4-4m4 4H4" />
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M16 20h1.25A2.75 2.75 0 0 0 20 17.25v-10.5A2.75 2.75 0 0 0 17.25 4H16" />
+                </svg>
+              </span>
+            <div className="flex-1 text-left">
+              <p className="text-[11px] font-semibold uppercase tracking-[0.12em] text-indigo-200">
+                {t('mobileAnalyze.sampleTitle', 'Sample run available')}
+              </p>
+              <p className="mt-1 text-[11px] text-indigo-100/80">
+                {t('mobileAnalyze.sampleNotice', 'Try our sample file first—this one-time test does not count against your daily quota.')}
+              </p>
+            </div>
+            <span className="inline-flex h-6 w-6 items-center justify-center rounded-full border border-indigo-300/50 bg-indigo-500/10 text-indigo-100">
+                <svg viewBox="0 0 24 24" className="h-3.5 w-3.5" fill="none" stroke="currentColor" strokeWidth="2">
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" />
+                </svg>
+              </span>
+          </button>
+          {/* Separated sample file entry placed above the main upload button */}
           <div className="mt-auto space-y-3">
-            <button
-              type="button"
-              onClick={handleStart}
-              className="inline-flex w-full items-center justify-center rounded-2xl bg-gradient-to-r from-indigo-500 to-indigo-400 px-4 py-3 text-base font-semibold text-white shadow-lg shadow-indigo-500/25 transition-transform duration-200 active:scale-[0.99]"
-            >
-              {t('mobileAnalyze.primary', 'Upload images')}
-            </button>
-            {/* <button
-              type="button"
-              onClick={handleHistory}
-              className="inline-flex w-full items-center justify-center rounded-2xl border border-slate-800 bg-slate-900/40 px-4 py-3 text-sm font-semibold text-slate-300 transition-colors hover:border-slate-700 hover:text-white"
-            >
-              {isLoggedIn
-                ? t('mobileAnalyze.secondaryAuthed')
-                : t('mobileAnalyze.secondary', 'View recent reports')}
-            </button> */}
+
+
+            {/* Primary upload action */}
+            <div className="space-y-3">
+              <button
+                type="button"
+                onClick={handleStart}
+                className="inline-flex w-full items-center justify-center rounded-2xl bg-gradient-to-r from-indigo-500 to-indigo-400 px-4 py-3 text-base font-semibold text-white shadow-lg shadow-indigo-500/25 transition-transform duration-200 active:scale-[0.99]"
+              >
+                {t('mobileAnalyze.primary', 'Upload images')}
+              </button>
+            </div>
           </div>
         </div>
       </main>
