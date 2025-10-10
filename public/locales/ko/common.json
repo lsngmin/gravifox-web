@@ -27,21 +27,21 @@
   "mobileAnalyze": {
     "badge": "",
     "heading": "새로운 분석을 시작할게요",
-    "subheading": "로그인하지 않고도 바로 검사할 수 있어요.",
+    "subheading": "의심되는 이미지를 업로드 하면, AI가 분석합니다.",
     "guidance": "AI가 만든 것처럼 헷갈리는 이미지를 올려 보세요.",
     "guidance2": "흐릿한 사진이나 흔들린 장면은 정확도가 낮아질 수 있어요.",
-    "sampleNotice": "샘플 파일로 먼저 테스트해 보세요. 1회 한정으로 횟수가 차감되지 않아요.",
+    "sampleNotice": "성능이 궁금하신가요? 샘플 파일로 먼저 테스트해 보세요.",
     "actions": {
       "upload": {
         "title": "파일 선택하기",
-        "caption": "의심되는 부분의 장면을 스크린샷으로 저장 후 올려주세요."
+        "caption": "의심되는 부분의 장면을 올려주세요."
       },
       "verify": {
         "title": "AI 정밀 검증",
         "caption": "눈에 보이지 않는 단서까지 살펴 진짜인지 확인해요."
       }
     },
-    "sampleTitle": "샘플 실행 제공",
+    "sampleTitle": "샘플 파일",
     "summary": {
       "label": "최근 보고서",
       "timestamp": "오늘 • 14:23",
@@ -56,7 +56,7 @@
     "sessions": {
       "title": "Sessions",
       "memberDescription": "오늘 {{remaining}}회 더 이용할 수 있어요.",
-      "guestDescription": "오늘 무료 분석 {{remaining}}회 남았어요. 가입하면 하루 {{upgrade}}회까지 이용 가능해요.",
+      "guestDescription": "오늘 무료 분석 {{remaining}}회 남았어요.",
       "resetHint": "횟수는 매일 자정에 초기화돼요."
     },
     "primary": "이미지 업로드하기",
@@ -116,17 +116,76 @@
     "processing": {
       "title": "분석 중입니다…",
       "subtitle": "평균 30초 내에 결과가 준비돼요. 페이지를 닫지 말고 잠시만 기다려 주세요.",
+      "doneTitle": "분석이 완료됐어요",
+      "doneSubtitle": "요약 리포트를 아래에서 바로 확인해 주세요.",
       "previewTitle": "확인 중인 파일",
       "previewHint": "{{count}}개 파일을 분석하고 있어요.",
       "statusLabel": "AI 흔적을 분석하는 중이에요",
       "statusHint": "워터마크, EXIF, 노이즈 패턴을 정밀 비교 중입니다.",
       "progressLabel": "진행률",
+      "timeout": "10초 동안 응답이 없어 연결을 종료했어요. 다시 시도해 주세요.",
       "steps": {
         "upload": "업로드 중",
         "verify": "메타 검증 중",
         "analyze": "AI 패턴 분석 중"
       },
       "footer": "분석이 완료되면 결과 페이지로 자동 이동합니다."
+    },
+    "report": {
+      "badge": {
+        "real": "진짜",
+        "fake": "가짜",
+        "unknown": "분류 불가"
+      },
+      "metrics": {
+        "title": "판정 근거",
+        "probFake": "의심 확률",
+        "probFakeHint": "모델이 합성으로 판단한 확률이에요.",
+        "probStd": "점수 표준편차",
+        "probStdHint": "검사 구간 사이의 점수 변동 폭을 보여줘요.",
+        "threshold": "임계값",
+        "thresholdHint": "이 값 이상이면 합성으로 간주해요.",
+        "delta": "임계 대비 차이",
+        "deltaHint": "양수면 임계값을 넘었고, 음수면 아직 안전 구간이에요.",
+        "highConf": "고확신 비율",
+        "highConfHint": "고확신 경계를 넘은 샘플 비중이에요.",
+        "agg": "집계 방식",
+        "aggHint": "모델이 점수를 통합해 최종 판정을 낸 방식이에요.",
+        "notAvailable": "제공되지 않음",
+        "latency": "추론 지연",
+        "latencyHint": "이 이미지를 처리하는 데 걸린 시간이예요.",
+        "backend": "백엔드",
+        "device": "디바이스",
+        "runtimeBackend": "모델이 실행된 백엔드 엔진이에요.",
+        "runtimeDevice": "분석이 수행된 하드웨어 정보예요."
+      },
+      "quantiles": {
+        "title": "점수 분포",
+        "subtitle": "확률 분포를 분위수로 요약했어요.",
+        "empty": "분포를 계산할 데이터가 부족해요."
+      },
+      "timeline": {
+        "title": "타임라인 요약",
+        "single": "단일 이미지 분석이라 타임라인 점수가 하나뿐이에요.",
+        "multi": "{{count}}개 샘플에서 점수가 {{min}}~{{max}} 범위로 측정됐어요.",
+        "trend": "임계 초과 구간 비율: {{ratio}}"
+      },
+      "exemplars": {
+        "title": "하이라이트",
+        "none": "강조할 만한 샘플이 없어요.",
+        "thresholdHit": "임계 이상 영역이 포착됐어요 (시작 {{start}}, 종료 {{end}})."
+      },
+      "classes": {
+        "title": "클래스 확률",
+        "caption": "확률이 높은 순으로 정렬했어요."
+      },
+      "runtime": {
+        "title": "추론 환경",
+        "subtitle": "모델이 실행된 환경 정보예요."
+      },
+      "notice": {
+        "imageOnly": "이번 업로드는 이미지이므로 영상 전용 지표는 숨겼어요."
+      }
     },
     "resultCard": {
       "badge": "AI 판정",

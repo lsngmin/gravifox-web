@@ -116,17 +116,76 @@
     "processing": {
       "title": "Processing…",
       "subtitle": "Most analyses finish within 30 seconds. Keep this page open while we work.",
+      "doneTitle": "Analysis complete",
+      "doneSubtitle": "Review the summary below.",
       "previewTitle": "Files in queue",
       "previewHint": "Analyzing {{count}} file(s).",
       "statusLabel": "Detecting synthetic artefacts",
       "statusHint": "Comparing watermark, EXIF, and neural noise signatures.",
       "progressLabel": "Progress",
+      "timeout": "The connection timed out after 10 seconds. Please start a new analysis.",
       "steps": {
         "upload": "Uploading",
         "verify": "Verifying metadata",
         "analyze": "Running AI analysis"
       },
       "footer": "You'll be redirected automatically when results are ready."
+    },
+    "report": {
+      "badge": {
+        "real": "REAL",
+        "fake": "FAKE",
+        "unknown": "UNKNOWN"
+      },
+      "metrics": {
+        "title": "Decision rationale",
+        "probFake": "Suspicion probability",
+        "probFakeHint": "Likelihood that the image is synthetic.",
+        "probStd": "Score standard deviation",
+        "probStdHint": "Variation of the score across inspected regions.",
+        "threshold": "Model threshold",
+        "thresholdHint": "Scores at or above this value are flagged as synthetic.",
+        "delta": "Margin vs threshold",
+        "deltaHint": "Positive values indicate the score exceeded the threshold.",
+        "highConf": "High-confidence share",
+        "highConfHint": "Portion of samples that crossed the high-confidence boundary.",
+        "agg": "Aggregator",
+        "aggHint": "Strategy the model used to combine scores.",
+        "notAvailable": "Not provided",
+        "latency": "Inference latency",
+        "latencyHint": "Time required to process this image.",
+        "backend": "Backend",
+        "device": "Device",
+        "runtimeBackend": "Execution backend reported by the model.",
+        "runtimeDevice": "Hardware that executed the analysis."
+      },
+      "quantiles": {
+        "title": "Score distribution",
+        "subtitle": "Quantiles of the class probability.",
+        "empty": "Not enough data to compute quantiles."
+      },
+      "timeline": {
+        "title": "Timeline summary",
+        "single": "Single image analysis – the timeline contains one score.",
+        "multi": "Scores ranged between {{min}} and {{max}} across {{count}} samples.",
+        "trend": "Above-threshold coverage: {{ratio}}."
+      },
+      "exemplars": {
+        "title": "Highlighted samples",
+        "none": "No notable samples to highlight.",
+        "thresholdHit": "A region crossed the threshold (start {{start}}, end {{end}})."
+      },
+      "classes": {
+        "title": "Class probabilities",
+        "caption": "Sorted by confidence."
+      },
+      "runtime": {
+        "title": "Runtime environment",
+        "subtitle": "Model execution context."
+      },
+      "notice": {
+        "imageOnly": "Video-only diagnostics are hidden because this upload was an image."
+      }
     },
     "resultCard": {
       "badge": "AI Verdict",

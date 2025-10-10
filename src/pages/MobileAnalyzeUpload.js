@@ -325,63 +325,44 @@ export default function MobileAnalyzeUpload() {
               </header>
 
               <section className="space-y-4">
-                <div className="rounded-3xl border border-slate-800/70 bg-[linear-gradient(150deg,rgba(15,23,42,0.92),rgba(30,41,59,0.82))] p-5 shadow-[0_26px_52px_-32px_rgba(15,23,42,0.88)]">
-                  <div className="flex flex-col gap-3">
+                <div className="px-1">
+                  <div className="flex items-center">
+                    <span className="inline-flex items-center rounded-full bg-gradient-to-r from-amber-400 via-rose-400 to-emerald-400 px-3 py-1.5 text-[12px] font-semibold text-slate-900 shadow-sm ring-1 ring-white/10">
+                      {selectedModel?.name || t('mobileAnalyze.uploadPage.modelSection.emptyOption', '기본 모델 (자동 선택)')}
+                    </span>
+                  </div>
+                  {/* Keep lightweight status messages for clarity */}
+                  {loadingModels && (
+                    <p className="mt-1 text-[12px] text-slate-500">
+                      {t('mobileAnalyze.uploadPage.modelSection.loading', '모델 정보를 불러오는 중이에요…')}
+                    </p>
+                  )}
+                  {!loadingModels && modelError && (
+                    <p className="mt-1 text-[12px] text-rose-300">
+                      {modelError}
+                    </p>
+                  )}
+                  {!loadingModels && !modelError && models.length === 0 && (
+                    <p className="mt-1 text-[12px] text-slate-500">
+                      {t('mobileAnalyze.uploadPage.modelSection.empty', '사용 가능한 모델이 없어요. 기본 설정으로 진행합니다.')}
+                    </p>
+                  )}
+                </div>
+                <div className="px-1">
+                  <div className="flex items-start gap-3">
+                    <div className="pt-0.5 text-indigo-200/80">
+                      <UploadCloud size={18} />
+                    </div>
                     <div>
-                      <p className="text-[11px] font-semibold uppercase tracking-[0.22em] text-indigo-200">
-                        {t('mobileAnalyze.uploadPage.modelSection.title', '분석 모델')}
+                      <p className="text-[15px] font-semibold text-slate-100 tracking-tight">
+                        {t('mobileAnalyze.uploadPage.actions.album', '앨범에서 선택')}
+                      </p>
+                      <p className="mt-2 text-xs text-slate-400">
+                        {t('mobileAnalyze.uploadPage.steps.selectHint', 'PNG, JPG, WEBP 형식을 지원해요.')}
                       </p>
                     </div>
-                    {models.length > 1 ? (
-                      <select
-                        value={modelKey || ''}
-                        onChange={(event) => setModelKey(event.target.value || null)}
-                        disabled={loadingModels || models.length === 0}
-                        className="w-full rounded-[18px] border border-slate-700 bg-slate-900/70 px-3 py-3 text-sm font-medium text-slate-200 focus:border-indigo-400 focus:outline-none focus:ring-0"
-                      >
-                        {models.map((model) => (
-                          <option key={model.key} value={model.key}>
-                            {model.name}
-                          </option>
-                        ))}
-                      </select>
-                    ) : models.length === 1 ? (
-                      <div className="rounded-[18px] border border-slate-700 bg-slate-900/70 px-4 py-3">
-                        <span className="text-sm font-semibold text-slate-100">{selectedModel?.name}</span>
-                      </div>
-                    ) : (
-                      <div className="rounded-[18px] border border-dashed border-slate-700 bg-slate-900/40 px-4 py-3 text-sm text-slate-400">
-                        {t('mobileAnalyze.uploadPage.modelSection.emptyOption', '기본 모델 (자동 선택)')}
-                      </div>
-                    )}
-                    {loadingModels && (
-                      <p className="text-[12px] text-slate-500">
-                        {t('mobileAnalyze.uploadPage.modelSection.loading', '모델 정보를 불러오는 중이에요…')}
-                      </p>
-                    )}
-                    {!loadingModels && modelError && (
-                      <p className="text-[12px] text-rose-300">
-                        {modelError}
-                      </p>
-                    )}
-                    {!loadingModels && !modelError && models.length === 0 && (
-                      <p className="text-[12px] text-slate-500">
-                        {t('mobileAnalyze.uploadPage.modelSection.empty', '사용 가능한 모델이 없어요. 기본 설정으로 진행합니다.')}
-                      </p>
-                    )}
                   </div>
                 </div>
-                <article className="rounded-3xl border border-slate-800/70 bg-[linear-gradient(150deg,rgba(15,23,42,0.92),rgba(30,41,59,0.82))] p-5 shadow-[0_26px_52px_-32px_rgba(15,23,42,0.88)]">
-                  <div className="flex flex-col gap-3">
-                    <UploadActionTile
-                      icon={UploadCloud}
-                      title={t('mobileAnalyze.uploadPage.actions.album', '앨범에서 선택')}
-                      subtitle={t('mobileAnalyze.uploadPage.steps.selectHint', 'PNG, JPG, WEBP 형식을 지원해요.')}
-                      accentClass="bg-[linear-gradient(135deg,rgba(129,140,248,0.55),rgba(99,102,241,0.2))] text-indigo-200"
-                      onClick={triggerAlbum}
-                    />
-                  </div>
-                </article>
 
                 {files.length === 0 ? (
                   <div className="rounded-[28px] border border-slate-800/70 bg-[linear-gradient(150deg,rgba(15,23,42,0.85),rgba(17,24,39,0.7))] px-6 py-12 text-center text-sm text-slate-300 shadow-[0_24px_54px_-32px_rgba(15,23,42,0.85)]">

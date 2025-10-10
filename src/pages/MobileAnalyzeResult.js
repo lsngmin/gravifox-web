@@ -7,6 +7,9 @@ import Footer from '../features/footer/footer';
 import { ANALYZE_ENDPOINTS } from '../api/endPointRoute';
 import MobileAnalysisReport from '../features/analyze/components/mobile/MobileAnalysisReport';
 
+const IS_TEST_ENV = String(process.env.NODE_ENV || '').toLowerCase() === 'test';
+const TEST_TIMEOUT_MS = 10_000;
+
 export default function MobileAnalyzeResult() {
   const { t } = useTranslation('common');
   const navigate = useNavigate();
@@ -30,6 +33,7 @@ export default function MobileAnalyzeResult() {
   useEffect(() => {
     if (!jobIds.length) return;
     const sources = [];
+    const timeouts = [];
     jobIds.forEach((jid) => {
       const token = sessionStorage.getItem(`sse:${jid}`);
       const metaStr = sessionStorage.getItem(`sse:meta:${jid}`);
@@ -81,6 +85,32 @@ export default function MobileAnalyzeResult() {
       const url = `${ANALYZE_ENDPOINTS.SSE(jid)}?token=${encodeURIComponent(token)}`;
       const es = new EventSource(url);
       sources.push(es);
+      let timeoutId = null;
+      if (IS_TEST_ENV) {
+        timeoutId = setTimeout(() => {
+          setReports((prev) => {
+            const current = prev[jid] || {};
+            if (current.result || current.error) return prev;
+            return {
+              ...prev,
+              [jid]: {
+                ...current,
+                error: t('mobileAnalyze.processing.timeout', '응답이 지연되고 있어요. 다시 시도해 주세요.'),
+                fileMeta,
+                timedOut: true,
+              },
+            };
+          });
+          try {
+            es.close();
+          } catch {}
+          try {
+            sessionStorage.removeItem(`sse:${jid}`);
+            sessionStorage.removeItem(`sse:meta:${jid}`);
+          } catch {}
+        }, TEST_TIMEOUT_MS);
+        timeouts.push(timeoutId);
+      }
       es.onopen = () => setReports((prev) => ({
         ...prev,
         [jid]: {
@@ -130,6 +160,7 @@ export default function MobileAnalyzeResult() {
             sessionStorage.setItem(`sse:report:${jid}`, JSON.stringify(payload));
           } catch {}
         } catch {}
+        if (timeoutId) clearTimeout(timeoutId);
         es.close();
         try {
           sessionStorage.removeItem(`sse:${jid}`);
@@ -162,6 +193,7 @@ export default function MobileAnalyzeResult() {
             },
           }));
         }
+        if (timeoutId) clearTimeout(timeoutId);
         es.close();
         try {
           sessionStorage.removeItem(`sse:${jid}`);
@@ -173,6 +205,9 @@ export default function MobileAnalyzeResult() {
     return () => {
       sources.forEach((es) => {
         try { es.close(); } catch {}
+      });
+      timeouts.forEach((timer) => {
+        if (timer) clearTimeout(timer);
       });
     };
   }, [jobIds, t]);
@@ -207,12 +242,12 @@ export default function MobileAnalyzeResult() {
       <Navigation variant="dark" />
       <main className="flex-1 flex justify-center">
         <div className="flex w-full max-w-sm flex-col gap-6 px-5 pb-14 pt-24">
-          <header className="space-y-3 text-center">
+          <header className="space-y-3">
             <div>
               <h1 className="text-[1.65rem] font-semibold leading-tight">
                 {hasPending
                   ? t('mobileAnalyze.processing.title', '분석 중입니다…')
-                  : t('mobileAnalyze.processing.doneTitle', '분석 결과가 준비됐어요')}
+                  : t('mobileAnalyze.processing.doneTitle', '분석이 완료됐어요')}
               </h1>
               <p className="mt-2 text-sm text-slate-400">
                 {hasPending

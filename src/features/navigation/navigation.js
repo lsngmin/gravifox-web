@@ -377,25 +377,51 @@ const Navigation = ({ variant = 'light' }) => {
                                 style={{ willChange: 'transform, opacity' }}
                             >
                                 <div className="mx-auto px-6 pb-8 pt-2">
-                                    <div className="w-full relative rounded-3xl border border-slate-200 bg-white px-5 pb-8 pt-4 shadow-[0_22px_48px_-22px_rgba(15,23,42,0.32)] sm:px-6">
+                                        <div
+                                            className={`w-full relative rounded-3xl border px-5 pb-8 pt-4 sm:px-6 ${
+                                                isDark
+                                                    ? 'border-slate-700/60 bg-slate-900/95 text-slate-100 shadow-[0_28px_48px_-24px_rgba(8,11,24,0.65)]'
+                                                    : 'border-slate-200 bg-white text-slate-900 shadow-[0_22px_48px_-22px_rgba(15,23,42,0.32)]'
+                                            }`}
+                                        >
                                         <div className="flex items-center justify-between gap-3">
                                             <div className="min-w-0 flex-1">
                                                 {isLoggedIn ? (
-                                                    <div className="flex items-center gap-3 rounded-2xl bg-indigo-50/70 px-4 py-3 text-slate-700">
+                                                    <div
+                                                        className={`flex items-center gap-3 rounded-2xl px-4 py-3 ${
+                                                            isDark
+                                                                ? 'bg-indigo-500/15 text-indigo-100'
+                                                                : 'bg-indigo-50/70 text-slate-700'
+                                                        }`}
+                                                    >
                                                     <div className="flex h-9 w-9 sm:h-10 sm:w-10 shrink-0 items-center justify-center rounded-full bg-indigo-500 text-xs sm:text-sm font-semibold text-white">
                                                             {userInitials}
                                                         </div>
                                                         <div className="min-w-0">
-                                                            <p className="text-sm font-semibold text-slate-900 whitespace-normal break-words">
+                                                            <p
+                                                                className={`text-sm font-semibold whitespace-normal break-words ${
+                                                                    isDark ? 'text-slate-100' : 'text-slate-900'
+                                                                }`}
+                                                            >
                                                                 {displayName || t('navigation.welcomeBack')}
                                                             </p>
                                                             {displayEmail && (
-                                                                <p className="text-xs text-slate-500 break-all whitespace-normal">{displayEmail}</p>
+                                                                <p
+                                                                    className={`text-xs break-all whitespace-normal ${
+                                                                        isDark ? 'text-slate-400' : 'text-slate-500'
+                                                                    }`}
+                                                                >
+                                                                    {displayEmail}
+                                                                </p>
                                                             )}
                                                         </div>
                                                     </div>
                                                 ) : (
-                                                    <div className="rounded-2xl bg-slate-50 px-4 py-2.5 text-[13px] font-medium leading-tight text-slate-600">
+                                                    <div
+                                                        className={`rounded-2xl px-4 py-2.5 text-[13px] font-medium leading-tight ${
+                                                            isDark ? 'bg-slate-800/80 text-slate-200' : 'bg-slate-50 text-slate-600'
+                                                        }`}
+                                                    >
                                                         <span className="block whitespace-normal break-words">{t('navigation.ctaGuest')}</span>
                                                     </div>
                                                 )}
@@ -405,7 +431,11 @@ const Navigation = ({ variant = 'light' }) => {
                                                     to={settingsPath}
                                                     onClick={() => setMobileMenuOpen(false)}
                                                     aria-label={t('navigation.actions.settings', 'Settings')}
-                                                    className="-m-2 flex h-10 w-10 items-center justify-center rounded-md text-slate-500 transition hover:bg-slate-100 hover:text-slate-700 active:scale-95"
+                                                    className={`-m-2 flex h-10 w-10 items-center justify-center rounded-md transition active:scale-95 ${
+                                                        isDark
+                                                            ? 'text-slate-400 hover:bg-slate-800/70 hover:text-slate-200'
+                                                            : 'text-slate-500 hover:bg-slate-100 hover:text-slate-700'
+                                                    }`}
                                                 >
                                                     <Cog6ToothIcon aria-hidden="true" className="size-6" />
                                                 </Link>
@@ -413,7 +443,11 @@ const Navigation = ({ variant = 'light' }) => {
                                                     type="button"
                                                     onClick={() => setMobileMenuOpen(false)}
                                                     aria-label={t('navigation.closeMenu')}
-                                                    className="-m-2 flex h-10 w-10 items-center justify-center rounded-md text-slate-500 transition hover:bg-slate-100 hover:text-slate-700 active:scale-95"
+                                                    className={`-m-2 flex h-10 w-10 items-center justify-center rounded-md transition active:scale-95 ${
+                                                        isDark
+                                                            ? 'text-slate-400 hover:bg-slate-800/70 hover:text-slate-200'
+                                                            : 'text-slate-500 hover:bg-slate-100 hover:text-slate-700'
+                                                    }`}
                                                 >
                                                     <XMarkIcon aria-hidden="true" className="size-6" />
                                                 </button>
@@ -433,15 +467,25 @@ const Navigation = ({ variant = 'light' }) => {
                                                                     aria-current={isActive ? 'page' : undefined}
                                                                     className={`flex items-center justify-between rounded-2xl border px-4 py-3 text-base font-semibold transition-all duration-200 ${
                                                                         isActive
-                                                                            ? 'border-indigo-200 bg-indigo-50 text-indigo-600 shadow-sm'
-                                                                            : 'border-slate-200/60 bg-white text-slate-700 hover:border-indigo-100 hover:bg-indigo-50/70 hover:text-indigo-600'
+                                                                            ? isDark
+                                                                                ? 'border-indigo-500/50 bg-indigo-500/20 text-indigo-100 shadow-sm'
+                                                                                : 'border-indigo-200 bg-indigo-50 text-indigo-600 shadow-sm'
+                                                                            : isDark
+                                                                                  ? 'border-slate-700/70 bg-slate-900/70 text-slate-200 hover:border-indigo-500/40 hover:bg-indigo-500/15 hover:text-indigo-100'
+                                                                                  : 'border-slate-200/60 bg-white text-slate-700 hover:border-indigo-100 hover:bg-indigo-50/70 hover:text-indigo-600'
                                                                     }`}
                                                                 >
                                                                     <span>{t(item.labelKey)}</span>
                                                                     <span
                                                                         aria-hidden="true"
                                                                         className={`text-sm font-medium transition-transform duration-200 ${
-                                                                            isActive ? 'translate-x-0 text-indigo-500' : 'translate-x-1 text-slate-400'
+                                                                            isActive
+                                                                                ? isDark
+                                                                                    ? 'translate-x-0 text-indigo-300'
+                                                                                    : 'translate-x-0 text-indigo-500'
+                                                                                : isDark
+                                                                                      ? 'translate-x-1 text-slate-500'
+                                                                                      : 'translate-x-1 text-slate-400'
                                                                         }`}
                                                                     >
                                                                         →
@@ -458,16 +502,21 @@ const Navigation = ({ variant = 'light' }) => {
                                             <Link
                                                 to={freeTrialPath}
                                                 onClick={() => setMobileMenuOpen(false)}
-                                                className="flex w-full items-center justify-center rounded-xl bg-gradient-to-r from-indigo-500 to-purple-500 px-4 py-3 text-base font-semibold text-white shadow-md transition hover:from-indigo-600 hover:to-purple-600"
+                                                className="flex w-full items-center justify-center rounded-xl bg-gradient-to-r from-indigo-500 via-violet-500 to-purple-500 px-4 py-3 text-base font-semibold text-white shadow-md transition hover:from-indigo-600 hover:via-violet-600 hover:to-purple-600"
                                             >
                                                 {t('navigation.actions.freeTrial')}
                                             </Link>
                                         </div>
 
-                                        <div className="mt-6 border-t border-slate-200 pt-6">
+                                        <div
+                                            className={`mt-6 border-t pt-6 ${
+                                                isDark ? 'border-slate-700/60' : 'border-slate-200'
+                                            }`}
+                                        >
                                             <MobileNavigationAuthButton
                                                 localePrefix={localePrefix}
                                                 onNavigate={() => setMobileMenuOpen(false)}
+                                                variant={variant}
                                             />
                                         </div>
                                         </div>
