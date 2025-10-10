@@ -1,5 +1,7 @@
 import { useTranslation } from 'react-i18next';
 
+import { SectionContainer, SectionHeader } from './components/sectionPrimitives';
+
 const steps = [
   {
     key: 'signup',
@@ -25,27 +27,22 @@ export default function Feature() {
   const { t } = useTranslation('home');
 
   return (
-    <section id="feature" className="relative isolate overflow-hidden py-16 sm:py-20">
-      <div
-        className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_top,_rgba(79,70,229,0.16),_transparent_60%)]"
-        aria-hidden="true"
-      />
-      <div className="relative mx-auto grid max-w-6xl gap-10 px-6 lg:grid-cols-[1fr_1fr] lg:items-center">
+    <SectionContainer
+      id="feature"
+      width="medium"
+      className="before:pointer-events-none before:absolute before:inset-0 before:bg-[radial-gradient(circle_at_top,_rgba(79,70,229,0.16),_transparent_60%)] before:opacity-90 before:content-['']"
+    >
+      <div className="relative grid gap-10 lg:grid-cols-[1fr_1fr] lg:items-center">
         <div className="space-y-6">
-          <span className="inline-flex items-center gap-2 rounded-full bg-indigo-50 px-3 py-1
-  text-[10px] sm:text-xs md:text-sm font-semibold uppercase tracking-[0.25em]
-  text-indigo-500 ring-1 ring-indigo-100">
-  {t('feature.eyebrow', '직접 체험하기')}
-</span>
-
-          <h2 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold leading-tight text-slate-900">
-            {t('feature.title', '사진이나 영상을 올리면, AI가 분석해요')}
-          </h2>
-
-          <p className="max-w-xl text-[12px] sm:text-sm md:text-base lg:text-lg text-slate-600 leading-relaxed sm:leading-normal md:leading-snug">
-            {t('feature.subtitle', '회원가입부터 결과 공유까지, 세 단계면 충분합니다.')}
-          </p>
-
+          <SectionHeader
+            eyebrow={t('feature.eyebrow', '직접 체험하기')}
+            title={t('feature.title', '사진이나 영상을 올리면, AI가 분석해요')}
+            description={t('feature.subtitle', '회원가입부터 결과 공유까지, 세 단계면 충분합니다.')}
+            align="left"
+            eyebrowClassName="inline-flex items-center gap-2 rounded-full bg-indigo-50 px-3 py-1 text-[10px] sm:text-xs md:text-sm font-semibold tracking-[0.25em] text-indigo-500 ring-1 ring-indigo-100"
+            titleClassName="text-2xl sm:text-3xl md:text-4xl lg:text-5xl lg:leading-tight"
+            descriptionClassName="max-w-xl text-[12px] sm:text-sm md:text-base lg:text-lg"
+          />
         </div>
 
         <div className="relative overflow-hidden rounded-3xl border border-indigo-100 bg-white/80 shadow-2xl shadow-indigo-200/50">
@@ -85,6 +82,6 @@ export default function Feature() {
           </div>
         </div>
       </div>
-    </section>
+    </SectionContainer>
   );
 }

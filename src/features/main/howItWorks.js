@@ -8,6 +8,8 @@ import 'swiper/css';
 import 'swiper/css/navigation';
 import 'swiper/css/pagination';
 
+import { SectionContainer, SectionHeader } from './components/sectionPrimitives';
+
 export default function HowItWorks() {
   const { t } = useTranslation('home');
   const prevRef = useRef(null);
@@ -55,21 +57,15 @@ export default function HowItWorks() {
   ];
 
   return (
-      <section id="how" className="py-16 sm:py-20 bg-gradient-to-b from-white via-slate-50/60 to-white">
-        <div className="mx-auto flex max-w-5xl flex-col items-center justify-center px-4 text-center sm:px-6 lg:px-8">
-          {/* Header */}
-          <h3 className="text-[11px] sm:text-xs font-semibold uppercase tracking-[0.25em] text-indigo-500">
-            {t('how.eyebrow', '이용방법')}
-          </h3>
-          <p className="mt-3 text-xl sm:text-3xl md:text-4xl font-bold tracking-tight text-slate-900">
-            {t('how.title', '올리고 나면 바로 시작돼요')}
-          </p>
-          <p className="mt-4 text-[13px] sm:text-base md:text-lg text-slate-600">
-            {t('how.subtitle', '다른 일을 하러 가도 분석은 백그라운드에서 계속돼요.')}
-          </p>
+    <SectionContainer id="how" variant="subtle" width="medium">
+      <div className="flex flex-col items-center text-center">
+        <SectionHeader
+          eyebrow={t('how.eyebrow', '이용방법')}
+          title={t('how.title', '올리고 나면 바로 시작돼요')}
+          description={t('how.subtitle', '다른 일을 하러 가도 분석은 백그라운드에서 계속돼요.')}
+        />
 
-          {/* Swiper section */}
-          <div className="mt-12 w-full">
+        <div className="mt-12 w-full">
             <Swiper
                 modules={[Navigation, Pagination, A11y]}
                 spaceBetween={40}
@@ -127,7 +123,7 @@ export default function HowItWorks() {
               </button>
             </div>
           </div>
-        </div>
-      </section>
+      </div>
+    </SectionContainer>
   );
 }
