@@ -7,12 +7,18 @@ import Footer from '../features/footer/footer';
 import ErrorModal from '../features/analyze/components/ErrorModal';
 import { ANALYZE_MODEL_ENDPOINTS } from '../api/endPointRoute';
 import submitAnalyzeFiles from '../features/analyze/api/submitAnalyze';
+import {
+  MAX_IMAGE_FILES,
+  MAX_IMAGE_SIZE_BYTES,
+  SUPPORTED_IMAGE_EXTENSIONS,
+  SUPPORTED_IMAGE_EXTENSIONS_LABEL,
+  SUPPORTED_IMAGE_MIME_TYPES,
+} from '../features/analyze/constants';
 
-const MAX_IMAGE_FILES = 3;
-const MAX_IMAGE_SIZE = 5 * 1024 * 1024; // 5MB
+const MAX_IMAGE_SIZE_MB = Math.floor(MAX_IMAGE_SIZE_BYTES / (1024 * 1024));
 
-const IMAGE_MIMES = new Set(['image/jpeg', 'image/png', 'image/webp']);
-const IMAGE_EXTS = new Set(['jpeg', 'jpg', 'png', 'webp']);
+const IMAGE_MIMES = new Set(SUPPORTED_IMAGE_MIME_TYPES);
+const IMAGE_EXTS = new Set(SUPPORTED_IMAGE_EXTENSIONS);
 
 const getExt = (file) => {
   const name = (file?.name || '').toLowerCase();
@@ -165,7 +171,7 @@ export default function MobileAnalyzeUpload() {
         continue;
       }
 
-      if (file.size > MAX_IMAGE_SIZE) {
+      if (file.size > MAX_IMAGE_SIZE_BYTES) {
         oversizeFound = true;
         continue;
       }
@@ -193,11 +199,17 @@ export default function MobileAnalyzeUpload() {
     const msgs = [];
     if (invalidTypeFound) {
       msgs.push(t('mobileAnalyze.uploadPage.errors.type', '지원하지 않는 파일 형식이에요.'));
-      msgs.push('JPEG, JPG, PNG, WEBP');
+      msgs.push(SUPPORTED_IMAGE_EXTENSIONS_LABEL);
     }
     if (oversizeFound) {
       msgs.push(t('mobileAnalyze.uploadPage.errors.size', '파일 용량 제한을 초과했어요.'));
-      msgs.push(t('mobileAnalyze.uploadPage.errors.sizeHint', '이미지는 최대 5MB까지만 업로드할 수 있어요.'));
+      msgs.push(
+        t(
+          'mobileAnalyze.uploadPage.errors.sizeHint',
+          '이미지는 최대 {{max}}MB까지만 업로드할 수 있어요.',
+          { max: MAX_IMAGE_SIZE_MB }
+        )
+      );
     }
     if (dupMsgs.length > 0) {
       msgs.push(...dupMsgs);

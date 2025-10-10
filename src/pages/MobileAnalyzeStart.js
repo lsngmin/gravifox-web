@@ -1,10 +1,16 @@
-import React, { useMemo } from 'react';
+import React, { useCallback, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useNavigate, useParams } from 'react-router-dom';
 import { UploadCloud, ShieldCheck, Clapperboard, LifeBuoy } from 'lucide-react';
 import Navigation from '../features/navigation/navigation';
 import Footer from '../features/footer/footer';
 import { useAuth } from 'providers/authProvider';
+import useNumberFormatter from '../hooks/useNumberFormatter';
+import {
+  DEFAULT_MEMBER_DAILY_QUOTA,
+  GUEST_DAILY_QUOTA,
+  MAX_IMAGE_FILES,
+} from '../features/analyze/constants';
 
 export default function MobileAnalyzeStart() {
   const { t, i18n } = useTranslation('common');
@@ -12,13 +18,10 @@ export default function MobileAnalyzeStart() {
   const { lng } = useParams();
   const { userInfo } = useAuth();
 
-  const formatNumber = useMemo(
-    () => new Intl.NumberFormat(i18n.language || 'en'),
-    [i18n.language]
-  );
+  const formatNumber = useNumberFormatter(i18n.language);
 
-  const guestDailyQuota = 10;
-  const memberDailyQuota = userInfo?.dailyQuota ?? 20;
+  const guestDailyQuota = GUEST_DAILY_QUOTA;
+  const memberDailyQuota = userInfo?.dailyQuota ?? DEFAULT_MEMBER_DAILY_QUOTA;
   const totalQuota = userInfo ? memberDailyQuota : guestDailyQuota;
   const usedToday = userInfo?.todayAnalyzeCount ?? 0;
   const remainingSessions = Math.max(totalQuota - usedToday, 0);
@@ -27,12 +30,40 @@ export default function MobileAnalyzeStart() {
   const formattedUpgrade = formatNumber.format(memberDailyQuota);
   const isLoggedIn = Boolean(userInfo);
 
-  const uploadRoute = lng ? `/${lng}/analyze/upload` : '/analyze/upload';
-  const supportRoute = lng ? `/${lng}/support` : '/support';
+  const uploadRoute = useMemo(
+    () => (lng ? `/${lng}/analyze/upload` : '/analyze/upload'),
+    [lng]
+  );
+  const supportRoute = useMemo(
+    () => (lng ? `/${lng}/support` : '/support'),
+    [lng]
+  );
 
-  const handleStart = () => {
+  const handleStart = useCallback(() => {
     navigate(uploadRoute);
-  };
+  }, [navigate, uploadRoute]);
+
+  const handleSampleStart = useCallback(() => {
+    navigate(uploadRoute, { state: { sample: true } });
+  }, [navigate, uploadRoute]);
+
+  const handleSupport = useCallback(() => {
+    navigate(supportRoute);
+  }, [navigate, supportRoute]);
+
+  const guidanceMessages = useMemo(
+    () => [
+      t(
+        'mobileAnalyze.guidance',
+        'Stuck between real or AI-made? Drop those tricky files here.'
+      ),
+      t(
+        'mobileAnalyze.guidance2',
+        'Stuck between real or AI-made? Drop those tricky files here.'
+      ),
+    ],
+    [t]
+  );
 
   // const handleHistory = () => {
   //   if (lng) {
@@ -55,16 +86,21 @@ export default function MobileAnalyzeStart() {
               <p className="mt-2 text-sm text-slate-400">
                 {t(
                   'mobileAnalyze.subheading',
-                  'Upload up to 5 images. We detect synthetic traces in seconds.'
+                  'Upload up to {{count}} images. We detect synthetic traces in seconds.',
+                  { count: MAX_IMAGE_FILES }
                 )}
               </p>
 
-              <p className="mt-3 border-l-2 border-indigo-500/40 pl-3 text-xs text-slate-400">
-                {t('mobileAnalyze.guidance', 'Stuck between real or AI-made? Drop those tricky files here.')}
-              </p>
-              <p className="mt-0.5 border-l-2 border-indigo-500/40 pl-3 text-xs text-slate-400">
-                {t('mobileAnalyze.guidance2', 'Stuck between real or AI-made? Drop those tricky files here.')}
-              </p>
+              {guidanceMessages.map((message, index) => (
+                <p
+                  key={index}
+                  className={`border-l-2 border-indigo-500/40 pl-3 text-xs text-slate-400 ${
+                    index === 0 ? 'mt-3' : 'mt-0.5'
+                  }`}
+                >
+                  {message}
+                </p>
+              ))}
             </div>
           </header>
 
@@ -131,7 +167,7 @@ export default function MobileAnalyzeStart() {
 
                 <button
                   type="button"
-                  onClick={() => navigate(uploadRoute, { state: { sample: true } })}
+                  onClick={handleSampleStart}
                   className="flex items-center justify-between gap-3 rounded-2xl border border-indigo-400/40 bg-indigo-500/15 px-3 py-3 text-indigo-100 transition hover:border-indigo-300 hover:bg-indigo-500/25"
                 >
                   <span className="inline-flex h-10 w-10 items-center justify-center rounded-full bg-indigo-500/25 text-white">
@@ -173,7 +209,7 @@ export default function MobileAnalyzeStart() {
 
             <button
               type="button"
-              onClick={() => navigate(supportRoute)}
+              onClick={handleSupport}
               className="flex w-full items-center gap-3 rounded-[26px] border border-indigo-400/35 bg-indigo-500/12 px-4 py-4 text-left text-[12px] text-slate-100 shadow-[0_20px_40px_-28px_rgba(79,70,229,0.55)] transition hover:border-indigo-300/60 hover:bg-indigo-500/20"
             >
               <div className="flex items-center gap-3 flex-1 min-w-0">
