@@ -6,9 +6,90 @@ import Navigation from '../features/navigation/navigation';
 import Footer from '../features/footer/footer';
 import { ANALYZE_ENDPOINTS } from '../api/endPointRoute';
 import MobileAnalysisReport from '../features/analyze/components/mobile/MobileAnalysisReport';
+import { normalizeAnalysisResult } from '../features/analyze/utils/normalizeResult';
 
 const IS_TEST_ENV = String(process.env.NODE_ENV || '').toLowerCase() === 'test';
 const TEST_TIMEOUT_MS = 10_000;
+
+const LOADING_MENTS = {
+  ANY: [
+    '분석을 준비하고 있어요…',
+    '증거를 정리하고 있어요…',
+    '신뢰도를 계산하고 있어요…',
+    '잠시만 기다려 주세요…',
+  ],
+  ALIGN: ['얼굴을 포착하고 있어요…', '프레임을 정렬하는 중이에요…'],
+  INFER: ['이상 징후를 감지하고 있어요…', 'AI 이미지 진위 여부를 확인 중이에요…'],
+  POST: ['결과를 정리하고 있어요…', '리포트를 구성하고 있어요…'],
+};
+
+function pickMent(stage) {
+  const pool = [
+    ...(LOADING_MENTS[stage?.toUpperCase?.()] || []),
+    ...LOADING_MENTS.ANY,
+  ];
+  const i = Math.floor(Math.random() * pool.length);
+  return pool[i] || '분석 중이에요…';
+}
+
+function LoadingMent({ stage }) {
+  const [text, setText] = useState(() => pickMent(stage));
+  const [visible, setVisible] = useState(true);
+
+  useEffect(() => {
+    if (!document.getElementById('mobile-loading-ment-anims')) {
+      const styleEl = document.createElement('style');
+      styleEl.id = 'mobile-loading-ment-anims';
+      styleEl.textContent = `@keyframes mobile-lm-shimmer {0%{background-position:200% 0}100%{background-position:-200% 0}}`;
+      document.head.appendChild(styleEl);
+    }
+  }, []);
+
+  useEffect(() => {
+    const timer = setInterval(() => {
+      setVisible(false);
+      const t = setTimeout(() => {
+        setText(pickMent(stage));
+        setVisible(true);
+      }, 300);
+      return () => clearTimeout(t);
+    }, 3600);
+    return () => clearInterval(timer);
+  }, [stage]);
+
+  const shimmerStyle = {
+    backgroundImage: 'linear-gradient(90deg, #94a3b8 0%, #64748b 50%, #94a3b8 100%)',
+    backgroundSize: '200% 100%',
+    WebkitBackgroundClip: 'text',
+    WebkitTextFillColor: 'transparent',
+    animation: 'mobile-lm-shimmer 3s linear infinite',
+  };
+
+  return (
+    <span
+      className={`inline-block text-xs font-medium leading-5 transition-opacity duration-300 ease-in-out ${
+        visible ? 'opacity-100' : 'opacity-0'
+      } truncate whitespace-nowrap max-w-full`}
+      style={shimmerStyle}
+    >
+      {text}
+    </span>
+  );
+}
+
+function resolveStageLabel(stage, t) {
+  const key = typeof stage === 'string' ? stage.toUpperCase() : '';
+  switch (key) {
+    case 'ALIGN':
+      return t('mobileAnalyze.processing.stage.align', '프레임 정렬 중');
+    case 'INFER':
+      return t('mobileAnalyze.processing.stage.infer', '패턴 분석 중');
+    case 'POST':
+      return t('mobileAnalyze.processing.stage.post', '리포트 정리 중');
+    default:
+      return t('mobileAnalyze.processing.stage.any', 'AI 흔적을 분석하는 중이에요');
+  }
+}
 
 export default function MobileAnalyzeResult() {
   const { t } = useTranslation('common');
@@ -61,11 +142,12 @@ export default function MobileAnalyzeResult() {
         })();
         const savedFailed = sessionStorage.getItem(`sse:failed:${jid}`);
         if (savedResult) {
+          const normalized = normalizeAnalysisResult(savedResult);
           setReports((prev) => ({
             ...prev,
             [jid]: {
               ...(prev[jid] || {}),
-              result: savedResult,
+              result: normalized,
               fileMeta,
             },
           }));
@@ -147,7 +229,7 @@ export default function MobileAnalyzeResult() {
       es.addEventListener('result', (event) => {
         try {
           const data = JSON.parse(event.data || '{}');
-          const payload = data?.result || data;
+          const payload = normalizeAnalysisResult(data?.result || data);
           setReports((prev) => ({
             ...prev,
             [jid]: {
@@ -212,24 +294,6 @@ export default function MobileAnalyzeResult() {
     };
   }, [jobIds, t]);
 
-  const steps = useMemo(
-    () => [
-      {
-        key: 'upload',
-        label: t('mobileAnalyze.processing.steps.upload', '업로드 중'),
-      },
-      {
-        key: 'verify',
-        label: t('mobileAnalyze.processing.steps.verify', '메타 검증 중'),
-      },
-      {
-        key: 'analyze',
-        label: t('mobileAnalyze.processing.steps.analyze', 'AI 패턴 분석 중'),
-      },
-    ],
-    [t]
-  );
-  const stageOrder = useMemo(() => ({ ALIGN: 0, INFER: 1, POST: 2 }), []);
   const analysisStates = useMemo(
     () => jobIds.map((jid) => ({ jobId: jid, ...(reports[jid] || {}) })),
     [jobIds, reports]
@@ -259,8 +323,6 @@ export default function MobileAnalyzeResult() {
 
           <div className="space-y-5">
             {analysisStates.map((entry) => {
-              const stageKey = String(entry.stage || '').toUpperCase();
-              const stageIndex = typeof stageOrder[stageKey] === 'number' ? stageOrder[stageKey] : 0;
               const rawProgress = typeof entry.progress === 'number' ? entry.progress : null;
               const percentValue =
                 rawProgress == null ? null : Math.max(0, rawProgress > 1 ? Math.min(rawProgress, 100) : rawProgress * 100);
@@ -280,10 +342,10 @@ export default function MobileAnalyzeResult() {
                         animate={{ opacity: 1, y: 0 }}
                         exit={{ opacity: 0, y: -12 }}
                         transition={{ duration: 0.35, ease: [0.4, 0, 0.2, 1] }}
-                        className="rounded-[28px] border border-rose-500/30 bg-rose-500/10 p-4 text-sm text-rose-100 shadow-[0_24px_52px_-36px_rgba(244,63,94,0.6)]"
+                        className="rounded-xl border border-rose-500/30 bg-rose-500/10 p-4 text-sm text-rose-100"
                       >
                         <div className="flex items-center justify-between gap-3">
-                          <p className="font-semibold">{t('mobileAnalyze.processing.failed', '분석에 실패했어요.')}</p>
+                          <p className="font-semibold text-rose-100">{t('mobileAnalyze.processing.failed', '분석에 실패했어요.')}</p>
                           <span className="text-[11px] text-rose-200/80 tracking-[0.14em] uppercase">
                             ID&nbsp;<span className="font-mono">{shortId}</span>
                           </span>
@@ -311,83 +373,55 @@ export default function MobileAnalyzeResult() {
                         initial={{ opacity: 0, y: 12 }}
                         animate={{ opacity: 1, y: 0 }}
                         exit={{ opacity: 0, y: -12 }}
-                        transition={{ duration: 0.45, ease: [0.4, 0, 0.2, 1] }}
-                        className="rounded-[32px] border border-indigo-500/25 bg-[linear-gradient(160deg,rgba(15,23,42,0.92),rgba(27,33,58,0.82))] p-5 shadow-[0_28px_60px_-32px_rgba(79,70,229,0.6)]"
+                        transition={{ duration: 0.35, ease: [0.4, 0, 0.2, 1] }}
+                        className="relative overflow-hidden rounded-2xl border border-slate-800 bg-slate-900/60 p-5 backdrop-blur-xl ring-1 ring-white/5 shadow-[0_24px_60px_-28px_rgba(2,6,23,0.6)]"
                       >
-                        <div className="flex items-start justify-between gap-4">
-                          <div className="flex items-center gap-3">
-                            <span className="relative inline-flex h-10 w-10 items-center justify-center">
-                              <span className="absolute inset-0 rounded-full border-2 border-indigo-500/25" aria-hidden="true" />
-                              <span className="absolute inset-0 rounded-full border-2 border-t-transparent border-indigo-400 animate-spin" aria-hidden="true" />
-                              <span className="sr-only">
-                                {t('mobileAnalyze.processing.statusLabel', 'AI 흔적을 분석하는 중이에요')}
+                        <div className="pointer-events-none absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-sky-500/40 to-transparent" />
+                        <div className="flex flex-col gap-5">
+                          <div className="flex flex-col gap-2">
+                            <p className="text-sm font-semibold text-slate-100">
+                              {t('mobileAnalyze.processing.statusLabel', 'AI 흔적을 분석하는 중이에요')}
+                            </p>
+                            {fileName && (
+                              <p className="truncate text-xs text-slate-400">파일: {fileName}</p>
+                            )}
+                            {modelKey && (
+                              <span className="inline-flex items-center gap-1 self-start rounded-full border border-white/10 bg-white/5 px-2 py-0.5 text-[11px] uppercase tracking-[0.08em] text-sky-200">
+                                {modelKey}
                               </span>
+                            )}
+                          </div>
+
+                          <div className="flex items-center justify-between">
+                            <span className="text-[11px] text-slate-500">
+                              ID&nbsp;<span className="font-mono text-slate-300">{shortId}</span>
                             </span>
-                            <div className="min-w-0">
-                              <p className="text-sm font-semibold text-slate-100">
-                                {t('mobileAnalyze.processing.statusLabel', 'AI 흔적을 분석하는 중이에요')}
-                              </p>
-                              {fileName && (
-                                <p className="mt-0.5 max-w-[12rem] truncate text-xs text-slate-400">{fileName}</p>
-                              )}
-                              {modelKey && <p className="text-[11px] text-indigo-200/70">{modelKey}</p>}
+                            <div className="ml-3 flex h-5 w-full max-w-[9rem] items-center justify-end overflow-hidden">
+                              <LoadingMent stage={entry.stage} />
                             </div>
                           </div>
-                          <span className="text-[11px] text-slate-500 tracking-[0.14em] uppercase">
-                            ID&nbsp;<span className="font-mono text-slate-300">{shortId}</span>
-                          </span>
-                        </div>
-
-                        <div className="mt-5 space-y-3">
-                          <ul className="space-y-2">
-                            {steps.map((item, index) => {
-                              const isActive = index === stageIndex;
-                              const isDone = index < stageIndex;
-                              return (
-                                <li
-                                  key={item.key}
-                                  className={`flex items-center gap-3 rounded-2xl border px-3 py-2 text-sm transition ${
-                                    isActive
-                                      ? 'border-indigo-400/60 bg-indigo-500/10 text-indigo-200 shadow-[0_12px_32px_-18px_rgba(99,102,241,0.55)]'
-                                      : isDone
-                                      ? 'border-emerald-400/50 bg-emerald-500/10 text-emerald-200'
-                                      : 'border-slate-800 bg-slate-900/60 text-slate-400'
-                                  }`}
-                                >
-                                  <span
-                                    className={`inline-flex h-8 w-8 shrink-0 items-center justify-center rounded-full text-xs font-semibold ${
-                                      isActive
-                                        ? 'bg-indigo-500 text-white'
-                                        : isDone
-                                        ? 'bg-emerald-500 text-white'
-                                        : 'bg-slate-800 text-slate-400'
-                                    }`}
-                                  >
-                                    {index + 1}
-                                  </span>
-                                  <span className="flex-1 text-left">{item.label}</span>
-                                  {isActive && (
-                                    <span className="flex h-2 w-2 animate-pulse rounded-full bg-indigo-400" aria-hidden="true" />
-                                  )}
-                                </li>
-                              );
-                            })}
-                          </ul>
 
                           {percentValue != null && (
-                            <div className="flex flex-col gap-1.5 text-[11px] text-slate-400">
-                              <div className="flex items-center justify-between text-slate-300">
+                            <div className="flex flex-col gap-2 text-[11px] text-slate-400">
+                              <div className="flex items-center justify-between text-slate-400">
                                 <span>{t('mobileAnalyze.processing.progressLabel', '진행률')}</span>
-                                <span className="font-semibold text-indigo-200">{Math.round(percentValue)}%</span>
+                                <span className="font-semibold text-slate-200">{Math.round(percentValue)}%</span>
                               </div>
-                              <div className="h-1.5 w-full rounded-full bg-slate-800">
+                              <div className="h-1.5 w-full rounded-full bg-white/5">
                                 <div
-                                  className="h-full rounded-full bg-gradient-to-r from-indigo-400 via-sky-400 to-indigo-300 transition-all duration-500"
+                                  className="h-full rounded-full bg-gradient-to-r from-sky-400 via-blue-500 to-indigo-500 transition-all duration-500 shadow-[0_0_14px_0_rgba(56,189,248,0.35)]"
                                   style={{ width: `${progressWidth}%` }}
                                 />
                               </div>
                             </div>
                           )}
+
+                          <div className="rounded-2xl border border-slate-800 bg-slate-900/50 p-3 text-[11px] text-slate-400">
+                            <div className="flex items-center justify-between">
+                              <span className="text-slate-500">{t('mobileAnalyze.processing.currentStage', '현재 단계')}</span>
+                              <span className="font-medium text-slate-200">{resolveStageLabel(entry.stage, t)}</span>
+                            </div>
+                          </div>
                         </div>
                       </motion.section>
                     )}

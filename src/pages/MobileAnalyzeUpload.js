@@ -1,6 +1,6 @@
 import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { useNavigate, useParams } from 'react-router-dom';
+import { useLocation, useNavigate, useParams } from 'react-router-dom';
 import { UploadCloud, ChevronRight, LifeBuoy } from 'lucide-react';
 import Navigation from '../features/navigation/navigation';
 import Footer from '../features/footer/footer';
@@ -99,6 +99,7 @@ export default function MobileAnalyzeUpload() {
   const { t } = useTranslation('common');
   const navigate = useNavigate();
   const { lng } = useParams();
+  const location = useLocation();
 
   const [files, setFiles] = useState([]);
   const [errorOpen, setErrorOpen] = useState(false);
@@ -111,9 +112,12 @@ export default function MobileAnalyzeUpload() {
   const [pendingResultPath, setPendingResultPath] = useState(null);
 
   const albumInputRef = useRef(null);
+  const sampleAutoFillRef = useRef(false);
 
   const processingRoute = lng ? `/${lng}/analyze/result` : '/analyze/result';
   const supportRoute = lng ? `/${lng}/support` : '/support';
+
+  const sampleRequested = Boolean(location?.state?.sample);
 
   useEffect(() => {
     let aborted = false;
@@ -150,6 +154,57 @@ export default function MobileAnalyzeUpload() {
       aborted = true;
     };
   }, [t]);
+
+  useEffect(() => {
+    if (!sampleRequested || sampleAutoFillRef.current || files.length > 0) {
+      return;
+    }
+
+    let cancelled = false;
+    sampleAutoFillRef.current = true;
+
+    const injectSamples = async () => {
+      const base = process.env.PUBLIC_URL || '';
+      const sampleNames = ['sample-image-01.png', 'sample-image-02.JPEG'];
+      const urls = sampleNames.map((name) => `${base}/samples/${name}`);
+
+      try {
+        const responses = await Promise.all(urls.map((url) => fetch(url)));
+        if (responses.some((res) => !res.ok)) {
+          throw new Error('sample_fetch_failed');
+        }
+
+        const blobs = await Promise.all(responses.map((res) => res.blob()));
+        if (cancelled) return;
+
+        const now = Date.now();
+        const sampleFiles = blobs.map(
+          (blob, idx) =>
+            new File([blob], sampleNames[idx], {
+              type: blob.type || 'image/png',
+              lastModified: now + idx,
+            })
+        );
+
+        setFiles((prev) => (prev.length > 0 ? prev : sampleFiles));
+      } catch (err) {
+        if (cancelled) return;
+        setErrorMsgs([
+          t(
+            'mobileAnalyze.uploadPage.sampleAutoFillError',
+            '샘플 파일을 자동으로 불러오지 못했어요. 다시 시도하거나 직접 업로드해 주세요.'
+          ),
+        ]);
+        setErrorOpen(true);
+      }
+    };
+
+    injectSamples();
+
+    return () => {
+      cancelled = true;
+    };
+  }, [files.length, sampleRequested, t]);
 
   const addFiles = (incoming) => {
     const list = Array.from(incoming || []);

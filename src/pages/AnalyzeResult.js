@@ -4,6 +4,7 @@ import Navigation from "../features/navigation/navigation";
 import Footer from "../features/footer/footer";
 import AnalysisReport from "../features/analyze/components/report/AnalysisReport";
 import { ANALYZE_ENDPOINTS } from "../api/endPointRoute";
+import { normalizeAnalysisResult } from "../features/analyze/utils/normalizeResult";
 
 // 로딩 멘트(랜덤 회전). 스테이지에 맞춘 후보 포함
 const LOADING_MENTS = {
@@ -135,7 +136,8 @@ export default function AnalyzeResult() {
         const savedResult = (() => { try { return JSON.parse(sessionStorage.getItem(`sse:report:${jid}`) || 'null'); } catch { return null; } })();
         const savedFailed = sessionStorage.getItem(`sse:failed:${jid}`);
         if (savedResult) {
-          setReports(prev => ({ ...prev, [jid]: { ...(prev[jid] || {}), result: savedResult, connected: false, fileMeta } }));
+          const normalized = normalizeAnalysisResult(savedResult);
+          setReports(prev => ({ ...prev, [jid]: { ...(prev[jid] || {}), result: normalized, connected: false, fileMeta } }));
           return;
         }
         if (savedFailed) {
@@ -160,7 +162,7 @@ export default function AnalyzeResult() {
       const onResult = (e) => {
         try {
           const d = JSON.parse(e.data || '{}');
-          const payload = (d.result || d);
+          const payload = normalizeAnalysisResult(d.result || d);
           setReports(prev => ({ ...prev, [jid]: { ...(prev[jid] || {}), result: payload, fileMeta } }));
           try { sessionStorage.setItem(`sse:report:${jid}`, JSON.stringify(payload)); } catch {}
         } catch {}

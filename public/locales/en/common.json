@@ -111,7 +111,8 @@
       "moreAction": "Upload another file",
       "reset": "Clear all files",
       "cta": "Start analysis",
-      "footer": "Works best on Wi-Fi • Avg. analysis time 30s"
+      "footer": "Works best on Wi-Fi • Avg. analysis time 30s",
+      "sampleAutoFillError": "We couldn’t load the sample images automatically. Please try again or upload your own."
     },
     "processing": {
       "title": "Processing…",

@@ -111,7 +111,8 @@
       "moreAction": "이미지 더 올리기",
       "reset": "모든 파일 비우기",
       "cta": "분석 시작하기",
-      "footer": "Wi-Fi 환경 권장 • 평균 분석 시간 30초"
+      "footer": "Wi-Fi 환경 권장 • 평균 분석 시간 30초",
+      "sampleAutoFillError": "샘플 파일을 자동으로 불러오지 못했어요. 다시 시도하거나 직접 업로드해 주세요."
     },
     "processing": {
       "title": "분석 중입니다…",

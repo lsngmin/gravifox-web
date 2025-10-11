@@ -68,6 +68,7 @@ export default function MobileAnalysisReport({ jobId, report, t }) {
   const exemplars = Array.isArray(data?.exemplars) ? data.exemplars : [];
   const segments = Array.isArray(data?.segments) ? data.segments : [];
   const probabilities = Array.isArray(data?.probabilities) ? data.probabilities : [];
+  const classNames = Array.isArray(data?.classNames) ? data.classNames : [];
 
   const scoreDelta =
     probFake != null && threshold != null ? probFake - threshold : null;
@@ -87,10 +88,14 @@ export default function MobileAnalysisReport({ jobId, report, t }) {
   const probabilityChips = useMemo(() => {
     if (!probabilities.length) return [];
     return probabilities
-      .map((value, index) => ({ index, value }))
+      .map((value, index) => ({
+        index,
+        value,
+        name: classNames[index] || `CLASS_${index + 1}`,
+      }))
       .sort((a, b) => b.value - a.value)
       .slice(0, Math.min(3, probabilities.length));
-  }, [probabilities]);
+  }, [probabilities, classNames]);
 
   const timelineSummary = useMemo(() => {
     if (!probsTimeline.length) return null;
@@ -301,7 +306,7 @@ export default function MobileAnalysisReport({ jobId, report, t }) {
                       key={item.index}
                       className="inline-flex items-center gap-1 rounded-full border border-indigo-400/35 bg-indigo-500/10 px-3 py-1 text-[11px] text-indigo-100"
                     >
-                      <span className="font-semibold">#{item.index}</span>
+                      <span className="font-semibold">{item.name}</span>
                       <span>{toPercent(item.value)}</span>
                     </span>
                   ))}
