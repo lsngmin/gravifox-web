@@ -10,7 +10,11 @@ import submitAnalyzeFiles from '../features/analyze/api/submitAnalyze';
 import { fetchQuotaSummary } from '../features/analyze/api/quotaSummary';
 import LoginRequiredModal from '../features/analyze/components/LoginRequiredModal';
 import { useAuth } from 'providers/authProvider';
-import { rememberAuthReturn, clearAuthReturn } from '../utils/authReturn';
+import {
+  rememberReturnCheckpoint,
+  clearReturnCheckpoint,
+} from '../lib/returnCheckpoint/index.js';
+import { CHECKPOINT_TYPES } from '../lib/returnCheckpoint/constants.js';
 import {
   MAX_IMAGE_FILES,
   MAX_IMAGE_SIZE_BYTES,
@@ -194,7 +198,10 @@ export default function MobileAnalyzeUpload() {
 
   const ensureQuotaBeforeSubmit = useCallback(async () => {
     if (!accessToken) {
-      rememberAuthReturn(location.pathname + location.search);
+      rememberReturnCheckpoint(
+        CHECKPOINT_TYPES.AUTH,
+        `${location.pathname}${location.search}`
+      );
       setLoginModalOpen(true);
       setLoadingQuota(false);
       return false;
@@ -516,7 +523,7 @@ export default function MobileAnalyzeUpload() {
   };
 
   const handleLoginSuccess = useCallback(async () => {
-    clearAuthReturn();
+    clearReturnCheckpoint(CHECKPOINT_TYPES.AUTH);
     await loadQuotaSummary();
   }, [loadQuotaSummary]);
 
@@ -532,13 +539,19 @@ export default function MobileAnalyzeUpload() {
   );
 
   const handleNavigateSignup = useCallback(() => {
-    rememberAuthReturn(location.pathname + location.search);
+    rememberReturnCheckpoint(
+      CHECKPOINT_TYPES.AUTH,
+      `${location.pathname}${location.search}`
+    );
     setLoginModalOpen(false);
     navigate(localizedPath('/agree'));
   }, [localizedPath, location.pathname, location.search, navigate]);
 
   const handleNavigateForgot = useCallback(() => {
-    rememberAuthReturn(location.pathname + location.search);
+    rememberReturnCheckpoint(
+      CHECKPOINT_TYPES.AUTH,
+      `${location.pathname}${location.search}`
+    );
     setLoginModalOpen(false);
     navigate(localizedPath('/support'));
   }, [localizedPath, location.pathname, location.search, navigate]);

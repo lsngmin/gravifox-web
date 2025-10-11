@@ -1,6 +1,8 @@
 import React, { useEffect, useMemo, useRef, useState } from "react";
 import AnalysisReport from "../../analyze/components/report/AnalysisReport";
 import { ANALYZE_ENDPOINTS, FASTAPI_ENDPOINTS } from "../../../api/endPointRoute";
+import axios from "../../../api/http";
+import ensureUploadToken from "../../analyze/api/uploadTokenClient";
 import { Transition } from '@headlessui/react';
 
 function readLocalReports() {
@@ -543,22 +545,58 @@ function ReAnalyzePane({ onFinish }) {
     setProgress(null);
     try {
       // 1) upload
+      let uploadId;
+      let uploadToken;
+      try {
+        const tokenPayload = await ensureUploadToken(file);
+        uploadId = tokenPayload?.uploadId;
+        uploadToken = tokenPayload?.uploadToken;
+        if (!uploadId || !uploadToken) throw new Error('업로드 토큰을 발급받지 못했어요.');
+      } catch (issueErr) {
+        const detail = issueErr?.response?.data;
+        const status = issueErr?.response?.status;
+        if (status === 401 || status === 403) {
+          const err = new Error(detail?.message || detail?.error || '업로드 토큰 발급이 거부됐어요.');
+          err.status = status;
+          throw err;
+        }
+        throw new Error(detail?.message || detail?.error || issueErr?.message || '업로드 토큰을 발급받지 못했어요.');
+      }
+
       const form = new FormData();
       form.append('file', file, file.name || 'media');
-      const up = await fetch(FASTAPI_ENDPOINTS.UPLOAD, { method: 'POST', body: form });
+      form.append('uploadId', uploadId);
+      const up = await fetch(FASTAPI_ENDPOINTS.UPLOAD, {
+        method: 'POST',
+        headers: { 'Upload-Token': uploadToken },
+        body: form,
+      });
       if (!up.ok) throw new Error('업로드에 실패했어요.');
       const upJson = await up.json();
-      const uploadId = upJson?.uploadId;
-      if (!uploadId) throw new Error('uploadId를 받지 못했어요.');
+      const resolvedUploadId = upJson?.uploadId || uploadId;
+      if (!resolvedUploadId) throw new Error('uploadId를 확인하지 못했어요.');
 
       // 2) analyze create
       setStage('CREATE');
-      const an = await fetch(ANALYZE_ENDPOINTS.CREATE, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ uploadId }) });
-      if (!an.ok) throw new Error('분석 생성에 실패했어요.');
-      const anJson = await an.json();
+      let anJson;
+      try {
+        const anResp = await axios.post(ANALYZE_ENDPOINTS.CREATE, { uploadId: resolvedUploadId });
+        anJson = anResp?.data;
+      } catch (createErr) {
+        const resp = createErr?.response;
+        const detail = resp?.data;
+        const status = resp?.status;
+        const message = detail?.message || detail?.error || resp?.statusText || createErr?.message || '분석 생성에 실패했어요.';
+        if (status === 401 || status === 403) {
+          const err = new Error(message);
+          err.status = status;
+          throw err;
+        }
+        throw new Error(message);
+      }
       const { jobId, sseToken } = anJson || {};
       if (!jobId || !sseToken) throw new Error('jobId 또는 sseToken이 없어요.');
-      const fileMeta = { name: file.name, size: file.size, type: file.type };
+      const fileMeta = { name: file.name, size: file.size, type: file.type, uploadId: resolvedUploadId };
       setMeta(fileMeta);
       try {
         sessionStorage.setItem(`sse:${jobId}`, sseToken);

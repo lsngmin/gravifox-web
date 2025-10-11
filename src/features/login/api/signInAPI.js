@@ -2,7 +2,11 @@ import {useAuth} from "providers/authProvider";
 import axios from "axios";
 import {useLocation, useNavigate} from "react-router-dom";
 import {AUTH_ENDPOINTS} from "../../../api/endPointRoute";
-import { rememberAuthReturn, clearAuthReturn } from "../../../utils/authReturn";
+import {
+    rememberReturnCheckpoint,
+    clearReturnCheckpoint,
+} from "../../../lib/returnCheckpoint/index.js";
+import { CHECKPOINT_TYPES } from "../../../lib/returnCheckpoint/constants.js";
 
 const SignInAPI = () => {
     const location = useLocation(),
@@ -36,7 +40,7 @@ const SignInAPI = () => {
         };
 
         try {
-            rememberAuthReturn(from);
+            rememberReturnCheckpoint(CHECKPOINT_TYPES.AUTH, from);
             const response = await axios.post(AUTH_ENDPOINTS.SIGNIN, requestData, {
                 withCredentials: true,
                 headers: {
@@ -44,7 +48,7 @@ const SignInAPI = () => {
                 }
             });
             setAccessToken(response.data.accessToken);
-            clearAuthReturn();
+            clearReturnCheckpoint(CHECKPOINT_TYPES.AUTH);
             navigate(from, {replace: true});
         } catch (error) {
             const resp = error?.response;

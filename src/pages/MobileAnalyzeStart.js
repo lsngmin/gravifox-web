@@ -6,7 +6,12 @@ import Navigation from '../features/navigation/navigation';
 import Footer from '../features/footer/footer';
 import { useAuth } from 'providers/authProvider';
 import useNumberFormatter from '../hooks/useNumberFormatter';
-import { rememberAuthReturn, getAuthReturn, clearAuthReturn } from '../utils/authReturn';
+import {
+  rememberReturnCheckpoint,
+  getReturnCheckpoint,
+  clearReturnCheckpoint,
+} from '../lib/returnCheckpoint/index.js';
+import { CHECKPOINT_TYPES } from '../lib/returnCheckpoint/constants.js';
 import {
   DEFAULT_MEMBER_DAILY_QUOTA,
   GUEST_DAILY_QUOTA,
@@ -75,7 +80,7 @@ export default function MobileAnalyzeStart() {
 
   const startFlow = useCallback(async (action) => {
     const targetPath = buildReturnPath(action);
-    rememberAuthReturn(targetPath);
+    rememberReturnCheckpoint(CHECKPOINT_TYPES.AUTH, targetPath);
 
     setPendingAction(null);
     if (!accessToken) {
@@ -106,7 +111,7 @@ export default function MobileAnalyzeStart() {
       }
 
       proceedToAction(action);
-      clearAuthReturn();
+      clearReturnCheckpoint(CHECKPOINT_TYPES.AUTH);
     } catch (error) {
       if (error?.status === 401) {
         setPendingAction(action);
@@ -145,13 +150,16 @@ export default function MobileAnalyzeStart() {
 
   const handleNavigateSignup = useCallback(() => {
     const target = buildReturnPath(pendingAction || 'upload');
-    rememberAuthReturn(target);
+    rememberReturnCheckpoint(CHECKPOINT_TYPES.AUTH, target);
     setLoginModalOpen(false);
     navigate(localizedPath('/agree'));
   }, [buildReturnPath, localizedPath, navigate, pendingAction]);
 
   const handleNavigateForgot = useCallback(() => {
-    rememberAuthReturn(buildReturnPath(pendingAction || 'upload'));
+    rememberReturnCheckpoint(
+      CHECKPOINT_TYPES.AUTH,
+      buildReturnPath(pendingAction || 'upload')
+    );
     setLoginModalOpen(false);
     navigate(supportRoute);
   }, [buildReturnPath, navigate, pendingAction, supportRoute]);
@@ -159,9 +167,9 @@ export default function MobileAnalyzeStart() {
   const handleLoginSuccess = useCallback(() => {
     loginCompletedRef.current = true;
     setLoginModalOpen(false);
-    const { path } = getAuthReturn();
+    const { path } = getReturnCheckpoint(CHECKPOINT_TYPES.AUTH);
     if (path) {
-      clearAuthReturn();
+      clearReturnCheckpoint(CHECKPOINT_TYPES.AUTH);
       const isSample = path.includes('sample=1') || pendingAction === 'sample';
       navigate(path, {
         replace: true,

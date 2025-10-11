@@ -1,17 +1,19 @@
 import React from "react";
 import { useTranslation } from "react-i18next";
 import {AUTH_ENDPOINTS} from "../../../api/endPointRoute";
-import { rememberAuthReturn } from "../../../utils/authReturn";
+import {
+    rememberReturnCheckpoint,
+} from "../../../lib/returnCheckpoint/index.js";
+import { CHECKPOINT_TYPES } from "../../../lib/returnCheckpoint/constants.js";
 
-const GoogleLoginButton = ({ variant = 'light', returnPath = '/' }) => {
+const GoogleLoginButton = ({ variant = 'light', returnPath }) => {
     const { t } = useTranslation('common');
     const googleLoginHandler = () => {
-        try {
-            const fallback = `${window.location.pathname}${window.location.search}`;
-            rememberAuthReturn(returnPath || fallback);
-        } catch {
-            rememberAuthReturn(returnPath || '/');
+        let target = returnPath;
+        if (!target && typeof window !== 'undefined') {
+            target = `${window.location.pathname}${window.location.search}`;
         }
+        rememberReturnCheckpoint(CHECKPOINT_TYPES.AUTH, target);
         window.location.href = AUTH_ENDPOINTS.GOOGLE;
     };
     const isDark = variant === 'dark';

@@ -1,5 +1,6 @@
 import axios from "../../../api/http";
 import { ANALYZE_ENDPOINTS, FASTAPI_ENDPOINTS } from "../../../api/endPointRoute";
+import ensureUploadToken from "./uploadTokenClient";
 
 const toJson = async (response) => {
     try {
@@ -29,11 +30,32 @@ export async function submitAnalyzeFiles(files, {
 
     for (const file of files) {
         try {
+            let uploadId;
+            let uploadToken;
+            try {
+                const tokenPayload = await ensureUploadToken(file);
+                uploadId = tokenPayload?.uploadId;
+                uploadToken = tokenPayload?.uploadToken;
+            } catch (issueErr) {
+                const status = issueErr?.response?.status;
+                const detail = issueErr?.response?.data;
+                if (status === 401 || status === 403) {
+                    const err = new Error(detail?.message || detail?.error || "업로드 토큰 발급이 거부됐어요.");
+                    err.status = status;
+                    throw err;
+                }
+                throw new Error(detail?.message || detail?.error || issueErr?.message || "업로드 토큰을 발급받지 못했어요.");
+            }
+
             const form = new FormData();
             form.append("file", file, file?.name || "media");
+            form.append("uploadId", uploadId);
 
             const uploadResp = await fetch(FASTAPI_ENDPOINTS.UPLOAD, {
                 method: "POST",
+                headers: {
+                    "Upload-Token": uploadToken,
+                },
                 body: form,
             });
             if (!uploadResp.ok) {
@@ -43,19 +65,19 @@ export async function submitAnalyzeFiles(files, {
                 continue;
             }
             const uploadJson = await toJson(uploadResp);
-            const uploadId = uploadJson?.uploadId;
-            if (!uploadId) {
-                errors.push("uploadId를 받지 못했어요.");
+            const resolvedUploadId = uploadJson?.uploadId || uploadId;
+            if (!resolvedUploadId) {
+                errors.push("uploadId를 확인하지 못했어요.");
                 continue;
             }
 
-            const body = { uploadId };
+            const body = { uploadId: resolvedUploadId };
             if (modelKeyTrimmed) body.modelKey = modelKeyTrimmed;
 
             const mergedParams = { ...(params || {}) };
             if (typeof buildParams === "function") {
                 try {
-                    const extra = buildParams(file, uploadJson);
+                    const extra = buildParams(file, { ...(uploadJson || {}), uploadId: resolvedUploadId });
                     if (extra && typeof extra === "object") {
                         Object.assign(mergedParams, extra);
                     }
@@ -101,6 +123,7 @@ export async function submitAnalyzeFiles(files, {
                     size: file?.size,
                     type: file?.type,
                     modelKey: resolvedModelKey,
+                    uploadId: resolvedUploadId,
                 };
                 if (typeof buildMeta === "function") {
                     try {
@@ -113,6 +136,9 @@ export async function submitAnalyzeFiles(files, {
             jobIds.push(jobId);
         } catch (err) {
             const message = err?.message || "분석 처리 중 오류가 발생했어요.";
+            if (err?.status === 401 || err?.status === 403) {
+                throw err;
+            }
             errors.push(message);
         }
     }

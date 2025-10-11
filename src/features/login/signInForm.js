@@ -4,7 +4,10 @@ import LoginErrorMessage from "features/login/loginErrorMessage";
 import SignInAPI from "features/login/api/signInAPI";
 import GoogleLoginButton from "features/login/components/googleLoginButton";
 import { Link, useNavigate, useParams, useLocation } from "react-router-dom";
-import { rememberAuthReturn } from "../../utils/authReturn";
+import {
+    rememberReturnCheckpoint,
+} from "../../lib/returnCheckpoint/index.js";
+import { CHECKPOINT_TYPES } from "../../lib/returnCheckpoint/constants.js";
 
 export default function SignInForm() {
     const navigate = useNavigate();
@@ -53,7 +56,7 @@ export default function SignInForm() {
         }
     };
     const handleChangeForm = () => {
-        rememberAuthReturn(returnPath);
+        rememberReturnCheckpoint(CHECKPOINT_TYPES.AUTH, returnPath);
         navigate(localizedPath("/agree"));
     };
 
@@ -105,7 +108,7 @@ export default function SignInForm() {
                         <Link
                             to={localizedPath("/support")}
                             className="text-xs font-semibold text-indigo-300 transition hover:text-indigo-200"
-                            onClick={() => rememberAuthReturn(returnPath)}
+                            onClick={() => rememberReturnCheckpoint(CHECKPOINT_TYPES.AUTH, returnPath)}
                         >
                             비밀번호 찾기
                         </Link>

@@ -5,7 +5,11 @@ import { setHttpAccessToken, setHttpHandlers } from "../api/http";
 import { isTokenValid, getExpiryMs, decodeJwt } from "../utils/jwt";
 import { AUTH_ENDPOINTS, PROFILE_ENDPOINTS } from "../api/endPointRoute";
 import { getProfileCache, setProfileCache, clearProfileCache } from "../utils/profileCache";
-import { getAuthReturn, clearAuthReturn } from "../utils/authReturn";
+import {
+    getReturnCheckpoint,
+    clearReturnCheckpoint,
+} from "../lib/returnCheckpoint/index.js";
+import { CHECKPOINT_TYPES } from "../lib/returnCheckpoint/constants.js";
 
 const BOOTSTRAP_TIMEOUT_MS = 15000;
 
@@ -215,10 +219,10 @@ export const AuthProvider = ({ children }) => {
         if (oauthRedirectHandledRef.current || isChecking || isLoading) {
             return;
         }
-        const { path } = getAuthReturn();
+        const { path } = getReturnCheckpoint(CHECKPOINT_TYPES.AUTH);
         if (path) {
             oauthRedirectHandledRef.current = true;
-            clearAuthReturn();
+            clearReturnCheckpoint(CHECKPOINT_TYPES.AUTH);
             const current = `${window.location.pathname}${window.location.search}`;
             if (current !== path) {
                 window.location.replace(path);

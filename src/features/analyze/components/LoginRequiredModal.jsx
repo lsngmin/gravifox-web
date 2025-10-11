@@ -2,9 +2,9 @@ import React, { useEffect, useMemo, useState } from "react";
 import axios from "../../../api/http";
 import { AUTH_ENDPOINTS } from "../../../api/endPointRoute";
 import { useAuth } from "providers/authProvider";
-import { rememberAuthReturn } from "../../../utils/authReturn";
 import { useTranslation } from "react-i18next";
-
+import {rememberReturnCheckpoint} from "../../../lib/returnCheckpoint";
+import {CHECKPOINT_TYPES} from "../../../lib/returnCheckpoint/constants";
 const overlayClass =
   "fixed inset-0 z-[200] flex items-center justify-center bg-slate-950/70 backdrop-blur-sm";
 
@@ -53,7 +53,7 @@ export default function LoginRequiredModal({
     setLoading(true);
     setError(null);
     try {
-      rememberAuthReturn(returnPath || "/");
+      rememberReturnCheckpoint(CHECKPOINT_TYPES.UPLOAD, returnPath);
       const response = await axios.post(
         AUTH_ENDPOINTS.SIGNIN,
         {
@@ -99,7 +99,7 @@ export default function LoginRequiredModal({
   };
 
   const handleGoogleLogin = () => {
-    rememberAuthReturn(returnPath || "/");
+    rememberReturnCheckpoint(CHECKPOINT_TYPES.UPLOAD, returnPath);
     window.location.href = AUTH_ENDPOINTS.GOOGLE;
   };
 

@@ -1,0 +1,29 @@
+import axios from "../../../api/http";
+
+export const buildUploadId = (file) => {
+  const uuid = typeof crypto !== "undefined" && crypto?.randomUUID ? crypto.randomUUID() : `${Date.now()}-${Math.random().toString(16).slice(2, 10)}`;
+  const name = (file?.name || "").toLowerCase();
+  const dot = name.lastIndexOf(".");
+  if (dot !== -1 && dot < name.length - 1) {
+    const ext = name.slice(dot);
+    return `${uuid}${ext}`;
+  }
+  return uuid;
+};
+
+export const requestUploadToken = async (uploadId) => {
+  const resp = await axios.post("/api/v1/files/upload-token", { uploadId });
+  return resp?.data || null;
+};
+
+export const ensureUploadToken = async (file) => {
+  const uploadId = buildUploadId(file);
+  const payload = await requestUploadToken(uploadId);
+  const token = payload?.uploadToken || payload?.token;
+  if (!token) {
+    throw new Error("업로드 토큰을 발급받지 못했어요.");
+  }
+  return { uploadId, uploadToken: token, payload };
+};
+
+export default ensureUploadToken;
