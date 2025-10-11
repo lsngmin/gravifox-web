@@ -1,4 +1,5 @@
 import axios from "../../../api/http";
+import { API_BASE } from "../../../api/endPointRoute";
 
 const BYPASS_TOKEN = (process.env.REACT_APP_UPLOAD_TOKEN_BYPASS || "").trim();
 const BYPASS_UPLOAD_ID_PREFIX = (process.env.REACT_APP_UPLOAD_TOKEN_BYPASS_UPLOAD_ID_PREFIX || "").trim();
@@ -15,8 +16,8 @@ export const buildUploadId = (file) => {
 };
 
 export const requestUploadToken = async (uploadId) => {
-  axios.defaults.baseURL = process.env.REACT_APP_API_BASE_URL;
-  const resp = await axios.post("/api/v1/files/upload-token", { uploadId });
+  const baseUrl = API_BASE || "https://api.gravifox.com";
+  const resp = await axios.post(`${baseUrl}/api/v1/files/upload-token`, { uploadId });
   return resp?.data || null;
 };
 
