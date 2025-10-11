@@ -12,6 +12,7 @@ export const buildUploadId = (file) => {
 };
 
 export const requestUploadToken = async (uploadId) => {
+  axios.defaults.baseURL = process.env.REACT_APP_API_BASE_URL;
   const resp = await axios.post("/api/v1/files/upload-token", { uploadId });
   return resp?.data || null;
 };
