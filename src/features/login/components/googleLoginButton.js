@@ -1,8 +1,17 @@
 import React from "react";
+import { useTranslation } from "react-i18next";
 import {AUTH_ENDPOINTS} from "../../../api/endPointRoute";
+import { rememberAuthReturn } from "../../../utils/authReturn";
 
-const GoogleLoginButton = ({ variant = 'light' }) => {
+const GoogleLoginButton = ({ variant = 'light', returnPath = '/' }) => {
+    const { t } = useTranslation('common');
     const googleLoginHandler = () => {
+        try {
+            const fallback = `${window.location.pathname}${window.location.search}`;
+            rememberAuthReturn(returnPath || fallback);
+        } catch {
+            rememberAuthReturn(returnPath || '/');
+        }
         window.location.href = AUTH_ENDPOINTS.GOOGLE;
     };
     const isDark = variant === 'dark';
@@ -12,7 +21,7 @@ const GoogleLoginButton = ({ variant = 'light' }) => {
     return (
         <button onClick={googleLoginHandler} className={base}>
             <img src="https://www.svgrepo.com/show/475656/google-color.svg" alt="Google" className="h-[18px] w-[18px]" />
-            Google로 계속하기
+            {t('loginModal.googleButton', 'Google로 계속하기')}
         </button>
     )
 }

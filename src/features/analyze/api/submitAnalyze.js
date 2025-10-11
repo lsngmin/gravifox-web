@@ -1,3 +1,4 @@
+import axios from "../../../api/http";
 import { ANALYZE_ENDPOINTS, FASTAPI_ENDPOINTS } from "../../../api/endPointRoute";
 
 const toJson = async (response) => {
@@ -16,6 +17,7 @@ export async function submitAnalyzeFiles(files, {
 } = {}) {
     const jobIds = [];
     const errors = [];
+    let lastRemainingQuota = null;
     if (!Array.isArray(files) || files.length === 0) {
         return { jobIds, errors };
     }
@@ -63,21 +65,30 @@ export async function submitAnalyzeFiles(files, {
                 body.params = mergedParams;
             }
 
-            const analyzeResp = await fetch(ANALYZE_ENDPOINTS.CREATE, {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify(body),
-            });
-            if (!analyzeResp.ok) {
-                const detail = await toJson(analyzeResp);
-                const reason = detail?.message || detail?.error || analyzeResp.statusText || "분석 생성에 실패했어요.";
+            let analyzeJson;
+            try {
+                const analyzeResp = await axios.post(ANALYZE_ENDPOINTS.CREATE, body);
+                analyzeJson = analyzeResp?.data;
+            } catch (error) {
+                const resp = error?.response;
+                const detail = resp?.data;
+                const reason = detail?.message || detail?.error || detail?.code || resp?.statusText || error?.message || "분석 생성에 실패했어요.";
+                const status = resp?.status;
+                if (status === 401 || status === 403 || status === 429) {
+                    const err = new Error(reason);
+                    err.status = status;
+                    err.code = detail?.error || detail?.code;
+                    throw err;
+                }
                 errors.push(reason);
                 continue;
             }
-            const analyzeJson = await toJson(analyzeResp);
             const jobId = analyzeJson?.jobId;
             const token = analyzeJson?.sseToken;
             const resolvedModelKey = analyzeJson?.modelKey || modelKeyTrimmed;
+            if (typeof analyzeJson?.remainingQuota === "number") {
+                lastRemainingQuota = analyzeJson.remainingQuota;
+            }
             if (!jobId || !token) {
                 errors.push("jobId 또는 sseToken이 없어요.");
                 continue;
@@ -105,7 +116,7 @@ export async function submitAnalyzeFiles(files, {
             errors.push(message);
         }
     }
-    return { jobIds, errors };
+    return { jobIds, errors, remainingQuota: lastRemainingQuota };
 }
 
 export default submitAnalyzeFiles;

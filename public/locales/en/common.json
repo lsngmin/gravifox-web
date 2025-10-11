@@ -101,18 +101,39 @@
         "title": "Upload error",
         "duplicate": "That file is already in the list.",
         "type": "This file type is not supported.",
-      "size": "File size exceeds the limit.",
+        "size": "File size exceeds the limit.",
         "sizeHint": "Images can be up to 5MB each.",
         "imageLimit": "You can add up to {{max}} images.",
-        "videoLimit": "You can add up to {{max}} videos."
+        "videoLimit": "You can add up to {{max}} videos.",
+        "emailNotVerified": "Email verification is required. Please check your inbox and complete verification.",
+        "quotaExhausted": "You have used all available analyses for this month.",
+        "summaryFailed": "We couldn’t confirm your remaining quota. Please try again shortly."
       },
       "primaryAction": "Upload images",
       "moreHint": "Need to add more images?",
       "moreAction": "Upload another file",
       "reset": "Clear all files",
       "cta": "Start analysis",
+      "ctaLoading": "Preparing your analysis…",
       "footer": "Works best on Wi-Fi • Avg. analysis time 30s",
       "sampleAutoFillError": "We couldn’t load the sample images automatically. Please try again or upload your own."
+    },
+    "quota": {
+      "loading": "Fetching your remaining quota…",
+      "title": "Monthly analyses left",
+      "period": "Period: {{period}}",
+      "emailPending": "Verify your email to start using analyses."
+    },
+    "loginModal": {
+      "title": "Sign in required",
+      "subtitle": "Sign in with your email or continue with Google.",
+      "emailButton": "Sign in with email",
+      "googleButton": "Continue with Google",
+      "loading": "Signing you in…",
+      "signupPrompt": "Need an account?",
+      "signupAction": "Sign up",
+      "forgotPrompt": "Forgot your password?",
+      "forgotAction": "Get help"
     },
     "processing": {
       "title": "Processing…",

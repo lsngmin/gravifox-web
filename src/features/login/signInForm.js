@@ -3,11 +3,20 @@ import React, { useState } from "react";
 import LoginErrorMessage from "features/login/loginErrorMessage";
 import SignInAPI from "features/login/api/signInAPI";
 import GoogleLoginButton from "features/login/components/googleLoginButton";
-import { Link, useNavigate, useParams } from "react-router-dom";
+import { Link, useNavigate, useParams, useLocation } from "react-router-dom";
+import { rememberAuthReturn } from "../../utils/authReturn";
 
 export default function SignInForm() {
     const navigate = useNavigate();
     const { lng } = useParams();
+    const location = useLocation();
+    const localeMatch = location.pathname?.match(/^\/([a-zA-Z-]{2,5})(?=\/|$)/);
+    const prefix = localeMatch ? `/${localeMatch[1]}` : "";
+    const defaultPath = `${prefix}/analyze/upload`;
+    const fromLocation = location.state?.from;
+    const fromPath = fromLocation?.pathname || defaultPath;
+    const fromSearch = fromLocation?.search || "";
+    const returnPath = `${fromPath}${fromSearch}`;
     const localizedPath = (path) => {
         const prefix = lng ? `/${lng}` : "";
         if (path === "/" && prefix) {
@@ -44,6 +53,7 @@ export default function SignInForm() {
         }
     };
     const handleChangeForm = () => {
+        rememberAuthReturn(returnPath);
         navigate(localizedPath("/agree"));
     };
 
@@ -92,7 +102,11 @@ export default function SignInForm() {
                         <label htmlFor="password" className="block text-sm font-medium text-slate-300">
                             비밀번호
                         </label>
-                        <Link to={localizedPath("/support")} className="text-xs font-semibold text-indigo-300 transition hover:text-indigo-200">
+                        <Link
+                            to={localizedPath("/support")}
+                            className="text-xs font-semibold text-indigo-300 transition hover:text-indigo-200"
+                            onClick={() => rememberAuthReturn(returnPath)}
+                        >
                             비밀번호 찾기
                         </Link>
                     </div>
@@ -134,7 +148,7 @@ export default function SignInForm() {
             </div>
 
             <div className="mt-6">
-                <GoogleLoginButton variant="dark" />
+                <GoogleLoginButton variant="dark" returnPath={returnPath} />
             </div>
 
             <p className="mt-8 text-center text-sm text-slate-400">

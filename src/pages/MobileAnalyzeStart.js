@@ -1,4 +1,4 @@
-import React, { useCallback, useMemo } from 'react';
+import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useNavigate, useParams } from 'react-router-dom';
 import { UploadCloud, ShieldCheck, Clapperboard, LifeBuoy } from 'lucide-react';
@@ -6,17 +6,36 @@ import Navigation from '../features/navigation/navigation';
 import Footer from '../features/footer/footer';
 import { useAuth } from 'providers/authProvider';
 import useNumberFormatter from '../hooks/useNumberFormatter';
+import { rememberAuthReturn, getAuthReturn, clearAuthReturn } from '../utils/authReturn';
 import {
   DEFAULT_MEMBER_DAILY_QUOTA,
   GUEST_DAILY_QUOTA,
   MAX_IMAGE_FILES,
 } from '../features/analyze/constants';
+import { fetchQuotaSummary } from '../features/analyze/api/quotaSummary';
+import LoginRequiredModal from '../features/analyze/components/LoginRequiredModal';
+import ErrorModal from '../features/analyze/components/ErrorModal';
 
 export default function MobileAnalyzeStart() {
   const { t, i18n } = useTranslation('common');
   const navigate = useNavigate();
   const { lng } = useParams();
-  const { userInfo } = useAuth();
+  const { userInfo, accessToken } = useAuth();
+  const [loginModalOpen, setLoginModalOpen] = useState(false);
+  const [pendingAction, setPendingAction] = useState(null);
+  const [errorOpen, setErrorOpen] = useState(false);
+  const [errorMsgs, setErrorMsgs] = useState([]);
+  const [awaitingEmailVerification, setAwaitingEmailVerification] = useState(null);
+  const [checkingQuota, setCheckingQuota] = useState(false);
+  const loginCompletedRef = useRef(false);
+
+  const localizedPath = useCallback((path) => {
+    const prefix = lng ? `/${lng}` : '';
+    if (path === '/' && prefix) {
+      return prefix;
+    }
+    return `${prefix}${path}`;
+  }, [lng]);
 
   const formatNumber = useNumberFormatter(i18n.language);
 
@@ -39,17 +58,124 @@ export default function MobileAnalyzeStart() {
     [lng]
   );
 
-  const handleStart = useCallback(() => {
-    navigate(uploadRoute);
+  const proceedToAction = useCallback((action) => {
+    if (action === 'sample') {
+      navigate(uploadRoute, { state: { sample: true } });
+    } else {
+      navigate(uploadRoute);
+    }
   }, [navigate, uploadRoute]);
 
+  const buildReturnPath = useCallback((action) => {
+    if (action === 'sample') {
+      return `${uploadRoute}?sample=1`;
+    }
+    return uploadRoute;
+  }, [uploadRoute]);
+
+  const startFlow = useCallback(async (action) => {
+    const targetPath = buildReturnPath(action);
+    rememberAuthReturn(targetPath);
+
+    setPendingAction(null);
+    if (!accessToken) {
+      setPendingAction(action);
+      setLoginModalOpen(true);
+      return;
+    }
+
+    setCheckingQuota(true);
+    try {
+      const summary = await fetchQuotaSummary();
+
+      if (summary?.loginType === 'EMAIL' && !summary?.emailVerified) {
+        setAwaitingEmailVerification(userInfo?.userId || '');
+        setErrorMsgs([
+          t('mobileAnalyze.uploadPage.errors.emailNotVerified', '이메일 인증이 필요해요. 받은 메일함의 인증 링크를 확인해 주세요.'),
+        ]);
+        setErrorOpen(true);
+        return;
+      }
+
+      if ((summary?.remaining ?? 0) <= 0) {
+        setErrorMsgs([
+          t('mobileAnalyze.uploadPage.errors.quotaExhausted', '이번 달 사용할 수 있는 분석 횟수를 모두 사용했어요.'),
+        ]);
+        setErrorOpen(true);
+        return;
+      }
+
+      proceedToAction(action);
+      clearAuthReturn();
+    } catch (error) {
+      if (error?.status === 401) {
+        setPendingAction(action);
+        setLoginModalOpen(true);
+      } else {
+        setErrorMsgs([
+          error?.message ||
+            t('mobileAnalyze.uploadPage.errors.summaryFailed', '사용 가능 횟수를 확인하지 못했어요. 잠시 후 다시 시도해 주세요.'),
+        ]);
+        setErrorOpen(true);
+      }
+    } finally {
+      setCheckingQuota(false);
+    }
+  }, [accessToken, buildReturnPath, proceedToAction, t, userInfo]);
+
+  const handleStart = useCallback(() => {
+    startFlow('upload');
+  }, [startFlow]);
+
   const handleSampleStart = useCallback(() => {
-    navigate(uploadRoute, { state: { sample: true } });
-  }, [navigate, uploadRoute]);
+    startFlow('sample');
+  }, [startFlow]);
 
   const handleSupport = useCallback(() => {
     navigate(supportRoute);
   }, [navigate, supportRoute]);
+
+  const handleNeedEmailVerification = useCallback((email) => {
+    setAwaitingEmailVerification(email || '');
+    setErrorMsgs([
+      t('mobileAnalyze.uploadPage.errors.emailNotVerified', '이메일 인증이 필요해요. 받은 메일함의 인증 링크를 확인해 주세요.'),
+    ]);
+    setErrorOpen(true);
+  }, [t]);
+
+  const handleNavigateSignup = useCallback(() => {
+    const target = buildReturnPath(pendingAction || 'upload');
+    rememberAuthReturn(target);
+    setLoginModalOpen(false);
+    navigate(localizedPath('/agree'));
+  }, [buildReturnPath, localizedPath, navigate, pendingAction]);
+
+  const handleNavigateForgot = useCallback(() => {
+    rememberAuthReturn(buildReturnPath(pendingAction || 'upload'));
+    setLoginModalOpen(false);
+    navigate(supportRoute);
+  }, [buildReturnPath, navigate, pendingAction, supportRoute]);
+
+  const handleLoginSuccess = useCallback(() => {
+    loginCompletedRef.current = true;
+    setLoginModalOpen(false);
+    const { path } = getAuthReturn();
+    if (path) {
+      clearAuthReturn();
+      const isSample = path.includes('sample=1') || pendingAction === 'sample';
+      navigate(path, {
+        replace: true,
+        state: isSample ? { sample: true } : undefined,
+      });
+    }
+    setPendingAction(null);
+  }, [navigate, pendingAction]);
+
+  useEffect(() => {
+    if (accessToken && pendingAction && !loginModalOpen) {
+      startFlow(pendingAction);
+    }
+  }, [accessToken, pendingAction, loginModalOpen, startFlow]);
 
   const guidanceMessages = useMemo(
     () => [
@@ -211,7 +337,12 @@ export default function MobileAnalyzeStart() {
           <button
               type="button"
               onClick={handleSampleStart}
-              className="flex items-center justify-between gap-3 rounded-2xl border border-indigo-400/40 bg-indigo-500/15 px-3 py-3 text-indigo-100 transition hover:border-indigo-300 hover:bg-indigo-500/25"
+              disabled={checkingQuota}
+              className={`flex items-center justify-between gap-3 rounded-2xl border border-indigo-400/40 px-3 py-3 text-indigo-100 transition ${
+                checkingQuota
+                  ? 'cursor-not-allowed bg-indigo-500/10 opacity-60'
+                  : 'bg-indigo-500/15 hover:border-indigo-300 hover:bg-indigo-500/25'
+              }`}
           >
               <span className="inline-flex h-10 w-10 items-center justify-center rounded-full bg-indigo-500/25 text-white">
                 <svg viewBox="0 0 24 24" className="h-5 w-5" fill="none" stroke="currentColor" strokeWidth="1.8">
@@ -242,15 +373,48 @@ export default function MobileAnalyzeStart() {
               <button
                 type="button"
                 onClick={handleStart}
-                className="inline-flex w-full items-center justify-center rounded-2xl bg-gradient-to-r from-indigo-500 to-indigo-400 px-4 py-3 text-base font-semibold text-white shadow-lg shadow-indigo-500/25 transition-transform duration-200 active:scale-[0.99]"
+                disabled={checkingQuota}
+                className={`inline-flex w-full items-center justify-center rounded-2xl px-4 py-3 text-base font-semibold text-white shadow-lg shadow-indigo-500/25 transition-transform duration-200 ${
+                  checkingQuota
+                    ? 'cursor-not-allowed bg-slate-800/60 opacity-60'
+                    : 'bg-gradient-to-r from-indigo-500 to-indigo-400 active:scale-[0.99]'
+                }`}
               >
-                {t('mobileAnalyze.primary', 'Upload images')}
+                {checkingQuota
+                  ? t('mobileAnalyze.uploadPage.ctaLoading', '분석을 준비하고 있어요…')
+                  : t('mobileAnalyze.primary', 'Upload images')}
               </button>
             </div>
           </div>
         </div>
       </main>
       <Footer transparent inline variant="dark" showLinks={false} />
+      <ErrorModal
+        open={errorOpen}
+        messages={errorMsgs}
+        onClose={() => {
+          setErrorOpen(false);
+          setErrorMsgs([]);
+        }}
+        title={t('mobileAnalyze.uploadPage.errors.title', '업로드 오류')}
+        theme="dark"
+      />
+      <LoginRequiredModal
+        open={loginModalOpen}
+        onClose={() => {
+          setLoginModalOpen(false);
+          if (!loginCompletedRef.current) {
+            setPendingAction(null);
+          }
+          loginCompletedRef.current = false;
+        }}
+        onSuccess={handleLoginSuccess}
+        onNeedEmailVerification={handleNeedEmailVerification}
+        defaultEmail={awaitingEmailVerification || ''}
+        returnPath={buildReturnPath(pendingAction || 'upload')}
+        onNavigateSignup={handleNavigateSignup}
+        onNavigateForgot={handleNavigateForgot}
+      />
     </div>
   );
 }

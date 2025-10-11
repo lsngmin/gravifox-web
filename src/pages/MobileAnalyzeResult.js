@@ -67,9 +67,9 @@ function LoadingMent({ stage }) {
 
   return (
     <span
-      className={`inline-block text-xs font-medium leading-5 transition-opacity duration-300 ease-in-out ${
+      className={`inline-flex items-center text-[11px] font-semibold tracking-[0.04em] transition-opacity duration-300 ease-in-out ${
         visible ? 'opacity-100' : 'opacity-0'
-      } truncate whitespace-nowrap max-w-full`}
+      } whitespace-nowrap`}
       style={shimmerStyle}
     >
       {text}
@@ -300,28 +300,80 @@ export default function MobileAnalyzeResult() {
   );
   const hasPending = analysisStates.some((item) => !item.result && !item.error);
   const hasResults = analysisStates.some((item) => Boolean(item.result));
+  const summary = useMemo(() => {
+    const total = analysisStates.length;
+    const success = analysisStates.filter((item) => Boolean(item.result)).length;
+    const failed = analysisStates.filter(
+      (item) => !item.result && Boolean(item.error)
+    ).length;
+    const pending = Math.max(0, total - success - failed);
+    return { total, success, failed, pending };
+  }, [analysisStates]);
+  const titleText = hasPending
+    ? t('mobileAnalyze.processing.title', '분석 중입니다…')
+    : t('mobileAnalyze.processing.doneTitle', '분석이 완료됐어요');
+  const subtitleText = hasPending
+    ? t(
+        'mobileAnalyze.processing.subtitle',
+        '평균 30초 내에 결과가 준비돼요. 페이지를 닫지 말고 잠시만 기다려 주세요.'
+      )
+    : t(
+        'mobileAnalyze.processing.doneSubtitle',
+        '요약 리포트를 아래에서 바로 확인해 주세요.'
+      );
 
   return (
-    <div className="min-h-screen bg-slate-950 text-slate-100 flex flex-col">
+    <div className="flex min-h-screen flex-col bg-slate-950 text-slate-100">
       <Navigation variant="dark" />
-      <main className="flex-1 flex justify-center">
-        <div className="flex w-full max-w-sm flex-col gap-6 px-5 pb-14 pt-24">
-          <header className="space-y-3">
-            <div>
-              <h1 className="text-[1.65rem] font-semibold leading-tight">
-                {hasPending
-                  ? t('mobileAnalyze.processing.title', '분석 중입니다…')
-                  : t('mobileAnalyze.processing.doneTitle', '분석이 완료됐어요')}
-              </h1>
-              <p className="mt-2 text-sm text-slate-400">
-                {hasPending
-                  ? t('mobileAnalyze.processing.subtitle', '평균 30초 내에 결과가 준비돼요. 페이지를 닫지 말고 잠시만 기다려 주세요.')
-                  : t('mobileAnalyze.processing.doneSubtitle', '요약 리포트를 아래에서 바로 확인해 주세요.')}
-              </p>
+      <main className="relative flex-1">
+        <div className="pointer-events-none absolute inset-x-0 top-0 h-[420px] bg-[radial-gradient(circle_at_20%_-10%,rgba(56,189,248,0.18),transparent_60%)]" />
+        <div className="pointer-events-none absolute inset-x-0 top-24 h-64 bg-[radial-gradient(circle_at_80%_-20%,rgba(79,70,229,0.18),transparent_55%)]" />
+        <div className="relative mx-auto flex w-full max-w-md flex-col gap-8 px-5 pb-20 pt-24">
+          <header className="rounded-3xl border border-white/10 bg-slate-900/70 px-6 py-6 shadow-[0_32px_60px_-36px_rgba(15,23,42,0.9)] backdrop-blur-xl">
+            <div className="flex items-start justify-between gap-4">
+              <div className="space-y-2">
+                <h1 className="text-[1.6rem] font-semibold leading-tight text-slate-50">
+                  {titleText}
+                </h1>
+                <p className="text-sm text-slate-300">{subtitleText}</p>
+              </div>
+              {summary.total > 0 && (
+                <span className="inline-flex items-center rounded-2xl border border-white/10 bg-white/10 px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.16em] text-sky-100">
+                  {summary.success}/{summary.total}
+                </span>
+              )}
             </div>
+            {summary.total > 0 && (
+              <dl className="mt-5 grid grid-cols-2 gap-3 text-[11px] text-slate-300">
+                <div className="rounded-2xl bg-white/5 px-3 py-2">
+                  <dt className="text-[10px] uppercase tracking-[0.18em] text-slate-400">
+                    {t('mobileAnalyze.processing.stat.pending', '대기')}
+                  </dt>
+                  <dd className="mt-1 text-lg font-semibold text-white">
+                    {summary.pending}
+                  </dd>
+                </div>
+                <div className="rounded-2xl bg-white/5 px-3 py-2">
+                  <dt className="text-[10px] uppercase tracking-[0.18em] text-slate-400">
+                    {t('mobileAnalyze.processing.stat.completed', '완료')}
+                  </dt>
+                  <dd className="mt-1 text-lg font-semibold text-white">
+                    {summary.success}
+                  </dd>
+                </div>
+                <div className="col-span-2 rounded-2xl bg-white/5 px-3 py-2">
+                  <dt className="text-[10px] uppercase tracking-[0.18em] text-slate-400">
+                    {t('mobileAnalyze.processing.stat.failed', '실패')}
+                  </dt>
+                  <dd className="mt-1 text-lg font-semibold text-white">
+                    {summary.failed}
+                  </dd>
+                </div>
+              </dl>
+            )}
           </header>
 
-          <div className="space-y-5">
+          <div className="flex flex-col gap-6">
             {analysisStates.map((entry) => {
               const rawProgress = typeof entry.progress === 'number' ? entry.progress : null;
               const percentValue =
@@ -342,18 +394,43 @@ export default function MobileAnalyzeResult() {
                         animate={{ opacity: 1, y: 0 }}
                         exit={{ opacity: 0, y: -12 }}
                         transition={{ duration: 0.35, ease: [0.4, 0, 0.2, 1] }}
-                        className="rounded-xl border border-rose-500/30 bg-rose-500/10 p-4 text-sm text-rose-100"
+                        className="relative overflow-hidden rounded-3xl border border-rose-500/40 bg-rose-950/40 px-5 py-6 text-sm text-rose-100 shadow-[0_32px_60px_-36px_rgba(127,29,29,0.55)] backdrop-blur-lg"
                       >
-                        <div className="flex items-center justify-between gap-3">
-                          <p className="font-semibold text-rose-100">{t('mobileAnalyze.processing.failed', '분석에 실패했어요.')}</p>
-                          <span className="text-[11px] text-rose-200/80 tracking-[0.14em] uppercase">
-                            ID&nbsp;<span className="font-mono">{shortId}</span>
-                          </span>
+                        <div className="absolute right-[-30%] top-[-10%] h-32 w-40 rounded-full bg-rose-500/30 blur-3xl" />
+                        <div className="relative flex flex-col gap-4">
+                          <div className="flex items-start justify-between gap-4">
+                            <div className="space-y-1">
+                              <p className="text-sm font-semibold text-rose-100">
+                                {t('mobileAnalyze.processing.failed', '분석에 실패했어요.')}
+                              </p>
+                              <p className="text-xs text-rose-200/80">{entry.error}</p>
+                            </div>
+                            <span className="inline-flex items-center rounded-full bg-rose-500/10 px-2 py-0.5 text-[11px] font-mono text-rose-100/80">
+                              #{shortId}
+                            </span>
+                          </div>
+                          <dl className="grid grid-cols-[minmax(4.5rem,auto),1fr] gap-x-4 gap-y-2 text-[11px] text-rose-200/80">
+                            {fileName && (
+                              <>
+                                <dt className="uppercase tracking-[0.18em] text-rose-200/70">
+                                  {t('mobileAnalyze.processing.fileLabel', '파일')}
+                                </dt>
+                                <dd className="truncate text-rose-100">{fileName}</dd>
+                              </>
+                            )}
+                            {modelKey && (
+                              <>
+                                <dt className="uppercase tracking-[0.18em] text-rose-200/70">
+                                  {t('mobileAnalyze.processing.modelLabel', '모델')}
+                                </dt>
+                                <dd className="text-rose-100">{modelKey}</dd>
+                              </>
+                            )}
+                          </dl>
+                          <p className="text-[11px] text-rose-200/70">
+                            {t('mobileAnalyze.processing.failedHint', '다시 시도하거나 PC 버전에서 분석을 진행해 주세요.')}
+                          </p>
                         </div>
-                        <p className="mt-1 text-xs text-rose-200/80">{entry.error}</p>
-                        <p className="mt-2 text-[11px] text-rose-200/70">
-                          {t('mobileAnalyze.processing.failedHint', '다시 시도하거나 PC 버전에서 분석을 진행해 주세요.')}
-                        </p>
                       </motion.section>
                     ) : entry.result ? (
                       <motion.div
@@ -363,6 +440,7 @@ export default function MobileAnalyzeResult() {
                         animate={{ opacity: 1, y: 0 }}
                         exit={{ opacity: 0, y: -12 }}
                         transition={{ duration: 0.45, ease: [0.4, 0, 0.2, 1] }}
+                        className="rounded-[34px] border border-white/5 bg-slate-900/40 p-[1px] shadow-[0_32px_60px_-36px_rgba(15,23,42,0.9)] backdrop-blur"
                       >
                         <MobileAnalysisReport jobId={entry.jobId} report={entry} t={t} />
                       </motion.div>
@@ -374,54 +452,62 @@ export default function MobileAnalyzeResult() {
                         animate={{ opacity: 1, y: 0 }}
                         exit={{ opacity: 0, y: -12 }}
                         transition={{ duration: 0.35, ease: [0.4, 0, 0.2, 1] }}
-                        className="relative overflow-hidden rounded-2xl border border-slate-800 bg-slate-900/60 p-5 backdrop-blur-xl ring-1 ring-white/5 shadow-[0_24px_60px_-28px_rgba(2,6,23,0.6)]"
+                        className="relative overflow-hidden rounded-3xl border border-white/10 bg-slate-900/60 px-5 py-6 shadow-[0_32px_60px_-36px_rgba(15,23,42,0.9)] backdrop-blur-xl"
                       >
                         <div className="pointer-events-none absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-sky-500/40 to-transparent" />
-                        <div className="flex flex-col gap-5">
-                          <div className="flex flex-col gap-2">
-                            <p className="text-sm font-semibold text-slate-100">
-                              {t('mobileAnalyze.processing.statusLabel', 'AI 흔적을 분석하는 중이에요')}
-                            </p>
-                            {fileName && (
-                              <p className="truncate text-xs text-slate-400">파일: {fileName}</p>
-                            )}
-                            {modelKey && (
-                              <span className="inline-flex items-center gap-1 self-start rounded-full border border-white/10 bg-white/5 px-2 py-0.5 text-[11px] uppercase tracking-[0.08em] text-sky-200">
-                                {modelKey}
+                        <div className="pointer-events-none absolute right-[-30%] top-[-40%] h-56 w-56 rounded-full bg-sky-500/20 blur-3xl" />
+                        <div className="relative flex flex-col gap-5">
+                          <div className="flex flex-wrap items-center justify-between gap-3">
+                            <div className="flex flex-wrap items-center gap-2">
+                              <span className="inline-flex items-center rounded-full bg-sky-500/15 px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.18em] text-sky-100">
+                                {t('mobileAnalyze.processing.badgePending', 'Processing')}
                               </span>
-                            )}
-                          </div>
-
-                          <div className="flex items-center justify-between">
-                            <span className="text-[11px] text-slate-500">
-                              ID&nbsp;<span className="font-mono text-slate-300">{shortId}</span>
-                            </span>
-                            <div className="ml-3 flex h-5 w-full max-w-[9rem] items-center justify-end overflow-hidden">
                               <LoadingMent stage={entry.stage} />
                             </div>
+                            <span className="inline-flex items-center rounded-full bg-white/5 px-2 py-0.5 text-[11px] font-mono text-slate-300">
+                              #{shortId}
+                            </span>
                           </div>
 
+                          <dl className="grid grid-cols-[minmax(4.5rem,auto),1fr] gap-x-4 gap-y-2 text-[11px] text-slate-400">
+                            <dt className="uppercase tracking-[0.18em] text-slate-500">
+                              {t('mobileAnalyze.processing.currentStageShort', '단계')}
+                            </dt>
+                            <dd className="font-medium text-slate-100">
+                              {resolveStageLabel(entry.stage, t)}
+                            </dd>
+                            <dt className="uppercase tracking-[0.18em] text-slate-500">
+                              {t('mobileAnalyze.processing.fileLabel', '파일')}
+                            </dt>
+                            <dd className="truncate text-slate-200">
+                              {fileName || t('mobileAnalyze.processing.unknownFile', '이름 없는 파일')}
+                            </dd>
+                            {modelKey && (
+                              <>
+                                <dt className="uppercase tracking-[0.18em] text-slate-500">
+                                  {t('mobileAnalyze.processing.modelLabel', '모델')}
+                                </dt>
+                                <dd className="text-sky-200">{modelKey}</dd>
+                              </>
+                            )}
+                          </dl>
+
                           {percentValue != null && (
-                            <div className="flex flex-col gap-2 text-[11px] text-slate-400">
-                              <div className="flex items-center justify-between text-slate-400">
+                            <div className="space-y-2 text-[11px] text-slate-400">
+                              <div className="flex items-center justify-between">
                                 <span>{t('mobileAnalyze.processing.progressLabel', '진행률')}</span>
-                                <span className="font-semibold text-slate-200">{Math.round(percentValue)}%</span>
+                                <span className="font-semibold text-slate-100">
+                                  {Math.round(percentValue)}%
+                                </span>
                               </div>
-                              <div className="h-1.5 w-full rounded-full bg-white/5">
+                              <div className="h-2 w-full rounded-full bg-white/5">
                                 <div
-                                  className="h-full rounded-full bg-gradient-to-r from-sky-400 via-blue-500 to-indigo-500 transition-all duration-500 shadow-[0_0_14px_0_rgba(56,189,248,0.35)]"
+                                  className="h-full rounded-full bg-gradient-to-r from-sky-400 via-blue-500 to-indigo-500 transition-[width] duration-500 ease-out shadow-[0_0_18px_rgba(59,130,246,0.55)]"
                                   style={{ width: `${progressWidth}%` }}
                                 />
                               </div>
                             </div>
                           )}
-
-                          <div className="rounded-2xl border border-slate-800 bg-slate-900/50 p-3 text-[11px] text-slate-400">
-                            <div className="flex items-center justify-between">
-                              <span className="text-slate-500">{t('mobileAnalyze.processing.currentStage', '현재 단계')}</span>
-                              <span className="font-medium text-slate-200">{resolveStageLabel(entry.stage, t)}</span>
-                            </div>
-                          </div>
                         </div>
                       </motion.section>
                     )}

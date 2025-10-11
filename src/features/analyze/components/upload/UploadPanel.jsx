@@ -179,7 +179,7 @@ export default function UploadPanel({
         setErrorOpen(false);
         setPendingResultPath(null);
         try {
-            const { jobIds, errors: uploadErrors } = await submitAnalyzeFiles(arr, {
+            const { jobIds, errors: uploadErrors, remainingQuota } = await submitAnalyzeFiles(arr, {
                 modelKey: selectedModelKey,
                 buildMeta: (file) => ({
                     name: file?.name,
@@ -207,8 +207,18 @@ export default function UploadPanel({
             setPendingResultPath(null);
             navigate(resultPath);
         } catch (e) {
-            const msg = e?.message || "분석 시작 중 오류가 발생했어요.";
-            setErrorMsgs([msg]);
+            const status = e?.status;
+            const code = e?.code;
+            if (status === 401) {
+                setErrorMsgs(["Login is required. Please sign in and try again."]);
+            } else if (status === 403 && code === "email_not_verified") {
+                setErrorMsgs(["Please verify your email address before running an analysis."]);
+            } else if (status === 429 || code === "quota_exhausted") {
+                setErrorMsgs(["Monthly analysis quota has been exhausted."]);
+            } else {
+                const msg = e?.message || "분석 시작 중 오류가 발생했어요.";
+                setErrorMsgs([msg]);
+            }
             setErrorOpen(true);
             setPendingResultPath(null);
         } finally {

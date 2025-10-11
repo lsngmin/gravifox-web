@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useRef, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useLocation, useNavigate, useParams } from 'react-router-dom';
 import { UploadCloud, ChevronRight, LifeBuoy } from 'lucide-react';
@@ -7,6 +7,10 @@ import Footer from '../features/footer/footer';
 import ErrorModal from '../features/analyze/components/ErrorModal';
 import { ANALYZE_MODEL_ENDPOINTS } from '../api/endPointRoute';
 import submitAnalyzeFiles from '../features/analyze/api/submitAnalyze';
+import { fetchQuotaSummary } from '../features/analyze/api/quotaSummary';
+import LoginRequiredModal from '../features/analyze/components/LoginRequiredModal';
+import { useAuth } from 'providers/authProvider';
+import { rememberAuthReturn, clearAuthReturn } from '../utils/authReturn';
 import {
   MAX_IMAGE_FILES,
   MAX_IMAGE_SIZE_BYTES,
@@ -96,10 +100,11 @@ function UploadActionTile({ icon: Icon, title, subtitle, accentClass, onClick })
 }
 
 export default function MobileAnalyzeUpload() {
-  const { t } = useTranslation('common');
+  const { t, i18n } = useTranslation('common');
   const navigate = useNavigate();
   const { lng } = useParams();
   const location = useLocation();
+  const { accessToken, userInfo } = useAuth();
 
   const [files, setFiles] = useState([]);
   const [errorOpen, setErrorOpen] = useState(false);
@@ -110,6 +115,10 @@ export default function MobileAnalyzeUpload() {
   const [loadingModels, setLoadingModels] = useState(true);
   const [submitting, setSubmitting] = useState(false);
   const [pendingResultPath, setPendingResultPath] = useState(null);
+  const [quotaSummary, setQuotaSummary] = useState(null);
+  const [loadingQuota, setLoadingQuota] = useState(false);
+  const [loginModalOpen, setLoginModalOpen] = useState(false);
+  const [awaitingEmailVerification, setAwaitingEmailVerification] = useState(null);
 
   const albumInputRef = useRef(null);
   const sampleAutoFillRef = useRef(false);
@@ -117,8 +126,116 @@ export default function MobileAnalyzeUpload() {
   const processingRoute = lng ? `/${lng}/analyze/result` : '/analyze/result';
   const supportRoute = lng ? `/${lng}/support` : '/support';
 
-  const sampleRequested = Boolean(location?.state?.sample);
+  const queryParams = useMemo(() => new URLSearchParams(location.search), [location.search]);
+  const localizedPath = useCallback((path) => {
+    const prefix = lng ? `/${lng}` : '';
+    if (path === '/' && prefix) {
+      return prefix;
+    }
+    return `${prefix}${path}`;
+  }, [lng]);
 
+  const sampleRequested = useMemo(() => {
+    if (location.state && location.state.sample) {
+      return true;
+    }
+    return queryParams.get('sample') === '1';
+  }, [location.state, queryParams]);
+
+  const quotaNumberFormatter = useMemo(
+    () => new Intl.NumberFormat(i18n?.language || undefined),
+    [i18n?.language]
+  );
+
+  const quotaPeriodLabel = useMemo(() => {
+    if (!quotaSummary?.periodStart || !quotaSummary?.periodEnd) return '';
+    try {
+      const start = new Date(quotaSummary.periodStart);
+      const endExclusive = new Date(quotaSummary.periodEnd);
+      if (!Number.isNaN(endExclusive.getTime())) {
+        endExclusive.setDate(endExclusive.getDate() - 1);
+      }
+      const formatter = new Intl.DateTimeFormat(i18n?.language || undefined, {
+        year: 'numeric',
+        month: '2-digit',
+        day: '2-digit',
+      });
+      return `${formatter.format(start)} ~ ${formatter.format(endExclusive)}`;
+    } catch (error) {
+      return '';
+    }
+  }, [quotaSummary, i18n?.language]);
+
+  const loadQuotaSummary = useCallback(async () => {
+    if (!accessToken) {
+      setQuotaSummary(null);
+      return;
+    }
+    setLoadingQuota(true);
+    try {
+      const summary = await fetchQuotaSummary();
+      setQuotaSummary(summary);
+    } catch (error) {
+      if (error?.status === 401) {
+        setQuotaSummary(null);
+      }
+    } finally {
+      setLoadingQuota(false);
+    }
+  }, [accessToken]);
+
+  useEffect(() => {
+    if (accessToken) {
+      loadQuotaSummary();
+    } else {
+      setQuotaSummary(null);
+    }
+  }, [accessToken, loadQuotaSummary]);
+
+  const ensureQuotaBeforeSubmit = useCallback(async () => {
+    if (!accessToken) {
+      rememberAuthReturn(location.pathname + location.search);
+      setLoginModalOpen(true);
+      setLoadingQuota(false);
+      return false;
+    }
+    setLoadingQuota(true);
+    try {
+      const summary = await fetchQuotaSummary();
+      setQuotaSummary(summary);
+
+      if (summary?.loginType === 'EMAIL' && !summary?.emailVerified) {
+        setAwaitingEmailVerification(userInfo?.userId || '');
+        setErrorMsgs([
+          t('mobileAnalyze.uploadPage.errors.emailNotVerified', '이메일 인증이 필요해요. 받은 메일함의 인증 링크를 확인해 주세요.'),
+        ]);
+        setErrorOpen(true);
+        return false;
+      }
+
+      if ((summary?.remaining ?? 0) <= 0) {
+        setErrorMsgs([
+          t('mobileAnalyze.uploadPage.errors.quotaExhausted', '이번 달 사용할 수 있는 분석 횟수를 모두 사용했어요.'),
+        ]);
+        setErrorOpen(true);
+        return false;
+      }
+      return true;
+    } catch (error) {
+      if (error?.status === 401) {
+        setLoginModalOpen(true);
+        return false;
+      }
+      setErrorMsgs([
+        error?.message ||
+          t('mobileAnalyze.uploadPage.errors.summaryFailed', '사용 가능 횟수를 확인하지 못했어요. 잠시 후 다시 시도해 주세요.'),
+      ]);
+      setErrorOpen(true);
+      return false;
+    } finally {
+      setLoadingQuota(false);
+    }
+  }, [t, userInfo]);
   useEffect(() => {
     let aborted = false;
     const loadModels = async () => {
@@ -290,13 +407,19 @@ export default function MobileAnalyzeUpload() {
 
   const handleAnalyze = async () => {
     if (!files.length || submitting) return;
+
+    const allowed = await ensureQuotaBeforeSubmit();
+    if (!allowed) {
+      return;
+    }
+
     setSubmitting(true);
     setErrorMsgs([]);
     setErrorOpen(false);
     setPendingResultPath(null);
     let stayOnPage = false;
     try {
-      const { jobIds, errors } = await submitAnalyzeFiles(files, {
+      const { jobIds, errors, remainingQuota } = await submitAnalyzeFiles(files, {
         modelKey,
         buildMeta: (file) => ({
           name: file?.name,
@@ -306,10 +429,23 @@ export default function MobileAnalyzeUpload() {
         }),
       });
 
+      if (typeof remainingQuota === 'number') {
+        setQuotaSummary((prev) =>
+          prev
+            ? {
+                ...prev,
+                remaining: remainingQuota,
+                used: Math.min(prev.limit - remainingQuota, prev.limit),
+              }
+            : prev
+        );
+      }
+
       if (!jobIds.length) {
-        const fallback = errors.length > 0
-          ? errors
-          : [t('mobileAnalyze.uploadPage.errors.submit', '분석을 시작할 수 없어요. 다시 시도해 주세요.')];
+        const fallback =
+          errors.length > 0
+            ? errors
+            : [t('mobileAnalyze.uploadPage.errors.submit', '분석을 시작할 수 없어요. 다시 시도해 주세요.')];
         setErrorMsgs(fallback);
         setErrorOpen(true);
         stayOnPage = true;
@@ -327,11 +463,26 @@ export default function MobileAnalyzeUpload() {
 
       navigate(resultUrl, { replace: true });
     } catch (err) {
-      const message = err?.message || t('mobileAnalyze.uploadPage.errors.submit', '분석 시작 중 오류가 발생했어요.');
-      setErrorMsgs([message]);
-      setErrorOpen(true);
-      setPendingResultPath(null);
       stayOnPage = true;
+      if (err?.status === 401) {
+        setLoginModalOpen(true);
+      } else if (err?.status === 403 && err?.code === 'email_not_verified') {
+        setAwaitingEmailVerification(userInfo?.userId || '');
+        setErrorMsgs([
+          t('mobileAnalyze.uploadPage.errors.emailNotVerified', '이메일 인증이 필요해요. 받은 메일함의 인증 링크를 확인해 주세요.'),
+        ]);
+        setErrorOpen(true);
+      } else if (err?.status === 429 || err?.code === 'quota_exhausted') {
+        setErrorMsgs([
+          t('mobileAnalyze.uploadPage.errors.quotaExhausted', '이번 달 사용할 수 있는 분석 횟수를 모두 사용했어요.'),
+        ]);
+        setErrorOpen(true);
+      } else {
+        const message = err?.message || t('mobileAnalyze.uploadPage.errors.submit', '분석 시작 중 오류가 발생했어요.');
+        setErrorMsgs([message]);
+        setErrorOpen(true);
+      }
+      setPendingResultPath(null);
     } finally {
       if (stayOnPage) {
         setSubmitting(false);
@@ -364,6 +515,34 @@ export default function MobileAnalyzeUpload() {
     untitled: t('mobileAnalyze.uploadPage.meta.untitled', '이름 없음'),
   };
 
+  const handleLoginSuccess = useCallback(async () => {
+    clearAuthReturn();
+    await loadQuotaSummary();
+  }, [loadQuotaSummary]);
+
+  const handleEmailVerificationNeeded = useCallback(
+    (email) => {
+      setAwaitingEmailVerification(email || '');
+      setErrorMsgs([
+        t('mobileAnalyze.uploadPage.errors.emailNotVerified', '이메일 인증이 필요해요. 받은 메일함의 인증 링크를 확인해 주세요.'),
+      ]);
+      setErrorOpen(true);
+    },
+    [t]
+  );
+
+  const handleNavigateSignup = useCallback(() => {
+    rememberAuthReturn(location.pathname + location.search);
+    setLoginModalOpen(false);
+    navigate(localizedPath('/agree'));
+  }, [localizedPath, location.pathname, location.search, navigate]);
+
+  const handleNavigateForgot = useCallback(() => {
+    rememberAuthReturn(location.pathname + location.search);
+    setLoginModalOpen(false);
+    navigate(localizedPath('/support'));
+  }, [localizedPath, location.pathname, location.search, navigate]);
+
   return (
     <div className="min-h-screen bg-slate-950 text-slate-100 flex flex-col">
       <Navigation variant="dark" />
@@ -390,6 +569,39 @@ export default function MobileAnalyzeUpload() {
                   </p>
                 </div>
               </header>
+
+              {loadingQuota && !quotaSummary && (
+                <div className="rounded-3xl border border-indigo-400/30 bg-indigo-500/12 px-4 py-4 text-[12px] text-indigo-100/80 shadow-[0_20px_40px_-28px_rgba(79,70,229,0.4)]">
+                  {t('mobileAnalyze.uploadPage.quota.loading', '사용 가능 횟수를 불러오는 중이에요…')}
+                </div>
+              )}
+
+              {quotaSummary && (
+                <div className="rounded-3xl border border-indigo-400/35 bg-indigo-500/12 px-4 py-4 text-indigo-100 shadow-[0_20px_40px_-28px_rgba(79,70,229,0.55)]">
+                  <p className="text-[11px] font-semibold uppercase tracking-[0.14em] text-indigo-200">
+                    {t('mobileAnalyze.uploadPage.quota.title', '이번 달 남은 분석')}
+                  </p>
+                  <p className="mt-2 text-2xl font-semibold text-white">
+                    {quotaNumberFormatter.format(quotaSummary.remaining)}
+                    <span className="ml-2 text-sm text-indigo-100/75">
+                      / {quotaNumberFormatter.format(quotaSummary.limit)}
+                    </span>
+                  </p>
+                  {quotaPeriodLabel && (
+                    <p className="mt-2 text-[11px] text-indigo-100/70">
+                      {t('mobileAnalyze.uploadPage.quota.period', {
+                        defaultValue: '집계 기간: {{period}}',
+                        period: quotaPeriodLabel,
+                      })}
+                    </p>
+                  )}
+                  {quotaSummary.loginType === 'EMAIL' && !quotaSummary.emailVerified && (
+                    <p className="mt-2 text-[11px] text-amber-200/80">
+                      {t('mobileAnalyze.uploadPage.quota.emailPending', '이메일 인증이 완료되면 바로 이용할 수 있어요.')}
+                    </p>
+                  )}
+                </div>
+              )}
 
               <section className="space-y-4">
                 <div className="px-1">
@@ -543,6 +755,16 @@ export default function MobileAnalyzeUpload() {
         }}
         title={t('mobileAnalyze.uploadPage.errors.title', '업로드 오류')}
         theme="dark"
+      />
+      <LoginRequiredModal
+        open={loginModalOpen}
+        onClose={() => setLoginModalOpen(false)}
+        onSuccess={handleLoginSuccess}
+        onNeedEmailVerification={handleEmailVerificationNeeded}
+        defaultEmail={awaitingEmailVerification || ''}
+        returnPath={location.pathname + location.search}
+        onNavigateSignup={handleNavigateSignup}
+        onNavigateForgot={handleNavigateForgot}
       />
     </div>
   );

@@ -96,6 +96,7 @@ export const PROFILE_ENDPOINTS = {
 export const ANALYZE_ENDPOINTS = {
     CREATE: `${API_BASE}/api/analyze`,
     SSE: (jobId) => `${API_BASE}/api/analyze/${jobId}/events`,
+    QUOTA_SUMMARY: `${API_BASE}/api/analyze/quota/summary`,
 };
 
 export const ANALYZE_MODEL_ENDPOINTS = {

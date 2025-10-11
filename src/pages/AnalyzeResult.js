@@ -28,6 +28,12 @@ const LOADING_MENTS = {
   ],
 };
 
+const STAGE_LABELS = {
+  ALIGN: "얼굴 정렬 중",
+  INFER: "추론 중",
+  POST: "결과 정리 중",
+};
+
 function pickMent(stage) {
   const pool = [
     ...(LOADING_MENTS[stage?.toUpperCase?.()] || []),
@@ -81,6 +87,18 @@ function LoadingMent({ stage }) {
       {text}
     </span>
   );
+}
+
+function resolveStageLabel(stage) {
+  if (!stage) return "진행 중";
+  const upper = typeof stage === "string" ? stage.toUpperCase() : stage;
+  return STAGE_LABELS[upper] || "진행 중";
+}
+
+function normalizeProgress(progress) {
+  if (typeof progress !== "number" || Number.isNaN(progress)) return null;
+  const pct = progress > 1 ? progress : progress * 100;
+  return Math.max(0, Math.min(100, Math.round(pct)));
 }
 
 export default function AnalyzeResult() {
@@ -190,108 +208,191 @@ export default function AnalyzeResult() {
   }, [jobIds, legacyJobId, legacyToken, search]);
 
   const ids = jobIds;
+  const statItems = [
+    { label: "총 요청", value: summary.total, accent: "text-white" },
+    { label: "진행 중", value: summary.running, accent: "text-indigo-100" },
+    { label: "완료", value: summary.done, accent: "text-emerald-100" },
+    { label: "실패", value: summary.failed, accent: "text-rose-100" },
+  ];
+  const formatNumber = (v) => {
+    if (typeof v !== "number" || Number.isNaN(v)) return "-";
+    return v.toLocaleString();
+  };
 
   return (
-    <div className="p-0">
+    <div className="flex min-h-screen flex-col bg-slate-100">
       <Navigation />
-      <div className="mx-auto mt-28 w-full max-w-6xl px-4 sm:mt-32 sm:px-6 lg:mt-36 lg:px-8">
-        <div className="mb-6 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-          <h1 className="text-2xl font-semibold text-slate-600">미디어 분석 완료</h1>
-          <div className="flex w-full flex-col gap-2 sm:w-auto sm:flex-row sm:items-center">
-            <button
-              type="button"
-              onClick={() => navigate("/analyze")}
-              className="inline-flex w-full items-center justify-center rounded-md border border-slate-200 bg-white px-3.5 py-2 text-sm font-semibold text-slate-700 transition hover:bg-slate-50 sm:w-auto"
-            >
-              돌아가기
-            </button>
-            <button
-              type="button"
-              onClick={() => window.print()}
-              className="inline-flex w-full items-center justify-center rounded-md bg-indigo-600 px-3.5 py-2 text-sm font-semibold text-white shadow-sm transition hover:bg-indigo-700 sm:w-auto"
-            >
-              PDF로 저장
-            </button>
-          </div>
-        </div>
-
-        {summary.total > 0 && (
-          <div className="mb-6">
-            <div className="mx-auto flex w-full max-w-5xl flex-col gap-3 rounded-xl border border-slate-200 bg-white p-4 text-sm sm:flex-row sm:items-center">
-              <div className="flex flex-wrap items-center gap-2">
-                <span className="rounded-md bg-slate-100 px-2 py-1 text-slate-700">총 {summary.total}</span>
-                <span className="rounded-md bg-indigo-50 px-2 py-1 text-indigo-700">진행 {summary.running}</span>
-                <span className="rounded-md bg-emerald-50 px-2 py-1 text-emerald-700">완료 {summary.done}</span>
-                <span className="rounded-md bg-rose-50 px-2 py-1 text-rose-700">실패 {summary.failed}</span>
-              </div>
-              <div className="flex w-full items-center gap-2 sm:ml-auto sm:w-auto">
-                <div className="h-2 w-full overflow-hidden rounded-full bg-slate-100 sm:w-40">
-                  <div className="h-2 rounded-full transition-all" style={{ width: `${summary.pct}%`, background: 'var(--brand)' }} />
+      <main className="flex-1">
+        <section className="relative overflow-hidden bg-gradient-to-br from-slate-950 via-slate-900 to-indigo-900 text-slate-100">
+          <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_top_left,rgba(99,102,241,0.28),transparent_60%)]" aria-hidden />
+          <div className="pointer-events-none absolute inset-x-0 bottom-0 h-32 bg-gradient-to-t from-slate-900/60 via-transparent" aria-hidden />
+          <div className="relative z-10 mx-auto w-full max-w-6xl px-5 py-16 sm:px-6 lg:px-8 lg:py-20">
+            <div className="flex flex-col gap-10 lg:flex-row lg:items-end">
+              <div className="flex-1">
+                <span className="inline-flex items-center rounded-full border border-white/10 bg-white/10 px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.18em] text-slate-200">
+                  Analyze Result
+                </span>
+                <h1 className="mt-4 text-3xl font-semibold tracking-tight text-white sm:text-4xl">
+                  미디어 분석 리포트가 준비됐어요
+                </h1>
+                <p className="mt-4 max-w-2xl text-sm text-slate-300 sm:text-base">
+                  업로드한 미디어에 대한 판정과 핵심 지표를 한눈에 확인해 보세요. 필요한 경우 PDF로 저장하거나 추가 분석을 바로 진행할 수 있어요.
+                </p>
+                <div className="mt-8 flex flex-wrap items-center gap-3">
+                  <button
+                    type="button"
+                    onClick={() => navigate("/analyze")}
+                    className="inline-flex items-center justify-center rounded-full border border-white/20 bg-white/5 px-5 py-2 text-sm font-semibold text-slate-100 transition hover:border-white/40 hover:bg-white/10"
+                  >
+                    돌아가기
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => window.print()}
+                    className="inline-flex items-center justify-center rounded-full bg-white px-5 py-2 text-sm font-semibold text-slate-900 shadow-lg shadow-slate-900/20 transition hover:bg-slate-100"
+                  >
+                    PDF로 저장
+                  </button>
                 </div>
-                <span className="text-slate-600">{summary.pct}%</span>
               </div>
+              {summary.total > 0 && (
+                <div className="w-full max-w-sm rounded-2xl border border-white/10 bg-white/10 p-5 shadow-xl shadow-black/10 backdrop-blur-sm">
+                  <div className="flex items-center justify-between text-xs font-semibold uppercase tracking-wide text-slate-200">
+                    <span>전체 진행률</span>
+                    <span>{summary.pct}%</span>
+                  </div>
+                  <div className="mt-3 h-2 w-full overflow-hidden rounded-full bg-white/10">
+                    <div
+                      className="h-full rounded-full bg-gradient-to-r from-indigo-400 via-sky-400 to-emerald-300 transition-all duration-500"
+                      style={{ width: `${summary.pct}%` }}
+                    />
+                  </div>
+                  <p className="mt-4 text-xs text-slate-300">
+                    {summary.done > 0 ? `완료 ${summary.done.toLocaleString()}건, 진행 ${summary.running.toLocaleString()}건, 실패 ${summary.failed.toLocaleString()}건` : "분석이 진행 중이에요."}
+                  </p>
+                </div>
+              )}
             </div>
-            {/* <HelpTips variant="D" /> */}
+
+            {summary.total > 0 && (
+              <div className="mt-10 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+                {statItems.map((item) => (
+                  <div
+                    key={item.label}
+                    className="group relative overflow-hidden rounded-2xl border border-white/10 bg-white/[0.08] p-5 shadow-lg shadow-slate-950/5 backdrop-blur"
+                  >
+                    <div className="absolute inset-0 translate-y-8 scale-[1.15] bg-[radial-gradient(circle_at_top,rgba(255,255,255,0.16),transparent_55%)] opacity-0 transition duration-500 group-hover:translate-y-0 group-hover:opacity-100" aria-hidden />
+                    <div className="relative z-10 flex flex-col">
+                      <span className="text-xs font-medium uppercase tracking-[0.14em] text-slate-300">{item.label}</span>
+                      <span className={`mt-3 text-2xl font-semibold ${item.accent}`}>
+                        {formatNumber(item.value)}
+                      </span>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
           </div>
-        )}
+        </section>
 
-        {ids.length > 0 && (
-          <div className="space-y-4">
-            {ids.map((jid) => {
-              const r = reports[jid] || {};
+        <section className="relative z-10 -mt-10 pb-16 sm:-mt-14 sm:pb-24">
+          <div className="mx-auto w-full max-w-6xl px-5 sm:px-6 lg:px-8">
+            {ids.length > 0 && (
+              <div className="grid gap-6">
+                {ids.map((jid) => {
+                  const r = reports[jid] || {};
+                  const progressPct = normalizeProgress(r.progress);
+                  const stageLabel = resolveStageLabel(r.stage);
 
-              // 완료: 리포트 카드만 표시
-              if (r.result) {
-                return (
-                  <div key={jid}>
-                    <AnalysisReport ref={reportRef} data={r.result} mediaMeta={r.fileMeta} />
-                  </div>
-                );
-              }
+                  if (r.result) {
+                    return (
+                      <div key={jid} className="relative">
+                        <AnalysisReport ref={reportRef} data={r.result} mediaMeta={r.fileMeta} />
+                      </div>
+                    );
+                  }
 
-              // 실패: 에러만 간결히 표시
-              if (r.error) {
-                return (
-                  <div key={jid} className="mx-auto w-full max-w-5xl rounded-xl border border-rose-200 bg-rose-50 p-4 text-sm text-rose-700">
-                    {r.error}
-                  </div>
-                );
-              }
+                  if (r.error) {
+                    return (
+                      <div
+                        key={jid}
+                        className="overflow-hidden rounded-2xl border border-rose-200 bg-white p-6 text-sm text-rose-700 shadow-sm shadow-rose-200/50"
+                      >
+                        <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+                          <div className="text-base font-semibold text-rose-600">분석 실패</div>
+                          {r.fileMeta?.name && (
+                            <div className="truncate text-xs font-medium text-rose-500/80">파일명 · {r.fileMeta.name}</div>
+                          )}
+                        </div>
+                        <p className="mt-3 leading-relaxed text-rose-600">{r.error}</p>
+                      </div>
+                    );
+                  }
 
-              // 진행 중: 파일명 + 우측 멘트(헤더 내부 중앙 정렬)
-              return (
-                <div key={jid} className="mx-auto w-full max-w-5xl rounded-xl border border-slate-200 bg-white p-5">
-                  <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-                    <div className="min-w-0">
-                      {r.fileMeta?.name && (
-                        <p className="truncate text-sm font-medium text-slate-800">파일: {r.fileMeta.name}</p>
+                  return (
+                    <div
+                      key={jid}
+                      className="overflow-hidden rounded-2xl border border-slate-200 bg-white p-6 shadow-sm shadow-slate-200/60 transition hover:border-indigo-200 hover:shadow-lg"
+                    >
+                      <div className="flex flex-col gap-5 lg:flex-row lg:items-center lg:justify-between">
+                        <div className="min-w-0">
+                          <p className="text-xs font-medium uppercase tracking-[0.18em] text-slate-400">분석 진행 중</p>
+                          {r.fileMeta?.name && (
+                            <p className="mt-2 truncate text-base font-semibold text-slate-900" title={r.fileMeta.name}>
+                              {r.fileMeta.name}
+                            </p>
+                          )}
+                          <p className="mt-1 text-sm text-slate-500">{stageLabel}</p>
+                        </div>
+                        <div className="flex flex-col items-start gap-3 text-sm text-indigo-600 sm:flex-row sm:items-center sm:gap-4">
+                          <LoadingMent stage={r.stage} />
+                          <span className="rounded-full border border-indigo-100 bg-indigo-50 px-3 py-1 text-xs font-medium text-indigo-600">
+                            {r.connected ? "실시간 연결" : "연결 대기"}
+                          </span>
+                        </div>
+                      </div>
+                      {progressPct !== null && (
+                        <div className="mt-5">
+                          <div className="flex items-center justify-between text-xs font-medium text-slate-500">
+                            <span>진행률</span>
+                            <span className="text-slate-700">{progressPct}%</span>
+                          </div>
+                          <div className="mt-2 h-1.5 w-full overflow-hidden rounded-full bg-slate-100">
+                            <div
+                              className="h-full rounded-full bg-gradient-to-r from-indigo-500 via-sky-500 to-emerald-400 transition-all duration-500"
+                              style={{ width: `${progressPct}%` }}
+                            />
+                          </div>
+                        </div>
                       )}
                     </div>
-                    <div className="mt-1 flex h-6 w-full items-center justify-center overflow-hidden text-center sm:mt-0 sm:w-48 sm:justify-end sm:text-right">
-                      <LoadingMent stage={r.stage} />
-                    </div>
-                  </div>
-                </div>
-              );
-            })}
-          </div>
-        )}
+                  );
+                })}
+              </div>
+            )}
 
-        {ids.length === 0 && (
-          <div className="mt-6 rounded-md border border-slate-200 bg-white p-6 text-sm text-slate-700">
-            <p className="text-sm text-slate-700">유효한 분석 세션이 없어요. 파일을 업로드하고 분석을 시작해주세요.</p>
-            <div className="mt-4 flex flex-col gap-2 sm:flex-row sm:items-center">
-              <button
-                type="button"
-                onClick={() => navigate("/analyze")}
-                className="inline-flex w-full items-center justify-center rounded-md border border-slate-200 bg-white px-3.5 py-2 text-sm font-semibold text-slate-700 transition hover:bg-slate-50 sm:w-auto"
-              >
-                업로드 페이지로 이동
-              </button>
-            </div>
+            {ids.length === 0 && (
+              <div className="mt-10 overflow-hidden rounded-2xl border border-slate-200 bg-white p-8 shadow-sm shadow-slate-200/60">
+                <div className="max-w-xl">
+                  <h2 className="text-lg font-semibold text-slate-900">분석 내역이 없어요</h2>
+                  <p className="mt-2 text-sm text-slate-600">
+                    유효한 분석 세션을 찾지 못했어요. 새 미디어를 업로드하고 분석을 시작해 주세요.
+                  </p>
+                </div>
+                <div className="mt-6 flex flex-wrap gap-3">
+                  <button
+                    type="button"
+                    onClick={() => navigate("/analyze")}
+                    className="inline-flex items-center justify-center rounded-full border border-slate-200 bg-white px-5 py-2 text-sm font-semibold text-slate-700 transition hover:border-indigo-200 hover:text-indigo-600"
+                  >
+                    업로드 페이지로 이동
+                  </button>
+                </div>
+              </div>
+            )}
           </div>
-        )}
-      </div>
+        </section>
+      </main>
       <Footer />
     </div>
   );

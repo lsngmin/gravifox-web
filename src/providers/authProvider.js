@@ -5,6 +5,7 @@ import { setHttpAccessToken, setHttpHandlers } from "../api/http";
 import { isTokenValid, getExpiryMs, decodeJwt } from "../utils/jwt";
 import { AUTH_ENDPOINTS, PROFILE_ENDPOINTS } from "../api/endPointRoute";
 import { getProfileCache, setProfileCache, clearProfileCache } from "../utils/profileCache";
+import { getAuthReturn, clearAuthReturn } from "../utils/authReturn";
 
 const BOOTSTRAP_TIMEOUT_MS = 15000;
 
@@ -42,6 +43,7 @@ export const AuthProvider = ({ children }) => {
     const [bootstrapKey, setBootstrapKey] = useState(0);
     const [autoRefreshEnabled, setAutoRefreshEnabled] = useState(true);
     const unauthorizedCountRef = useRef(0);
+    const oauthRedirectHandledRef = useRef(false);
 
     const clearSession = useCallback(() => {
         setAccessTokenState(null);
@@ -204,6 +206,25 @@ export const AuthProvider = ({ children }) => {
         }, delay);
         return () => clearTimeout(id);
     }, [accessToken, clearSession, updateAccessToken]);
+
+    useEffect(() => {
+        if (!accessToken) {
+            oauthRedirectHandledRef.current = false;
+            return;
+        }
+        if (oauthRedirectHandledRef.current || isChecking || isLoading) {
+            return;
+        }
+        const { path } = getAuthReturn();
+        if (path) {
+            oauthRedirectHandledRef.current = true;
+            clearAuthReturn();
+            const current = `${window.location.pathname}${window.location.search}`;
+            if (current !== path) {
+                window.location.replace(path);
+            }
+        }
+    }, [accessToken, isChecking, isLoading]);
     const retryBootstrap = () => {
         setIsChecking(true);
         setIsLoading(true);
