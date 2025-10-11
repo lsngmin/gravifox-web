@@ -1,17 +1,5 @@
 // Base URLs (with fallback for legacy key)
-const DEFAULT_API_BASE = "https://api.gravifox.com";
-
-const resolveApiBase = () => {
-    const raw =
-        process.env.REACT_APP_API_BASE ||
-        process.env.REACT_APP_API_BASE_URL ||
-        "";
-    const trimmed = typeof raw === "string" ? raw.trim() : "";
-    const base = trimmed || DEFAULT_API_BASE;
-    return base.replace(/\/+$/, "");
-};
-
-export const API_BASE = resolveApiBase();
+export const API_BASE = process.env.REACT_APP_API_BASE || process.env.REACT_APP_API_BASE_URL;
 
 const resolveFastApiBase = () => {
     const raw = (process.env.REACT_APP_FASTAPI_BASE || "117.17.149.66").trim();
