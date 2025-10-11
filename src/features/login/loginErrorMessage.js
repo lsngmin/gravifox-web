@@ -1,41 +1,50 @@
-import React from "react";
+import React from 'react';
 
-export default function LoginErrorMessage({status, message, onClose}) {
-    // 상태코드와 메세지 모두 존재하지 않으면 메세지가 없는 것으로 판단
+export default function LoginErrorMessage({ status, message, onClose }) {
     if (!status && !message) return null;
-    // 메세지의 목록 입니다. Http 상태코드와 그에 상응하는 Messaged
+
     const messages = {
         422: "Oops! Something doesn’t match.",
-        401: "Invalid credentials.",
+        401: 'Invalid credentials.',
         400: "Something doesn’t match.",
-        default: "Unexpected error occurred.",
+        default: 'Unexpected error occurred.',
     };
-    // 메세지의 우선순위입니다
+
     const displayMessage = message || messages[status] || messages.default;
 
     return (
-        <div id="alert-2"
-             className="flex items-center p-4 mb-4 text-red-800 rounded-lg bg-red-50 dark:bg-gray-800 dark:text-red-400"
-             role="alert">
-            <svg className="shrink-0 w-4 h-4" aria-hidden="true" xmlns="http://www.w3.org/2000/svg"
-                 fill="currentColor" viewBox="0 0 20 20">
-                <path
-                    d="M10 .5a9.5 9.5 0 1 0 9.5 9.5A9.51 9.51 0 0 0 10 .5ZM9.5 4a1.5 1.5 0 1 1 0 3 1.5 1.5 0 0 1 0-3ZM12 15H8a1 1 0 0 1 0-2h1v-3H8a1 1 0 0 1 0-2h2a1 1 0 0 1 1 1v4h1a1 1 0 0 1 0 2Z"/>
+        <div
+            id="login-error-message"
+            role="alert"
+            aria-live="assertive"
+            className="mt-4 flex items-start gap-3 rounded-2xl border border-red-400/30 bg-red-500/10 px-4 py-3 text-sm text-red-100 shadow-[0_20px_40px_-24px_rgba(248,113,113,0.6)] backdrop-blur-sm"
+        >
+            <svg
+                className="mt-0.5 h-4 w-4 flex-none"
+                aria-hidden="true"
+                xmlns="http://www.w3.org/2000/svg"
+                fill="currentColor"
+                viewBox="0 0 20 20"
+            >
+                <path d="M10 .5a9.5 9.5 0 1 0 9.5 9.5A9.51 9.51 0 0 0 10 .5ZM9.5 4a1.5 1.5 0 1 1 0 3 1.5 1.5 0 0 1 0-3ZM12 15H8a1 1 0 0 1 0-2h1v-3H8a1 1 0 0 1 0-2h2a1 1 0 0 1 1 1v4h1a1 1 0 0 1 0 2Z" />
             </svg>
-            <span className="sr-only">Info</span>
-            <div className="ms-3 text-sm font-medium">
-                {displayMessage}
-            </div>
-            <button type="button"
-                    className="ms-auto -mx-1.5 -my-1.5 bg-red-50 text-red-500 rounded-lg focus:ring-2 focus:ring-red-400 p-1.5 hover:bg-red-200 inline-flex items-center justify-center h-8 w-8 dark:bg-gray-800 dark:text-red-400 dark:hover:bg-gray-700"
-                    data-dismiss-target="#alert-2" aria-label="Close" onClick={onClose}>
-                <span className="sr-only">Close</span>
-                <svg className="w-3 h-3" aria-hidden="true" xmlns="http://www.w3.org/2000/svg"
-                     fill="none" viewBox="0 0 14 14">
-                    <path stroke="currentColor" strokeLinecap="round" strokeLinejoin="round"
-                          strokeWidth="2" d="m1 1 6 6m0 0 6 6M7 7l6-6M7 7l-6 6"/>
+            <div className="flex-1 font-medium leading-snug text-red-100/90">{displayMessage}</div>
+            <button
+                type="button"
+                onClick={onClose}
+                aria-label="Close"
+                className="-m-1 inline-flex size-8 items-center justify-center rounded-xl border border-red-400/50 bg-red-500/20 text-red-50 transition hover:bg-red-500/30 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-red-200/60 focus-visible:ring-offset-2 focus-visible:ring-offset-slate-900"
+            >
+                <svg
+                    className="size-3.5"
+                    aria-hidden="true"
+                    xmlns="http://www.w3.org/2000/svg"
+                    fill="none"
+                    viewBox="0 0 14 14"
+                >
+                    <path stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="m1 1 6 6m0 0 6 6M7 7l6-6M7 7l-6 6" />
                 </svg>
             </button>
         </div>
-    )
+    );
 }

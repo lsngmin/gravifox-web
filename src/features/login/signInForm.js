@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useMemo, useState } from "react";
 
 import LoginErrorMessage from "features/login/loginErrorMessage";
 import SignInAPI from "features/login/api/signInAPI";
@@ -61,8 +61,15 @@ export default function SignInForm() {
             ...prev,
             [field]: event.target.value,
         }));
-        // 이전에 발생한 에러 메시지를 초기화하여, 폼을 다시 제출할 때 중복된 에러 메시지가 표시되지 않도록 합니다.
     };
+
+    const fieldsetClass =
+        'space-y-2 rounded-2xl border border-slate-800/80 bg-slate-900/40 px-4 py-4 shadow-[0_16px_36px_-24px_rgba(15,23,42,0.65)] transition hover:border-slate-600/60 focus-within:border-indigo-300/60 focus-within:shadow-[0_20px_40px_-26px_rgba(99,102,241,0.45)]';
+    const labelClass = 'block text-sm font-semibold text-slate-200';
+    const inputClass =
+        'mt-1 block w-full rounded-xl border border-slate-700/80 bg-slate-900/60 px-4 py-3 text-sm font-medium text-slate-100 placeholder-slate-500 outline-none transition focus:border-indigo-300/70 focus:ring-2 focus:ring-indigo-400/30 focus:ring-offset-2 focus:ring-offset-slate-950';
+
+    const errorMessageId = useMemo(() => (errorStatus || errorMessage ? 'login-error-message' : undefined), [errorStatus, errorMessage]);
 
     return (
         <div className="mx-auto w-full max-w-sm rounded-3xl border border-slate-800 bg-slate-900/70 px-6 py-10 text-slate-100 shadow-[0_24px_48px_-24px_rgba(15,23,42,0.8)] sm:px-8">
@@ -70,29 +77,39 @@ export default function SignInForm() {
                 <h2 className="text-2xl font-semibold tracking-tight">계정으로 로그인</h2>
                 <p className="text-sm text-slate-400">로그인하면 바로 이용할 수 있어요.</p>
             </div>
-            <form onSubmit={handleSubmit} className="mt-8 space-y-5">
-                <div className="space-y-2">
-                    <label htmlFor="userId" className="block text-sm font-medium text-slate-300">
+            <form onSubmit={handleSubmit} className="mt-8 space-y-5" noValidate>
+                <fieldset className={fieldsetClass}>
+                    <legend className="sr-only">로그인 정보</legend>
+                    <label htmlFor="userId" className={labelClass}>
                         이메일
                     </label>
                     <input
                         id="userId"
                         name="userId"
-                        type="text"
+                        type="email"
+                        inputMode="email"
                         autoComplete="email"
                         value={formState.userId}
-                        onChange={handleInputChange("userId")}
+                        onChange={handleInputChange('userId')}
                         placeholder="you@example.com"
-                        className="block w-full rounded-xl border border-slate-700 bg-slate-900/60 px-4 py-3 text-sm font-medium text-slate-100 placeholder-slate-500 outline-none transition focus:border-indigo-400/70 focus:ring-2 focus:ring-indigo-400/20"
+                        className={inputClass}
+                        aria-describedby={errorMessageId}
+                        aria-invalid={Boolean(errorStatus)}
+                        required
+                        autoFocus
                     />
-                </div>
+                </fieldset>
 
-                <div className="space-y-2">
+                <fieldset className={fieldsetClass}>
+                    <legend className="sr-only">비밀번호 정보</legend>
                     <div className="flex items-center justify-between">
-                        <label htmlFor="password" className="block text-sm font-medium text-slate-300">
+                        <label htmlFor="password" className={labelClass}>
                             비밀번호
                         </label>
-                        <Link to={localizedPath("/support")} className="text-xs font-semibold text-indigo-300 transition hover:text-indigo-200">
+                        <Link
+                            to={localizedPath('/support')}
+                            className="text-xs font-semibold text-indigo-300 transition hover:text-indigo-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-indigo-200/80 focus-visible:ring-offset-2 focus-visible:ring-offset-slate-900 rounded-full px-2 py-1"
+                        >
                             비밀번호 찾기
                         </Link>
                     </div>
@@ -102,15 +119,20 @@ export default function SignInForm() {
                         type="password"
                         autoComplete="current-password"
                         value={formState.password}
-                        onChange={handleInputChange("password")}
+                        onChange={handleInputChange('password')}
                         placeholder="••••••••"
-                        className="block w-full rounded-xl border border-slate-700 bg-slate-900/60 px-4 py-3 text-sm font-medium text-slate-100 placeholder-slate-500 outline-none transition focus:border-indigo-400/70 focus:ring-2 focus:ring-indigo-400/20"
+                        className={inputClass}
+                        aria-describedby={errorMessageId}
+                        aria-invalid={Boolean(errorStatus)}
+                        required
+                        minLength={8}
                     />
-                </div>
+                </fieldset>
 
                 <button
                     type="submit"
-                    className="flex w-full justify-center rounded-xl bg-gradient-to-r from-indigo-500 via-indigo-400 to-sky-400 px-4 py-3 text-sm font-semibold text-white shadow-[0_18px_36px_-22px_rgba(59,130,246,0.55)] transition active:scale-[0.99]"
+                    className="flex w-full justify-center rounded-xl bg-gradient-to-r from-indigo-500 via-indigo-400 to-sky-400 px-4 py-3 text-sm font-semibold text-white shadow-[0_18px_36px_-22px_rgba(59,130,246,0.55)] transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-indigo-200/80 focus-visible:ring-offset-2 focus-visible:ring-offset-slate-900 active:scale-[0.99]"
+                    aria-describedby={errorMessageId}
                 >
                     로그인
                 </button>
@@ -127,10 +149,12 @@ export default function SignInForm() {
                 </div>
             </form>
 
-            <div className="relative mt-8 flex items-center">
-                <span className="h-px flex-1 bg-slate-800" />
-                <span className="px-3 text-xs font-semibold tracking-[0.25em] text-slate-500">OR</span>
-                <span className="h-px flex-1 bg-slate-800" />
+            <div className="relative mt-8 flex items-center" role="presentation">
+                <span className="h-px flex-1 bg-slate-800" aria-hidden="true" />
+                <span className="px-3 text-xs font-semibold tracking-[0.25em] text-slate-500" aria-hidden="true">
+                    OR
+                </span>
+                <span className="h-px flex-1 bg-slate-800" aria-hidden="true" />
             </div>
 
             <div className="mt-6">
@@ -139,7 +163,11 @@ export default function SignInForm() {
 
             <p className="mt-8 text-center text-sm text-slate-400">
                 아직 멤버가 아니신가요?{' '}
-                <button className="font-semibold text-indigo-300 transition hover:text-indigo-200" onClick={handleChangeForm}>
+                <button
+                    type="button"
+                    className="font-semibold text-indigo-300 transition hover:text-indigo-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-indigo-200/70 focus-visible:ring-offset-2 focus-visible:ring-offset-slate-900"
+                    onClick={handleChangeForm}
+                >
                     가입하기
                 </button>
             </p>
