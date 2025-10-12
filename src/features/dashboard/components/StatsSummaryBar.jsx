@@ -1,4 +1,5 @@
 import React, { useEffect, useMemo } from "react";
+import { parseStoredReport } from "../../../utils/reportStorage";
 
 function readLocalReports() {
   try {
@@ -9,10 +10,12 @@ function readLocalReports() {
       const jobId = key.replace("sse:report:", "");
       try {
         const raw = sessionStorage.getItem(key);
-        const data = raw ? JSON.parse(raw) : null;
-        let meta = null;
-        try { const m = sessionStorage.getItem(`sse:meta:${jobId}`); meta = m ? JSON.parse(m) : null; } catch {}
-        if (data && jobId) items.push({ jobId, data, meta });
+        const stored = parseStoredReport(raw);
+        let meta = stored.fileMeta;
+        if (!meta) {
+          try { const m = sessionStorage.getItem(`sse:meta:${jobId}`); meta = m ? JSON.parse(m) : null; } catch {}
+        }
+        if (stored.result && jobId) items.push({ jobId, data: stored.result, meta, storedAt: stored.storedAt || null });
       } catch {}
     }
     return items;

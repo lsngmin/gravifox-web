@@ -10,6 +10,7 @@ import submitAnalyzeFiles from '../features/analyze/api/submitAnalyze';
 import { fetchQuotaSummary } from '../features/analyze/api/quotaSummary';
 import LoginRequiredModal from '../features/analyze/components/LoginRequiredModal';
 import { useAuth } from 'providers/authProvider';
+import { readFileAsDataURL } from '../utils/filePreview';
 import {
   rememberReturnCheckpoint,
   clearReturnCheckpoint,
@@ -428,12 +429,19 @@ export default function MobileAnalyzeUpload() {
     try {
       const { jobIds, errors, remainingQuota } = await submitAnalyzeFiles(files, {
         modelKey,
-        buildMeta: (file) => ({
-          name: file?.name,
-          size: file?.size,
-          type: file?.type,
-          modelKey,
-        }),
+        buildMeta: async (file) => {
+          const base = {
+            name: file?.name,
+            size: file?.size,
+            type: file?.type,
+            modelKey,
+          };
+          const preview = await readFileAsDataURL(file);
+          if (preview) {
+            base.previewDataUrl = preview;
+          }
+          return base;
+        },
       });
 
       if (typeof remainingQuota === 'number') {
