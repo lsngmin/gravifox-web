@@ -127,8 +127,13 @@ export async function submitAnalyzeFiles(files, {
                 };
                 if (typeof buildMeta === "function") {
                     try {
-                        const extraMeta = buildMeta(file, analyzeJson) || {};
-                        Object.assign(baseMeta, extraMeta);
+                        const extraMetaMaybe = buildMeta(file, analyzeJson);
+                        const extraMeta = extraMetaMaybe && typeof extraMetaMaybe.then === "function"
+                            ? await extraMetaMaybe
+                            : extraMetaMaybe;
+                        if (extraMeta && typeof extraMeta === "object") {
+                            Object.assign(baseMeta, extraMeta);
+                        }
                     } catch {}
                 }
                 sessionStorage.setItem(`sse:meta:${jobId}`, JSON.stringify(baseMeta));

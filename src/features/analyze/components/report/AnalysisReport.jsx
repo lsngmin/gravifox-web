@@ -274,18 +274,30 @@ const AnalysisReport = forwardRef(function AnalysisReport({ data, mediaMeta }, r
 
         {mediaMeta && (
           <div className="mt-4 rounded-xl border border-slate-200 p-4">
-            <div className="grid grid-cols-1 gap-3 sm:grid-cols-3">
-              <div>
-                <p className="text-xs text-slate-500">파일명</p>
-                <p className="truncate text-sm font-medium text-slate-800">{mediaMeta?.name || '-'}</p>
-              </div>
-              <div>
-                <p className="text-xs text-slate-500">타입</p>
-                <p className="text-sm font-medium text-slate-800">{mediaMeta?.type || '-'}</p>
-              </div>
-              <div>
-                <p className="text-xs text-slate-500">크기</p>
-                <p className="text-sm font-medium text-slate-800">{prettyBytes(mediaMeta?.size)}</p>
+            <div className="flex flex-col gap-4 sm:flex-row">
+              {mediaMeta?.previewDataUrl && (
+                <div className="w-full max-w-[220px] overflow-hidden rounded-lg border border-slate-200 bg-slate-50">
+                  <img
+                    src={mediaMeta.previewDataUrl}
+                    alt={mediaMeta?.name ? `${mediaMeta.name} 미리보기` : '업로드한 미디어 미리보기'}
+                    className="block h-full w-full object-contain bg-white"
+                    loading="lazy"
+                  />
+                </div>
+              )}
+              <div className="grid flex-1 grid-cols-1 gap-3 sm:grid-cols-3">
+                <div>
+                  <p className="text-xs text-slate-500">파일명</p>
+                  <p className="truncate text-sm font-medium text-slate-800">{mediaMeta?.name || '-'}</p>
+                </div>
+                <div>
+                  <p className="text-xs text-slate-500">타입</p>
+                  <p className="text-sm font-medium text-slate-800">{mediaMeta?.type || '-'}</p>
+                </div>
+                <div>
+                  <p className="text-xs text-slate-500">크기</p>
+                  <p className="text-sm font-medium text-slate-800">{prettyBytes(mediaMeta?.size)}</p>
+                </div>
               </div>
             </div>
           </div>

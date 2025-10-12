@@ -9,6 +9,7 @@ import FilePreviewCard from "./FilePreviewCard";
 import MobileFilePreviewItem from "../mobile/MobileFilePreviewItem";
 import UploadMoreNote from "./UploadMoreNote";
 import ErrorModal from "../ErrorModal";
+import { readFileAsDataURL } from "../../../../utils/filePreview";
 
 const MAX_IMAGE_FILES = 3;
 const MAX_VIDEO_FILES = 2;
@@ -181,11 +182,18 @@ export default function UploadPanel({
         try {
             const { jobIds, errors: uploadErrors, remainingQuota } = await submitAnalyzeFiles(arr, {
                 modelKey: selectedModelKey,
-                buildMeta: (file) => ({
-                    name: file?.name,
-                    size: file?.size,
-                    type: file?.type,
-                }),
+                buildMeta: async (file) => {
+                    const base = {
+                        name: file?.name,
+                        size: file?.size,
+                        type: file?.type,
+                    };
+                    const preview = await readFileAsDataURL(file);
+                    if (preview) {
+                        base.previewDataUrl = preview;
+                    }
+                    return base;
+                },
             });
 
             if (!jobIds.length) {

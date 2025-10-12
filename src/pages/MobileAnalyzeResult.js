@@ -7,6 +7,7 @@ import Footer from '../features/footer/footer';
 import { ANALYZE_ENDPOINTS } from '../api/endPointRoute';
 import MobileAnalysisReport from '../features/analyze/components/mobile/MobileAnalysisReport';
 import { normalizeAnalysisResult } from '../features/analyze/utils/normalizeResult';
+import { buildStoredFailure, buildStoredReport, parseStoredFailure, parseStoredReport } from '../utils/reportStorage';
 
 const IS_TEST_ENV = String(process.env.NODE_ENV || '').toLowerCase() === 'test';
 const TEST_TIMEOUT_MS = 10_000;
@@ -133,33 +134,32 @@ export default function MobileAnalyzeResult() {
       }));
 
       if (!token) {
-        const savedResult = (() => {
-          try {
-            return JSON.parse(sessionStorage.getItem(`sse:report:${jid}`) || 'null');
-          } catch {
-            return null;
-          }
-        })();
-        const savedFailed = sessionStorage.getItem(`sse:failed:${jid}`);
-        if (savedResult) {
-          const normalized = normalizeAnalysisResult(savedResult);
+        const storedReportRaw = sessionStorage.getItem(`sse:report:${jid}`);
+        const { result: storedResult, fileMeta: storedMeta } = parseStoredReport(storedReportRaw, fileMeta);
+        const effectiveMeta = storedMeta || fileMeta;
+        if (storedResult) {
+          const normalized = normalizeAnalysisResult(storedResult);
           setReports((prev) => ({
             ...prev,
             [jid]: {
               ...(prev[jid] || {}),
               result: normalized,
-              fileMeta,
+              fileMeta: effectiveMeta,
             },
           }));
-        } else if (savedFailed) {
-          setReports((prev) => ({
-            ...prev,
-            [jid]: {
-              ...(prev[jid] || {}),
-              error: savedFailed,
-              fileMeta,
-            },
-          }));
+        } else {
+          const storedFailedRaw = sessionStorage.getItem(`sse:failed:${jid}`);
+          const { reason: storedReason, fileMeta: failedMeta } = parseStoredFailure(storedFailedRaw, effectiveMeta);
+          if (storedReason) {
+            setReports((prev) => ({
+              ...prev,
+              [jid]: {
+                ...(prev[jid] || {}),
+                error: storedReason,
+                fileMeta: failedMeta || effectiveMeta,
+              },
+            }));
+          }
         }
         return;
       }
@@ -239,7 +239,7 @@ export default function MobileAnalyzeResult() {
             },
           }));
           try {
-            sessionStorage.setItem(`sse:report:${jid}`, JSON.stringify(payload));
+            sessionStorage.setItem(`sse:report:${jid}`, JSON.stringify(buildStoredReport(payload, fileMeta)));
           } catch {}
         } catch {}
         if (timeoutId) clearTimeout(timeoutId);
@@ -263,7 +263,7 @@ export default function MobileAnalyzeResult() {
             },
           }));
           try {
-            sessionStorage.setItem(`sse:failed:${jid}`, reason);
+            sessionStorage.setItem(`sse:failed:${jid}`, JSON.stringify(buildStoredFailure(reason, fileMeta)));
           } catch {}
         } catch {
           setReports((prev) => ({

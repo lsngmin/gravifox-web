@@ -86,6 +86,7 @@ export default function MobileAnalysisReport({ jobId, report, t }) {
 
   const fileName = report?.fileMeta?.name || '';
   const modelKey = report?.fileMeta?.modelKey || '';
+  const filePreview = typeof report?.fileMeta?.previewDataUrl === 'string' ? report.fileMeta.previewDataUrl : null;
   const shortId = jobId.slice(-6);
 
   const probFake =
@@ -277,6 +278,22 @@ export default function MobileAnalysisReport({ jobId, report, t }) {
             <ScoreDial value={confidenceValue} label={confidenceLabel} theme={theme} />
           </div>
         </div>
+
+        {filePreview && (
+          <div className="rounded-3xl border border-white/12 bg-black/25 p-4">
+            <div className="text-[11px] font-semibold uppercase tracking-[0.16em] text-slate-200/80">
+              {t?.('mobileAnalyze.report.previewUpload', '업로드 미디어 미리보기')}
+            </div>
+            <div className="mt-3 overflow-hidden rounded-2xl border border-white/10 bg-slate-900/40">
+              <img
+                src={filePreview}
+                alt={fileName ? `${fileName} 미리보기` : t?.('mobileAnalyze.report.previewUploadAlt', '업로드한 미디어 미리보기')}
+                className="h-full w-full object-contain bg-slate-950/50"
+                loading="lazy"
+              />
+            </div>
+          </div>
+        )}
 
         {metrics.length > 0 && (
           <div className="grid grid-cols-1 gap-3 min-[430px]:grid-cols-2">

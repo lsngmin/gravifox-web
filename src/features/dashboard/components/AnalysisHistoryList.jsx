@@ -4,6 +4,7 @@ import { ANALYZE_ENDPOINTS, FASTAPI_ENDPOINTS } from "../../../api/endPointRoute
 import axios from "../../../api/http";
 import ensureUploadToken from "../../analyze/api/uploadTokenClient";
 import { Transition } from '@headlessui/react';
+import { buildStoredFailure, buildStoredReport, parseStoredReport } from "../../../utils/reportStorage";
 
 function readLocalReports() {
   try {
@@ -14,15 +15,16 @@ function readLocalReports() {
       const jobId = key.replace("sse:report:", "");
       try {
         const raw = sessionStorage.getItem(key);
-        const data = raw ? JSON.parse(raw) : null;
-        // try to attach file meta
-        let meta = null;
-        try {
-          const m = sessionStorage.getItem(`sse:meta:${jobId}`);
-          meta = m ? JSON.parse(m) : null;
-        } catch {}
-        if (data && jobId) {
-          items.push({ jobId, data, meta });
+        const stored = parseStoredReport(raw);
+        let meta = stored.fileMeta;
+        if (!meta) {
+          try {
+            const m = sessionStorage.getItem(`sse:meta:${jobId}`);
+            meta = m ? JSON.parse(m) : null;
+          } catch {}
+        }
+        if (stored.result && jobId) {
+          items.push({ jobId, data: stored.result, meta, storedAt: stored.storedAt || null });
         }
       } catch {}
     }
@@ -616,7 +618,7 @@ function ReAnalyzePane({ onFinish }) {
           const d = JSON.parse(e.data || '{}');
           const payload = (d.result || d);
           setResult(payload);
-          try { sessionStorage.setItem(`sse:report:${jobId}`, JSON.stringify(payload)); } catch {}
+          try { sessionStorage.setItem(`sse:report:${jobId}`, JSON.stringify(buildStoredReport(payload, fileMeta))); } catch {}
         } catch {}
         try { es.close(); } catch {}
         setSubmitting(false);
@@ -627,7 +629,7 @@ function ReAnalyzePane({ onFinish }) {
           const d = JSON.parse(e.data || '{}');
           const reason = (d?.reason || '분석에 실패했어요.');
           setError(reason);
-          try { sessionStorage.setItem(`sse:failed:${jobId}`, reason); } catch {}
+          try { sessionStorage.setItem(`sse:failed:${jobId}`, JSON.stringify(buildStoredFailure(reason, fileMeta))); } catch {}
         } catch { setError('분석에 실패했어요.'); }
         try { es.close(); } catch {}
         setSubmitting(false);

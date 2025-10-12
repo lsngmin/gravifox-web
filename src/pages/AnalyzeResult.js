@@ -5,6 +5,7 @@ import Footer from "../features/footer/footer";
 import AnalysisReport from "../features/analyze/components/report/AnalysisReport";
 import { ANALYZE_ENDPOINTS } from "../api/endPointRoute";
 import { normalizeAnalysisResult } from "../features/analyze/utils/normalizeResult";
+import { buildStoredFailure, buildStoredReport, parseStoredFailure, parseStoredReport } from "../utils/reportStorage";
 
 // 로딩 멘트(랜덤 회전). 스테이지에 맞춘 후보 포함
 const LOADING_MENTS = {
@@ -151,15 +152,18 @@ export default function AnalyzeResult() {
 
       if (!token) {
         // 토큰이 없어도, 저장된 결과/실패 정보가 있으면 복원해서 표시
-        const savedResult = (() => { try { return JSON.parse(sessionStorage.getItem(`sse:report:${jid}`) || 'null'); } catch { return null; } })();
-        const savedFailed = sessionStorage.getItem(`sse:failed:${jid}`);
-        if (savedResult) {
-          const normalized = normalizeAnalysisResult(savedResult);
-          setReports(prev => ({ ...prev, [jid]: { ...(prev[jid] || {}), result: normalized, connected: false, fileMeta } }));
+        const storedReportRaw = sessionStorage.getItem(`sse:report:${jid}`);
+        const { result: storedResult, fileMeta: storedMeta } = parseStoredReport(storedReportRaw, fileMeta);
+        const effectiveMeta = storedMeta || fileMeta;
+        if (storedResult) {
+          const normalized = normalizeAnalysisResult(storedResult);
+          setReports(prev => ({ ...prev, [jid]: { ...(prev[jid] || {}), result: normalized, connected: false, fileMeta: effectiveMeta } }));
           return;
         }
-        if (savedFailed) {
-          setReports(prev => ({ ...prev, [jid]: { ...(prev[jid] || {}), error: savedFailed || '분석에 실패했어요.', connected: false, fileMeta } }));
+        const storedFailedRaw = sessionStorage.getItem(`sse:failed:${jid}`);
+        const { reason: storedReason, fileMeta: failedMeta } = parseStoredFailure(storedFailedRaw, effectiveMeta);
+        if (storedReason) {
+          setReports(prev => ({ ...prev, [jid]: { ...(prev[jid] || {}), error: storedReason || '분석에 실패했어요.', connected: false, fileMeta: failedMeta || effectiveMeta } }));
           return;
         }
         setReports(prev => ({ ...prev, [jid]: { ...(prev[jid] || {}), error: '세션 토큰을 찾을 수 없어요. 다시 시작해 주세요.', connected: false, fileMeta } }));
@@ -182,7 +186,7 @@ export default function AnalyzeResult() {
           const d = JSON.parse(e.data || '{}');
           const payload = normalizeAnalysisResult(d.result || d);
           setReports(prev => ({ ...prev, [jid]: { ...(prev[jid] || {}), result: payload, fileMeta } }));
-          try { sessionStorage.setItem(`sse:report:${jid}`, JSON.stringify(payload)); } catch {}
+          try { sessionStorage.setItem(`sse:report:${jid}`, JSON.stringify(buildStoredReport(payload, fileMeta))); } catch {}
         } catch {}
         es.close();
         try { sessionStorage.removeItem(`sse:${jid}`); sessionStorage.removeItem(`sse:meta:${jid}`); } catch {}
@@ -192,7 +196,7 @@ export default function AnalyzeResult() {
           const d = JSON.parse(e.data || '{}');
           const reason = (d?.reason || '분석에 실패했어요.');
           setReports(prev => ({ ...prev, [jid]: { ...(prev[jid] || {}), error: reason, fileMeta } }));
-          try { sessionStorage.setItem(`sse:failed:${jid}`, reason); } catch {}
+          try { sessionStorage.setItem(`sse:failed:${jid}`, JSON.stringify(buildStoredFailure(reason, fileMeta))); } catch {}
         } catch {
           setReports(prev => ({ ...prev, [jid]: { ...(prev[jid] || {}), error: '분석에 실패했어요.', fileMeta } }));
         }
