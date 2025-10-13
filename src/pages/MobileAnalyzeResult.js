@@ -9,6 +9,7 @@ import { ANALYZE_ENDPOINTS } from '../api/endPointRoute';
 import MobileAnalysisReport from '../features/analyze/components/mobile/MobileAnalysisReport';
 import { normalizeAnalysisResult } from '../features/analyze/utils/normalizeResult';
 import { buildStoredFailure, buildStoredReport, parseStoredFailure, parseStoredReport } from '../utils/reportStorage';
+import { useAnalyzeFlow } from '../features/analyze/contexts/AnalyzeFlowContext';
 
 const IS_TEST_ENV = String(process.env.NODE_ENV || '').toLowerCase() === 'test';
 const TEST_TIMEOUT_MS = 10_000;
@@ -99,6 +100,7 @@ export default function MobileAnalyzeResult() {
   const { lng } = useParams();
   const { search } = useLocation();
   const params = useMemo(() => new URLSearchParams(search), [search]);
+  const { isTestMode, ensureTestReports } = useAnalyzeFlow();
   const jobIds = useMemo(() => {
     const csv = params.get('jobIds');
     if (!csv) return [];
@@ -115,10 +117,13 @@ export default function MobileAnalyzeResult() {
 
   useEffect(() => {
     if (!jobIds.length) return;
+    if (isTestMode) {
+      ensureTestReports(jobIds);
+    }
     const sources = [];
     const timeouts = [];
     jobIds.forEach((jid) => {
-      const token = sessionStorage.getItem(`sse:${jid}`);
+      const token = isTestMode ? null : sessionStorage.getItem(`sse:${jid}`);
       const metaStr = sessionStorage.getItem(`sse:meta:${jid}`);
       let fileMeta = null;
       try {
@@ -293,7 +298,7 @@ export default function MobileAnalyzeResult() {
         if (timer) clearTimeout(timer);
       });
     };
-  }, [jobIds, t]);
+  }, [ensureTestReports, isTestMode, jobIds, t]);
 
   const analysisStates = useMemo(
     () => jobIds.map((jid) => ({ jobId: jid, ...(reports[jid] || {}) })),
