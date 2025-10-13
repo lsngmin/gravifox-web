@@ -2,7 +2,7 @@ import React, { useEffect, useMemo, useState } from 'react';
 import { useLocation, useNavigate, useParams } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { AnimatePresence, motion } from 'framer-motion';
-import { CheckCircle2, Sparkles } from 'lucide-react';
+import { CheckCircle2 } from 'lucide-react';
 import Navigation from '../features/navigation/navigation';
 import Footer from '../features/footer/footer';
 import { ANALYZE_ENDPOINTS } from '../api/endPointRoute';
@@ -107,7 +107,6 @@ export default function MobileAnalyzeResult() {
     return csv.split(',').map((s) => s.trim()).filter(Boolean);
   }, [params]);
   const [reports, setReports] = useState({});
-
   useEffect(() => {
     if (jobIds.length === 0) {
       const fallback = lng ? `/${lng}/analyze/upload` : '/analyze/upload';
@@ -328,7 +327,14 @@ export default function MobileAnalyzeResult() {
         '요약 리포트를 아래에서 바로 확인해 주세요.'
       );
   const isCompletedView = !hasPending && summary.total > 0;
-
+  const dashboardLine1 = t(
+    'mobileAnalyze.processing.doneFooter.line1',
+    '결과는 일주일 동안 자동으로 대시보드에 저장돼요.'
+  );
+  const dashboardLine2 = t(
+    'mobileAnalyze.processing.doneFooter.line2',
+    '언제든지 다시 확인해 보세요.'
+  );
   return (
     <div className="flex min-h-screen flex-col bg-slate-950 text-slate-100">
       <Navigation variant="dark" />
@@ -341,20 +347,24 @@ export default function MobileAnalyzeResult() {
           className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_85%_0%,rgba(129,140,248,0.12),transparent_60%)]"
           aria-hidden="true"
         />
-        <div className="relative mx-auto flex w-full max-w-[460px] flex-col gap-8 px-5 pb-24 pt-24">
+        <div className="relative mx-auto flex w-full max-w-[460px] flex-col gap-4 px-5 pb-4 pt-16">
           <header
-            className={`relative overflow-hidden rounded-[32px] border border-white/10 px-6 shadow-[0_32px_70px_-42px_rgba(15,23,42,0.92)] backdrop-blur-xl ${
-              isCompletedView ? 'bg-slate-900/60 py-8' : 'bg-slate-900/70 py-7'
+            className={`relative overflow-hidden rounded-[28px] px-6 shadow-[0_30px_80px_-48px_rgba(15,23,42,0.95)] backdrop-blur-xl ring-1 ring-transparent ${
+              isCompletedView ? 'bg-slate-950/60 py-5' : 'bg-slate-950/70 py-7'
             }`}
           >
             {isCompletedView ? (
               <>
                 <div
-                  className="pointer-events-none absolute -left-20 -top-24 h-44 w-44 rounded-full bg-emerald-500/18 blur-3xl"
+                  className="pointer-events-none absolute inset-0 rounded-[28px] bg-gradient-to-br from-emerald-400/20 via-teal-300/12 to-transparent"
                   aria-hidden="true"
                 />
                 <div
-                  className="pointer-events-none absolute -right-16 bottom-[-28px] h-52 w-52 rounded-full bg-teal-500/16 blur-3xl"
+                  className="pointer-events-none absolute inset-0 rounded-[28px] bg-[radial-gradient(circle_at_18%_20%,rgba(59,130,246,0.24),transparent_55%)]"
+                  aria-hidden="true"
+                />
+                <div
+                  className="pointer-events-none absolute inset-0 rounded-[28px] bg-[conic-gradient(from_120deg_at_80%_15%,rgba(16,185,129,0.28)_0deg,transparent_120deg)]"
                   aria-hidden="true"
                 />
               </>
@@ -372,43 +382,19 @@ export default function MobileAnalyzeResult() {
             )}
             <div className="relative flex flex-col items-center text-center">
               {isCompletedView ? (
-                <div className="flex w-full flex-col items-center gap-6">
-                  <div className="flex flex-col items-center gap-4">
-                    <div className="flex h-12 w-12 items-center justify-center rounded-full bg-emerald-500/15 text-emerald-200">
-                      <CheckCircle2 aria-hidden className="h-7 w-7" />
-                    </div>
-                    <div className="space-y-2">
-                      <h1 className="text-[1.55rem] font-semibold leading-snug text-white">{titleText}</h1>
-                      <p className="text-sm leading-relaxed text-slate-200/90">{subtitleText}</p>
-                    </div>
+                <div className="flex w-full flex-col items-center gap-4">
+                  <div
+                    className="flex h-12 w-12 items-center justify-center rounded-full border border-emerald-400/45 bg-emerald-500/10 text-emerald-100 shadow-[0_18px_42px_-30px_rgba(16,185,129,0.85)]"
+                    aria-label={titleText}
+                  >
+                    <CheckCircle2 aria-hidden className="h-6 w-6" />
                   </div>
-                  <p className="flex items-center gap-2 rounded-2xl border border-emerald-400/20 bg-emerald-500/5 px-4 py-3 text-[11px] font-medium text-emerald-100">
-                    <Sparkles aria-hidden className="h-4 w-4" />
-                    {t(
-                      'mobileAnalyze.processing.doneHint',
-                      '모든 파일의 정리가 끝났어요. 아래에서 차분히 결과를 확인해 보세요.'
-                    )}
-                  </p>
-                  <dl className="grid w-full grid-cols-3 gap-2 text-[11px] text-slate-300">
-                    <div className="flex flex-col items-center gap-1 rounded-2xl border border-white/10 bg-white/5 px-3 py-3 text-slate-200/90">
-                      <dt className="text-xs font-semibold uppercase tracking-[0.08em] text-slate-400">
-                        {t('mobileAnalyze.processing.stat.pending', '대기')}
-                      </dt>
-                      <dd className="text-xl font-semibold text-white">{summary.pending}</dd>
-                    </div>
-                    <div className="flex flex-col items-center gap-1 rounded-2xl border border-emerald-400/30 bg-emerald-500/10 px-3 py-3 text-emerald-100">
-                      <dt className="text-xs font-semibold uppercase tracking-[0.08em] text-emerald-200/80">
-                        {t('mobileAnalyze.processing.stat.completed', '완료')}
-                      </dt>
-                      <dd className="text-xl font-semibold text-white">{summary.success}</dd>
-                    </div>
-                    <div className="flex flex-col items-center gap-1 rounded-2xl border border-white/10 bg-white/5 px-3 py-3 text-slate-200/90">
-                      <dt className="text-xs font-semibold uppercase tracking-[0.08em] text-slate-400">
-                        {t('mobileAnalyze.processing.stat.failed', '실패')}
-                      </dt>
-                      <dd className="text-xl font-semibold text-white">{summary.failed}</dd>
-                    </div>
-                  </dl>
+                  <div className="flex flex-col items-center gap-1">
+                    <h1 className="text-[1.35rem] font-semibold leading-tight text-white">{titleText}</h1>
+                    <p className="text-[11px] leading-snug text-slate-300">{subtitleText}</p>
+                  </div>
+
+
                 </div>
               ) : (
                 <div className="flex flex-col items-center gap-7">
@@ -452,7 +438,21 @@ export default function MobileAnalyzeResult() {
             </div>
           </header>
 
-          <div className="flex flex-col gap-6">
+          {isCompletedView && (
+            <section className="rounded-[24px] border border-emerald-300/10 bg-emerald-500/5 px-5 py-4 text-left text-[11px] text-emerald-100 shadow-[0_18px_42px_-36px_rgba(16,185,129,0.55)] backdrop-blur">
+              <p className="font-semibold uppercase tracking-[0.22em] text-emerald-200/80">
+                {t('mobileAnalyze.processing.tip.title', 'TIP')}
+              </p>
+              <p className="mt-1 leading-relaxed text-emerald-100/90">
+                {t(
+                  'mobileAnalyze.processing.tip.body',
+                  '생성 확률은 AI가 합성을 얼마나 의심하는지를 보여줘요. 0%에 가까우면 실제 촬영 사진에 가깝고, 100%에 가까울수록 AI 생성 가능성이 높다는 뜻이에요.'
+                )}
+              </p>
+            </section>
+          )}
+
+          <div className="flex flex-col gap-3">
             {analysisStates.map((entry) => {
               const rawProgress = typeof entry.progress === 'number' ? entry.progress : null;
               const percentValue =
@@ -460,8 +460,6 @@ export default function MobileAnalyzeResult() {
               const progressWidth = percentValue == null ? null : Math.min(100, Math.max(12, percentValue));
               const fileName = entry.fileMeta?.name || '';
               const modelKey = entry.fileMeta?.modelKey || '';
-              const shortId = entry.jobId ? entry.jobId.slice(-6) : '—';
-
               return (
                 <motion.div key={entry.jobId} layout>
                   <AnimatePresence mode="wait" initial={false}>
@@ -473,7 +471,7 @@ export default function MobileAnalyzeResult() {
                         animate={{ opacity: 1, y: 0 }}
                         exit={{ opacity: 0, y: -12 }}
                         transition={{ duration: 0.35, ease: [0.4, 0, 0.2, 1] }}
-                        className="relative overflow-hidden rounded-[28px] border border-rose-500/40 bg-slate-950/75 px-5 py-6 text-sm text-rose-100 shadow-[0_34px_64px_-38px_rgba(127,29,29,0.45)] backdrop-blur-lg"
+                        className="relative overflow-hidden rounded-[26px] bg-slate-950/75 px-5 py-6 text-sm text-rose-100 shadow-[0_34px_64px_-38px_rgba(127,29,29,0.45)] backdrop-blur-lg ring-1 ring-rose-400/40 ring-inset"
                       >
                         <div className="pointer-events-none absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-rose-500/40 to-transparent" />
                         <div className="pointer-events-none absolute -right-24 top-[-30%] h-44 w-44 rounded-full bg-rose-500/18 blur-3xl" />
@@ -481,9 +479,6 @@ export default function MobileAnalyzeResult() {
                           <div className="flex items-center justify-between gap-3">
                             <span className="inline-flex items-center rounded-full bg-rose-500/15 px-3 py-1 text-[11px] font-medium text-rose-100">
                               {t('mobileAnalyze.processing.failedBadge', '처리 오류')}
-                            </span>
-                            <span className="inline-flex items-center rounded-full bg-white/5 px-2.5 py-1 text-[11px] font-mono text-rose-50/90">
-                              #{shortId}
                             </span>
                           </div>
                           <div className="space-y-2">
@@ -521,10 +516,17 @@ export default function MobileAnalyzeResult() {
                         initial={{ opacity: 0, y: 12 }}
                         animate={{ opacity: 1, y: 0 }}
                         exit={{ opacity: 0, y: -12 }}
-                        transition={{ duration: 0.45, ease: [0.4, 0, 0.2, 1] }}
-                        className="rounded-[34px] border border-white/5 bg-slate-900/40 p-[1px] shadow-[0_32px_60px_-36px_rgba(15,23,42,0.9)] backdrop-blur"
+                        transition={{
+                          duration: 0.4,
+                          ease: [0.4, 0, 0.2, 1],
+                          layout: { duration: 0.45, ease: [0.25, 0.1, 0.25, 1] },
+                        }}
+                        className="rounded-[32px] bg-slate-950/55 p-[1px] shadow-[0_32px_60px_-38px_rgba(15,23,42,0.9)] backdrop-blur ring-1 ring-transparent transition-all duration-300"
                       >
-                        <MobileAnalysisReport jobId={entry.jobId} report={entry} t={t} />
+                        <MobileAnalysisReport
+                          report={entry}
+                          t={t}
+                        />
                       </motion.div>
                     ) : (
                       <motion.section
@@ -534,7 +536,7 @@ export default function MobileAnalyzeResult() {
                         animate={{ opacity: 1, y: 0 }}
                         exit={{ opacity: 0, y: -12 }}
                         transition={{ duration: 0.35, ease: [0.4, 0, 0.2, 1] }}
-                        className="relative overflow-hidden rounded-[28px] border border-white/10 bg-slate-900/70 px-5 py-6 shadow-[0_34px_60px_-38px_rgba(15,23,42,0.85)] backdrop-blur-xl"
+                        className="relative overflow-hidden rounded-[26px] bg-slate-900/70 px-5 py-6 shadow-[0_34px_60px_-38px_rgba(15,23,42,0.85)] backdrop-blur-xl ring-1 ring-sky-300/25 ring-inset"
                       >
                         <div className="pointer-events-none absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-sky-500/40 to-transparent" />
                         <div className="pointer-events-none absolute right-[-30%] top-[-35%] h-56 w-56 rounded-full bg-sky-500/18 blur-3xl" />
@@ -546,9 +548,6 @@ export default function MobileAnalyzeResult() {
                               </span>
                               <LoadingMent stage={entry.stage} />
                             </div>
-                            <span className="inline-flex items-center rounded-full bg-white/5 px-2.5 py-1 text-[11px] font-mono text-slate-300">
-                              #{shortId}
-                            </span>
                           </div>
                           <div className="space-y-2">
                             <h2 className="text-lg font-semibold text-white">
@@ -591,10 +590,17 @@ export default function MobileAnalyzeResult() {
 
           {!hasPending && hasResults && (
             <div className="rounded-3xl border border-white/10 bg-white/5 px-5 py-4 text-center text-[11px] text-slate-300 shadow-[0_24px_40px_-40px_rgba(15,23,42,0.9)]">
-              {t(
-                'mobileAnalyze.processing.doneFooter',
-                '상세 차트가 필요하다면 데스크톱 결과 페이지에서 이어서 확인할 수 있어요.'
-              )}
+              <p>
+                {dashboardLine1}
+                <br />
+                {dashboardLine2}
+              </p>
+              <a
+                href="/dashboard"
+                className="mt-2 inline-flex items-center justify-center rounded-full border border-sky-200/25 bg-sky-400/10 px-3 py-1.5 text-[10px] font-semibold uppercase tracking-[0.16em] text-sky-50 shadow-[0_16px_26px_-20px_rgba(56,189,248,0.35)] transition hover:bg-sky-400/18 focus:outline-none focus-visible:ring-2 focus-visible:ring-sky-200/60"
+              >
+                {t('mobileAnalyze.processing.doneFooter.link', '대시보드로 이동하기')}
+              </a>
             </div>
           )}
         </div>

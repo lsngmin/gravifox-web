@@ -1,93 +1,65 @@
-import React, { useMemo } from 'react';
-import { CheckCircle2, AlertTriangle, Info } from 'lucide-react';
+import React, { useCallback, useMemo, useState } from 'react';
+import { Share2, Star, ArrowUpRight } from 'lucide-react';
 
-const VERDICT_THEME = {
-  REAL: {
-    gradient: 'from-emerald-500/20 via-teal-500/12 to-emerald-500/6',
-    badgeBg: 'bg-emerald-500/18 text-emerald-100',
-    ringColor: 'rgba(16,185,129,0.88)',
-    Icon: CheckCircle2,
-    headline: 'REAL',
-    accentText: 'text-emerald-200',
-  },
-  FAKE: {
-    gradient: 'from-rose-500/26 via-rose-500/12 to-rose-500/6',
-    badgeBg: 'bg-rose-500/18 text-rose-100',
-    ringColor: 'rgba(244,63,94,0.9)',
-    Icon: AlertTriangle,
-    headline: 'FAKE',
-    accentText: 'text-rose-200',
-  },
-  UNKNOWN: {
-    gradient: 'from-amber-500/24 via-amber-500/12 to-amber-500/6',
-    badgeBg: 'bg-amber-500/18 text-amber-100',
-    ringColor: 'rgba(245,158,11,0.88)',
-    Icon: Info,
-    headline: 'UNKNOWN',
-    accentText: 'text-amber-200',
-  },
-};
+const clamp01 = (value) => Math.max(0, Math.min(1, value));
 
-const toPercent = (value) => {
-  if (typeof value !== 'number' || Number.isNaN(value)) return null;
-  return `${(value * 100).toFixed(1)}%`;
-};
-
-function MetricCard({ label, value, hint, tone }) {
-  if (value == null || value === '') return null;
-  return (
-    <div className="flex flex-col gap-1 rounded-2xl border border-white/8 bg-black/30 px-4 py-3 text-left shadow-[0_24px_44px_-38px_rgba(15,23,42,0.9)]">
-      <span className="text-[10px] uppercase tracking-[0.22em] text-slate-400">{label}</span>
-      <span className={`text-base font-semibold text-slate-100 ${tone || ''}`}>{value}</span>
-      {hint && <span className="text-[11px] leading-snug text-slate-400">{hint}</span>}
-    </div>
-  );
-}
-
-function InfoCard({ label, value }) {
-  if (value == null || value === '') return null;
-  return (
-    <div className="flex flex-col gap-1 rounded-2xl border border-white/8 bg-white/5 px-4 py-3 text-left shadow-[0_18px_36px_-30px_rgba(15,23,42,0.85)]">
-      <span className="text-[10px] uppercase tracking-[0.22em] text-slate-400">{label}</span>
-      <span className="text-sm font-medium text-slate-100">{value}</span>
-    </div>
-  );
-}
-
-function ScoreDial({ value, label, theme }) {
-  if (value == null || Number.isNaN(value)) return null;
-  const percent = Math.max(0, Math.min(100, Math.round(value * 100)));
-  const ringStyle = {
-    backgroundImage: `conic-gradient(${theme.ringColor} ${percent}%, rgba(148,163,184,0.18) ${percent}% 100%)`,
+function buildConfidenceCopy({ percent, t }) {
+  if (percent == null) {
+    return {
+      headline: t?.('mobileAnalyze.report.confidence.pending', '생성 확률을 계산하는 중이에요.'),
+      detail:
+        t?.(
+          'mobileAnalyze.report.confidence.pendingDetail',
+          '분석이 마무리되면 가장 유력한 판단 기준을 바로 알려 드릴게요.'
+        ) || '',
+    };
+  }
+  if (percent >= 85) {
+    return {
+      headline: t?.('mobileAnalyze.report.confidence.ai.high', 'AI가 생성했을 가능성이 매우 높아요.'),
+      detail:
+        t?.(
+          'mobileAnalyze.report.confidence.ai.highDetail',
+          '공유하기 전에는 출처와 근거를 함께 보관해 두는 것이 좋아요.'
+        ) || '',
+    };
+  }
+  if (percent >= 60) {
+    return {
+      headline: t?.('mobileAnalyze.report.confidence.ai.mid', 'AI 생성 징후가 뚜렷하게 나타났어요.'),
+      detail:
+        t?.(
+          'mobileAnalyze.report.confidence.ai.midDetail',
+          '세부 항목을 살펴보며 추가 근거를 확보하면 판단에 도움이 돼요.'
+        ) || '',
+    };
+  }
+  if (percent >= 40) {
+    return {
+      headline: t?.('mobileAnalyze.report.confidence.mixed', '실제와 합성 신호가 비슷하게 감지됐어요.'),
+      detail:
+        t?.(
+          'mobileAnalyze.report.confidence.mixedDetail',
+          '다른 자료와 함께 교차 확인하면 더 정확한 결론을 얻을 수 있어요.'
+        ) || '',
+    };
+  }
+  return {
+    headline: t?.('mobileAnalyze.report.confidence.real.high', '실제 사진일 가능성이 높아요'),
+    detail:
+      t?.(
+        'mobileAnalyze.report.confidence.real.highDetail',
+        'AI 생성으로 판단된 흔적이 거의 없어요.'
+      ) || '',
   };
-  return (
-    <div className="flex flex-col items-center gap-2">
-      <div className="relative flex h-[96px] w-[96px] items-center justify-center rounded-full p-[2px]" style={ringStyle}>
-        <div className="flex h-full w-full flex-col items-center justify-center rounded-full bg-slate-950/90 shadow-[inset_0_0_0_1px_rgba(148,163,184,0.12)]">
-          <span className="text-2xl font-semibold text-white">
-            {percent}
-            <span className="text-lg">%</span>
-          </span>
-          <span className="text-[10px] uppercase tracking-[0.24em] text-slate-400">{label}</span>
-        </div>
-      </div>
-    </div>
-  );
 }
 
-export default function MobileAnalysisReport({ jobId, report, t }) {
+export default function MobileAnalysisReport({ report, t }) {
   const data = report?.result || {};
+  const fileName = report?.fileMeta?.name || '';
+  const filePreview = typeof report?.fileMeta?.previewDataUrl === 'string' ? report.fileMeta.previewDataUrl : null;
   const rawLabel = data.label || data.decision || 'UNKNOWN';
   const label = typeof rawLabel === 'string' ? rawLabel.toUpperCase() : 'UNKNOWN';
-  const theme = VERDICT_THEME[label] || VERDICT_THEME.UNKNOWN;
-  const Icon = theme.Icon;
-  const verdictTitle =
-    t?.(`mobileAnalyze.report.badge.${label.toLowerCase()}`, theme.headline) || theme.headline;
-
-  const fileName = report?.fileMeta?.name || '';
-  const modelKey = report?.fileMeta?.modelKey || '';
-  const filePreview = typeof report?.fileMeta?.previewDataUrl === 'string' ? report.fileMeta.previewDataUrl : null;
-  const shortId = jobId.slice(-6);
 
   const probFake =
     typeof data.prob_fake === 'number'
@@ -102,249 +74,151 @@ export default function MobileAnalysisReport({ jobId, report, t }) {
       ? data.pReal
       : null;
   const confidence = typeof data.confidence === 'number' ? data.confidence : null;
-  const threshold = typeof data.threshold === 'number' ? data.threshold : null;
-  const latency = typeof data.latency_sec === 'number' ? data.latency_sec : null;
-  const runtimeBackend = data?.runtime?.backend;
-  const runtimeDevice = data?.runtime?.device;
 
-  const scoreDelta =
-    probFake != null && threshold != null ? probFake - threshold : null;
+  const aiProbability = useMemo(() => {
+    if (typeof probFake === 'number') return clamp01(probFake);
+    if (Array.isArray(data?.probabilities) && data.probabilities.length >= 2) {
+      const aiProb = data.probabilities[1];
+      if (typeof aiProb === 'number' && !Number.isNaN(aiProb)) return clamp01(aiProb);
+      const realProb = data.probabilities[0];
+      if (typeof realProb === 'number' && !Number.isNaN(realProb)) return clamp01(1 - realProb);
+    }
+    if (typeof data?.pAi === 'number') return clamp01(data.pAi);
+    if (typeof data?.p_ai === 'number') return clamp01(data.p_ai);
+    if (typeof data?.ai_prob === 'number') return clamp01(data.ai_prob);
+    if (typeof probReal === 'number') return clamp01(1 - probReal);
+    if (typeof data?.pReal === 'number') return clamp01(1 - data.pReal);
+    if (typeof confidence === 'number') {
+      return clamp01(label === 'FAKE' ? confidence : 1 - confidence);
+    }
+    return null;
+  }, [probFake, data, probReal, confidence, label]);
 
-  const decisionText = useMemo(() => {
-    if (label === 'REAL') {
-      return t?.('mobileAnalyze.report.summary.realTitle', '합성 징후가 거의 발견되지 않았어요.');
-    }
-    if (label === 'FAKE') {
-      return t?.('mobileAnalyze.report.summary.fakeTitle', '합성 의심 신호가 강하게 포착됐어요.');
-    }
-    return t?.('mobileAnalyze.report.summary.unknownTitle', '추가 확인이 필요합니다.');
-  }, [label, t]);
+  const confidencePercent =
+    aiProbability == null || Number.isNaN(aiProbability)
+      ? null
+      : Math.round(clamp01(aiProbability) * 100);
 
-  const summaryLines = useMemo(() => {
-    const lines = [];
-    if (probFake != null && threshold != null) {
-      const delta = probFake - threshold;
-      const verdictWord =
-        delta >= 0
-          ? t?.('mobileAnalyze.report.summary.highRisk', '의심 점수가 기준선을 넘었어요.')
-          : t?.('mobileAnalyze.report.summary.lowRisk', '의심 점수가 기준선 아래에 위치해요.');
-      lines.push(verdictWord);
-    }
-    if (confidence != null) {
-      lines.push(
-        t?.('mobileAnalyze.report.summary.confidence', {
-          defaultValue: '전체 분석 신뢰도는 {{value}} 수준이에요.',
-          value: toPercent(confidence) || '-',
-        })
-      );
-    }
-    if (!lines.length) {
-      lines.push(t?.('mobileAnalyze.report.summary.default', '세부 항목을 함께 확인해 주세요.'));
-    }
-    return lines.filter(Boolean).slice(0, 3);
-  }, [probFake, threshold, confidence, t]);
+  const { headline: rawHeadline, detail } = useMemo(
+    () => buildConfidenceCopy({ percent: confidencePercent, t }),
+    [confidencePercent, t]
+  );
 
-  const metrics = useMemo(() => {
-    const items = [];
-    const aiPercent = toPercent(probFake);
-    const realPercent = toPercent(probReal);
-    if (aiPercent) {
-      items.push({
-        key: 'ai',
-        label: t?.('mobileAnalyze.report.metrics.probFake', 'AI 가능성'),
-        value: aiPercent,
-        tone: 'text-rose-200',
-      });
-    }
-    if (realPercent) {
-      items.push({
-        key: 'real',
-        label: t?.('mobileAnalyze.report.metrics.probReal', 'Real 가능성'),
-        value: realPercent,
-        tone: 'text-emerald-200',
-      });
-    }
-    if (threshold != null) {
-      items.push({
-        key: 'threshold',
-        label: t?.('mobileAnalyze.report.metrics.threshold', '판정 기준'),
-        value: threshold.toFixed(3),
-      });
-    }
-    if (scoreDelta != null) {
-      items.push({
-        key: 'delta',
-        label: t?.('mobileAnalyze.report.metrics.delta', '기준 대비'),
-        value: `${scoreDelta >= 0 ? '+' : ''}${scoreDelta.toFixed(3)}`,
-        hint:
-          scoreDelta >= 0
-            ? t?.('mobileAnalyze.report.metrics.deltaHint.high', '기준보다 높아 의심 신호가 커요.')
-            : t?.('mobileAnalyze.report.metrics.deltaHint.low', '기준보다 낮아 비교적 안전해요.'),
-      });
-    }
-    return items.slice(0, 4);
-  }, [probFake, probReal, threshold, scoreDelta, t]);
+  const headline = useMemo(() => {
+    if (typeof rawHeadline !== 'string') return rawHeadline;
+    return rawHeadline.replace(/\.\s*$/, '');
+  }, [rawHeadline]);
 
-  const infoItems = useMemo(() => {
-    const items = [];
-    if (modelKey) {
-      items.push({
-        key: 'model',
-        label: t?.('mobileAnalyze.report.modelKey', '모델 키'),
-        value: modelKey,
-      });
-    }
-    if (latency != null) {
-      items.push({
-        key: 'latency',
-        label: t?.('mobileAnalyze.report.metrics.latency', '추론 지연'),
-        value: `${latency.toFixed(2)}s`,
-      });
-    }
-    if (runtimeBackend) {
-      items.push({
-        key: 'backend',
-        label: t?.('mobileAnalyze.report.metrics.backend', '백엔드'),
-        value: runtimeBackend,
-      });
-    }
-    if (runtimeDevice) {
-      items.push({
-        key: 'device',
-        label: t?.('mobileAnalyze.report.metrics.device', '디바이스'),
-        value: runtimeDevice,
-      });
-    }
-    return items;
-  }, [modelKey, latency, runtimeBackend, runtimeDevice, t]);
+  const [bookmarked, setBookmarked] = useState(false);
+  const handleToggleBookmark = useCallback(() => {
+    setBookmarked((prev) => !prev);
+  }, []);
 
-  const heroImage = (() => {
-    const samples = data?.faces?.samples;
-    if (!Array.isArray(samples) || !samples.length) return null;
-    const first = samples.find((item) => item?.image_jpg_base64);
-    return first?.image_jpg_base64 ? `data:image/jpeg;base64,${first.image_jpg_base64}` : null;
-  })();
+  const handleShare = useCallback(async () => {
+    const isClient = typeof window !== 'undefined';
+    const nav = typeof navigator !== 'undefined' ? navigator : null;
+    const shareUrl = isClient ? window.location.href : '';
+    const shareTitle =
+      fileName || t?.('mobileAnalyze.report.share.title', '분석 결과를 확인해 보세요');
+    const shareText = headline;
+    try {
+      if (nav?.share) {
+        await nav.share({
+          title: shareTitle,
+          text: shareText,
+          url: shareUrl,
+        });
+        return;
+      }
+      if (nav?.clipboard?.writeText) {
+        await nav.clipboard.writeText(shareUrl);
+        if (isClient && typeof window.alert === 'function') {
+          window.alert(
+            t?.('mobileAnalyze.report.share.copied', '링크가 복사됐어요.')
+          );
+        }
+        return;
+      }
+      throw new Error('share-unavailable');
+    } catch (error) {
+      if (isClient && typeof window.alert === 'function') {
+        window.alert(
+          t?.(
+            'mobileAnalyze.report.share.failed',
+            '공유 기능을 사용할 수 없어요. 링크를 직접 복사해 주세요.'
+          )
+        );
+      }
+    }
+  }, [headline, fileName, t]);
 
-  const confidenceLabel =
-    label === 'FAKE'
-      ? t?.('mobileAnalyze.report.metrics.aiConfidence', 'AI 신뢰도')
-      : t?.('mobileAnalyze.report.metrics.realConfidence', 'Real 신뢰도');
+  const generationLabel = t?.('mobileAnalyze.report.metrics.generationProbability', '생성 확률');
+  const detailLabel = t?.('mobileAnalyze.report.actions.viewDetail', '세부 리포트 보기');
+  const percentDisplay = confidencePercent != null ? `${confidencePercent}%` : '—';
 
-  const confidenceValue =
-    confidence != null
-      ? confidence
-      : label === 'FAKE'
-      ? probFake
-      : probReal;
+  const gradientStyle = useMemo(
+    () => ({
+      background:
+        'radial-gradient(circle at 18% 24%, rgba(216,180,254,0.2), transparent 60%), radial-gradient(circle at 82% 22%, rgba(56,189,248,0.18), transparent 54%), linear-gradient(140deg, rgba(15,118,110,0.22), rgba(8,47,73,0.55))',
+      border: '1px solid rgba(255,255,255,0.08)',
+    }),
+    []
+  );
 
   return (
-    <section className={`relative overflow-hidden rounded-[30px] border border-white/10 bg-gradient-to-br ${theme.gradient} p-6 text-slate-100 shadow-[0_34px_68px_-36px_rgba(15,23,42,0.85)]`}>
-      <div className="pointer-events-none absolute -left-16 top-[-50px] h-48 w-48 rounded-full bg-white/10 blur-3xl" />
-      <div className="pointer-events-none absolute right-[-40px] bottom-[-60px] h-56 w-56 rounded-full bg-white/6 blur-3xl" />
-      <div className="relative flex flex-col gap-6">
-        <div className="flex items-center justify-between text-[11px] text-slate-400">
-          <span className="font-mono text-slate-300">#{shortId}</span>
-          <span className="truncate text-right text-slate-200/80">
-            {fileName || t?.('mobileAnalyze.report.header.untitled', '이름 없는 업로드')}
-          </span>
+    <section
+      className="relative overflow-hidden rounded-[28px] bg-slate-950/88 p-4 text-slate-100 shadow-[0_30px_60px_-32px_rgba(15,23,42,0.88)]"
+      style={gradientStyle}
+    >
+      <div className="pointer-events-none absolute -left-24 top-[-36px] h-48 w-48 rounded-full bg-emerald-400/10 blur-3xl" aria-hidden="true" />
+      <div className="pointer-events-none absolute right-[-28px] bottom-[-48px] h-48 w-48 rounded-full bg-sky-400/12 blur-3xl" aria-hidden="true" />
+      <div className="relative flex flex-col gap-2.5">
+        <span className="inline-flex w-fit items-center justify-center self-end rounded-full border border-[rgba(99,102,241,0.35)] bg-[linear-gradient(140deg,rgba(99,102,241,0.22),rgba(129,140,248,0.1),rgba(99,102,241,0.18))] px-4 py-1.5 text-[12px] font-semibold uppercase tracking-[0.2em] text-slate-100 shadow-[0_16px_36px_-28px_rgba(30,64,175,0.48),0_10px_28px_-22px_rgba(99,102,241,0.38),0_0_14px_rgba(129,140,248,0.22)] backdrop-blur-xl">
+          {generationLabel} {percentDisplay}
+        </span>
+        <div className="flex flex-col gap-2">
+          <h2 className="text-[1.35rem] font-semibold leading-tight text-white">{headline}</h2>
+          {detail && <p className="text-sm leading-relaxed text-slate-200/85">{detail}</p>}
         </div>
-
-        <div className="flex flex-col gap-4">
-          <div className="flex flex-wrap items-center gap-2">
-            <span className={`inline-flex items-center gap-2 rounded-full px-3 py-1 text-[11px] font-medium ${theme.badgeBg}`}>
-              <span className="inline-flex h-5 w-5 items-center justify-center text-white">
-                <Icon size={16} />
-              </span>
-              {t?.('mobileAnalyze.report.summary.heading', '분석 결과')}
-            </span>
-            {modelKey && (
-              <span className="inline-flex items-center rounded-full bg-white/12 px-3 py-1 text-[10px] font-medium text-slate-100">
-                {modelKey}
-              </span>
-            )}
-          </div>
-          <div className="flex items-end justify-between gap-6">
-            <div className="space-y-2">
-              <h2 className="text-[1.6rem] font-semibold leading-tight text-white">
-                {verdictTitle}
-              </h2>
-              {decisionText && (
-                <p className="text-sm text-slate-200/90">{decisionText}</p>
-              )}
-              {summaryLines[0] && (
-                <p className="text-[12px] text-slate-300/90">{summaryLines[0]}</p>
-              )}
-            </div>
-            <ScoreDial value={confidenceValue} label={confidenceLabel} theme={theme} />
-          </div>
-        </div>
-
         {filePreview && (
-          <div className="rounded-3xl border border-white/12 bg-black/25 p-4">
-            <div className="text-[11px] font-semibold uppercase tracking-[0.16em] text-slate-200/80">
-              {t?.('mobileAnalyze.report.previewUpload', '업로드 미디어 미리보기')}
-            </div>
-            <div className="mt-3 overflow-hidden rounded-2xl border border-white/10 bg-slate-900/40">
-              <img
-                src={filePreview}
-                alt={fileName ? `${fileName} 미리보기` : t?.('mobileAnalyze.report.previewUploadAlt', '업로드한 미디어 미리보기')}
-                className="h-full w-full object-contain bg-slate-950/50"
-                loading="lazy"
-              />
-            </div>
-          </div>
-        )}
-
-        {metrics.length > 0 && (
-          <div className="grid grid-cols-1 gap-3 min-[430px]:grid-cols-2">
-            {metrics.map((metric) => (
-              <MetricCard
-                key={metric.key}
-                label={metric.label}
-                value={metric.value}
-                hint={metric.hint}
-                tone={metric.tone}
-              />
-            ))}
-          </div>
-        )}
-
-        {summaryLines.length > 1 && (
-          <div className="rounded-3xl border border-white/12 bg-black/30 px-4 py-4 text-[12px] leading-relaxed text-slate-200">
-            {summaryLines.slice(1).map((line, idx) => (
-              <p key={idx} className={idx === 0 ? '' : 'mt-2'}>
-                {line}
-              </p>
-            ))}
-          </div>
-        )}
-
-        {heroImage && (
-          <div className="relative overflow-hidden rounded-3xl border border-white/10 bg-black/45 shadow-[0_30px_54px_-38px_rgba(15,23,42,0.85)]">
+          <div className="overflow-hidden rounded-3xl border border-white/10 bg-black/35 mt-0.5 mb-0.5">
             <img
-              src={heroImage}
-              alt={t?.('mobileAnalyze.report.previewAlt', '분석 샘플')}
-              className="h-full w-full object-cover"
+              src={filePreview}
+              alt={fileName ? `${fileName} 미리보기` : t?.('mobileAnalyze.report.previewUploadAlt', '업로드 미디어 미리보기')}
+              className="h-[17rem] w-full object-cover"
+              loading="lazy"
             />
-            <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-slate-950/60 via-transparent to-transparent" />
-            <div className="absolute bottom-3 left-3 flex flex-wrap items-center gap-2">
-              <span className="inline-flex items-center rounded-full bg-black/50 px-3 py-1 text-[11px] font-medium text-white/85">
-                {t?.('mobileAnalyze.report.preview', '분석 샘플')}
-              </span>
-              <span className="inline-flex items-center rounded-full bg-white/10 px-3 py-1 text-[11px] font-mono text-white/90">
-                #{shortId}
-              </span>
-            </div>
           </div>
         )}
-
-        {infoItems.length > 0 && (
-          <div className="grid grid-cols-1 gap-3 min-[430px]:grid-cols-2">
-            {infoItems.map((item) => (
-              <InfoCard key={item.key} label={item.label} value={item.value} />
-            ))}
+        <div className="flex items-center justify-between gap-2.5 pt-0.5">
+          <button
+            type="button"
+            className="inline-flex h-9 items-center gap-2.5 rounded-full border border-emerald-300/30 bg-emerald-400/22 px-4 text-[11px] font-semibold uppercase tracking-[0.2em] text-emerald-50 shadow-[0_22px_34px_-22px_rgba(16,185,129,0.45)] backdrop-blur transition hover:bg-emerald-400/26 focus:outline-none focus-visible:ring-2 focus-visible:ring-emerald-200/80"
+          >
+            <ArrowUpRight className="h-3.5 w-3.5" />
+            {detailLabel}
+          </button>
+          <div className="flex items-center gap-2">
+            <button
+              type="button"
+              onClick={handleShare}
+              className="inline-flex h-9 w-9 items-center justify-center rounded-full bg-white/12 text-slate-100 shadow-[0_10px_18px_-16px_rgba(148,163,184,0.55)] backdrop-blur transition hover:bg-white/18 focus:outline-none focus-visible:ring-2 focus-visible:ring-emerald-300/70"
+              aria-label={t?.('mobileAnalyze.report.actions.share', '결과 링크 공유하기')}
+              title={t?.('mobileAnalyze.report.actions.share', '결과 링크 공유하기')}
+            >
+              <Share2 className="h-4 w-4" />
+            </button>
+            <button
+              type="button"
+              onClick={handleToggleBookmark}
+              className="inline-flex h-9 w-9 items-center justify-center rounded-full bg-white/12 text-slate-200 shadow-[0_10px_18px_-16px_rgba(148,163,184,0.45)] backdrop-blur transition hover:bg-white/18 focus:outline-none focus-visible:ring-2 focus-visible:ring-emerald-300/70"
+              aria-label={t?.('mobileAnalyze.report.actions.bookmark', '즐겨찾기에 추가')}
+              title={t?.('mobileAnalyze.report.actions.bookmark', '즐겨찾기에 추가')}
+            >
+              <Star className={`h-4 w-4 ${bookmarked ? 'fill-amber-300 stroke-current' : 'fill-none stroke-current'}`} />
+            </button>
           </div>
-        )}
+        </div>
       </div>
     </section>
   );
