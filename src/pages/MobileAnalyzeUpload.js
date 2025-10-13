@@ -5,12 +5,10 @@ import { UploadCloud, ChevronRight, LifeBuoy } from 'lucide-react';
 import Navigation from '../features/navigation/navigation';
 import Footer from '../features/footer/footer';
 import ErrorModal from '../features/analyze/components/ErrorModal';
-import { ANALYZE_MODEL_ENDPOINTS } from '../api/endPointRoute';
-import submitAnalyzeFiles from '../features/analyze/api/submitAnalyze';
-import { fetchQuotaSummary } from '../features/analyze/api/quotaSummary';
 import LoginRequiredModal from '../features/analyze/components/LoginRequiredModal';
 import { useAuth } from 'providers/authProvider';
 import { readFileAsDataURL } from '../utils/filePreview';
+import { useAnalyzeFlow } from '../features/analyze/contexts/AnalyzeFlowContext';
 import {
   rememberReturnCheckpoint,
   clearReturnCheckpoint,
@@ -110,6 +108,7 @@ export default function MobileAnalyzeUpload() {
   const { lng } = useParams();
   const location = useLocation();
   const { accessToken, userInfo } = useAuth();
+  const { fetchQuotaSummary: resolveQuotaSummary, fetchModels, submitAnalyzeFiles: runSubmitAnalyze } = useAnalyzeFlow();
 
   const [files, setFiles] = useState([]);
   const [errorOpen, setErrorOpen] = useState(false);
@@ -178,7 +177,7 @@ export default function MobileAnalyzeUpload() {
     }
     setLoadingQuota(true);
     try {
-      const summary = await fetchQuotaSummary();
+      const summary = await resolveQuotaSummary();
       setQuotaSummary(summary);
     } catch (error) {
       if (error?.status === 401) {
@@ -187,7 +186,7 @@ export default function MobileAnalyzeUpload() {
     } finally {
       setLoadingQuota(false);
     }
-  }, [accessToken]);
+  }, [accessToken, resolveQuotaSummary]);
 
   useEffect(() => {
     if (accessToken) {
@@ -209,7 +208,7 @@ export default function MobileAnalyzeUpload() {
     }
     setLoadingQuota(true);
     try {
-      const summary = await fetchQuotaSummary();
+      const summary = await resolveQuotaSummary();
       setQuotaSummary(summary);
 
       if (summary?.loginType === 'EMAIL' && !summary?.emailVerified) {
@@ -243,17 +242,13 @@ export default function MobileAnalyzeUpload() {
     } finally {
       setLoadingQuota(false);
     }
-  }, [t, userInfo]);
+  }, [resolveQuotaSummary, t, userInfo]);
   useEffect(() => {
     let aborted = false;
     const loadModels = async () => {
       setLoadingModels(true);
       try {
-        const response = await fetch(ANALYZE_MODEL_ENDPOINTS.LIST);
-        if (!response.ok) {
-          throw new Error(t('mobileAnalyze.uploadPage.modelFetchError', '모델 목록을 불러오지 못했어요.'));
-        }
-        const data = await response.json();
+        const data = await fetchModels();
         if (aborted) return;
         const items = Array.isArray(data?.items) ? data.items : [];
         setModels(items);
@@ -278,7 +273,7 @@ export default function MobileAnalyzeUpload() {
     return () => {
       aborted = true;
     };
-  }, [t]);
+  }, [fetchModels, t]);
 
   useEffect(() => {
     if (!sampleRequested || sampleAutoFillRef.current || files.length > 0) {
@@ -427,7 +422,7 @@ export default function MobileAnalyzeUpload() {
     setPendingResultPath(null);
     let stayOnPage = false;
     try {
-      const { jobIds, errors, remainingQuota } = await submitAnalyzeFiles(files, {
+      const { jobIds, errors, remainingQuota } = await runSubmitAnalyze(files, {
         modelKey,
         buildMeta: async (file) => {
           const base = {
