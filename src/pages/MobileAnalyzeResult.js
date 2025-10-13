@@ -2,6 +2,7 @@ import React, { useEffect, useMemo, useState } from 'react';
 import { useLocation, useNavigate, useParams } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { AnimatePresence, motion } from 'framer-motion';
+import { CheckCircle2, Sparkles } from 'lucide-react';
 import Navigation from '../features/navigation/navigation';
 import Footer from '../features/footer/footer';
 import { ANALYZE_ENDPOINTS } from '../api/endPointRoute';
@@ -321,6 +322,7 @@ export default function MobileAnalyzeResult() {
         'mobileAnalyze.processing.doneSubtitle',
         '요약 리포트를 아래에서 바로 확인해 주세요.'
       );
+  const isCompletedView = !hasPending && summary.total > 0;
 
   return (
     <div className="flex min-h-screen flex-col bg-slate-950 text-slate-100">
@@ -335,49 +337,111 @@ export default function MobileAnalyzeResult() {
           aria-hidden="true"
         />
         <div className="relative mx-auto flex w-full max-w-[460px] flex-col gap-8 px-5 pb-24 pt-24">
-          <header className="relative overflow-hidden rounded-[32px] border border-white/10 bg-slate-900/70 px-6 py-7 shadow-[0_32px_70px_-42px_rgba(15,23,42,0.92)] backdrop-blur-xl">
-            <div
-              className="pointer-events-none absolute -left-16 -top-16 h-40 w-40 rounded-full bg-sky-500/24 blur-3xl"
-              aria-hidden="true"
-            />
-            <div
-              className="pointer-events-none absolute -right-12 bottom-[-24px] h-48 w-48 rounded-full bg-indigo-500/18 blur-3xl"
-              aria-hidden="true"
-            />
-            <div className="relative flex flex-col items-center gap-7 text-center">
-              <div className="space-y-3">
-                <h1 className="text-[1.65rem] font-semibold leading-snug text-white">
-                  {titleText}
-                </h1>
-                <p className="text-sm leading-relaxed text-slate-200/90">{subtitleText}</p>
-                {summary.total > 0 && (
-                  <p className="text-[11px] text-slate-400">
-                    {hasPending
-                      ? t('mobileAnalyze.processing.summary.progressing', '실시간으로 결과가 이어지고 있어요.')
-                      : t('mobileAnalyze.processing.summary.completed', '모든 파일에 대한 결과가 정리됐어요.')}
+          <header
+            className={`relative overflow-hidden rounded-[32px] border border-white/10 px-6 shadow-[0_32px_70px_-42px_rgba(15,23,42,0.92)] backdrop-blur-xl ${
+              isCompletedView ? 'bg-slate-900/60 py-8' : 'bg-slate-900/70 py-7'
+            }`}
+          >
+            {isCompletedView ? (
+              <>
+                <div
+                  className="pointer-events-none absolute -left-20 -top-24 h-44 w-44 rounded-full bg-emerald-500/18 blur-3xl"
+                  aria-hidden="true"
+                />
+                <div
+                  className="pointer-events-none absolute -right-16 bottom-[-28px] h-52 w-52 rounded-full bg-teal-500/16 blur-3xl"
+                  aria-hidden="true"
+                />
+              </>
+            ) : (
+              <>
+                <div
+                  className="pointer-events-none absolute -left-16 -top-16 h-40 w-40 rounded-full bg-sky-500/24 blur-3xl"
+                  aria-hidden="true"
+                />
+                <div
+                  className="pointer-events-none absolute -right-12 bottom-[-24px] h-48 w-48 rounded-full bg-indigo-500/18 blur-3xl"
+                  aria-hidden="true"
+                />
+              </>
+            )}
+            <div className="relative flex flex-col items-center text-center">
+              {isCompletedView ? (
+                <div className="flex w-full flex-col items-center gap-6">
+                  <div className="flex flex-col items-center gap-4">
+                    <div className="flex h-12 w-12 items-center justify-center rounded-full bg-emerald-500/15 text-emerald-200">
+                      <CheckCircle2 aria-hidden className="h-7 w-7" />
+                    </div>
+                    <div className="space-y-2">
+                      <h1 className="text-[1.55rem] font-semibold leading-snug text-white">{titleText}</h1>
+                      <p className="text-sm leading-relaxed text-slate-200/90">{subtitleText}</p>
+                    </div>
+                  </div>
+                  <p className="flex items-center gap-2 rounded-2xl border border-emerald-400/20 bg-emerald-500/5 px-4 py-3 text-[11px] font-medium text-emerald-100">
+                    <Sparkles aria-hidden className="h-4 w-4" />
+                    {t(
+                      'mobileAnalyze.processing.doneHint',
+                      '모든 파일의 정리가 끝났어요. 아래에서 차분히 결과를 확인해 보세요.'
+                    )}
                   </p>
-                )}
-              </div>
-              {summary.total > 0 && (
-                <div className="grid w-full grid-cols-3 gap-3">
-                  <div className="flex flex-col items-center gap-1 rounded-2xl border border-white/10 bg-black/30 px-4 py-4 shadow-[0_24px_36px_-32px_rgba(15,23,42,0.9)]">
-                    <span className="text-2xl font-semibold text-white">{summary.pending}</span>
-                    <span className="text-[11px] text-slate-400">
-                      {t('mobileAnalyze.processing.stat.pending', '대기')}
-                    </span>
+                  <dl className="grid w-full grid-cols-3 gap-2 text-[11px] text-slate-300">
+                    <div className="flex flex-col items-center gap-1 rounded-2xl border border-white/10 bg-white/5 px-3 py-3 text-slate-200/90">
+                      <dt className="text-xs font-semibold uppercase tracking-[0.08em] text-slate-400">
+                        {t('mobileAnalyze.processing.stat.pending', '대기')}
+                      </dt>
+                      <dd className="text-xl font-semibold text-white">{summary.pending}</dd>
+                    </div>
+                    <div className="flex flex-col items-center gap-1 rounded-2xl border border-emerald-400/30 bg-emerald-500/10 px-3 py-3 text-emerald-100">
+                      <dt className="text-xs font-semibold uppercase tracking-[0.08em] text-emerald-200/80">
+                        {t('mobileAnalyze.processing.stat.completed', '완료')}
+                      </dt>
+                      <dd className="text-xl font-semibold text-white">{summary.success}</dd>
+                    </div>
+                    <div className="flex flex-col items-center gap-1 rounded-2xl border border-white/10 bg-white/5 px-3 py-3 text-slate-200/90">
+                      <dt className="text-xs font-semibold uppercase tracking-[0.08em] text-slate-400">
+                        {t('mobileAnalyze.processing.stat.failed', '실패')}
+                      </dt>
+                      <dd className="text-xl font-semibold text-white">{summary.failed}</dd>
+                    </div>
+                  </dl>
+                </div>
+              ) : (
+                <div className="flex flex-col items-center gap-7">
+                  <div className="space-y-3">
+                    <h1 className="text-[1.65rem] font-semibold leading-snug text-white">
+                      {titleText}
+                    </h1>
+                    <p className="text-sm leading-relaxed text-slate-200/90">{subtitleText}</p>
+                    {summary.total > 0 && (
+                      <p className="text-[11px] text-slate-400">
+                        {hasPending
+                          ? t('mobileAnalyze.processing.summary.progressing', '실시간으로 결과가 이어지고 있어요.')
+                          : t('mobileAnalyze.processing.summary.completed', '모든 파일에 대한 결과가 정리됐어요.')}
+                      </p>
+                    )}
                   </div>
-                  <div className="flex flex-col items-center gap-1 rounded-2xl border border-white/10 bg-black/30 px-4 py-4 shadow-[0_24px_36px_-32px_rgba(15,23,42,0.9)]">
-                    <span className="text-2xl font-semibold text-white">{summary.success}</span>
-                    <span className="text-[11px] text-slate-400">
-                      {t('mobileAnalyze.processing.stat.completed', '완료')}
-                    </span>
-                  </div>
-                  <div className="flex flex-col items-center gap-1 rounded-2xl border border-white/10 bg-black/30 px-4 py-4 shadow-[0_24px_36px_-32px_rgba(15,23,42,0.9)]">
-                    <span className="text-2xl font-semibold text-white">{summary.failed}</span>
-                    <span className="text-[11px] text-slate-400">
-                      {t('mobileAnalyze.processing.stat.failed', '실패')}
-                    </span>
-                  </div>
+                  {summary.total > 0 && (
+                    <div className="grid w-full grid-cols-3 gap-3">
+                      <div className="flex flex-col items-center gap-1 rounded-2xl border border-white/10 bg-black/30 px-4 py-4 shadow-[0_24px_36px_-32px_rgba(15,23,42,0.9)]">
+                        <span className="text-2xl font-semibold text-white">{summary.pending}</span>
+                        <span className="text-[11px] text-slate-400">
+                          {t('mobileAnalyze.processing.stat.pending', '대기')}
+                        </span>
+                      </div>
+                      <div className="flex flex-col items-center gap-1 rounded-2xl border border-white/10 bg-black/30 px-4 py-4 shadow-[0_24px_36px_-32px_rgba(15,23,42,0.9)]">
+                        <span className="text-2xl font-semibold text-white">{summary.success}</span>
+                        <span className="text-[11px] text-slate-400">
+                          {t('mobileAnalyze.processing.stat.completed', '완료')}
+                        </span>
+                      </div>
+                      <div className="flex flex-col items-center gap-1 rounded-2xl border border-white/10 bg-black/30 px-4 py-4 shadow-[0_24px_36px_-32px_rgba(15,23,42,0.9)]">
+                        <span className="text-2xl font-semibold text-white">{summary.failed}</span>
+                        <span className="text-[11px] text-slate-400">
+                          {t('mobileAnalyze.processing.stat.failed', '실패')}
+                        </span>
+                      </div>
+                    </div>
+                  )}
                 </div>
               )}
             </div>
