@@ -1,6 +1,8 @@
 import { useTranslation } from 'react-i18next';
 import { ArrowOutward } from '@mui/icons-material';
-import { MessageSquare, Sparkles, Upload, ScanSearch, CheckCircle2, Mail,Map } from "lucide-react";
+import { MessageSquare, Sparkles, Upload, ScanSearch, CheckCircle2, Mail, Map } from "lucide-react";
+
+import { SectionGrid } from './components/sectionPrimitives';
 
 export default function PageSection() {
     const { t, i18n } = useTranslation('home');
@@ -237,44 +239,36 @@ export default function PageSection() {
                             </a>
                         </div>
 
-                        {/*              <div className="space-y-4">*/}
-          {/*                  <div className="inline-flex items-center gap-2 rounded-full border border-white/15 bg-white/10 px-4 py-1 text-[10px] sm:text-xs font-semibold uppercase tracking-[0.18em] text-indigo-200/80">*/}
-          {/*                      <Sparkles className="h-3.5 w-3.5" />*/}
-          {/*                      <span>{usageLabel}</span>*/}
-          {/*                  </div>*/}
-          {/*                  <p className="max-w-2xl text-sm sm:text-base text-indigo-100/80">*/}
-          {/*                      {usageDescription}*/}
-          {/*                  </p>*/}
-          {/*                  <div className="grid gap-4 sm:grid-cols-3">*/}
-          {/*                      {metrics.map((metric) => (*/}
-          {/*                          <div*/}
-          {/*                              key={metric.value}*/}
-          {/*                              className="*/}
-          {/*  group relative overflow-hidden*/}
-          {/*  rounded-2xl border border-white/10 bg-white/[0.06]*/}
-          {/*  px-5 py-5*/}
-          {/*  text-indigo-100/90*/}
-          {/*  backdrop-blur-sm*/}
-          {/*  transition-all duration-300*/}
-          {/*  hover:bg-white/[0.12] hover:translate-y-[-2px]*/}
-          {/*  hover:shadow-[0_12px_40px_-20px_rgba(129,140,248,0.4)]*/}
-          {/*"*/}
-          {/*                          >*/}
-          {/*                              <div className="flex items-center gap-3">*/}
-          {/*                                  <metric.icon className="h-5 w-5 text-indigo-300/90 transition-transform duration-300 group-hover:scale-110" />*/}
-          {/*                                  <h3 className="text-base font-semibold text-white tracking-tight">*/}
-          {/*                                      {metric.value}*/}
-          {/*                                  </h3>*/}
-          {/*                              </div>*/}
-          {/*                              <p className="mt-2 text-[13px] leading-relaxed text-indigo-100/80">*/}
-          {/*                                  {metric.desc}*/}
-          {/*                              </p>*/}
+                        <div className="mt-8 space-y-4">
+                            <div className="inline-flex items-center gap-2 rounded-full border border-white/15 bg-white/10 px-4 py-1 text-[10px] sm:text-xs font-semibold uppercase tracking-[0.18em] text-indigo-200/80">
+                                <Sparkles className="h-3.5 w-3.5" />
+                                <span>{usageLabel}</span>
+                            </div>
+                            <p className="max-w-2xl text-sm sm:text-base text-indigo-100/80">
+                                {usageDescription}
+                            </p>
+                            <SectionGrid className="mt-6 gap-4 sm:grid-cols-3">
+                                {metrics.map((metric) => (
+                                    <div
+                                        key={metric.value}
+                                        tabIndex={0}
+                                        className="group relative overflow-hidden rounded-2xl border border-white/10 bg-white/[0.06] px-5 py-5 text-indigo-100/90 backdrop-blur-sm transition-all duration-300 hover:-translate-y-0.5 hover:bg-white/[0.12] hover:shadow-[0_12px_40px_-20px_rgba(129,140,248,0.4)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-200"
+                                    >
+                                        <div className="flex items-center gap-3">
+                                            <metric.icon className="h-5 w-5 text-indigo-300/90 transition-transform duration-300 group-hover:scale-110" />
+                                            <h3 className="text-base font-semibold text-white tracking-tight">
+                                                {metric.value}
+                                            </h3>
+                                        </div>
+                                        <p className="mt-2 text-[13px] leading-relaxed text-indigo-100/80">
+                                            {metric.desc}
+                                        </p>
 
-          {/*                              <div className="pointer-events-none absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-300 bg-gradient-to-tr from-indigo-400/10 to-transparent" />*/}
-          {/*                          </div>*/}
-          {/*                      ))}*/}
-          {/*                  </div>*/}
-          {/*              </div>*/}
+                                        <div className="pointer-events-none absolute inset-0 bg-gradient-to-tr from-indigo-400/10 to-transparent opacity-0 transition-opacity duration-300 group-hover:opacity-100" aria-hidden="true" />
+                                    </div>
+                                ))}
+                            </SectionGrid>
+                        </div>
                     </div>
                 </div>
             </div>
