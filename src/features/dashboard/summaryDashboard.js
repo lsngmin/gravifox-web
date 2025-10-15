@@ -19,10 +19,10 @@ const SummaryDashboard = () => {
         style.textContent = `
           body.dashboard-body-dark,
           body.dashboard-body-dark #root {
-            background-color: #020617;
+            background-color: #13213f;
           }
           .dashboard-dark {
-            background-color: #020617;
+            background-color: #13213f;
             color: rgba(226,232,240,0.92);
           }
           .dashboard-dark a {
@@ -30,27 +30,27 @@ const SummaryDashboard = () => {
           }
           .dashboard-dark .bg-white {
             --tw-bg-opacity: 1;
-            background-color: rgba(15,23,42,0.82);
+            background-color: rgba(30,41,59,0.72);
             backdrop-filter: blur(10px);
           }
           .dashboard-dark .bg-slate-100 {
-            background-color: rgba(30,41,59,0.7);
+            background-color: rgba(41,53,75,0.6);
           }
           .dashboard-dark .bg-rose-50 {
-            background-color: rgba(76,5,25,0.6);
+            background-color: rgba(120,22,45,0.6);
           }
           .dashboard-dark .bg-emerald-50 {
-            background-color: rgba(4,47,46,0.55);
+            background-color: rgba(22,78,73,0.55);
           }
           .dashboard-dark .bg-amber-50 {
-            background-color: rgba(69,38,10,0.58);
+            background-color: rgba(120,63,4,0.58);
           }
           .dashboard-dark .bg-slate-200 {
-            background-color: rgba(71,85,105,0.35);
+            background-color: rgba(100,116,139,0.3);
           }
           .dashboard-dark .border-slate-200 {
             --tw-border-opacity: 1;
-            border-color: rgba(71,85,105,0.45);
+            border-color: rgba(94,106,131,0.4);
           }
           .dashboard-dark .border-rose-200 {
             border-color: rgba(244,63,94,0.35);
@@ -140,11 +140,11 @@ const SummaryDashboard = () => {
     };
 
     return (
-        <div className="dashboard-dark flex-1 bg-slate-950 p-4 text-slate-100 md:p-6">
+        <div className="dashboard-dark flex-1 bg-slate-800 p-4 text-slate-100 md:p-6">
             <div className="mx-auto w-full max-w-6xl space-y-6">
                 {/* Dashboard hero */}
-                <div className="relative overflow-hidden rounded-2xl border border-slate-800/60 bg-slate-900/70 px-5 py-7 shadow-lg shadow-slate-900/30 md:px-6 md:py-8">
-                    <div className="absolute inset-0 bg-gradient-to-br from-indigo-700/35 via-slate-950/90 to-indigo-900/60" />
+                <div className="relative overflow-hidden rounded-2xl border border-slate-700/55 bg-slate-700/60 px-5 py-7 shadow-lg shadow-slate-900/20 md:px-6 md:py-8">
+                    <div className="absolute inset-0 bg-gradient-to-br from-indigo-700/30 via-slate-900/70 to-indigo-900/50" />
                     <div className="absolute inset-y-0 right-[-10%] w-64 bg-gradient-to-l from-violet-500/35 via-indigo-400/20 to-transparent blur-3xl opacity-70" aria-hidden="true" />
                     <div className="absolute -top-24 -left-24 h-48 w-48 rounded-full bg-gradient-to-br from-indigo-500/30 via-violet-500/20 to-transparent blur-3xl opacity-70" aria-hidden="true" />
                     <div className="relative space-y-3">
@@ -156,7 +156,7 @@ const SummaryDashboard = () => {
                     </div>
                 </div>
 
-                <div className="rounded-xl border border-slate-800/60 bg-slate-900/50 px-4 py-3 text-sm text-slate-300 shadow-inner shadow-slate-900/30">
+                <div className="rounded-xl border border-slate-700/50 bg-slate-700/35 px-4 py-3 text-sm text-slate-300 shadow-inner shadow-slate-900/20">
                     {quotaLoading
                         ? "남은 분석 횟수를 불러오는 중이에요…"
                         : typeof quotaSummary?.remaining === "number"

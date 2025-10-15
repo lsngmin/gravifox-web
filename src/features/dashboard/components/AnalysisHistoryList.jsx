@@ -164,13 +164,22 @@ export default function AnalysisHistoryList() {
     return (sum / count) * 100;
   }, [filtered]);
 
+  const hasTopStats = filtered.length > 0 || averageProb !== null;
+
   return (
     <div className="mt-4 space-y-3">
-      {averageProb !== null && (
+      {hasTopStats && (
         <div className="space-y-1.5">
-          <p className="text-sm text-slate-500 sm:text-base">
-            사용자님이 업로드한 이미지의 평균 생성 확률은 {averageProb.toFixed(1)}%예요.
-          </p>
+          {filtered.length > 0 && (
+            <p className="text-xl font-semibold text-slate-200 sm:text-2xl">
+              지난 일주일 동안 총 {filtered.length}건의 분석 결과가 있어요
+            </p>
+          )}
+          {averageProb !== null && (
+            <p className="text-sm text-slate-500 sm:text-base">
+              사용자님이 업로드한 이미지의 평균 생성 확률은 {averageProb.toFixed(1)}%예요.
+            </p>
+          )}
         </div>
       )}
       {items.length > 0 && (
@@ -269,8 +278,8 @@ export default function AnalysisHistoryList() {
                     {labelText}
                   </span>
                 </div>
-                <p className="truncate text-xs font-medium text-slate-300 sm:text-sm">{meta?.name || '파일명 없음'}</p>
               </div>
+              <p className="truncate text-right text-xs font-medium text-slate-300 sm:text-sm">{meta?.name || '파일명 없음'}</p>
 
               <div className="relative overflow-hidden rounded-2xl border border-slate-700/35 bg-slate-900/80">
                 {previewUrl ? (

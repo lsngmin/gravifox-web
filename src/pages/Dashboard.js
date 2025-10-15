@@ -21,7 +21,7 @@ const Dashboard = () => {
     return (
         <>
             <Navigation variant="dark" />
-            <main className="mt-14 min-h-screen bg-slate-950 text-slate-100 md:mt-20">
+            <main className="mt-14 min-h-screen bg-[#13213f] text-slate-100 md:mt-20">
                 <SummaryDashboard />
                 <Footer variant="dark" showLinks={false} inline />
             </main>
