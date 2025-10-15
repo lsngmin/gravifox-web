@@ -1,4 +1,5 @@
 import React, { useEffect, useMemo, useRef, useState } from "react";
+import { ArrowPathIcon, StarIcon } from "@heroicons/react/24/outline";
 import AnalysisReport from "../../analyze/components/report/AnalysisReport";
 import { ANALYZE_ENDPOINTS, FASTAPI_ENDPOINTS } from "../../../api/endPointRoute";
 import axios from "../../../api/http";
@@ -35,6 +36,21 @@ function readLocalReports() {
   }
 }
 
+function formatFileSize(bytes) {
+  if (typeof bytes !== 'number' || !Number.isFinite(bytes) || bytes < 0) return '-';
+  if (bytes === 0) return '0B';
+  const units = ['KB', 'MB', 'GB', 'TB'];
+  let value = bytes;
+  let unitIndex = -1;
+  while (value >= 1024 && unitIndex < units.length - 1) {
+    value /= 1024;
+    unitIndex += 1;
+  }
+  if (unitIndex === -1) return `${value}B`;
+  const precision = value >= 100 ? 0 : value >= 10 ? 1 : 2;
+  return `${value.toFixed(precision)}${units[unitIndex]}`;
+}
+
 export default function AnalysisHistoryList() {
   const [local, setLocal] = useState(() => readLocalReports());
   const [search, setSearch] = useState("");
@@ -48,14 +64,6 @@ export default function AnalysisHistoryList() {
     } catch { return new Set(); }
   });
   const [sortKey, setSortKey] = useState('NEWEST'); // NEWEST | OLDEST | LABEL | NAME_ASC | NAME_DESC | SIZE_ASC | SIZE_DESC
-  const [selected, setSelected] = useState(() => new Set());
-  const [notes, setNotes] = useState(() => {
-    try {
-      const raw = localStorage.getItem('dashboard:notes');
-      return raw ? JSON.parse(raw) : {};
-    } catch { return {}; }
-  });
-  const [openMemo, setOpenMemo] = useState(null); // jobId | null
   const [openReports, setOpenReports] = useState(() => new Set());
   const [openRe, setOpenRe] = useState(() => new Set());
 
@@ -90,33 +98,6 @@ export default function AnalysisHistoryList() {
     const next = new Set(favs);
     if (next.has(jobId)) next.delete(jobId); else next.add(jobId);
     saveFavs(next);
-  };
-
-  const clearLocalReports = () => {
-    try {
-      const toRemove = [];
-      for (let i = 0; i < sessionStorage.length; i++) {
-        const key = sessionStorage.key(i);
-        if (key && key.startsWith('sse:report:')) toRemove.push(key);
-      }
-      toRemove.forEach(k => { try { sessionStorage.removeItem(k); } catch {} });
-    } catch {}
-    setLocal(readLocalReports());
-  };
-
-  const exportLocalReports = () => {
-    try {
-      const payload = { exportedAt: new Date().toISOString(), items: local };
-      const blob = new Blob([JSON.stringify(payload, null, 2)], { type: 'application/json' });
-      const url = URL.createObjectURL(blob);
-      const a = document.createElement('a');
-      a.href = url;
-      a.download = 'analyze-history.json';
-      document.body.appendChild(a);
-      a.click();
-      a.remove();
-      setTimeout(() => URL.revokeObjectURL(url), 1000);
-    } catch {}
   };
 
   const copyJobId = async (jid) => {
@@ -168,190 +149,88 @@ export default function AnalysisHistoryList() {
     return list;
   }, [items, search, labelTab, favOnly, favs, sortKey]);
 
-  const saveNotes = (next) => {
-    setNotes(next);
-    try { localStorage.setItem('dashboard:notes', JSON.stringify(next)); } catch {}
-  };
-  const addTag = (jobId, text) => {
-    const tag = (text || '').trim();
-    if (!tag) return;
-    const next = { ...notes };
-    const cur = next[jobId] || { tags: [], memo: '' };
-    if (!cur.tags.includes(tag)) cur.tags.push(tag);
-    next[jobId] = cur;
-    saveNotes(next);
-  };
-  const removeTag = (jobId, idx) => {
-    const next = { ...notes };
-    const cur = next[jobId] || { tags: [], memo: '' };
-    cur.tags = (cur.tags || []).filter((_, i) => i !== idx);
-    next[jobId] = cur;
-    saveNotes(next);
-  };
-  const updateMemo = (jobId, text) => {
-    const next = { ...notes };
-    const cur = next[jobId] || { tags: [], memo: '' };
-    cur.memo = text;
-    next[jobId] = cur;
-    saveNotes(next);
-  };
-
-  const toggleSelect = (jid) => {
-    const next = new Set(selected);
-    if (next.has(jid)) next.delete(jid); else next.add(jid);
-    setSelected(next);
-  };
-  const selectAll = (checked) => {
-    if (checked) {
-      setSelected(new Set(filtered.map(it => it.jobId)));
-    } else {
-      setSelected(new Set());
-    }
-  };
-  const exportSelected = () => {
-    const setSel = new Set(selected);
-    const pick = items.filter(it => setSel.has(it.jobId));
-    try {
-      const payload = { exportedAt: new Date().toISOString(), items: pick };
-      const blob = new Blob([JSON.stringify(payload, null, 2)], { type: 'application/json' });
-      const url = URL.createObjectURL(blob);
-      const a = document.createElement('a');
-      a.href = url;
-      a.download = 'analyze-selected.json';
-      document.body.appendChild(a);
-      a.click();
-      a.remove();
-      setTimeout(() => URL.revokeObjectURL(url), 1000);
-    } catch {}
-  };
-  const deleteSelected = () => {
-    const setSel = new Set(selected);
-    try {
-      const seen = getSeenMap();
-      filtered.forEach(it => {
-        if (!setSel.has(it.jobId)) return;
-        try { sessionStorage.removeItem(`sse:report:${it.jobId}`); } catch {}
-        try { sessionStorage.removeItem(`sse:meta:${it.jobId}`); } catch {}
-        try { delete seen[it.jobId]; } catch {}
-        try { favs.delete(it.jobId); } catch {}
-        try { delete notes[it.jobId]; } catch {}
-      });
-      setSeenMap(seen);
-      saveFavs(new Set(favs));
-      saveNotes({ ...notes });
-    } catch {}
-    setSelected(new Set());
-    setLocal(readLocalReports());
-  };
-
-  // Compare view state
-  const [compareOpen, setCompareOpen] = useState(false);
-  const comparePair = useMemo(() => {
-    if (selected.size !== 2) return null;
-    const ids = Array.from(selected);
-    const map = new Map(items.map(it => [it.jobId, it]));
-    const a = map.get(ids[0]);
-    const b = map.get(ids[1]);
-    if (!a || !b) return null;
-    return { a, b };
-  }, [selected, items]);
+  const averageProb = useMemo(() => {
+    if (!filtered.length) return null;
+    let sum = 0;
+    let count = 0;
+    filtered.forEach(({ data }) => {
+      const prob = typeof data?.prob_fake === 'number' ? data.prob_fake : NaN;
+      if (Number.isFinite(prob)) {
+        sum += prob;
+        count += 1;
+      }
+    });
+    if (!count) return null;
+    return (sum / count) * 100;
+  }, [filtered]);
 
   return (
     <div className="mt-4 space-y-3">
-      <div className="flex items-center justify-between">
-        <div className="flex items-center gap-2">
-          <h3 className="text-base font-semibold text-slate-800">최근 분석</h3>
-          {filtered.length > 0 && (
-            <span className="inline-flex items-center rounded-full bg-slate-100 px-2 py-0.5 text-xs font-semibold text-slate-700">
-              총 {filtered.length}
-            </span>
-          )}
+      {averageProb !== null && (
+        <div className="space-y-1.5">
+          <p className="text-sm text-slate-500 sm:text-base">
+            사용자님이 업로드한 이미지의 평균 생성 확률은 {averageProb.toFixed(1)}%예요.
+          </p>
         </div>
-        {items.length > 0 && (
-          <div className="flex items-center gap-2">
-            <button
-              type="button"
-              className="text-xs font-semibold text-slate-600 hover:text-slate-800"
-              onClick={() => setLocal(readLocalReports())}
-            >
-              새로고침
-            </button>
-            <div className="hidden sm:flex items-center gap-1 text-xs">
-              <span className="text-slate-400">정렬</span>
-              <select
-                className="rounded border border-slate-200 bg-white px-1.5 py-1 text-xs font-medium text-slate-700"
-                value={sortKey}
-                onChange={(e)=>setSortKey(e.target.value)}
-              >
-                <option value="NEWEST">최신순</option>
-                <option value="OLDEST">오래된순</option>
-                <option value="LABEL">레이블</option>
-                <option value="NAME_ASC">파일명 A→Z</option>
-                <option value="NAME_DESC">파일명 Z→A</option>
-                <option value="SIZE_ASC">파일 크기 ↑</option>
-                <option value="SIZE_DESC">파일 크기 ↓</option>
-              </select>
+      )}
+      {items.length > 0 && (
+        <div className="rounded-xl border border-indigo-500/35 bg-slate-900/75 px-4 py-3 text-xs text-indigo-100 shadow-lg shadow-indigo-900/35 backdrop-blur">
+          <div className="flex items-center justify-between gap-4">
+            <div className="min-w-0 space-y-1">
+              <p className="text-sm font-semibold text-indigo-100">최근 분석 데이터를 불러오는 중이에요</p>
+              <p className="text-xs leading-relaxed text-indigo-200/85">
+                결과가 보이지 않는다면 오른쪽 새로고침을 눌러주세요.
+              </p>
             </div>
             <button
               type="button"
-              className="text-xs font-semibold text-slate-600 hover:text-slate-800"
-              onClick={exportLocalReports}
+              onClick={() => setLocal(readLocalReports())}
+              className="inline-flex h-12 w-12 flex-none items-center justify-center rounded-full border border-indigo-400/40 bg-indigo-500/25 text-indigo-100 transition hover:bg-indigo-500/35 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-300"
+              aria-label="최근 분석 새로고침"
             >
-              내보내기
-            </button>
-            <button
-              type="button"
-              className="text-xs font-semibold text-rose-600 hover:text-rose-700"
-              onClick={clearLocalReports}
-            >
-              기록 지우기
+              <ArrowPathIcon className="h-6 w-6" aria-hidden="true" />
             </button>
           </div>
-        )}
-      </div>
-      {/* Selection + bulk actions */}
-      {filtered.length > 0 && (
-        <div className="flex items-center gap-3 text-xs text-slate-700">
-          <label className="inline-flex items-center gap-1">
-            <input type="checkbox" className="rounded border-slate-300" onChange={(e)=>selectAll(e.target.checked)} checked={selected.size>0 && selected.size===filtered.length} />
-            전체 선택
-          </label>
-          {selected.size > 0 && (
-            <>
-              <span className="text-slate-400">|</span>
-              <span>선택 {selected.size}개</span>
-              <button onClick={exportSelected} className="ml-1 rounded border border-slate-200 bg-white px-2 py-1 text-xs font-semibold hover:bg-slate-50">선택 내보내기</button>
-              <button onClick={deleteSelected} className="rounded border border-rose-200 bg-rose-50 px-2 py-1 text-xs font-semibold text-rose-700 hover:bg-rose-100">선택 삭제</button>
-              {selected.size === 2 && (
-                <button onClick={()=>setCompareOpen(true)} className="rounded border border-indigo-200 bg-indigo-50 px-2 py-1 text-xs font-semibold text-indigo-700 hover:bg-indigo-100">비교 보기</button>
-              )}
-            </>
-          )}
         </div>
       )}
       {/* Filters */}
-      <div className="flex flex-wrap items-center gap-2">
-        <div className="inline-flex rounded-lg border border-slate-200 bg-white p-0.5">
+      <div className="flex w-full flex-wrap items-center justify-between gap-3">
+        <button
+          type="button"
+          onClick={() => setFavOnly((prev) => !prev)}
+          className={`inline-flex items-center gap-1.5 rounded-md border px-3 py-1.5 text-[13px] font-semibold transition ${
+            favOnly ? 'border-indigo-500 bg-indigo-600 text-white shadow-sm' : 'border-slate-200 bg-white text-slate-700 hover:bg-slate-50'
+          }`}
+        >
+          <StarIcon className="h-4 w-4" aria-hidden="true" />
+          즐겨찾기만
+        </button>
+        <div className="flex flex-wrap items-center justify-end gap-3">
+          <div className="inline-flex rounded-lg border border-slate-200 bg-white p-0.5">
           {['ALL','REAL','FAKE','UNKNOWN'].map(L => (
             <button
               key={L}
               onClick={() => setLabelTab(L)}
-              className={`px-2.5 py-1 text-xs font-semibold rounded-md ${labelTab===L ? 'bg-indigo-600 text-white' : 'text-slate-700 hover:bg-slate-50'}`}
+              className={`rounded-md px-3 py-1.5 text-[13px] font-semibold ${labelTab===L ? 'bg-indigo-600 text-white shadow-sm' : 'text-slate-700 hover:bg-slate-50'}`}
             >{L}</button>
           ))}
         </div>
-        <label className="ml-1 inline-flex items-center gap-1 text-xs font-medium text-slate-700">
-          <input type="checkbox" className="rounded border-slate-300" checked={favOnly} onChange={e=>setFavOnly(e.target.checked)} />
-          즐겨찾기만
-        </label>
-        <div className="ml-auto flex items-center">
-          <input
-            type="text"
-            value={search}
-            onChange={(e)=>setSearch(e.target.value)}
-            placeholder="파일명으로 검색"
-            className="w-52 rounded-md border border-slate-200 bg-white px-2 py-1.5 text-xs font-medium text-slate-700 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-indigo-500/30"
-          />
+          <div className="hidden items-center gap-1 text-xs text-slate-500 sm:flex">
+            <span className="text-slate-400">정렬</span>
+            <select
+              className="rounded border border-slate-200 bg-white px-1.5 py-1 text-xs font-medium text-slate-700"
+              value={sortKey}
+              onChange={(e)=>setSortKey(e.target.value)}
+            >
+              <option value="NEWEST">최신순</option>
+              <option value="OLDEST">오래된순</option>
+              <option value="LABEL">레이블</option>
+              <option value="NAME_ASC">파일명 A→Z</option>
+              <option value="NAME_DESC">파일명 Z→A</option>
+              <option value="SIZE_ASC">파일 크기 ↑</option>
+              <option value="SIZE_DESC">파일 크기 ↓</option>
+            </select>
+          </div>
         </div>
       </div>
 
@@ -363,100 +242,93 @@ export default function AnalysisHistoryList() {
 
       {filtered.map(({ jobId, data, meta }) => {
         const label = computeLabel(data);
-        const prob = typeof data?.prob_fake === 'number' ? `${(data.prob_fake * 100).toFixed(1)}%` : '-';
-        const thr = typeof data?.threshold === 'number' ? data.threshold.toFixed(2) : '-';
-        const tone = String(label).toUpperCase() === 'FAKE'
-          ? 'text-rose-700 bg-rose-50 border-rose-200'
-          : String(label).toUpperCase() === 'REAL'
-            ? 'text-emerald-700 bg-emerald-50 border-emerald-200'
-            : 'text-amber-700 bg-amber-50 border-amber-200';
-        const note = notes[jobId] || { tags: [], memo: '' };
-
+        const probValue = typeof data?.prob_fake === 'number' ? (data.prob_fake * 100).toFixed(1) : null;
+        const prob = probValue !== null ? `${probValue}%` : '-';
+        const labelText = String(label).toUpperCase();
+        const labelTone = labelText === 'FAKE'
+          ? { wrapper: 'border-rose-400/55 bg-rose-500/20 text-rose-100', dot: 'bg-rose-300' }
+          : labelText === 'REAL'
+            ? { wrapper: 'border-emerald-400/55 bg-emerald-500/20 text-emerald-100', dot: 'bg-emerald-300' }
+            : { wrapper: 'border-amber-400/55 bg-amber-500/20 text-amber-100', dot: 'bg-amber-300' };
+        const previewUrl = typeof meta?.previewDataUrl === 'string' ? meta.previewDataUrl : null;
+        const mediaKind = typeof meta?.type === 'string' ? meta.type.split('/')[0] : null;
+        const previewFallbackText = mediaKind === 'video' ? 'VIDEO' : mediaKind === 'audio' ? 'AUDIO' : mediaKind === 'image' ? 'IMAGE' : 'MEDIA';
         return (
-          <div key={jobId} className="rounded-xl border border-slate-200 bg-white p-4">
-            <div className="flex items-center justify-between gap-3">
-              <div className="min-w-0">
-                {meta?.name && (
-                  <p className="text-sm font-semibold text-slate-900 truncate">파일: {meta.name}</p>
-                )}
-                <p className="mt-0.5 text-xs text-slate-600 truncate">Job ID: {jobId}</p>
-                <p className="mt-0.5 text-xs text-slate-600">확률 {prob} • 임계값 {thr}</p>
-                {/* tags */}
-                <div className="mt-2 flex flex-wrap items-center gap-2">
-                  {(note.tags || []).map((t, idx) => (
-                    <span key={idx} className="inline-flex items-center gap-1 rounded-full border border-slate-200 bg-slate-50 px-2 py-0.5 text-[10px] font-semibold text-slate-700">
-                      {t}
-                      <button className="text-slate-400 hover:text-slate-600" onClick={()=>removeTag(jobId, idx)}>×</button>
-                    </span>
-                  ))}
-                  <TagInput onAdd={(val)=>addTag(jobId, val)} />
+          <div key={jobId} className="relative overflow-hidden rounded-2xl border border-slate-700/40 bg-slate-950/70 p-5 shadow-lg shadow-slate-900/40">
+            <div className="absolute inset-0 bg-gradient-to-br from-indigo-500/10 via-transparent to-slate-900/60" aria-hidden="true" />
+            <div className="relative space-y-4">
+              <div className="space-y-2">
+                <div className="flex items-center justify-between gap-2">
+                  <span className="inline-flex items-center gap-1.5 rounded-lg border border-indigo-400/50 bg-indigo-500/20 px-3 py-1 text-[12px] font-semibold text-indigo-100">
+                    <span className="h-2.5 w-2.5 rounded-full bg-indigo-200/90" />
+                    생성 확률
+                    <span className="text-white">{prob}</span>
+                  </span>
+                  <span className={`inline-flex items-center gap-1.5 rounded-lg border px-3 py-1 text-[12px] font-semibold uppercase tracking-[0.18em] ${labelTone.wrapper}`}>
+                    <span className={`h-2.5 w-2.5 rounded-full ${labelTone.dot}`} />
+                    {labelText}
+                  </span>
                 </div>
-                {/* memo */}
-                <div className="mt-2">
-                  <button onClick={()=> setOpenMemo(openMemo===jobId ? null : jobId)} className="text-[10px] font-medium text-indigo-600 hover:underline">
-                    {openMemo===jobId ? '메모 닫기' : '메모 추가/보기'}
-                  </button>
-                  {openMemo===jobId && (
-                    <textarea
-                      className="mt-1 w-full rounded-md border border-slate-200 bg-white p-2 text-xs text-slate-700"
-                      rows={3}
-                      value={note.memo || ''}
-                      onChange={(e)=>updateMemo(jobId, e.target.value)}
-                      placeholder="메모를 입력하세요"
-                    />
-                  )}
-                </div>
+                <p className="truncate text-xs font-medium text-slate-300 sm:text-sm">{meta?.name || '파일명 없음'}</p>
               </div>
-              <div className="flex items-center gap-3">
-                <input type="checkbox" className="rounded border-slate-300" checked={selected.has(jobId)} onChange={()=>toggleSelect(jobId)} />
-                <span className={`inline-flex items-center rounded-full px-2.5 py-1 text-xs font-semibold border ${tone}`}>
-                  {String(label).toUpperCase()}
-                </span>
-                <button
-                  type="button"
-                  onClick={() => toggleFav(jobId)}
-                  title={favs.has(jobId) ? '즐겨찾기 해제' : '즐겨찾기'}
-                  className="p-1 rounded hover:bg-slate-100"
-                >
-                  {favs.has(jobId) ? (
-                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="#f59e0b" className="w-5 h-5">
-                      <path d="M12 .587l3.668 7.431 8.2 1.193-5.934 5.787 1.402 8.168L12 18.896l-7.336 3.87 1.402-8.168L.132 9.211l8.2-1.193L12 .587z"/>
-                    </svg>
-                  ) : (
-                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="#cbd5e1" strokeWidth="1.8" className="w-5 h-5">
-                      <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14l-5-4.87 6.91-1.01L12 2z" />
-                    </svg>
-                  )}
-                </button>
-                <button
-                  type="button"
-                  onClick={() => copyJobId(jobId)}
-                  className="inline-flex items-center rounded-md border border-slate-200 bg-white px-2.5 py-1.5 text-xs font-semibold text-slate-700 hover:bg-slate-50"
-                >
-                  ID 복사
-                </button>
-                <button
-                  type="button"
-                  onClick={() => {
-                    const next = new Set(openReports);
-                    if (next.has(jobId)) next.delete(jobId); else next.add(jobId);
-                    setOpenReports(next);
-                  }}
-                  className="inline-flex items-center rounded-md bg-indigo-600 px-3 py-1.5 text-xs font-semibold text-white hover:bg-indigo-700"
-                >
-                  {openReports.has(jobId) ? '리포트 닫기' : '리포트 보기'}
-                </button>
-                <button
-                  type="button"
-                  onClick={() => {
-                    const next = new Set(openRe);
-                    if (next.has(jobId)) next.delete(jobId); else next.add(jobId);
-                    setOpenRe(next);
-                  }}
-                  className="inline-flex items-center rounded-md border border-indigo-200 bg-indigo-50 px-2.5 py-1.5 text-xs font-semibold text-indigo-700 hover:bg-indigo-100"
-                >
-                  {openRe.has(jobId) ? '재분석 닫기' : '재분석'}
-                </button>
+
+              <div className="relative overflow-hidden rounded-2xl border border-slate-700/35 bg-slate-900/80">
+                {previewUrl ? (
+                  <img
+                    src={previewUrl}
+                    alt={meta?.name ? `${meta.name} 미리보기` : '업로드 미디어 미리보기'}
+                    className="h-52 w-full object-cover sm:h-64"
+                    loading="lazy"
+                  />
+                ) : (
+                  <div className="flex h-52 w-full items-center justify-center bg-slate-900/70 text-xs font-semibold uppercase tracking-[0.18em] text-slate-500 sm:h-64">
+                    {previewFallbackText}
+                  </div>
+                )}
+              </div>
+              <div className="flex flex-wrap items-center justify-between gap-2 sm:gap-3">
+                <div className="flex items-center gap-2">
+                  <button
+                    type="button"
+                    onClick={() => toggleFav(jobId)}
+                    title={favs.has(jobId) ? '즐겨찾기 해제' : '즐겨찾기'}
+                    className="inline-flex h-9 w-9 items-center justify-center rounded-full border border-amber-400/30 bg-amber-500/10 text-amber-300 transition hover:bg-amber-500/20"
+                  >
+                    {favs.has(jobId) ? (
+                      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" className="h-[18px] w-[18px]">
+                        <path d="M12 .587l3.668 7.431 8.2 1.193-5.934 5.787 1.402 8.168L12 18.896l-7.336 3.87 1.402-8.168L.132 9.211l8.2-1.193L12 .587z"/>
+                      </svg>
+                    ) : (
+                      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" className="h-[18px] w-[18px]">
+                        <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14l-5-4.87 6.91-1.01L12 2z" />
+                      </svg>
+                    )}
+                  </button>
+                </div>
+                <div className="flex flex-wrap items-center gap-2">
+                  <button
+                    type="button"
+                    onClick={() => {
+                      const next = new Set(openReports);
+                      if (next.has(jobId)) next.delete(jobId); else next.add(jobId);
+                      setOpenReports(next);
+                    }}
+                    className="inline-flex items-center rounded-lg bg-indigo-500/80 px-3 py-1.5 text-xs font-semibold text-white transition hover:bg-indigo-500"
+                  >
+                    {openReports.has(jobId) ? '리포트 닫기' : '리포트 보기'}
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      const next = new Set(openRe);
+                      if (next.has(jobId)) next.delete(jobId); else next.add(jobId);
+                      setOpenRe(next);
+                    }}
+                    className="inline-flex items-center rounded-lg border border-indigo-400/40 bg-indigo-500/10 px-3 py-1.5 text-xs font-semibold text-indigo-200 transition hover:bg-indigo-500/20"
+                  >
+                    {openRe.has(jobId) ? '재분석 닫기' : '재분석'}
+                  </button>
+                </div>
               </div>
             </div>
             <Transition
@@ -481,7 +353,7 @@ export default function AnalysisHistoryList() {
               leaveFrom="opacity-100 translate-y-0"
               leaveTo="opacity-0 -translate-y-1"
             >
-              <div className="mt-3 rounded-xl border border-slate-200 bg-white p-3">
+              <div className="mt-3 rounded-2xl border border-slate-800/60 bg-slate-950/70 p-3">
                 <ReAnalyzePane onFinish={() => setLocal(readLocalReports())} />
               </div>
             </Transition>
@@ -489,40 +361,7 @@ export default function AnalysisHistoryList() {
         );
       })}
 
-      {/* Compare view */}
-      {compareOpen && comparePair && (
-        <CompareView
-          a={comparePair.a}
-          b={comparePair.b}
-          onClose={()=>setCompareOpen(false)}
-          computeLabel={computeLabel}
-        />
-      )}
     </div>
-  );
-}
-
-// Small tag input component (inline)
-function TagInput({ onAdd }) {
-  const [v, setV] = useState('');
-  const onKeyDown = (e) => {
-    if (e.key === 'Enter') {
-      e.preventDefault();
-      const t = v.trim();
-      if (t) onAdd(t);
-      setV('');
-    }
-  };
-  return (
-    <input
-      type="text"
-      value={v}
-      onChange={(e)=>setV(e.target.value)}
-      onKeyDown={onKeyDown}
-      placeholder="태그 추가 (Enter)"
-      className="rounded-md border border-slate-200 bg-white px-2 py-1 text-[10px] font-medium text-slate-700 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-indigo-500/30"
-      style={{ minWidth: 140 }}
-    />
   );
 }
 
@@ -666,72 +505,6 @@ function ReAnalyzePane({ onFinish }) {
           <AnalysisReport data={result} mediaMeta={meta} />
         </div>
       )}
-    </div>
-  );
-}
-
-function CompareView({ a, b, onClose, computeLabel }) {
-  const prettyBytes = (n) => {
-    if (typeof n !== 'number') return '-';
-    const u = ['B','KB','MB','GB','TB']; let i=0, v=n;
-    while (v>=1024 && i<u.length-1) { v/=1024; i++; }
-    const digits = v>=100 ? 0 : v>=10 ? 1 : 2;
-    return `${v.toFixed(digits)} ${u[i]}`;
-  };
-  const la = computeLabel(a.data), lb = computeLabel(b.data);
-  const tone = (L) => L==='FAKE' ? 'text-rose-700 bg-rose-50 border-rose-200' : L==='REAL' ? 'text-emerald-700 bg-emerald-50 border-emerald-200' : 'text-amber-700 bg-amber-50 border-amber-200';
-  const prob = (d)=> typeof d?.prob_fake === 'number' ? `${(d.prob_fake*100).toFixed(1)}%` : '-';
-  const thr = (d)=> typeof d?.threshold === 'number' ? d.threshold.toFixed(2) : '-';
-  return (
-    <div className="mt-4 rounded-2xl border border-slate-200 bg-white p-4">
-      <div className="flex items-center justify-between mb-3">
-        <h4 className="text-sm font-semibold text-slate-900">비교 보기</h4>
-        <div className="flex items-center gap-2">
-          <button onClick={onClose} className="rounded-md border border-slate-200 bg-white px-2.5 py-1.5 text-xs font-semibold text-slate-700 hover:bg-slate-50">닫기</button>
-        </div>
-      </div>
-      <div className="grid grid-cols-1 gap-3 md:grid-cols-2">
-        {[a,b].map((it, idx) => {
-          const L = idx===0 ? la : lb;
-          return (
-            <div key={idx} className="rounded-xl border border-slate-200 bg-white p-4">
-              <div className="flex items-center justify-between">
-                <div className="min-w-0">
-                  <p className="text-sm font-semibold text-slate-900 truncate">{it.meta?.name || '파일명 없음'}</p>
-                  <p className="mt-0.5 text-xs text-slate-600 truncate">Job ID: {it.jobId}</p>
-                </div>
-                <span className={`inline-flex items-center rounded-full px-2.5 py-1 text-xs font-semibold border ${tone(L)}`}>{L}</span>
-              </div>
-              <dl className="mt-3 grid grid-cols-2 gap-x-6 gap-y-2 text-xs">
-                <div>
-                  <dt className="text-slate-500">확률</dt>
-                  <dd className="font-semibold text-slate-900">{prob(it.data)}</dd>
-                </div>
-                <div>
-                  <dt className="text-slate-500">임계값</dt>
-                  <dd className="font-semibold text-slate-900">{thr(it.data)}</dd>
-                </div>
-                <div>
-                  <dt className="text-slate-500">파일 크기</dt>
-                  <dd className="font-semibold text-slate-900">{prettyBytes(it.meta?.size)}</dd>
-                </div>
-                <div>
-                  <dt className="text-slate-500">타입</dt>
-                  <dd className="font-semibold text-slate-900">{it.meta?.type || '-'}</dd>
-                </div>
-                <div>
-                  <dt className="text-slate-500">표준편차</dt>
-                  <dd className="font-semibold text-slate-900">{typeof it.data?.prob_std === 'number' ? it.data.prob_std.toFixed(3) : '-'}</dd>
-                </div>
-                <div>
-                  <dt className="text-slate-500">고확신 비율</dt>
-                  <dd className="font-semibold text-slate-900">{typeof it.data?.high_conf_ratio === 'number' ? `${(it.data.high_conf_ratio*100).toFixed(1)}%` : '-'}</dd>
-                </div>
-              </dl>
-            </div>
-          );
-        })}
-      </div>
     </div>
   );
 }

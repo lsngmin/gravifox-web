@@ -61,6 +61,32 @@ export default function MobileAnalysisReport({ report, t }) {
   const rawLabel = data.label || data.decision || 'UNKNOWN';
   const label = typeof rawLabel === 'string' ? rawLabel.toUpperCase() : 'UNKNOWN';
 
+  const labelCopy = useMemo(() => {
+    if (label === 'REAL') return t?.('mobileAnalyze.report.labels.real', 'REAL');
+    if (label === 'FAKE') return t?.('mobileAnalyze.report.labels.fake', 'FAKE');
+    if (label === 'UNKNOWN') return t?.('mobileAnalyze.report.labels.unknown', 'UNKNOWN');
+    return label || 'UNKNOWN';
+  }, [label, t]);
+
+  const labelTone = useMemo(() => {
+    if (label === 'REAL') {
+      return {
+        badge: 'border-emerald-300/50 bg-emerald-500/20 text-emerald-50 shadow-[0_18px_32px_-24px_rgba(16,185,129,0.65)]',
+        dot: 'bg-emerald-300 shadow-[0_0_0_2px_rgba(15,23,42,0.55),0_0_16px_-4px_rgba(16,185,129,0.65)]',
+      };
+    }
+    if (label === 'FAKE') {
+      return {
+        badge: 'border-rose-300/50 bg-rose-500/22 text-rose-100 shadow-[0_18px_32px_-24px_rgba(244,63,94,0.65)]',
+        dot: 'bg-rose-300 shadow-[0_0_0_2px_rgba(15,23,42,0.55),0_0_16px_-4px_rgba(244,63,94,0.65)]',
+      };
+    }
+    return {
+      badge: 'border-amber-300/40 bg-amber-500/18 text-amber-100 shadow-[0_18px_32px_-24px_rgba(245,158,11,0.6)]',
+      dot: 'bg-amber-300 shadow-[0_0_0_2px_rgba(15,23,42,0.55),0_0_16px_-4px_rgba(245,158,11,0.6)]',
+    };
+  }, [label]);
+
   const probFake =
     typeof data.prob_fake === 'number'
       ? data.prob_fake
@@ -173,9 +199,15 @@ export default function MobileAnalysisReport({ report, t }) {
       <div className="pointer-events-none absolute -left-24 top-[-36px] h-48 w-48 rounded-full bg-emerald-400/10 blur-3xl" aria-hidden="true" />
       <div className="pointer-events-none absolute right-[-28px] bottom-[-48px] h-48 w-48 rounded-full bg-sky-400/12 blur-3xl" aria-hidden="true" />
       <div className="relative flex flex-col gap-2.5">
-        <span className="inline-flex w-fit items-center justify-center self-end rounded-full border border-[rgba(99,102,241,0.35)] bg-[linear-gradient(140deg,rgba(99,102,241,0.22),rgba(129,140,248,0.1),rgba(99,102,241,0.18))] px-4 py-1.5 text-[12px] font-semibold uppercase tracking-[0.2em] text-slate-100 shadow-[0_16px_36px_-28px_rgba(30,64,175,0.48),0_10px_28px_-22px_rgba(99,102,241,0.38),0_0_14px_rgba(129,140,248,0.22)] backdrop-blur-xl">
-          {generationLabel} {percentDisplay}
-        </span>
+        <div className="flex w-full flex-wrap items-center gap-2">
+          <span className={`inline-flex items-center rounded-full border px-3.5 py-1.5 text-[11px] font-semibold uppercase tracking-[0.18em] ${labelTone.badge}`}>
+            <span className={`mr-2 inline-block h-2.5 w-2.5 rounded-full ${labelTone.dot}`} />
+            {labelCopy}
+          </span>
+          <span className="ml-auto inline-flex items-center justify-center rounded-full border border-[rgba(99,102,241,0.35)] bg-[linear-gradient(140deg,rgba(99,102,241,0.22),rgba(129,140,248,0.1),rgba(99,102,241,0.18))] px-4 py-1.5 text-[12px] font-semibold uppercase tracking-[0.2em] text-slate-100 shadow-[0_16px_36px_-28px_rgba(30,64,175,0.48),0_10px_28px_-22px_rgba(99,102,241,0.38),0_0_14px_rgba(129,140,248,0.22)] backdrop-blur-xl">
+            {generationLabel} {percentDisplay}
+          </span>
+        </div>
         <div className="flex flex-col gap-2">
           <h2 className="text-[1.35rem] font-semibold leading-tight text-white">{headline}</h2>
           {detail && <p className="text-sm leading-relaxed text-slate-200/85">{detail}</p>}

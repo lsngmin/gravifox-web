@@ -221,7 +221,6 @@ const Navigation = ({ variant = 'light' }) => {
     }, [displayName, displayEmail]);
 
     const loginPath = localePrefix ? `${localePrefix}/login` : '/login';
-    const freeTrialPath = localePrefix ? `${localePrefix}/free-trial` : '/free-trial';
     const settingsPath = localePrefix ? `${localePrefix}/settings` : '/settings';
 
     const buildLinkTarget = (item) => {
@@ -369,21 +368,21 @@ const Navigation = ({ variant = 'light' }) => {
                                 leave={leaveBase}
                                 leaveFrom={leaveFrom}
                                 leaveTo={leaveTo}
-                                className="fixed inset-x-0 top-0 lg:hidden origin-top z-[80]"
+                                className="fixed inset-0 lg:hidden z-[80] flex items-center justify-center px-6"
                                 id="mobile-main-menu"
                                 role="dialog"
                                 aria-modal="true"
                                 aria-label="Mobile menu"
                                 style={{ willChange: 'transform, opacity' }}
                             >
-                                <div className="mx-auto px-6 pb-8 pt-2">
-                                        <div
-                                            className={`w-full relative rounded-3xl border px-5 pb-8 pt-4 sm:px-6 ${
-                                                isDark
-                                                    ? 'border-slate-700/60 bg-slate-900/95 text-slate-100 shadow-[0_28px_48px_-24px_rgba(8,11,24,0.65)]'
-                                                    : 'border-slate-200 bg-white text-slate-900 shadow-[0_22px_48px_-22px_rgba(15,23,42,0.32)]'
-                                            }`}
-                                        >
+                                <div className="w-full max-w-lg py-6">
+                                    <div
+                                        className={`w-full relative rounded-3xl border px-5 pb-8 pt-4 sm:px-6 ${
+                                            isDark
+                                                ? 'border-slate-700/60 bg-slate-900/95 text-slate-100 shadow-[0_28px_48px_-24px_rgba(8,11,24,0.65)]'
+                                                : 'border-slate-200 bg-white text-slate-900 shadow-[0_22px_48px_-22px_rgba(15,23,42,0.32)]'
+                                        }`}
+                                    >
                                         <div className="flex items-center justify-between gap-3">
                                             <div className="min-w-0 flex-1">
                                                 {isLoggedIn ? (
@@ -394,7 +393,7 @@ const Navigation = ({ variant = 'light' }) => {
                                                                 : 'bg-indigo-50/70 text-slate-700'
                                                         }`}
                                                     >
-                                                    <div className="flex h-9 w-9 sm:h-10 sm:w-10 shrink-0 items-center justify-center rounded-full bg-indigo-500 text-xs sm:text-sm font-semibold text-white">
+                                                        <div className="flex h-9 w-9 sm:h-10 sm:w-10 shrink-0 items-center justify-center rounded-full bg-indigo-500 text-xs sm:text-sm font-semibold text-white">
                                                             {userInitials}
                                                         </div>
                                                         <div className="min-w-0">
@@ -415,6 +414,18 @@ const Navigation = ({ variant = 'light' }) => {
                                                                 </p>
                                                             )}
                                                         </div>
+                                                        <Link
+                                                            to={settingsPath}
+                                                            onClick={() => setMobileMenuOpen(false)}
+                                                            aria-label={t('navigation.actions.settings', 'Settings')}
+                                                            className={`ml-auto flex h-9 w-9 shrink-0 items-center justify-center rounded-xl transition active:scale-95 ${
+                                                                isDark
+                                                                    ? 'text-indigo-100 hover:bg-indigo-500/30 hover:text-white'
+                                                                    : 'text-indigo-500 hover:bg-indigo-100/80 hover:text-indigo-600'
+                                                            }`}
+                                                        >
+                                                            <Cog6ToothIcon aria-hidden="true" className="size-5" />
+                                                        </Link>
                                                     </div>
                                                 ) : (
                                                     <div
@@ -427,18 +438,20 @@ const Navigation = ({ variant = 'light' }) => {
                                                 )}
                                             </div>
                                             <div className="flex items-center gap-2">
-                                                <Link
-                                                    to={settingsPath}
-                                                    onClick={() => setMobileMenuOpen(false)}
-                                                    aria-label={t('navigation.actions.settings', 'Settings')}
-                                                    className={`-m-2 flex h-10 w-10 items-center justify-center rounded-md transition active:scale-95 ${
-                                                        isDark
-                                                            ? 'text-slate-400 hover:bg-slate-800/70 hover:text-slate-200'
-                                                            : 'text-slate-500 hover:bg-slate-100 hover:text-slate-700'
-                                                    }`}
-                                                >
-                                                    <Cog6ToothIcon aria-hidden="true" className="size-6" />
-                                                </Link>
+                                                {!isLoggedIn && (
+                                                    <Link
+                                                        to={settingsPath}
+                                                        onClick={() => setMobileMenuOpen(false)}
+                                                        aria-label={t('navigation.actions.settings', 'Settings')}
+                                                        className={`-m-2 flex h-10 w-10 items-center justify-center rounded-md transition active:scale-95 ${
+                                                            isDark
+                                                                ? 'text-slate-400 hover:bg-slate-800/70 hover:text-slate-200'
+                                                                : 'text-slate-500 hover:bg-slate-100 hover:text-slate-700'
+                                                        }`}
+                                                    >
+                                                        <Cog6ToothIcon aria-hidden="true" className="size-6" />
+                                                    </Link>
+                                                )}
                                                 <button
                                                     type="button"
                                                     onClick={() => setMobileMenuOpen(false)}
@@ -497,17 +510,6 @@ const Navigation = ({ variant = 'light' }) => {
                                                 </ul>
                                             </nav>
                                         </div>
-
-                                        <div className="mt-6">
-                                            <Link
-                                                to={freeTrialPath}
-                                                onClick={() => setMobileMenuOpen(false)}
-                                                className="flex w-full items-center justify-center rounded-xl bg-gradient-to-r from-indigo-500 via-violet-500 to-purple-500 px-4 py-3 text-base font-semibold text-white shadow-md transition hover:from-indigo-600 hover:via-violet-600 hover:to-purple-600"
-                                            >
-                                                {t('navigation.actions.freeTrial')}
-                                            </Link>
-                                        </div>
-
                                         <div
                                             className={`mt-6 border-t pt-6 ${
                                                 isDark ? 'border-slate-700/60' : 'border-slate-200'

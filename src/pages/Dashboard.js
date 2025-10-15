@@ -20,10 +20,10 @@ const Dashboard = () => {
 
     return (
         <>
-            <Navigation />
-            <main className="mt-24 min-h-screen bg-white">
+            <Navigation variant="dark" />
+            <main className="mt-14 min-h-screen bg-slate-950 text-slate-100 md:mt-20">
                 <SummaryDashboard />
-                <Footer />
+                <Footer variant="dark" showLinks={false} inline />
             </main>
         </>
     );
