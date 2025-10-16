@@ -1,6 +1,8 @@
 import React, { useEffect, useMemo, useRef, useState } from "react";
 import { ArrowPathIcon, StarIcon } from "@heroicons/react/24/outline";
 import AnalysisReport from "../../analyze/components/report/AnalysisReport";
+import { persistPreviewForJob } from "../../../utils/previewStore";
+import usePreviewUrl from "../../../utils/usePreviewUrl";
 import MobileReportDrawer from "../../analyze/components/mobile/MobileReportDrawer";
 import { ANALYZE_ENDPOINTS, FASTAPI_ENDPOINTS } from "../../../api/endPointRoute";
 import axios from "../../../api/http";
@@ -250,109 +252,25 @@ export default function AnalysisHistoryList() {
         </div>
       )}
 
-      {filtered.map(({ jobId, data, meta }) => {
-        const label = computeLabel(data);
-        const probValue = typeof data?.prob_fake === 'number' ? (data.prob_fake * 100).toFixed(1) : null;
-        const prob = probValue !== null ? `${probValue}%` : '-';
-        const labelText = String(label).toUpperCase();
-        const labelTone = labelText === 'FAKE'
-          ? { wrapper: 'border-rose-400/55 bg-rose-500/20 text-rose-100', dot: 'bg-rose-300' }
-          : labelText === 'REAL'
-            ? { wrapper: 'border-emerald-400/55 bg-emerald-500/20 text-emerald-100', dot: 'bg-emerald-300' }
-            : { wrapper: 'border-amber-400/55 bg-amber-500/20 text-amber-100', dot: 'bg-amber-300' };
-        const previewUrl = typeof meta?.previewDataUrl === 'string' ? meta.previewDataUrl : null;
-        const mediaKind = typeof meta?.type === 'string' ? meta.type.split('/')[0] : null;
-        const previewFallbackText = mediaKind === 'video' ? 'VIDEO' : mediaKind === 'audio' ? 'AUDIO' : mediaKind === 'image' ? 'IMAGE' : 'MEDIA';
-        return (
-          <div key={jobId} className="relative overflow-hidden rounded-2xl border border-slate-700/40 bg-slate-950/70 p-5 shadow-lg shadow-slate-900/40">
-            <div className="absolute inset-0 bg-gradient-to-br from-indigo-500/10 via-transparent to-slate-900/60" aria-hidden="true" />
-            <div className="relative space-y-4">
-              <div className="space-y-2">
-                <div className="flex items-center justify-between gap-2">
-                  <span className="inline-flex items-center gap-1.5 rounded-lg border border-indigo-400/50 bg-indigo-500/20 px-3 py-1 text-[12px] font-semibold text-indigo-100">
-                    <span className="h-2.5 w-2.5 rounded-full bg-indigo-200/90" />
-                    생성 확률
-                    <span className="text-white">{prob}</span>
-                  </span>
-                  <span className={`inline-flex items-center gap-1.5 rounded-lg border px-3 py-1 text-[12px] font-semibold uppercase tracking-[0.18em] ${labelTone.wrapper}`}>
-                    <span className={`h-2.5 w-2.5 rounded-full ${labelTone.dot}`} />
-                    {labelText}
-                  </span>
-                </div>
-              </div>
-              <p className="truncate text-right text-xs font-medium text-slate-300 sm:text-sm">{meta?.name || '파일명 없음'}</p>
-
-              <div className="relative overflow-hidden rounded-2xl border border-slate-700/35 bg-slate-900/80">
-                {previewUrl ? (
-                  <img
-                    src={previewUrl}
-                    alt={meta?.name ? `${meta.name} 미리보기` : '업로드 미디어 미리보기'}
-                    className="h-52 w-full object-cover sm:h-64"
-                    loading="lazy"
-                  />
-                ) : (
-                  <div className="flex h-52 w-full items-center justify-center bg-slate-900/70 text-xs font-semibold uppercase tracking-[0.18em] text-slate-500 sm:h-64">
-                    {previewFallbackText}
-                  </div>
-                )}
-              </div>
-              <div className="flex flex-wrap items-center justify-between gap-2 sm:gap-3">
-                <div className="flex items-center gap-2">
-                  <button
-                    type="button"
-                    onClick={() => toggleFav(jobId)}
-                    title={favs.has(jobId) ? '즐겨찾기 해제' : '즐겨찾기'}
-                    className="inline-flex h-9 w-9 items-center justify-center rounded-full border border-amber-400/30 bg-amber-500/10 text-amber-300 transition hover:bg-amber-500/20"
-                  >
-                    {favs.has(jobId) ? (
-                      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" className="h-[18px] w-[18px]">
-                        <path d="M12 .587l3.668 7.431 8.2 1.193-5.934 5.787 1.402 8.168L12 18.896l-7.336 3.87 1.402-8.168L.132 9.211l8.2-1.193L12 .587z"/>
-                      </svg>
-                    ) : (
-                      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" className="h-[18px] w-[18px]">
-                        <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14l-5-4.87 6.91-1.01L12 2z" />
-                      </svg>
-                    )}
-                  </button>
-                </div>
-                <div className="flex flex-wrap items-center gap-2">
-                  <button
-                    type="button"
-                    onClick={() => setDrawerReport({ jobId, data, meta })}
-                    className="inline-flex items-center rounded-lg bg-indigo-500/80 px-3 py-1.5 text-xs font-semibold text-white transition hover:bg-indigo-500"
-                  >
-                    리포트 보기
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => {
-                      const next = new Set(openRe);
-                      if (next.has(jobId)) next.delete(jobId); else next.add(jobId);
-                      setOpenRe(next);
-                    }}
-                    className="inline-flex items-center rounded-lg border border-indigo-400/40 bg-indigo-500/10 px-3 py-1.5 text-xs font-semibold text-indigo-200 transition hover:bg-indigo-500/20"
-                  >
-                    {openRe.has(jobId) ? '재분석 닫기' : '재분석'}
-                  </button>
-                </div>
-              </div>
-            </div>
-            <Transition
-              show={openRe.has(jobId)}
-              enter="transition-all duration-300 ease-out"
-              enterFrom="opacity-0 -translate-y-1"
-              enterTo="opacity-100 translate-y-0"
-              leave="transition-all duration-200 ease-in"
-              leaveFrom="opacity-100 translate-y-0"
-              leaveTo="opacity-0 -translate-y-1"
-            >
-              <div className="mt-3 rounded-2xl border border-slate-800/60 bg-slate-950/70 p-3">
-                <ReAnalyzePane onFinish={() => setLocal(readLocalReports())} />
-              </div>
-            </Transition>
-          </div>
-        );
-      })}
+      {filtered.map(({ jobId, data, meta }) => (
+        <HistoryCard
+          key={jobId}
+          jobId={jobId}
+          data={data}
+          meta={meta}
+          computeLabel={computeLabel}
+          favs={favs}
+          onToggleFav={toggleFav}
+          onOpenReport={() => setDrawerReport({ jobId, data, meta })}
+          isReOpen={openRe.has(jobId)}
+          onToggleRe={() => {
+            const next = new Set(openRe);
+            if (next.has(jobId)) next.delete(jobId); else next.add(jobId);
+            setOpenRe(next);
+          }}
+          onReanalyzeFinish={() => setLocal(readLocalReports())}
+        />
+      ))}
 
       <MobileReportDrawer
         open={!!drawerReport}
@@ -361,6 +279,118 @@ export default function AnalysisHistoryList() {
         mediaMeta={drawerReport?.meta}
         jobId={drawerReport?.jobId}
       />
+    </div>
+  );
+}
+
+function HistoryCard({
+  jobId,
+  data,
+  meta,
+  computeLabel,
+  favs,
+  onToggleFav,
+  onOpenReport,
+  isReOpen,
+  onToggleRe,
+  onReanalyzeFinish,
+}) {
+  const previewUrl = usePreviewUrl(meta);
+  const label = computeLabel(data);
+  const probValue = typeof data?.prob_fake === 'number' ? (data.prob_fake * 100).toFixed(1) : null;
+  const prob = probValue !== null ? `${probValue}%` : '-';
+  const labelText = String(label).toUpperCase();
+  const labelTone = labelText === 'FAKE'
+    ? { wrapper: 'border-rose-400/55 bg-rose-500/20 text-rose-100', dot: 'bg-rose-300' }
+    : labelText === 'REAL'
+      ? { wrapper: 'border-emerald-400/55 bg-emerald-500/20 text-emerald-100', dot: 'bg-emerald-300' }
+      : { wrapper: 'border-amber-400/55 bg-amber-500/20 text-amber-100', dot: 'bg-amber-300' };
+  const mediaKind = typeof meta?.type === 'string' ? meta.type.split('/')[0] : null;
+  const previewFallbackText = mediaKind === 'video' ? 'VIDEO' : mediaKind === 'audio' ? 'AUDIO' : mediaKind === 'image' ? 'IMAGE' : 'MEDIA';
+
+  return (
+    <div className="relative overflow-hidden rounded-2xl border border-slate-700/40 bg-slate-950/70 p-5 shadow-lg shadow-slate-900/40">
+      <div className="absolute inset-0 bg-gradient-to-br from-indigo-500/10 via-transparent to-slate-900/60" aria-hidden="true" />
+      <div className="relative space-y-4">
+        <div className="space-y-2">
+          <div className="flex items-center justify-between gap-2">
+            <span className="inline-flex items-center gap-1.5 rounded-lg border border-indigo-400/50 bg-indigo-500/20 px-3 py-1 text-[12px] font-semibold text-indigo-100">
+              <span className="h-2.5 w-2.5 rounded-full bg-indigo-200/90" />
+              생성 확률
+              <span className="text-white">{prob}</span>
+            </span>
+            <span className={`inline-flex items-center gap-1.5 rounded-lg border px-3 py-1 text-[12px] font-semibold uppercase tracking-[0.18em] ${labelTone.wrapper}`}>
+              <span className={`h-2.5 w-2.5 rounded-full ${labelTone.dot}`} />
+              {labelText}
+            </span>
+          </div>
+        </div>
+        <p className="truncate text-right text-xs font-medium text-slate-300 sm:text-sm">{meta?.name || '파일명 없음'}</p>
+
+        <div className="relative overflow-hidden rounded-2xl border border-slate-700/35 bg-slate-900/80">
+          {previewUrl ? (
+            <img
+              src={previewUrl}
+              alt={meta?.name ? `${meta.name} 미리보기` : '업로드 미디어 미리보기'}
+              className="h-52 w-full object-cover sm:h-64"
+              loading="lazy"
+            />
+          ) : (
+            <div className="flex h-52 w-full items-center justify-center bg-slate-900/70 text-xs font-semibold uppercase tracking-[0.18em] text-slate-500 sm:h-64">
+              {previewFallbackText}
+            </div>
+          )}
+        </div>
+        <div className="flex flex-wrap items-center justify-between gap-2 sm:gap-3">
+          <div className="flex items-center gap-2">
+            <button
+              type="button"
+              onClick={() => onToggleFav(jobId)}
+              title={favs.has(jobId) ? '즐겨찾기 해제' : '즐겨찾기'}
+              className="inline-flex h-9 w-9 items-center justify-center rounded-full border border-amber-400/30 bg-amber-500/10 text-amber-300 transition hover:bg-amber-500/20"
+            >
+              {favs.has(jobId) ? (
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" className="h-[18px] w-[18px]">
+                  <path d="M12 .587l3.668 7.431 8.2 1.193-5.934 5.787 1.402 8.168L12 18.896l-7.336 3.87 1.402-8.168L.132 9.211l8.2-1.193L12 .587z"/>
+                </svg>
+              ) : (
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" className="h-[18px] w-[18px]">
+                  <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14l-5-4.87 6.91-1.01L12 2z" />
+                </svg>
+              )}
+            </button>
+          </div>
+          <div className="flex flex-wrap items-center gap-2">
+            <button
+              type="button"
+              onClick={onOpenReport}
+              className="inline-flex items-center rounded-lg bg-indigo-500/80 px-3 py-1.5 text-xs font-semibold text-white transition hover:bg-indigo-500"
+            >
+              리포트 보기
+            </button>
+            <button
+              type="button"
+              onClick={onToggleRe}
+              className="inline-flex items-center rounded-lg border border-indigo-400/40 bg-indigo-500/10 px-3 py-1.5 text-xs font-semibold text-indigo-200 transition hover:bg-indigo-500/20"
+            >
+              {isReOpen ? '재분석 닫기' : '재분석'}
+            </button>
+          </div>
+        </div>
+      </div>
+      <Transition
+        show={isReOpen}
+        enter="transition-all duration-300 ease-out"
+        enterFrom="opacity-0 -translate-y-1"
+        enterTo="opacity-100 translate-y-0"
+        leave="transition-all duration-200 ease-in"
+        leaveFrom="opacity-100 translate-y-0"
+        leaveTo="opacity-0 -translate-y-1"
+      >
+        <div className="mt-3 rounded-2xl border border-slate-800/60 bg-slate-950/70 p-3">
+          <ReAnalyzePane onFinish={onReanalyzeFinish} />
+        </div>
+      </Transition>
     </div>
   );
 }
@@ -437,7 +467,8 @@ function ReAnalyzePane({ onFinish }) {
       }
       const { jobId, sseToken } = anJson || {};
       if (!jobId || !sseToken) throw new Error('jobId 또는 sseToken이 없어요.');
-      const fileMeta = { name: file.name, size: file.size, type: file.type, uploadId: resolvedUploadId };
+      try { await persistPreviewForJob(jobId, file); } catch {}
+      const fileMeta = { name: file.name, size: file.size, type: file.type, uploadId: resolvedUploadId, previewStoreId: jobId };
       setMeta(fileMeta);
       try {
         sessionStorage.setItem(`sse:${jobId}`, sseToken);

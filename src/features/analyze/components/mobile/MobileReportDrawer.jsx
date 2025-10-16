@@ -2,6 +2,7 @@ import React, { Fragment, useEffect, useMemo } from 'react';
 import { createPortal } from 'react-dom';
 import { Transition } from '@headlessui/react';
 import { XMarkIcon } from '@heroicons/react/24/outline';
+import usePreviewUrl from '../../../../utils/usePreviewUrl';
 import MobileHeatmapPreview from './MobileHeatmapPreview';
 
 const METRIC_DEFS = [
@@ -209,8 +210,7 @@ export default function MobileReportDrawer({ open, onClose = () => {}, data, med
   }, [data]);
   const storedAt = mediaMeta?.storedAt || mediaMeta?.stored_at || data?.storedAt;
   const formattedStoredAt = storedAt ? formatDate(storedAt) : null;
-  const previewSrc =
-    typeof mediaMeta?.previewDataUrl === 'string' ? mediaMeta.previewDataUrl : null;
+  const previewSrc = usePreviewUrl(mediaMeta);
   const heatmapData =
     (data && typeof data.heatmap === 'object' && data.heatmap) ||
     (data && typeof data.inference === 'object' && data.inference && data.inference.heatmap) ||

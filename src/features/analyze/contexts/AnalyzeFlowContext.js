@@ -517,6 +517,12 @@ async function submitAnalyzeFilesTest(files, options = {}, scenarioKey) {
       } catch {}
     }
 
+    if (typeof options?.afterAnalyze === 'function' && file) {
+      try {
+        await options.afterAnalyze(file, { jobId, uploadId: `demo-upload-${idx + 1}` }, baseMeta);
+      } catch {}
+    }
+
     ensureSessionValue(`sse:meta:${jobId}`, JSON.stringify(baseMeta));
     ensureSessionValue(`sse:${jobId}`, null);
 

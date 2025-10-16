@@ -15,6 +15,7 @@ export async function submitAnalyzeFiles(files, {
     params = {},
     buildParams,
     buildMeta,
+    afterAnalyze,
 } = {}) {
     const jobIds = [];
     const errors = [];
@@ -137,6 +138,11 @@ export async function submitAnalyzeFiles(files, {
                     } catch {}
                 }
                 sessionStorage.setItem(`sse:meta:${jobId}`, JSON.stringify(baseMeta));
+                if (typeof afterAnalyze === "function") {
+                    try {
+                        await afterAnalyze(file, { ...analyzeJson, jobId, modelKey: resolvedModelKey, uploadId: resolvedUploadId }, baseMeta);
+                    } catch {}
+                }
             } catch {}
             jobIds.push(jobId);
         } catch (err) {

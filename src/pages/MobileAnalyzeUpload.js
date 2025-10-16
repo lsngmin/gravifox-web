@@ -7,8 +7,8 @@ import Footer from '../features/footer/footer';
 import ErrorModal from '../features/analyze/components/ErrorModal';
 import LoginRequiredModal from '../features/analyze/components/LoginRequiredModal';
 import { useAuth } from 'providers/authProvider';
-import { readFileAsDataURL } from '../utils/filePreview';
 import { useAnalyzeFlow } from '../features/analyze/contexts/AnalyzeFlowContext';
+import { persistPreviewForJob } from '../utils/previewStore';
 import {
   rememberReturnCheckpoint,
   clearReturnCheckpoint,
@@ -424,18 +424,15 @@ export default function MobileAnalyzeUpload() {
     try {
       const { jobIds, errors, remainingQuota } = await runSubmitAnalyze(files, {
         modelKey,
-        buildMeta: async (file) => {
-          const base = {
-            name: file?.name,
-            size: file?.size,
-            type: file?.type,
-            modelKey,
-          };
-          const preview = await readFileAsDataURL(file);
-          if (preview) {
-            base.previewDataUrl = preview;
-          }
-          return base;
+        buildMeta: async (file) => ({
+          name: file?.name,
+          size: file?.size,
+          type: file?.type,
+          modelKey,
+        }),
+        afterAnalyze: async (file, analyzeJson) => {
+          if (!file || !analyzeJson?.jobId) return;
+          await persistPreviewForJob(analyzeJson.jobId, file);
         },
       });
 

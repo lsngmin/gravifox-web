@@ -1,6 +1,7 @@
 import React, { useCallback, useMemo, useState } from 'react';
 import { Share2, Star, ArrowUpRight } from 'lucide-react';
 import MobileReportDrawer from './MobileReportDrawer';
+import usePreviewUrl from '../../../../utils/usePreviewUrl';
 
 const clamp01 = (value) => Math.max(0, Math.min(1, value));
 
@@ -58,7 +59,7 @@ function buildConfidenceCopy({ percent, t }) {
 export default function MobileAnalysisReport({ report, t }) {
   const data = report?.result || {};
   const fileName = report?.fileMeta?.name || '';
-  const filePreview = typeof report?.fileMeta?.previewDataUrl === 'string' ? report.fileMeta.previewDataUrl : null;
+  const previewUrl = usePreviewUrl(report?.fileMeta);
   const rawLabel = data.label || data.decision || 'UNKNOWN';
   const label = typeof rawLabel === 'string' ? rawLabel.toUpperCase() : 'UNKNOWN';
 
@@ -216,16 +217,16 @@ export default function MobileAnalysisReport({ report, t }) {
             <h2 className="text-[1.35rem] font-semibold leading-tight text-white">{headline}</h2>
             {detail && <p className="text-sm leading-relaxed text-slate-200/85">{detail}</p>}
           </div>
-          {filePreview && (
-            <div className="mt-0.5 mb-0.5 overflow-hidden rounded-3xl border border-white/10 bg-black/35">
-              <img
-                src={filePreview}
-                alt={fileName ? `${fileName} 미리보기` : t?.('mobileAnalyze.report.previewUploadAlt', '업로드 미디어 미리보기')}
-                className="h-[17rem] w-full object-cover"
-                loading="lazy"
-              />
-            </div>
-          )}
+        {previewUrl && (
+          <div className="mt-0.5 mb-0.5 overflow-hidden rounded-3xl border border-white/10 bg-black/35">
+            <img
+              src={previewUrl}
+              alt={fileName ? `${fileName} 미리보기` : t?.('mobileAnalyze.report.previewUploadAlt', '업로드 미디어 미리보기')}
+              className="h-[17rem] w-full object-cover"
+              loading="lazy"
+            />
+          </div>
+        )}
           <div className="flex items-center justify-between gap-2.5 pt-0.5">
             <button
               type="button"

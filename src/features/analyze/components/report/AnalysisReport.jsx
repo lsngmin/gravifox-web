@@ -2,6 +2,7 @@ import React, { forwardRef, useMemo, useEffect, useState } from "react";
 import InfoHover from "./InfoHover";
 import Sparkline from "./Sparkline";
 import AutoNarrative from "./AutoNarrative";
+import usePreviewUrl from "../../../../utils/usePreviewUrl";
 
 const toPct = (v) => `${(v * 100).toFixed(1)}%`;
 
@@ -63,6 +64,8 @@ function TimelineHeaderExtras({ tStats }) {
       setAuto(next);
     }
   };
+
+  const previewUrl = usePreviewUrl(mediaMeta);
 
   return (
     <div className="flex items-center gap-4 text-xs text-slate-600">
@@ -275,10 +278,10 @@ const AnalysisReport = forwardRef(function AnalysisReport({ data, mediaMeta }, r
         {mediaMeta && (
           <div className="mt-4 rounded-xl border border-slate-200 p-4">
             <div className="flex flex-col gap-4 sm:flex-row">
-              {mediaMeta?.previewDataUrl && (
+              {previewUrl && (
                 <div className="w-full max-w-[220px] overflow-hidden rounded-lg border border-slate-200 bg-slate-50">
                   <img
-                    src={mediaMeta.previewDataUrl}
+                    src={previewUrl}
                     alt={mediaMeta?.name ? `${mediaMeta.name} 미리보기` : '업로드한 미디어 미리보기'}
                     className="block h-full w-full object-contain bg-white"
                     loading="lazy"
