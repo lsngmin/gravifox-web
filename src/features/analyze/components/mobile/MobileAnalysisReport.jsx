@@ -1,5 +1,6 @@
 import React, { useCallback, useMemo, useState } from 'react';
 import { Share2, Star, ArrowUpRight } from 'lucide-react';
+import MobileReportDrawer from './MobileReportDrawer';
 
 const clamp01 = (value) => Math.max(0, Math.min(1, value));
 
@@ -191,67 +192,79 @@ export default function MobileAnalysisReport({ report, t }) {
     []
   );
 
+  const [modalOpen, setModalOpen] = useState(false);
+
   return (
-    <section
-      className="relative overflow-hidden rounded-[28px] bg-slate-950/88 p-4 text-slate-100 shadow-[0_30px_60px_-32px_rgba(15,23,42,0.88)]"
-      style={gradientStyle}
-    >
-      <div className="pointer-events-none absolute -left-24 top-[-36px] h-48 w-48 rounded-full bg-emerald-400/10 blur-3xl" aria-hidden="true" />
-      <div className="pointer-events-none absolute right-[-28px] bottom-[-48px] h-48 w-48 rounded-full bg-sky-400/12 blur-3xl" aria-hidden="true" />
-      <div className="relative flex flex-col gap-2.5">
-        <div className="flex w-full flex-wrap items-center gap-2">
-          <span className={`inline-flex items-center rounded-full border px-3.5 py-1.5 text-[11px] font-semibold uppercase tracking-[0.18em] ${labelTone.badge}`}>
-            <span className={`mr-2 inline-block h-2.5 w-2.5 rounded-full ${labelTone.dot}`} />
-            {labelCopy}
-          </span>
-          <span className="ml-auto inline-flex items-center justify-center rounded-full border border-[rgba(99,102,241,0.35)] bg-[linear-gradient(140deg,rgba(99,102,241,0.22),rgba(129,140,248,0.1),rgba(99,102,241,0.18))] px-4 py-1.5 text-[12px] font-semibold uppercase tracking-[0.2em] text-slate-100 shadow-[0_16px_36px_-28px_rgba(30,64,175,0.48),0_10px_28px_-22px_rgba(99,102,241,0.38),0_0_14px_rgba(129,140,248,0.22)] backdrop-blur-xl">
-            {generationLabel} {percentDisplay}
-          </span>
-        </div>
-        <div className="flex flex-col gap-2">
-          <h2 className="text-[1.35rem] font-semibold leading-tight text-white">{headline}</h2>
-          {detail && <p className="text-sm leading-relaxed text-slate-200/85">{detail}</p>}
-        </div>
-        {filePreview && (
-          <div className="overflow-hidden rounded-3xl border border-white/10 bg-black/35 mt-0.5 mb-0.5">
-            <img
-              src={filePreview}
-              alt={fileName ? `${fileName} 미리보기` : t?.('mobileAnalyze.report.previewUploadAlt', '업로드 미디어 미리보기')}
-              className="h-[17rem] w-full object-cover"
-              loading="lazy"
-            />
+    <>
+      <section
+        className="relative overflow-hidden rounded-[28px] bg-slate-950/88 p-4 text-slate-100 shadow-[0_30px_60px_-32px_rgba(15,23,42,0.88)]"
+        style={gradientStyle}
+      >
+        <div className="pointer-events-none absolute -left-24 top-[-36px] h-48 w-48 rounded-full bg-emerald-400/10 blur-3xl" aria-hidden="true" />
+        <div className="pointer-events-none absolute right-[-28px] bottom-[-48px] h-48 w-48 rounded-full bg-sky-400/12 blur-3xl" aria-hidden="true" />
+        <div className="relative flex flex-col gap-2.5">
+          <div className="flex w-full flex-wrap items-center gap-2">
+            <span className={`inline-flex items-center rounded-full border px-3.5 py-1.5 text-[11px] font-semibold uppercase tracking-[0.18em] ${labelTone.badge}`}>
+              <span className={`mr-2 inline-block h-2.5 w-2.5 rounded-full ${labelTone.dot}`} />
+              {labelCopy}
+            </span>
+            <span className="ml-auto inline-flex items-center justify-center rounded-full border border-[rgba(99,102,241,0.35)] bg-[linear-gradient(140deg,rgba(99,102,241,0.22),rgba(129,140,248,0.1),rgba(99,102,241,0.18))] px-4 py-1.5 text-[12px] font-semibold uppercase tracking-[0.2em] text-slate-100 shadow-[0_16px_36px_-28px_rgba(30,64,175,0.48),0_10px_28px_-22px_rgba(99,102,241,0.38),0_0_14px_rgba(129,140,248,0.22)] backdrop-blur-xl">
+              {generationLabel} {percentDisplay}
+            </span>
           </div>
-        )}
-        <div className="flex items-center justify-between gap-2.5 pt-0.5">
-          <button
-            type="button"
-            className="inline-flex h-9 items-center gap-2.5 rounded-full border border-emerald-300/30 bg-emerald-400/22 px-4 text-[11px] font-semibold uppercase tracking-[0.2em] text-emerald-50 shadow-[0_22px_34px_-22px_rgba(16,185,129,0.45)] backdrop-blur transition hover:bg-emerald-400/26 focus:outline-none focus-visible:ring-2 focus-visible:ring-emerald-200/80"
-          >
-            <ArrowUpRight className="h-3.5 w-3.5" />
-            {detailLabel}
-          </button>
-          <div className="flex items-center gap-2">
+          <div className="flex flex-col gap-2">
+            <h2 className="text-[1.35rem] font-semibold leading-tight text-white">{headline}</h2>
+            {detail && <p className="text-sm leading-relaxed text-slate-200/85">{detail}</p>}
+          </div>
+          {filePreview && (
+            <div className="mt-0.5 mb-0.5 overflow-hidden rounded-3xl border border-white/10 bg-black/35">
+              <img
+                src={filePreview}
+                alt={fileName ? `${fileName} 미리보기` : t?.('mobileAnalyze.report.previewUploadAlt', '업로드 미디어 미리보기')}
+                className="h-[17rem] w-full object-cover"
+                loading="lazy"
+              />
+            </div>
+          )}
+          <div className="flex items-center justify-between gap-2.5 pt-0.5">
             <button
               type="button"
-              onClick={handleShare}
-              className="inline-flex h-9 w-9 items-center justify-center rounded-full bg-white/12 text-slate-100 shadow-[0_10px_18px_-16px_rgba(148,163,184,0.55)] backdrop-blur transition hover:bg-white/18 focus:outline-none focus-visible:ring-2 focus-visible:ring-emerald-300/70"
-              aria-label={t?.('mobileAnalyze.report.actions.share', '결과 링크 공유하기')}
-              title={t?.('mobileAnalyze.report.actions.share', '결과 링크 공유하기')}
+              onClick={() => setModalOpen(true)}
+              className="inline-flex h-9 items-center gap-2.5 rounded-full border border-emerald-300/30 bg-emerald-400/22 px-4 text-[11px] font-semibold uppercase tracking-[0.2em] text-emerald-50 shadow-[0_22px_34px_-22px_rgba(16,185,129,0.45)] backdrop-blur transition hover:bg-emerald-400/26 focus:outline-none focus-visible:ring-2 focus-visible:ring-emerald-200/80"
             >
-              <Share2 className="h-4 w-4" />
+              <ArrowUpRight className="h-3.5 w-3.5" />
+              {detailLabel}
             </button>
-            <button
-              type="button"
-              onClick={handleToggleBookmark}
-              className="inline-flex h-9 w-9 items-center justify-center rounded-full bg-white/12 text-slate-200 shadow-[0_10px_18px_-16px_rgba(148,163,184,0.45)] backdrop-blur transition hover:bg-white/18 focus:outline-none focus-visible:ring-2 focus-visible:ring-emerald-300/70"
-              aria-label={t?.('mobileAnalyze.report.actions.bookmark', '즐겨찾기에 추가')}
-              title={t?.('mobileAnalyze.report.actions.bookmark', '즐겨찾기에 추가')}
-            >
-              <Star className={`h-4 w-4 ${bookmarked ? 'fill-amber-300 stroke-current' : 'fill-none stroke-current'}`} />
-            </button>
+            <div className="flex items-center gap-2">
+              <button
+                type="button"
+                onClick={handleShare}
+                className="inline-flex h-9 w-9 items-center justify-center rounded-full bg-white/12 text-slate-100 shadow-[0_10px_18px_-16px_rgba(148,163,184,0.55)] backdrop-blur transition hover:bg-white/18 focus:outline-none focus-visible:ring-2 focus-visible:ring-emerald-300/70"
+                aria-label={t?.('mobileAnalyze.report.actions.share', '결과 링크 공유하기')}
+                title={t?.('mobileAnalyze.report.actions.share', '결과 링크 공유하기')}
+              >
+                <Share2 className="h-4 w-4" />
+              </button>
+              <button
+                type="button"
+                onClick={handleToggleBookmark}
+                className="inline-flex h-9 w-9 items-center justify-center rounded-full bg-white/12 text-slate-200 shadow-[0_10px_18px_-16px_rgba(148,163,184,0.45)] backdrop-blur transition hover:bg-white/18 focus:outline-none focus-visible:ring-2 focus-visible:ring-emerald-300/70"
+                aria-label={t?.('mobileAnalyze.report.actions.bookmark', '즐겨찾기에 추가')}
+                title={t?.('mobileAnalyze.report.actions.bookmark', '즐겨찾기에 추가')}
+              >
+                <Star className={`h-4 w-4 ${bookmarked ? 'fill-amber-300 stroke-current' : 'fill-none stroke-current'}`} />
+              </button>
+            </div>
           </div>
         </div>
-      </div>
-    </section>
+      </section>
+      <MobileReportDrawer
+        open={modalOpen}
+        onClose={() => setModalOpen(false)}
+        data={report?.result}
+        mediaMeta={report?.fileMeta}
+        jobId={report?.jobId}
+      />
+    </>
   );
 }

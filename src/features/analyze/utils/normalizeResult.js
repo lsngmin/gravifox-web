@@ -60,6 +60,27 @@ export function normalizeAnalysisResult(raw = {}) {
     }
   }
 
+  const inferenceMeta = (result && typeof result.inference === "object" && result.inference) || {};
+  const heatmap =
+    (result && typeof result.heatmap === "object" && result.heatmap) ||
+    (typeof inferenceMeta.heatmap === "object" && inferenceMeta.heatmap) ||
+    null;
+  if (heatmap) {
+    result.heatmap = heatmap;
+    if (!inferenceMeta.heatmap) {
+      result.inference = { ...inferenceMeta, heatmap };
+    }
+  }
+
+  if (typeof result.heatmap_score !== "number") {
+    const derived = deriveHeatmapScore(heatmap);
+    if (typeof derived === "number" && Number.isFinite(derived)) {
+      result.heatmap_score = clamp01(derived);
+    }
+  } else {
+    result.heatmap_score = clamp01(result.heatmap_score);
+  }
+
   return result;
 }
 
@@ -68,6 +89,30 @@ function clamp01(value) {
   if (value < 0) return 0;
   if (value > 1) return 1;
   return value;
+}
+
+function deriveHeatmapScore(heatmap) {
+  if (!heatmap || typeof heatmap !== "object") return null;
+  const cells = Array.isArray(heatmap.cells) ? heatmap.cells : null;
+  if (!cells || cells.length === 0) return null;
+
+  let best = null;
+  cells.forEach((cell) => {
+    if (!cell || typeof cell !== "object") return;
+    const aiCandidates = [cell.ai_max, cell.ai_mean];
+    aiCandidates.forEach((candidate) => {
+      if (typeof candidate === "number" && Number.isFinite(candidate)) {
+        if (best == null || candidate > best) {
+          best = candidate;
+        }
+      }
+    });
+  });
+
+  if (best == null) return null;
+  if (best < 0) return 0;
+  if (best > 1) return 1;
+  return best;
 }
 
 export default normalizeAnalysisResult;
