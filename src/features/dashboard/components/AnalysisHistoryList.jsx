@@ -1,6 +1,7 @@
 import React, { useEffect, useMemo, useRef, useState } from "react";
 import { ArrowPathIcon, StarIcon } from "@heroicons/react/24/outline";
 import AnalysisReport from "../../analyze/components/report/AnalysisReport";
+import MobileReportDrawer from "../../analyze/components/mobile/MobileReportDrawer";
 import { ANALYZE_ENDPOINTS, FASTAPI_ENDPOINTS } from "../../../api/endPointRoute";
 import axios from "../../../api/http";
 import ensureUploadToken from "../../analyze/api/uploadTokenClient";
@@ -64,8 +65,8 @@ export default function AnalysisHistoryList() {
     } catch { return new Set(); }
   });
   const [sortKey, setSortKey] = useState('NEWEST'); // NEWEST | OLDEST | LABEL | NAME_ASC | NAME_DESC | SIZE_ASC | SIZE_DESC
-  const [openReports, setOpenReports] = useState(() => new Set());
   const [openRe, setOpenRe] = useState(() => new Set());
+  const [drawerReport, setDrawerReport] = useState(null);
 
   useEffect(() => {
     setLocal(readLocalReports());
@@ -317,14 +318,10 @@ export default function AnalysisHistoryList() {
                 <div className="flex flex-wrap items-center gap-2">
                   <button
                     type="button"
-                    onClick={() => {
-                      const next = new Set(openReports);
-                      if (next.has(jobId)) next.delete(jobId); else next.add(jobId);
-                      setOpenReports(next);
-                    }}
+                    onClick={() => setDrawerReport({ jobId, data, meta })}
                     className="inline-flex items-center rounded-lg bg-indigo-500/80 px-3 py-1.5 text-xs font-semibold text-white transition hover:bg-indigo-500"
                   >
-                    {openReports.has(jobId) ? '리포트 닫기' : '리포트 보기'}
+                    리포트 보기
                   </button>
                   <button
                     type="button"
@@ -340,19 +337,6 @@ export default function AnalysisHistoryList() {
                 </div>
               </div>
             </div>
-            <Transition
-              show={openReports.has(jobId)}
-              enter="transition-all duration-300 ease-out"
-              enterFrom="opacity-0 -translate-y-1 scale-[0.99]"
-              enterTo="opacity-100 translate-y-0 scale-100"
-              leave="transition-all duration-200 ease-in"
-              leaveFrom="opacity-100 translate-y-0 scale-100"
-              leaveTo="opacity-0 -translate-y-1 scale-[0.99]"
-            >
-              <div className="mt-3">
-                <AnalysisReport data={data} mediaMeta={meta} />
-              </div>
-            </Transition>
             <Transition
               show={openRe.has(jobId)}
               enter="transition-all duration-300 ease-out"
@@ -370,6 +354,13 @@ export default function AnalysisHistoryList() {
         );
       })}
 
+      <MobileReportDrawer
+        open={!!drawerReport}
+        onClose={() => setDrawerReport(null)}
+        data={drawerReport?.data}
+        mediaMeta={drawerReport?.meta}
+        jobId={drawerReport?.jobId}
+      />
     </div>
   );
 }
