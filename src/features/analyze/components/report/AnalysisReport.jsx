@@ -41,7 +41,7 @@ function useAutoScale() {
   return auto;
 }
 
-function TimelineHeaderExtras({ tStats }) {
+function TimelineHeaderExtras({ tStats, mediaMeta }) {
   const [auto, setAuto] = useState(false);
   // share with Sparkline via window setter
   useEffect(() => {
@@ -65,8 +65,6 @@ function TimelineHeaderExtras({ tStats }) {
     }
   };
 
-  const previewUrl = usePreviewUrl(mediaMeta);
-
   return (
     <div className="flex items-center gap-4 text-xs text-slate-600">
       {tStats && (
@@ -89,6 +87,7 @@ function TimelineHeaderExtras({ tStats }) {
 }
 
 const AnalysisReport = forwardRef(function AnalysisReport({ data, mediaMeta }, ref) {
+  const previewUrl = usePreviewUrl(mediaMeta);
   // inject appear animation keyframes once
   useEffect(() => {
     const id = 'analysis-report-anims';
@@ -365,7 +364,7 @@ const AnalysisReport = forwardRef(function AnalysisReport({ data, mediaMeta }, r
                 타임라인
                 <InfoHover text={infoText.probs_timeline} className="ml-1" />
               </div>
-              <TimelineHeaderExtras tStats={tStats} />
+              <TimelineHeaderExtras tStats={tStats} mediaMeta={mediaMeta} />
             </div>
             <div className={`mt-3 rounded-lg border border-slate-100 bg-slate-50 p-3 transition-opacity duration-300 ease-in-out ${fade ? 'opacity-0' : 'opacity-100'}`} id="timeline-graph">
               <Sparkline data={probs_timeline} threshold={threshold} autoScale={useAutoScale()} pad={0.03} />
