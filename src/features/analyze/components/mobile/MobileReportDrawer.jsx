@@ -2,6 +2,7 @@ import React, { Fragment, useEffect, useMemo } from 'react';
 import { createPortal } from 'react-dom';
 import { Transition } from '@headlessui/react';
 import { XMarkIcon } from '@heroicons/react/24/outline';
+import MobileHeatmapPreview from './MobileHeatmapPreview';
 
 const METRIC_DEFS = [
   { key: 'prob_std', label: '확률 표준편차', formatter: formatDecimal },
@@ -208,6 +209,17 @@ export default function MobileReportDrawer({ open, onClose = () => {}, data, med
   }, [data]);
   const storedAt = mediaMeta?.storedAt || mediaMeta?.stored_at || data?.storedAt;
   const formattedStoredAt = storedAt ? formatDate(storedAt) : null;
+  const previewSrc =
+    typeof mediaMeta?.previewDataUrl === 'string' ? mediaMeta.previewDataUrl : null;
+  const heatmapData =
+    (data && typeof data.heatmap === 'object' && data.heatmap) ||
+    (data && typeof data.inference === 'object' && data.inference && data.inference.heatmap) ||
+    null;
+  const showHeatmapPreview =
+    Boolean(previewSrc) &&
+    heatmapData &&
+    Array.isArray(heatmapData.cells) &&
+    heatmapData.cells.length > 0;
 
   if (typeof document === 'undefined') return null;
 
@@ -341,6 +353,14 @@ export default function MobileReportDrawer({ open, onClose = () => {}, data, med
                         </div>
                       )}
                     </section>
+                  )}
+
+                  {showHeatmapPreview && (
+                    <MobileHeatmapPreview
+                      imageSrc={previewSrc}
+                      mediaName={mediaMeta?.name}
+                      heatmap={heatmapData}
+                    />
                   )}
 
                   <section className="rounded-[26px] border border-slate-800/60 bg-slate-900/75 p-5">
