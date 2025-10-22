@@ -607,11 +607,6 @@ export default function MobileAnalyzeUpload() {
                         {t('mobileAnalyze.uploadPage.modelSection.hint', '사용할 분석 모델을 고르면 결과가 더 정확해져요.')}
                       </p>
                     </div>
-                    {selectedModel && (
-                      <span className="inline-flex items-center rounded-full bg-gradient-to-r from-amber-400 via-rose-400 to-emerald-400 px-3 py-1.5 text-[12px] font-semibold text-slate-900 shadow-sm ring-1 ring-white/10">
-                        {selectedModel.name}
-                      </span>
-                    )}
                   </div>
                   {loadingModels && (
                     <p className="text-[12px] text-slate-500">
@@ -633,8 +628,6 @@ export default function MobileAnalyzeUpload() {
                       {models.map((model) => {
                         const selected = model.key === modelKey;
                         const isDefault = model.key === defaultModelKey;
-                        const thresholdLabel =
-                          typeof model.threshold === 'number' ? model.threshold.toFixed(2) : null;
                         return (
                           <button
                             key={model.key}
@@ -657,29 +650,6 @@ export default function MobileAnalyzeUpload() {
                                     </span>
                                   )}
                                 </p>
-                                {model.description && (
-                                  <p className="mt-1 text-[11px] text-slate-300/80">
-                                    {model.description}
-                                  </p>
-                                )}
-                                <div className="mt-2 flex flex-wrap items-center gap-3 text-[10px] uppercase tracking-wide text-slate-300/70">
-                                  {model.version && (
-                                    <span className="inline-flex items-center gap-1">
-                                      {t('mobileAnalyze.uploadPage.modelSection.version', {
-                                        defaultValue: '버전 {{version}}',
-                                        version: model.version,
-                                      })}
-                                    </span>
-                                  )}
-                                  {thresholdLabel && (
-                                    <span className="inline-flex items-center gap-1">
-                                      {t('mobileAnalyze.uploadPage.modelSection.threshold', {
-                                        defaultValue: '임계값 {{threshold}}',
-                                        threshold: thresholdLabel,
-                                      })}
-                                    </span>
-                                  )}
-                                </div>
                               </div>
                               <span
                                 className={`mt-0.5 inline-flex h-6 w-6 items-center justify-center rounded-full border ${
