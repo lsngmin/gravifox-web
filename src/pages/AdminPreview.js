@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useState } from "react";
+import React, { useCallback, useEffect, useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
 import clsx from "clsx";
 import {
@@ -81,47 +81,63 @@ const analysisTrend = [
     { label: "금", value: 508 },
 ];
 
+const PAGE_SIZE = 10;
+
 const AdminPreview = () => {
     const { i18n } = useTranslation();
     const [isDarkMode, setIsDarkMode] = useState(true);
     const [hoveredEntry, setHoveredEntry] = useState(null);
-    const [userPage, setUserPage] = useState(null);
-    const [userLoading, setUserLoading] = useState(false);
-    const [userError, setUserError] = useState(null);
+    const [userItems, setUserItems] = useState([]);
+    const [pageMeta, setPageMeta] = useState({ page: -1, totalPages: 0, totalElements: 0, size: PAGE_SIZE });
+    const [isLoading, setIsLoading] = useState(false);
+    const [isAppending, setIsAppending] = useState(false);
+    const [error, setError] = useState(null);
 
-    useEffect(() => {
-        let cancelled = false;
-        const load = async () => {
-            setUserLoading(true);
-            setUserError(null);
-            try {
-                const data = await fetchAdminUsers({ page: 0, size: 10, sort: "userNo,DESC" });
-                if (!cancelled) {
-                    setUserPage(data);
+    const loadUsers = useCallback(async (nextPage = 0) => {
+        const append = nextPage > 0;
+        append ? setIsAppending(true) : setIsLoading(true);
+        setError(null);
+        try {
+            const data = await fetchAdminUsers({ page: nextPage, size: PAGE_SIZE, sort: "userNo,DESC" });
+            const items = data?.items ?? [];
+            setUserItems((prev) => {
+                if (!append) {
+                    return items;
                 }
-            } catch (err) {
-                if (!cancelled) {
-                    setUserError(err);
-                }
-            } finally {
-                if (!cancelled) {
-                    setUserLoading(false);
-                }
-            }
-        };
-        load();
-        return () => {
-            cancelled = true;
-        };
+                const existingIds = new Set(prev.map((item) => item.userNo));
+                const merged = [...prev];
+                items.forEach((item) => {
+                    if (!existingIds.has(item.userNo)) {
+                        merged.push(item);
+                        existingIds.add(item.userNo);
+                    }
+                });
+                return merged;
+            });
+            setPageMeta((prev) => ({
+                page: data?.page ?? nextPage,
+                totalPages: data?.totalPages ?? prev.totalPages,
+                totalElements: data?.totalElements ?? prev.totalElements,
+                size: data?.size ?? prev.size,
+            }));
+        } catch (err) {
+            setError(err);
+        } finally {
+            append ? setIsAppending(false) : setIsLoading(false);
+        }
     }, []);
 
+    useEffect(() => {
+        loadUsers(0);
+    }, [loadUsers]);
+
     const stats = useMemo(() => {
-        const items = userPage?.items ?? [];
-        const totalUsers = userPage?.totalElements ?? items.length;
+        const items = userItems;
+        const totalUsers = pageMeta.totalElements ?? items.length;
         const simulatedPrevDayUsers = Math.max(totalUsers - 2, 1);
         const growthRaw = totalUsers - simulatedPrevDayUsers;
         const growthPercent =
-            simulatedPrevDayUsers > 0 ? (growthRaw / simulatedPrevDayUsers) * 100 : 0;
+                simulatedPrevDayUsers > 0 ? (growthRaw / simulatedPrevDayUsers) * 100 : 0;
 
         const totalReports = analysisTrend.reduce((acc, point) => acc + point.value, 0);
 
@@ -167,9 +183,19 @@ const AdminPreview = () => {
                 footer: "Heatmap Lab 베타 운영 중",
             },
         ];
-    }, [userPage]);
+    }, [userItems, pageMeta.totalElements]);
 
-    const userSummaries = userPage?.items ?? [];
+    const userSummaries = userItems;
+    const errorMessage = error ? (error?.response?.data?.message ?? error.message ?? "사용자 정보를 불러오지 못했습니다.") : null;
+    const hasMore = pageMeta.page + 1 < pageMeta.totalPages;
+
+    const handleLoadMore = useCallback(() => {
+        if (isAppending || isLoading || !hasMore) {
+            return;
+        }
+        const nextPage = (pageMeta.page >= 0 ? pageMeta.page + 1 : 0);
+        loadUsers(nextPage);
+    }, [hasMore, isAppending, isLoading, loadUsers, pageMeta.page]);
 
     const formatDateTime = (value) => {
         if (!value) return "—";
@@ -663,28 +689,28 @@ const AdminPreview = () => {
                                     </tr>
                                 </thead>
                                 <tbody className={clsx(tableStripe)}>
-                                    {userLoading && (
+                                    {isLoading && userSummaries.length === 0 && (
                                         <tr>
                                             <td colSpan={5} className="px-6 py-6 text-center text-sm text-slate-500 dark:text-slate-400">
                                                 사용자 정보를 불러오는 중입니다...
                                             </td>
                                         </tr>
                                     )}
-                                    {userError && !userLoading && (
+                                    {errorMessage && !isLoading && userSummaries.length === 0 && (
                                         <tr>
                                             <td colSpan={5} className="px-6 py-6 text-center text-sm text-rose-500">
-                                                사용자 정보를 불러오지 못했습니다.
+                                                {errorMessage}
                                             </td>
                                         </tr>
                                     )}
-                                    {!userLoading && !userError && userSummaries.length === 0 && (
+                                    {!isLoading && !errorMessage && userSummaries.length === 0 && (
                                         <tr>
                                             <td colSpan={5} className="px-6 py-6 text-center text-sm text-slate-500 dark:text-slate-400">
                                                 표시할 사용자가 없습니다.
                                             </td>
                                         </tr>
                                     )}
-                                    {!userLoading && !userError && userSummaries.map((user) => {
+                                    {!isLoading && userSummaries.length > 0 && userSummaries.map((user) => {
                                         const limit = user.monthlyQuotaLimit ?? 0;
                                         const used = user.monthlyQuotaUsed ?? 0;
                                         const percent = limit > 0 ? Math.min(100, Math.round((used / limit) * 100)) : 0;
@@ -817,6 +843,27 @@ const AdminPreview = () => {
                                 </tbody>
                             </table>
                         </div>
+                        {hasMore && (
+                            <div className={clsx(
+                                    "border-t px-6 py-4 text-center",
+                                    isDarkMode ? "border-slate-800/40" : "border-slate-200"
+                            )}>
+                                <button
+                                    type="button"
+                                    onClick={handleLoadMore}
+                                    disabled={isAppending}
+                                    className={clsx(
+                                        "inline-flex items-center justify-center rounded-full px-4 py-1.5 text-sm font-medium transition",
+                                        isDarkMode
+                                            ? "border border-slate-700 text-slate-200 hover:border-slate-500 hover:text-white"
+                                            : "border border-slate-300 text-slate-600 hover:border-slate-400 hover:text-slate-800",
+                                        isAppending && "opacity-70"
+                                    )}
+                                >
+                                    {isAppending ? "불러오는 중..." : "더 보기"}
+                                </button>
+                            </div>
+                        )}
                     </article>
 
                     <aside
