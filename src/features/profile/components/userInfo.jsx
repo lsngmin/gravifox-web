@@ -4,12 +4,27 @@ import PlanCard from "./PlanCard";
 import SecurityCard from "./SecurityCard";
 import { BellIcon, SwatchIcon, TrashIcon } from "@heroicons/react/24/outline";
 import { SunIcon, MoonIcon } from "@heroicons/react/24/solid";
+import { useTranslation } from "react-i18next";
 
 export default function UserInfo({ theme = "dark", onThemeChange }) {
+  const { i18n } = useTranslation();
   const isDark = theme === "dark";
   const toggleTheme = () => {
     const next = isDark ? "light" : "dark";
     if (typeof onThemeChange === "function") onThemeChange(next);
+  };
+  const supportedLanguages = [
+    { code: "ko", label: "한국어" },
+    { code: "en", label: "English" },
+  ];
+  const currentLang = (i18n.language || "en").slice(0, 2);
+  const handleLanguageChange = (lng) => {
+    const target = supportedLanguages.find(({ code }) => code === lng) ? lng : "en";
+    if (target === currentLang) return;
+    i18n.changeLanguage(target);
+    try {
+      window?.localStorage?.setItem("i18nextLng", target);
+    } catch {}
   };
 
   return (
@@ -151,6 +166,44 @@ export default function UserInfo({ theme = "dark", onThemeChange }) {
                   </span>
                 </span>
               </button>
+            </div>
+
+            <div className="mt-6 flex flex-wrap items-center justify-between gap-4">
+              <div>
+                <p className={`text-sm font-semibold ${isDark ? "text-white" : "text-gray-900"}`}>언어 설정</p>
+                <p className={`text-xs ${isDark ? "text-slate-300/75" : "text-gray-500"}`}>
+                  사용 언어를 선택하면 전체 서비스 언어가 변경돼요.
+                </p>
+              </div>
+              <div
+                className={`relative inline-grid h-11 w-56 grid-cols-2 items-stretch overflow-hidden rounded-full text-xs font-semibold uppercase tracking-wide transition focus:outline-none focus-visible:ring-2 focus-visible:ring-emerald-200/80 ${
+                  isDark ? "border border-white/15 bg-white/[0.05] text-slate-300" : "border border-gray-200 bg-white text-gray-600 shadow-sm"
+                }`}
+                role="group"
+                aria-label="언어 선택"
+              >
+                {supportedLanguages.map(({ code, label }, idx) => {
+                  const active = currentLang === code;
+                  return (
+                    <button
+                      key={code}
+                      type="button"
+                      onClick={() => handleLanguageChange(code)}
+                      className={`relative flex items-center justify-center px-4 py-2 transition ${
+                        active
+                          ? isDark
+                            ? "bg-gradient-to-r from-emerald-500/80 to-teal-400/80 text-white shadow-[0_12px_22px_-18px_rgba(16,185,129,0.65)]"
+                            : "bg-emerald-200 text-emerald-900"
+                          : isDark
+                          ? "hover:bg-white/10"
+                          : "hover:bg-gray-100"
+                      }`}
+                    >
+                      {label}
+                    </button>
+                  );
+                })}
+              </div>
             </div>
           </div>
         </section>

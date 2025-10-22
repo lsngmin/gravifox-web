@@ -206,14 +206,6 @@ const Navigation = ({ variant = 'light' }) => {
     const isLoggedIn = Boolean(userInfo);
     const displayName = userInfo?.nickname || userInfo?.userId || '';
     const displayEmail = userInfo?.userId || '';
-    const userInitials = useMemo(() => {
-        const src = displayName || displayEmail || 'U';
-        const trimmed = (src || '').trim();
-        if (!trimmed) return 'U';
-        const letters = trimmed.replace(/[^A-Za-z0-9가-힣]/g, '');
-        return letters.slice(0, 1).toUpperCase() || 'U';
-    }, [displayName, displayEmail]);
-
     const loginPath = localePrefix ? `${localePrefix}/login` : '/login';
     const settingsPath = localePrefix ? `${localePrefix}/settings` : '/settings';
 
@@ -387,9 +379,6 @@ const Navigation = ({ variant = 'light' }) => {
                                                                 : 'bg-indigo-50/70 text-slate-700'
                                                         }`}
                                                     >
-                                                        <div className="flex h-9 w-9 sm:h-10 sm:w-10 shrink-0 items-center justify-center rounded-full bg-indigo-500 text-xs sm:text-sm font-semibold text-white">
-                                                            {userInitials}
-                                                        </div>
                                                         <div className="min-w-0">
                                                             <p
                                                                 className={`text-sm font-semibold whitespace-normal break-words ${

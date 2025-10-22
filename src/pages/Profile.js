@@ -41,8 +41,8 @@ const Profile = () => {
         </div>
       </main>
 
-      <footer className="relative z-10 bg-transparent">
-        <Footer variant={isDark ? "dark" : "light"} />
+      <footer className={`relative z-10 ${isDark ? "bg-transparent" : "bg-gray-50"}`}>
+        <Footer variant={isDark ? "dark" : "light"} transparent={isDark} />
       </footer>
     </div>
   );

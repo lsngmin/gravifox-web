@@ -1,6 +1,6 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import dayjs from 'dayjs';
-import { UserCircleIcon, CameraIcon, PencilSquareIcon, CheckIcon, XMarkIcon } from '@heroicons/react/24/outline';
+import { UserCircleIcon, PencilSquareIcon, CheckIcon, XMarkIcon } from '@heroicons/react/24/outline';
 import { useAuth } from 'providers/authProvider';
 import axios from 'axios';
 import { PROFILE_ENDPOINTS } from 'api/endPointRoute';
@@ -17,10 +17,7 @@ export default function ProfileCard({ theme = 'dark' }) {
   const [editing, setEditing] = useState(false);
   const [nicknameError, setNicknameError] = useState('');
   const email = userInfo?.userId ?? '';
-  const [avatar, setAvatar] = useState(null);
   const [savingName, setSavingName] = useState(false);
-  const [savingAvatar, setSavingAvatar] = useState(false);
-  const fileInputRef = useRef(null);
 
   const isDark = theme === 'dark';
   const serverNicknameUpdatedAt =
@@ -96,24 +93,6 @@ export default function ProfileCard({ theme = 'dark' }) {
     if (!result.ok) return;
     setNicknameError('');
     setEditing(false);
-  }
-
-  function onAvatarClick() {
-    fileInputRef.current?.click();
-  }
-
-  async function onAvatarChange(e) {
-    const file = e.target.files?.[0];
-    if (!file) return;
-    setSavingAvatar(true);
-    try {
-      const preview = URL.createObjectURL(file);
-      setAvatar(preview);
-      // TODO: replace with actual upload API
-    } finally {
-      setSavingAvatar(false);
-      if (fileInputRef.current) fileInputRef.current.value = '';
-    }
   }
 
   const containerClass = isDark
@@ -231,28 +210,22 @@ export default function ProfileCard({ theme = 'dark' }) {
                     >
                       {userInfo?.nickname || '닉네임이 설정되지 않았어요'}
                     </div>
-                    <button
-                      type="button"
-                      onClick={() => {
-                        if (!canEditNickname) return;
-                        setNickname(userInfo?.nickname ?? '');
-                        setNicknameError('');
-                        setEditing(true);
-                      }}
-                      disabled={!canEditNickname}
-                      className={`inline-flex items-center gap-2 rounded-md px-3 py-1.5 text-[13px] font-semibold transition focus:outline-none ${
-                        canEditNickname
-                          ? isDark
-                            ? 'text-indigo-200 hover:text-white'
-                            : 'text-indigo-600 hover:text-indigo-700'
-                          : isDark
-                          ? 'text-slate-500 cursor-not-allowed'
-                          : 'text-gray-400 cursor-not-allowed'
-                      }`}
-                    >
-                      <PencilSquareIcon className="h-4 w-4" />
-                      수정
-                    </button>
+                    {canEditNickname && (
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setNickname(userInfo?.nickname ?? '');
+                          setNicknameError('');
+                          setEditing(true);
+                        }}
+                        className={`inline-flex items-center gap-2 rounded-md px-3 py-1.5 text-[13px] font-semibold transition focus:outline-none ${
+                          isDark ? 'text-indigo-200 hover:text-white' : 'text-indigo-600 hover:text-indigo-700'
+                        }`}
+                      >
+                        <PencilSquareIcon className="h-4 w-4" />
+                        수정
+                      </button>
+                    )}
                   </>
                 )}
               </div>
@@ -279,60 +252,14 @@ export default function ProfileCard({ theme = 'dark' }) {
               >
                 로그인 이메일
               </label>
-              <p
-                className={`mt-2 rounded-lg border px-3 py-2 text-sm font-medium ${
-                  isDark ? 'border-white/12 bg-white/[0.03] text-white/90' : 'border-gray-200 bg-white text-gray-900'
-                }`}
-              >
+              <p className={`mt-2 text-sm font-semibold ${isDark ? 'text-white/90' : 'text-gray-900'}`}>
                 {email || '이메일 정보가 없습니다.'}
               </p>
-              <p className={`mt-1.5 text-[10px] ${isDark ? 'text-slate-400/75' : 'text-gray-500'}`}>
-                개인정보 보호를 위해 이메일은 읽기 전용으로 표시돼요.
-              </p>
             </div>
           </div>
         </div>
 
-        <div className="flex min-h-[8rem] items-center justify-center md:justify-end">
-          <div className="group relative">
-            <div
-              className={`relative flex h-28 w-28 cursor-pointer items-center justify-center overflow-hidden rounded-full text-[2.25rem] font-bold ${
-                isDark
-                  ? 'bg-gradient-to-br from-indigo-500 via-indigo-600 to-purple-600 text-white shadow-[0_20px_36px_-24px_rgba(99,102,241,0.9)]'
-                  : 'bg-indigo-500 text-white shadow-lg'
-              }`}
-              onClick={onAvatarClick}
-              title="프로필 사진 변경"
-            >
-              {avatar ? (
-                <img src={avatar} alt="프로필 이미지" className="h-full w-full object-cover" />
-              ) : (
-                (nickname?.[0] ?? 'U').toUpperCase()
-              )}
-              <div
-                className={`pointer-events-none absolute inset-0 flex items-center justify-center rounded-full transition ${
-                  isDark ? 'bg-black/45 opacity-0 group-hover:opacity-100' : 'bg-black/20 opacity-0 group-hover:opacity-100'
-                }`}
-              >
-                <div className="flex items-center gap-2 text-sm font-medium text-white">
-                  <CameraIcon className="h-4 w-4" />
-                  {savingAvatar ? '업로드 중...' : '변경'}
-                </div>
-              </div>
-            </div>
-
-            <input
-              ref={fileInputRef}
-              type="file"
-              accept="image/*"
-              className="hidden"
-              onChange={onAvatarChange}
-            />
-            <p className={`mt-1.5 text-center text-[11px] ${isDark ? 'text-slate-400/80 md:text-right' : 'text-gray-500 md:text-right'}`}>
-              JPG/PNG · 최대 5MB
-            </p>
-          </div>
-        </div>
+        <div className="flex min-h-[8rem] items-center justify-center md:justify-end" />
       </div>
     </section>
   );

@@ -52,14 +52,6 @@ export default function AvatarButton({ size = "md" }) {
         navigate(nextPath, { replace: true });
     };
 
-    const initials = useMemo(() => {
-        const src = userInfo?.nickname || userInfo?.userId || "U";
-        const s = (src || "U").trim();
-        if (!s) return "U";
-        const letters = s.replace(/[^A-Za-z0-9가-힣]/g, "");
-        return letters.slice(0, 1).toUpperCase();
-    }, [userInfo]);
-
     const displayName = userInfo?.nickname || userInfo?.userId || "User";
     const displayEmail = userInfo?.userId || "";
 
@@ -90,10 +82,6 @@ export default function AvatarButton({ size = "md" }) {
                 {/* 로그인 사용자 정보 */}
                 <div className="px-4 py-3 border-b border-gray-100">
                     <div className="flex items-center gap-3">
-                        {/* 아바타 */}
-                        <div className="w-9 h-9 sm:w-10 sm:h-10 rounded-full bg-indigo-500 flex items-center justify-center text-white font-semibold text-sm sm:text-base">
-                            {initials}
-                        </div>
                         <div>
                             <p className="text-sm font-semibold text-gray-900">{displayName}</p>
                             {displayEmail && (

@@ -30,15 +30,17 @@ const Footer = ({ transparent = false, inline = false, variant = 'light', showLi
 
     const isDark = variant === 'dark';
 
-    const darkSectionClass = transparent ? "bg-transparent" : "bg-[#13213f]";
-    const darkLinkClass = "text-slate-300 hover:text-slate-100";
-    const darkSeparatorClass = "text-slate-600";
-    const darkLanguageIdle = "bg-slate-800/70 text-slate-200 hover:bg-slate-700/70";
-    const darkRingClass = "ring-slate-600";
+    const darkSectionClass = transparent ? "bg-transparent" : "bg-slate-950";
+    const darkLinkClass = "text-slate-300 hover:text-white";
+    const darkSeparatorClass = "text-slate-700";
+    const darkLanguageIdle = "bg-slate-900/70 text-slate-200 hover:bg-slate-800/70";
+    const darkRingClass = "ring-slate-800";
     const darkCaptionClass = "text-slate-500";
 
+    const lightSectionClass = "bg-gray-50";
+
     return (
-        <section className={transparent ? "bg-transparent" : isDark ? darkSectionClass : "bg-white"}>
+        <section className={transparent ? "bg-transparent" : isDark ? darkSectionClass : lightSectionClass}>
             <div className="mx-auto max-w-screen-xl space-y-6 overflow-hidden px-4 py-12 sm:px-6 lg:px-8">
                 <nav className={`${inline ? 'flex flex-nowrap overflow-x-auto whitespace-nowrap' : 'flex flex-wrap'} items-center justify-center gap-x-6 gap-y-4 text-sm`}>
                     {showLinks && (
