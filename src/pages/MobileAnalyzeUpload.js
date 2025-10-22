@@ -1,7 +1,7 @@
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useLocation, useNavigate, useParams } from 'react-router-dom';
-import { UploadCloud, ChevronRight, LifeBuoy } from 'lucide-react';
+import { UploadCloud, Check } from 'lucide-react';
 import Navigation from '../features/navigation/navigation';
 import Footer from '../features/footer/footer';
 import ErrorModal from '../features/analyze/components/ErrorModal';
@@ -71,37 +71,6 @@ function FileMetaCard({ file, onRemove, labels }) {
   );
 }
 
-function UploadActionTile({ icon: Icon, title, subtitle, accentClass, onClick }) {
-  const interactive = typeof onClick === 'function';
-  const Component = interactive ? 'button' : 'div';
-  const baseClass = `group relative w-full overflow-hidden rounded-[28px] border border-slate-800/70 bg-[linear-gradient(145deg,rgba(15,23,42,0.92),rgba(30,41,59,0.76))] px-5 py-4 text-left shadow-[0_30px_64px_-36px_rgba(15,23,42,0.9)] ${
-    interactive ? 'transition-transform duration-150 hover:-translate-y-0.5 hover:border-indigo-400/60 focus:outline-none focus-visible:ring-2 focus-visible:ring-indigo-400/40' : ''
-  }`;
-
-  return (
-    <Component type={interactive ? 'button' : undefined} onClick={interactive ? onClick : undefined} className={baseClass}>
-      {interactive && (
-        <span
-          aria-hidden="true"
-          className="pointer-events-none absolute inset-y-0 left-0 w-[45%] translate-x-[-30%] bg-gradient-to-r from-white/6 to-transparent opacity-0 transition-opacity duration-200 group-hover:opacity-100"
-        />
-      )}
-      <div className="relative flex items-center gap-4">
-        <span
-          className={`inline-flex h-12 w-12 items-center justify-center rounded-2xl border border-white/5 bg-slate-900/70 text-base shadow-[0_18px_40px_-28px_rgba(99,102,241,0.65)] ${accentClass}`}
-        >
-          <Icon size={22} />
-        </span>
-        <div className="flex-1">
-          <p className="text-[15px] font-semibold text-slate-100 tracking-tight">{title}</p>
-          <p className="mt-1 text-xs text-slate-400">{subtitle}</p>
-        </div>
-        {interactive && <ChevronRight size={18} className="text-slate-500 transition group-hover:text-slate-300" aria-hidden="true" />}
-      </div>
-    </Component>
-  );
-}
-
 export default function MobileAnalyzeUpload() {
   const { t, i18n } = useTranslation('common');
   const navigate = useNavigate();
@@ -115,6 +84,7 @@ export default function MobileAnalyzeUpload() {
   const [errorMsgs, setErrorMsgs] = useState([]);
   const [models, setModels] = useState([]);
   const [modelKey, setModelKey] = useState(null);
+  const [defaultModelKey, setDefaultModelKey] = useState(null);
   const [modelError, setModelError] = useState(null);
   const [loadingModels, setLoadingModels] = useState(true);
   const [submitting, setSubmitting] = useState(false);
@@ -128,7 +98,6 @@ export default function MobileAnalyzeUpload() {
   const sampleAutoFillRef = useRef(false);
 
   const processingRoute = lng ? `/${lng}/analyze/result` : '/analyze/result';
-  const supportRoute = lng ? `/${lng}/support` : '/support';
 
   const queryParams = useMemo(() => new URLSearchParams(location.search), [location.search]);
   const localizedPath = useCallback((path) => {
@@ -242,7 +211,7 @@ export default function MobileAnalyzeUpload() {
     } finally {
       setLoadingQuota(false);
     }
-  }, [resolveQuotaSummary, t, userInfo]);
+  }, [accessToken, location.pathname, location.search, resolveQuotaSummary, t, userInfo]);
   useEffect(() => {
     let aborted = false;
     const loadModels = async () => {
@@ -252,12 +221,20 @@ export default function MobileAnalyzeUpload() {
         if (aborted) return;
         const items = Array.isArray(data?.items) ? data.items : [];
         setModels(items);
-        const defaultKey = data?.defaultKey;
-        if (defaultKey && items.some((m) => m.key === defaultKey)) {
-          setModelKey(defaultKey);
-        } else if (items.length > 0) {
-          setModelKey(items[0].key);
-        }
+        const defaultKey =
+          typeof data?.defaultKey === 'string' && data.defaultKey.trim().length > 0
+            ? data.defaultKey.trim()
+            : null;
+        setDefaultModelKey(defaultKey);
+        setModelKey((prev) => {
+          if (prev && items.some((m) => m.key === prev)) {
+            return prev;
+          }
+          if (defaultKey && items.some((m) => m.key === defaultKey)) {
+            return defaultKey;
+          }
+          return items.length > 0 ? items[0].key : null;
+        });
         setModelError(null);
       } catch (err) {
         if (!aborted) {
@@ -429,6 +406,9 @@ export default function MobileAnalyzeUpload() {
           size: file?.size,
           type: file?.type,
           modelKey,
+          modelName: selectedModel?.name,
+          modelVersion: selectedModel?.version,
+          modelDescription: selectedModel?.description,
         }),
         afterAnalyze: async (file, analyzeJson) => {
           if (!file || !analyzeJson?.jobId) return;
@@ -514,7 +494,7 @@ export default function MobileAnalyzeUpload() {
   }, [gradientIntensity]);
 
   const selectedModel = useMemo(() => models.find((item) => item.key === modelKey), [models, modelKey]);
-  const analyzeDisabled = !files.length || submitting;
+  const analyzeDisabled = !files.length || submitting || !modelKey;
   const uploadDisabled = files.length >= MAX_IMAGE_FILES || submitting;
 
   const metaLabels = {
@@ -617,27 +597,105 @@ export default function MobileAnalyzeUpload() {
               )}
 
               <section className="space-y-4">
-                <div className="px-1">
-                  <div className="flex items-center">
-                    <span className="inline-flex items-center rounded-full bg-gradient-to-r from-amber-400 via-rose-400 to-emerald-400 px-3 py-1.5 text-[12px] font-semibold text-slate-900 shadow-sm ring-1 ring-white/10">
-                      {selectedModel?.name || t('mobileAnalyze.uploadPage.modelSection.emptyOption', '기본 모델 (자동 선택)')}
-                    </span>
+                <div className="px-1 space-y-3">
+                  <div className="flex items-center justify-between gap-4">
+                    <div>
+                      <p className="text-[15px] font-semibold text-slate-100 tracking-tight">
+                        {t('mobileAnalyze.uploadPage.modelSection.title', '분석 모델 선택')}
+                      </p>
+                      <p className="mt-1 text-[12px] text-slate-400">
+                        {t('mobileAnalyze.uploadPage.modelSection.hint', '사용할 분석 모델을 고르면 결과가 더 정확해져요.')}
+                      </p>
+                    </div>
+                    {selectedModel && (
+                      <span className="inline-flex items-center rounded-full bg-gradient-to-r from-amber-400 via-rose-400 to-emerald-400 px-3 py-1.5 text-[12px] font-semibold text-slate-900 shadow-sm ring-1 ring-white/10">
+                        {selectedModel.name}
+                      </span>
+                    )}
                   </div>
-                  {/* Keep lightweight status messages for clarity */}
                   {loadingModels && (
-                    <p className="mt-1 text-[12px] text-slate-500">
+                    <p className="text-[12px] text-slate-500">
                       {t('mobileAnalyze.uploadPage.modelSection.loading', '모델 정보를 불러오는 중이에요…')}
                     </p>
                   )}
                   {!loadingModels && modelError && (
-                    <p className="mt-1 text-[12px] text-rose-300">
+                    <p className="text-[12px] text-rose-300">
                       {modelError}
                     </p>
                   )}
                   {!loadingModels && !modelError && models.length === 0 && (
-                    <p className="mt-1 text-[12px] text-slate-500">
+                    <p className="text-[12px] text-slate-500">
                       {t('mobileAnalyze.uploadPage.modelSection.empty', '사용 가능한 모델이 없어요. 기본 설정으로 진행합니다.')}
                     </p>
+                  )}
+                  {!loadingModels && !modelError && models.length > 0 && (
+                    <div className="space-y-2">
+                      {models.map((model) => {
+                        const selected = model.key === modelKey;
+                        const isDefault = model.key === defaultModelKey;
+                        const thresholdLabel =
+                          typeof model.threshold === 'number' ? model.threshold.toFixed(2) : null;
+                        return (
+                          <button
+                            key={model.key}
+                            type="button"
+                            onClick={() => setModelKey(model.key)}
+                            aria-pressed={selected}
+                            className={`w-full rounded-2xl border px-4 py-3 text-left transition ${
+                              selected
+                                ? 'border-indigo-400/70 bg-indigo-500/15 text-indigo-50 shadow-[0_18px_36px_-28px_rgba(99,102,241,0.45)]'
+                                : 'border-slate-800/70 bg-slate-900/70 text-slate-200 hover:border-indigo-400/40 hover:bg-slate-900/60'
+                            }`}
+                          >
+                            <div className="flex items-start justify-between gap-3">
+                              <div className="flex-1">
+                                <p className="text-sm font-semibold text-inherit">
+                                  {model.name}
+                                  {isDefault && (
+                                    <span className="ml-2 inline-flex items-center rounded-full bg-indigo-500/20 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wide text-indigo-200">
+                                      {t('mobileAnalyze.uploadPage.modelSection.recommended', '기본')}
+                                    </span>
+                                  )}
+                                </p>
+                                {model.description && (
+                                  <p className="mt-1 text-[11px] text-slate-300/80">
+                                    {model.description}
+                                  </p>
+                                )}
+                                <div className="mt-2 flex flex-wrap items-center gap-3 text-[10px] uppercase tracking-wide text-slate-300/70">
+                                  {model.version && (
+                                    <span className="inline-flex items-center gap-1">
+                                      {t('mobileAnalyze.uploadPage.modelSection.version', {
+                                        defaultValue: '버전 {{version}}',
+                                        version: model.version,
+                                      })}
+                                    </span>
+                                  )}
+                                  {thresholdLabel && (
+                                    <span className="inline-flex items-center gap-1">
+                                      {t('mobileAnalyze.uploadPage.modelSection.threshold', {
+                                        defaultValue: '임계값 {{threshold}}',
+                                        threshold: thresholdLabel,
+                                      })}
+                                    </span>
+                                  )}
+                                </div>
+                              </div>
+                              <span
+                                className={`mt-0.5 inline-flex h-6 w-6 items-center justify-center rounded-full border ${
+                                  selected
+                                    ? 'border-indigo-300 bg-indigo-500/30 text-white'
+                                    : 'border-slate-700 text-slate-500'
+                                }`}
+                                aria-hidden="true"
+                              >
+                                {selected ? <Check size={14} strokeWidth={2.5} /> : null}
+                              </span>
+                            </div>
+                          </button>
+                        );
+                      })}
+                    </div>
                   )}
                 </div>
                 <div className="px-1">

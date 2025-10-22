@@ -460,6 +460,15 @@ export default function MobileAnalyzeResult() {
               const progressWidth = percentValue == null ? null : Math.min(100, Math.max(12, percentValue));
               const fileName = entry.fileMeta?.name || '';
               const modelKey = entry.fileMeta?.modelKey || '';
+              const modelName = entry.fileMeta?.modelName || entry.result?.model?.name || '';
+              const modelVersion = entry.fileMeta?.modelVersion || entry.result?.model?.version || '';
+              let primaryModelLabel = modelName || modelKey || '';
+              if (!primaryModelLabel && modelVersion) {
+                primaryModelLabel = modelVersion;
+              }
+              const versionLabel = modelVersion && modelVersion !== primaryModelLabel ? modelVersion : '';
+              const keySuffix = modelName && modelKey ? modelKey : '';
+              const hasModelLabel = Boolean(primaryModelLabel);
               return (
                 <motion.div key={entry.jobId} layout>
                   <AnimatePresence mode="wait" initial={false}>
@@ -495,12 +504,20 @@ export default function MobileAnalyzeResult() {
                                 <dd className="truncate text-rose-100">{fileName}</dd>
                               </>
                             )}
-                            {modelKey && (
+                            {hasModelLabel && (
                               <>
                                 <dt className="text-rose-200/70">
                                   {t('mobileAnalyze.processing.modelLabel', '모델')}
                                 </dt>
-                                <dd className="text-rose-100">{modelKey}</dd>
+                                <dd className="text-rose-100">
+                                  <span>{primaryModelLabel}</span>
+                                  {versionLabel && (
+                                    <span className="ml-2 text-rose-200/75">{versionLabel}</span>
+                                  )}
+                                  {keySuffix && (
+                                    <span className="ml-2 text-rose-200/60">({keySuffix})</span>
+                                  )}
+                                </dd>
                               </>
                             )}
                           </dl>
@@ -557,10 +574,14 @@ export default function MobileAnalyzeResult() {
                               {resolveStageLabel(entry.stage, t)}
                             </p>
                           </div>
-                          {modelKey && (
+                          {hasModelLabel && (
                             <div className="text-[11px] text-slate-400">
                               <span className="text-slate-500">{t('mobileAnalyze.processing.modelLabel', '모델')} · </span>
-                              <span className="text-sky-200">{modelKey}</span>
+                              <span className="text-sky-200">
+                                {primaryModelLabel}
+                                {versionLabel && <span className="ml-2 text-sky-200/80">{versionLabel}</span>}
+                                {keySuffix && <span className="ml-2 text-sky-200/60">({keySuffix})</span>}
+                              </span>
                             </div>
                           )}
                           {percentValue != null && (
