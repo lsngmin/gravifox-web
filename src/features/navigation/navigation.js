@@ -47,12 +47,6 @@ const Navigation = ({ variant = 'light' }) => {
                 path: '/feature',
             },
             {
-                key: 'pricing',
-                labelKey: 'navigation.items.pricing',
-                to: localePrefix ? `${localePrefix}/pricing` : '/pricing',
-                path: '/pricing',
-            },
-            {
                 key: 'docs',
                 labelKey: 'navigation.items.docs',
                 to: localePrefix ? `${localePrefix}/docs` : '/docs',

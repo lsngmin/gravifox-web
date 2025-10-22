@@ -107,3 +107,7 @@ export const ANALYZE_MODEL_ENDPOINTS = {
 export const FASTAPI_ENDPOINTS = {
     UPLOAD: FASTAPI_BASE ? `${FASTAPI_BASE}/upload` : "",
 };
+
+export const ADMIN_ENDPOINTS = {
+    USERS: `${API_BASE}/admin/v1/users`,
+};

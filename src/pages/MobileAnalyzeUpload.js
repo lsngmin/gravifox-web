@@ -494,6 +494,8 @@ export default function MobileAnalyzeUpload() {
   }, [gradientIntensity]);
 
   const selectedModel = useMemo(() => models.find((item) => item.key === modelKey), [models, modelKey]);
+  const hasFiles = files.length > 0;
+  const canAddMoreImages = files.length < MAX_IMAGE_FILES;
   const analyzeDisabled = !files.length || submitting || !modelKey;
   const uploadDisabled = files.length >= MAX_IMAGE_FILES || submitting;
 
@@ -719,7 +721,7 @@ export default function MobileAnalyzeUpload() {
                 )}
               </section>
 
-              {files.length > 0 && files.length < MAX_IMAGE_FILES && (
+              {hasFiles && canAddMoreImages && (
                 <div className="flex flex-col items-center gap-2 rounded-[26px] border border-slate-800/60 bg-slate-900/60 px-4 py-4 text-center text-xs text-slate-300 shadow-[0_22px_48px_-34px_rgba(15,23,42,0.8)]">
                   <span>{t('mobileAnalyze.uploadPage.moreHint', '추가로 업로드할 이미지가 있으신가요?')}</span>
                   <button
@@ -732,19 +734,31 @@ export default function MobileAnalyzeUpload() {
                 </div>
               )}
 
-              <div className="mt-2 space-y-3">
+              {hasFiles && (
                 <button
                   type="button"
-                  onClick={triggerAlbum}
-                  disabled={uploadDisabled}
-                  className={`inline-flex w-full items-center justify-center rounded-[28px] px-4 py-3 text-base font-semibold transition ${
-                    uploadDisabled
-                      ? 'cursor-not-allowed border border-slate-700 bg-slate-800/60 text-slate-500'
-                      : 'border border-indigo-400/40 bg-indigo-500/15 text-indigo-100 hover:border-indigo-300 hover:bg-indigo-500/25'
-                  }`}
+                  onClick={handleReset}
+                  className="mt-3 w-full text-center text-xs font-semibold text-slate-400 underline-offset-4 transition hover:text-slate-200 hover:underline"
                 >
-                  {t('mobileAnalyze.uploadPage.primaryAction', '이미지 업로드하기')}
+                  {t('mobileAnalyze.uploadPage.reset', '모든 파일 비우기')}
                 </button>
+              )}
+
+              <div className="mt-2 space-y-3">
+                {!hasFiles && (
+                  <button
+                    type="button"
+                    onClick={triggerAlbum}
+                    disabled={uploadDisabled}
+                    className={`inline-flex w-full items-center justify-center rounded-[28px] px-4 py-3 text-base font-semibold transition ${
+                      uploadDisabled
+                        ? 'cursor-not-allowed border border-slate-700 bg-slate-800/60 text-slate-500'
+                        : 'border border-indigo-400/40 bg-indigo-500/15 text-indigo-100 hover:border-indigo-300 hover:bg-indigo-500/25'
+                    }`}
+                  >
+                    {t('mobileAnalyze.uploadPage.primaryAction', '이미지 업로드하기')}
+                  </button>
+                )}
                 <button
                   type="button"
                   disabled={analyzeDisabled}
@@ -759,15 +773,6 @@ export default function MobileAnalyzeUpload() {
                     ? t('mobileAnalyze.uploadPage.ctaLoading', '분석을 준비하고 있어요…')
                     : t('mobileAnalyze.uploadPage.cta', '분석 시작하기')}
                 </button>
-                {files.length > 0 && (
-                  <button
-                    type="button"
-                    onClick={handleReset}
-                    className="w-full text-center text-xs font-semibold text-slate-400 underline-offset-4 transition hover:text-slate-200 hover:underline"
-                  >
-                    {t('mobileAnalyze.uploadPage.reset', '모든 파일 비우기')}
-                  </button>
-                )}
               </div>
         </div>
       </main>

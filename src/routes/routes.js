@@ -23,6 +23,7 @@ import Blog from "../pages/Blog";
 import MobileAnalyzeStart from "../pages/MobileAnalyzeStart";
 import MobileAnalyzeUpload from "../pages/MobileAnalyzeUpload";
 import MobileAnalyzeResult from "../pages/MobileAnalyzeResult";
+import AdminPreview from "../pages/AdminPreview";
 
 // Create/update canonical link to point to language-prefixed URL
 function CanonicalLink() {
@@ -147,6 +148,7 @@ function AnimatedRoutes() {
                 <Route path=":lng/feature" element={<motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -20 }} transition={{ duration: 0.3 }}><Feature /></motion.div>} />
                 <Route path=":lng/support" element={<motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -20 }} transition={{ duration: 0.3 }}><Support /></motion.div>} />
                 <Route path=":lng/blog" element={<motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -20 }} transition={{ duration: 0.3 }}><Blog /></motion.div>} />
+                <Route path=":lng/admin/preview" element={<motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -12 }} transition={{ duration: 0.4, ease: "easeOut" }}><AdminPreview /></motion.div>} />
 
                 {/* Legacy non-prefixed routes → redirect to localized */}
                 <Route path="/login" element={<LegacyToLocalized />} />
@@ -170,6 +172,7 @@ function AnimatedRoutes() {
                 <Route path="/support" element={<LegacyToLocalized />} />
                 <Route path="/feature" element={<LegacyToLocalized />} />
                 <Route path="/blog" element={<LegacyToLocalized />} />
+                <Route path="/admin/preview" element={<LegacyToLocalized />} />
 
                 <Route path="/*" element={<motion.div><CustomErrorPage status={"404"} /></motion.div>} />
                 </Routes>
