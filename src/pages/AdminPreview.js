@@ -754,18 +754,19 @@ const AdminPreview = () => {
                                                         </span>
                                                     </div>
                                                 </td>
-                                                <td className="px-6 py-4">
-                                                    <span
-                                                        className={clsx(
-                                                            "rounded-full border px-3 py-1 text-xs font-medium",
-                                                            isDarkMode
-                                                                ? "border-slate-700 text-slate-200"
-                                                                : "border-slate-300 text-slate-600"
-                                                        )}
-                                                    >
-                                                        {loginLabel}
-                                                    </span>
-                                                </td>
+                                <td className="px-6 py-4">
+                                    <span
+                                        className={clsx(
+                                            "rounded-full border px-3 py-1 text-xs font-medium",
+                                            isDarkMode
+                                            ? "border-slate-700 text-slate-200"
+                                            : "border-slate-300 text-slate-600"
+                                        )}
+                                        style={{ whiteSpace: "nowrap" }}
+                                    >
+                                        {loginLabel}
+                                    </span>
+                                </td>
                                                 <td className="px-6 py-4">
                                                     <span
                                                         className={clsx(
@@ -818,11 +819,11 @@ const AdminPreview = () => {
                                                 </td>
                                                 <td className="px-6 py-4">
                                                     <span
-                                                        className={clsx(
-                                                            "inline-flex items-center gap-2 rounded-full border px-3 py-1 text-xs font-medium",
-                                                            status.tone === "success"
-                                                                ? isDarkMode
-                                                                    ? "border-emerald-500/30 bg-emerald-400/10 text-emerald-300"
+                                                    className={clsx(
+                                                        "inline-flex items-center gap-2 rounded-full border px-3 py-1 text-xs font-medium",
+                                                        status.tone === "success"
+                                                            ? isDarkMode
+                                                                ? "border-emerald-500/30 bg-emerald-400/10 text-emerald-300"
                                                                     : "border-emerald-200 bg-emerald-50 text-emerald-700"
                                                                 : status.tone === "warning"
                                                                 ? isDarkMode
@@ -830,8 +831,9 @@ const AdminPreview = () => {
                                                                     : "border-amber-200 bg-amber-50 text-amber-700"
                                                                 : isDarkMode
                                                                 ? "border-rose-500/30 bg-rose-400/10 text-rose-300"
-                                                                : "border-rose-200 bg-rose-50 text-rose-700"
-                                                        )}
+                                                            : "border-rose-200 bg-rose-50 text-rose-700"
+                                                    )}
+                                                    style={{ whiteSpace: "nowrap" }}
                                                     >
                                                         <span className="inline-block h-1.5 w-1.5 rounded-full bg-current opacity-60" />
                                                         {status.label}

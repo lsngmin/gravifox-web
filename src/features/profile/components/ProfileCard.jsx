@@ -20,49 +20,18 @@ export default function ProfileCard({ theme = 'dark' }) {
   const [avatar, setAvatar] = useState(null);
   const [savingName, setSavingName] = useState(false);
   const [savingAvatar, setSavingAvatar] = useState(false);
-  const [localNicknameUpdatedAt, setLocalNicknameUpdatedAt] = useState(null);
   const fileInputRef = useRef(null);
 
   const isDark = theme === 'dark';
-  const localStorageKey = userInfo?.userNo ? `nickname:last-change:${userInfo.userNo}` : null;
   const serverNicknameUpdatedAt =
     userInfo?.nicknameUpdatedAt || userInfo?.profileUpdatedAt || userInfo?.updatedAt || userInfo?.profile?.updatedAt || null;
-
-  useEffect(() => {
-    if (!localStorageKey) {
-      setLocalNicknameUpdatedAt(null);
-    }
-  }, [localStorageKey]);
 
   useEffect(() => {
     if (!editing) {
       setNickname(userInfo?.nickname ?? '');
     }
   }, [userInfo?.nickname, editing]);
-
-  useEffect(() => {
-    if (!localStorageKey || typeof window === 'undefined') return;
-    const stored = window.localStorage.getItem(localStorageKey);
-    if (stored && dayjs(stored).isValid()) {
-      setLocalNicknameUpdatedAt(stored);
-    } else if (stored) {
-      window.localStorage.removeItem(localStorageKey);
-    }
-  }, [localStorageKey]);
-
-  useEffect(() => {
-    if (!localStorageKey || !serverNicknameUpdatedAt || typeof window === 'undefined') return;
-    const serverDate = dayjs(serverNicknameUpdatedAt);
-    if (!serverDate.isValid()) return;
-    const serverIso = serverDate.toISOString();
-    const stored = window.localStorage.getItem(localStorageKey);
-    if (!stored || dayjs(serverIso).isAfter(dayjs(stored))) {
-      window.localStorage.setItem(localStorageKey, serverIso);
-      setLocalNicknameUpdatedAt(serverIso);
-    }
-  }, [localStorageKey, serverNicknameUpdatedAt]);
-
-  const lastNicknameChange = localNicknameUpdatedAt || serverNicknameUpdatedAt || null;
+  const lastNicknameChange = serverNicknameUpdatedAt || null;
   const nextNicknameChangeAt = lastNicknameChange && dayjs(lastNicknameChange).isValid()
     ? dayjs(lastNicknameChange).add(NICKNAME_COOLDOWN_DAYS, 'day')
     : null;
@@ -125,11 +94,6 @@ export default function ProfileCard({ theme = 'dark' }) {
   async function handleConfirmNickname() {
     const result = await handleSaveField();
     if (!result.ok) return;
-    if (result.changed && localStorageKey && typeof window !== 'undefined') {
-      const nowIso = new Date().toISOString();
-      window.localStorage.setItem(localStorageKey, nowIso);
-      setLocalNicknameUpdatedAt(nowIso);
-    }
     setNicknameError('');
     setEditing(false);
   }
