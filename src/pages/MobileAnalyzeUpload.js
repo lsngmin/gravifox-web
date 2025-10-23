@@ -636,34 +636,32 @@ export default function MobileAnalyzeUpload() {
                             type="button"
                             onClick={() => setModelKey(model.key)}
                             aria-pressed={selected}
-                            className={`w-full rounded-2xl border px-4 py-3 text-left transition ${
+                            className={`flex w-full items-center justify-between gap-3 rounded-2xl border px-4 py-3 text-left transition ${
                               selected
                                 ? 'border-indigo-400/70 bg-indigo-500/15 text-indigo-50 shadow-[0_18px_36px_-28px_rgba(99,102,241,0.45)]'
                                 : 'border-slate-800/70 bg-slate-900/70 text-slate-200 hover:border-indigo-400/40 hover:bg-slate-900/60'
                             }`}
                           >
-                            <div className="flex items-start justify-between gap-3">
-                              <div className="flex-1">
-                                <p className="text-sm font-semibold text-inherit">
-                                  {model.name}
-                                  {isDefault && (
-                                    <span className="ml-2 inline-flex items-center rounded-full bg-indigo-500/20 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wide text-indigo-200">
-                                      {t('mobileAnalyze.uploadPage.modelSection.recommended', '기본')}
-                                    </span>
-                                  )}
-                                </p>
-                              </div>
-                              <span
-                                className={`mt-0.5 inline-flex h-6 w-6 items-center justify-center rounded-full border ${
-                                  selected
-                                    ? 'border-indigo-300 bg-indigo-500/30 text-white'
-                                    : 'border-slate-700 text-slate-500'
-                                }`}
-                                aria-hidden="true"
-                              >
-                                {selected ? <Check size={14} strokeWidth={2.5} /> : null}
-                              </span>
+                            <div className="flex flex-1 flex-col justify-center">
+                              <p className="flex items-center text-sm font-semibold text-inherit">
+                                {model.name}
+                                {isDefault && (
+                                  <span className="ml-2 inline-flex items-center rounded-full bg-indigo-500/20 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wide text-indigo-200">
+                                    {t('mobileAnalyze.uploadPage.modelSection.recommended', '기본')}
+                                  </span>
+                                )}
+                              </p>
                             </div>
+                            <span
+                              className={`inline-flex h-6 w-6 items-center justify-center self-center rounded-full border ${
+                                selected
+                                  ? 'border-indigo-300 bg-indigo-500/30 text-white'
+                                  : 'border-slate-700 text-slate-500'
+                              }`}
+                              aria-hidden="true"
+                            >
+                              {selected ? <Check size={14} strokeWidth={2.5} /> : null}
+                            </span>
                           </button>
                         );
                       })}

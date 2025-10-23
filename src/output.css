@@ -5972,6 +5972,10 @@ video {
   color: rgb(156 163 175 / var(--tw-placeholder-opacity, 1));
 }
 
+.placeholder-transparent::placeholder {
+  color: transparent;
+}
+
 .accent-indigo-500 {
   accent-color: #6366f1;
 }
@@ -7641,6 +7645,10 @@ img, a, button {
   border-color: rgb(99 102 241 / var(--tw-border-opacity, 1));
 }
 
+.focus\:border-indigo-300\/70:focus {
+  border-color: rgb(165 180 252 / 0.7);
+}
+
 .focus\:outline-none:focus {
   outline: 2px solid transparent;
   outline-offset: 2px;
@@ -7727,6 +7735,14 @@ img, a, button {
 
 .focus\:ring-indigo-200\/50:focus {
   --tw-ring-color: rgb(199 210 254 / 0.5);
+}
+
+.focus\:ring-indigo-200\/60:focus {
+  --tw-ring-color: rgb(199 210 254 / 0.6);
+}
+
+.focus\:ring-indigo-300\/40:focus {
+  --tw-ring-color: rgb(165 180 252 / 0.4);
 }
 
 .focus\:ring-offset-1:focus {

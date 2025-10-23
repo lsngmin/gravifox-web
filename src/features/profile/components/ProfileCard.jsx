@@ -252,14 +252,21 @@ export default function ProfileCard({ theme = 'dark' }) {
               >
                 로그인 이메일
               </label>
-              <p className={`mt-2 text-sm font-semibold ${isDark ? 'text-white/90' : 'text-gray-900'}`}>
-                {email || '이메일 정보가 없습니다.'}
-              </p>
+              <input
+                type="email"
+                value={email || ''}
+                readOnly
+                aria-readonly="true"
+                className={`mt-2 w-full rounded-lg border px-3 py-2 text-sm font-medium focus:outline-none ${
+                  isDark
+                    ? 'border-white/12 bg-white/[0.06] text-white/90 placeholder-transparent focus:border-indigo-300/70 focus:ring-2 focus:ring-indigo-300/40'
+                    : 'border-gray-200 bg-white text-gray-900 placeholder-transparent focus:border-indigo-400 focus:ring-2 focus:ring-indigo-200/60'
+                }`}
+              />
             </div>
           </div>
         </div>
 
-        <div className="flex min-h-[8rem] items-center justify-center md:justify-end" />
       </div>
     </section>
   );

@@ -37,8 +37,8 @@ const Navigation = ({ variant = 'light' }) => {
             {
                 key: 'analyze',
                 labelKey: 'navigation.items.analyze',
-                to: localePrefix ? `${localePrefix}/analyze/desktop` : '/analyze/desktop',
-                path: '/analyze/desktop',
+                to: localePrefix ? `${localePrefix}/analyze` : '/analyze',
+                path: '/analyze',
             },
             {
                 key: 'features',
