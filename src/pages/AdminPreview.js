@@ -10,7 +10,7 @@ import {
     SunIcon,
     ShieldCheckIcon,
 } from "@heroicons/react/24/outline";
-import { fetchAdminUsers } from "../api/admin";
+import { fetchAdminUsers, resetAdminUserQuota } from "../api/admin";
 
 const SERVICE_TRACKS = [
     { key: "backend", label: "백엔드 API" },
@@ -91,12 +91,13 @@ const AdminPreview = () => {
     const [pageMeta, setPageMeta] = useState({ page: -1, totalPages: 0, totalElements: 0, size: PAGE_SIZE });
     const [isLoading, setIsLoading] = useState(false);
     const [isAppending, setIsAppending] = useState(false);
-    const [error, setError] = useState(null);
+    const [listError, setListError] = useState(null);
+    const [resettingIds, setResettingIds] = useState(() => new Set());
 
     const loadUsers = useCallback(async (nextPage = 0) => {
         const append = nextPage > 0;
         append ? setIsAppending(true) : setIsLoading(true);
-        setError(null);
+        setListError(null);
         try {
             const data = await fetchAdminUsers({ page: nextPage, size: PAGE_SIZE, sort: "userNo,DESC" });
             const items = data?.items ?? [];
@@ -121,7 +122,7 @@ const AdminPreview = () => {
                 size: data?.size ?? prev.size,
             }));
         } catch (err) {
-            setError(err);
+            setListError(err);
         } finally {
             append ? setIsAppending(false) : setIsLoading(false);
         }
@@ -186,7 +187,7 @@ const AdminPreview = () => {
     }, [userItems, pageMeta.totalElements]);
 
     const userSummaries = userItems;
-    const errorMessage = error ? (error?.response?.data?.message ?? error.message ?? "사용자 정보를 불러오지 못했습니다.") : null;
+    const errorMessage = listError ? (listError?.response?.data?.message ?? listError.message ?? "사용자 정보를 불러오지 못했습니다.") : null;
     const hasMore = pageMeta.page + 1 < pageMeta.totalPages;
 
     const handleLoadMore = useCallback(() => {
@@ -196,6 +197,36 @@ const AdminPreview = () => {
         const nextPage = (pageMeta.page >= 0 ? pageMeta.page + 1 : 0);
         loadUsers(nextPage);
     }, [hasMore, isAppending, isLoading, loadUsers, pageMeta.page]);
+
+    const handleResetUsage = useCallback(async (userNo) => {
+        setResettingIds((prev) => {
+            const next = new Set(prev);
+            next.add(userNo);
+            return next;
+        });
+        try {
+            await resetAdminUserQuota(userNo);
+            setUserItems((prev) => prev.map((item) => {
+                if (item.userNo !== userNo) {
+                    return item;
+                }
+                const limit = item.monthlyQuotaLimit ?? 0;
+                return {
+                    ...item,
+                    monthlyQuotaUsed: 0,
+                    monthlyQuotaRemaining: limit,
+                };
+            }));
+        } catch (err) {
+            console.error("Failed to reset monthly usage", err);
+        } finally {
+            setResettingIds((prev) => {
+                const next = new Set(prev);
+                next.delete(userNo);
+                return next;
+            });
+        }
+    }, []);
 
     const formatDateTime = (value) => {
         if (!value) return "—";
@@ -207,16 +238,6 @@ const AdminPreview = () => {
         } catch (err) {
             return value;
         }
-    };
-
-    const resolveStatus = (item) => {
-        if (!item?.emailVerified) {
-            return { label: "인증 필요", tone: "warning" };
-        }
-        if (item?.monthlyQuotaRemaining != null && item?.monthlyQuotaRemaining <= 0) {
-            return { label: "한도 초과", tone: "danger" };
-        }
-        return { label: "정상", tone: "success" };
     };
 
     const statusTimeline = useMemo(() => {
@@ -714,9 +735,9 @@ const AdminPreview = () => {
                                         const limit = user.monthlyQuotaLimit ?? 0;
                                         const used = user.monthlyQuotaUsed ?? 0;
                                         const percent = limit > 0 ? Math.min(100, Math.round((used / limit) * 100)) : 0;
-                                        const status = resolveStatus(user);
                                         const loginLabel = user.loginType ? user.loginType : "-";
                                         const limitDisplay = limit > 0 ? limit.toLocaleString() : "—";
+                                        const isResetting = resettingIds.has(user.userNo);
                                         return (
                                             <tr
                                                 key={user.userNo}
@@ -754,19 +775,19 @@ const AdminPreview = () => {
                                                         </span>
                                                     </div>
                                                 </td>
-                                <td className="px-6 py-4">
-                                    <span
-                                        className={clsx(
-                                            "rounded-full border px-3 py-1 text-xs font-medium",
-                                            isDarkMode
-                                            ? "border-slate-700 text-slate-200"
-                                            : "border-slate-300 text-slate-600"
-                                        )}
-                                        style={{ whiteSpace: "nowrap" }}
-                                    >
-                                        {loginLabel}
-                                    </span>
-                                </td>
+                                                <td className="px-6 py-4">
+                                                    <span
+                                                        className={clsx(
+                                                            "rounded-full border px-3 py-1 text-xs font-medium",
+                                                            isDarkMode
+                                                                ? "border-slate-700 text-slate-200"
+                                                                : "border-slate-300 text-slate-600"
+                                                        )}
+                                                        style={{ whiteSpace: "nowrap" }}
+                                                    >
+                                                        {loginLabel}
+                                                    </span>
+                                                </td>
                                                 <td className="px-6 py-4">
                                                     <span
                                                         className={clsx(
@@ -818,26 +839,21 @@ const AdminPreview = () => {
                                                     </div>
                                                 </td>
                                                 <td className="px-6 py-4">
-                                                    <span
-                                                    className={clsx(
-                                                        "inline-flex items-center gap-2 rounded-full border px-3 py-1 text-xs font-medium",
-                                                        status.tone === "success"
-                                                            ? isDarkMode
-                                                                ? "border-emerald-500/30 bg-emerald-400/10 text-emerald-300"
-                                                                    : "border-emerald-200 bg-emerald-50 text-emerald-700"
-                                                                : status.tone === "warning"
-                                                                ? isDarkMode
-                                                                    ? "border-amber-500/30 bg-amber-400/10 text-amber-300"
-                                                                    : "border-amber-200 bg-amber-50 text-amber-700"
-                                                                : isDarkMode
-                                                                ? "border-rose-500/30 bg-rose-400/10 text-rose-300"
-                                                            : "border-rose-200 bg-rose-50 text-rose-700"
-                                                    )}
-                                                    style={{ whiteSpace: "nowrap" }}
+                                                    <button
+                                                        type="button"
+                                                        onClick={() => handleResetUsage(user.userNo)}
+                                                        disabled={isResetting}
+                                                        className={clsx(
+                                                            "rounded-full border px-3 py-1 text-xs font-medium transition",
+                                                            isDarkMode
+                                                                ? "border-slate-700 text-slate-200 hover:border-slate-500 hover:text-white"
+                                                                : "border-slate-200 text-slate-600 hover:border-slate-400 hover:text-slate-800",
+                                                            isResetting && "opacity-60"
+                                                        )}
+                                                        style={{ whiteSpace: "nowrap" }}
                                                     >
-                                                        <span className="inline-block h-1.5 w-1.5 rounded-full bg-current opacity-60" />
-                                                        {status.label}
-                                                    </span>
+                                                        {isResetting ? "초기화 중..." : "사용량 초기화"}
+                                                    </button>
                                                 </td>
                                             </tr>
                                         );
