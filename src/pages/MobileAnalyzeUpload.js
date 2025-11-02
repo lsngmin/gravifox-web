@@ -2,8 +2,8 @@ import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { useTranslation } from 'react-i18next';
 import { useLocation, useNavigate, useParams } from 'react-router-dom';
 import { UploadCloud, Check } from 'lucide-react';
-import Navigation from '../features/navigation/navigation';
-import Footer from '../features/footer/footer';
+import Header from '../app/layout/Header';
+import Footer from '../app/layout/Footer/Footer';
 import ErrorModal from '../features/analyze/components/ErrorModal';
 import LoginRequiredModal from '../features/analyze/components/LoginRequiredModal';
 import { useAuth } from 'providers/authProvider';
@@ -539,8 +539,8 @@ export default function MobileAnalyzeUpload() {
   }, [localizedPath, location.pathname, location.search, navigate]);
 
   return (
-    <div className="min-h-screen bg-slate-950 text-slate-100 flex flex-col">
-      <Navigation variant="dark" />
+    <div className="dark min-h-screen bg-slate-950 text-slate-100 flex flex-col">
+      <Header />
       <main className="flex-1 flex justify-center">
         <div className="flex w-full max-w-sm flex-col gap-6 px-5 pb-14 pt-24">
               <button

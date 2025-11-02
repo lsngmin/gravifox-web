@@ -15,5 +15,12 @@
     "placeholder": "이메일 주소",
     "submit": "구독",
     "done": "구독 완료"
+  },
+  "list": {
+    "loadMore": "더 보기",
+    "empty": "아직 등록된 글이 없어요."
+  },
+  "meta": {
+    "readTime": "{{minutes}}분 소요"
   }
 }

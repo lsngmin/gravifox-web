@@ -1,7 +1,7 @@
 import React, { useEffect, useMemo, useState } from "react";
 import { useLocation, useNavigate, useParams } from "react-router-dom";
-import Navigation from "../features/navigation/navigation";
-import Footer from "../features/footer/footer";
+import Header from "../app/layout/Header";
+import Footer from "../app/layout/Footer/Footer";
 import axios from "axios";
 import { EMAIL_ENDPOINTS } from "api/endPointRoute";
 import { useAuth } from "providers/authProvider";
@@ -71,8 +71,8 @@ export default function EmailVerification() {
 
   if (redirecting) {
     return (
-      <div className="min-h-screen bg-slate-950 text-slate-100 flex flex-col">
-        <Navigation variant="dark" />
+      <div className="dark min-h-screen bg-slate-950 text-slate-100 flex flex-col">
+        <Header />
         <main className="flex-1 flex justify-center">
           <div className="w-full max-w-sm px-5 pt-24 pb-16 text-center space-y-4">
             <h2 className="text-xl font-semibold text-indigo-200">인증이 완료되었어요!</h2>
@@ -85,8 +85,8 @@ export default function EmailVerification() {
   }
 
   return (
-    <div className="min-h-screen bg-slate-950 text-slate-100 flex flex-col">
-      <Navigation variant="dark" />
+    <div className="dark min-h-screen bg-slate-950 text-slate-100 flex flex-col">
+      <Header />
       <main className="flex-1 flex justify-center">
         <div className="w-full max-w-sm px-5 pt-24 pb-16">
           <header className="text-center mb-6">

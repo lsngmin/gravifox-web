@@ -1,57 +1,70 @@
 import React, { useMemo, useState } from "react";
-import ContentDecor from "features/main/contentDecor";
-import Navigation from "../features/navigation/navigation";
-
-
+import Header from "../app/layout/Header";
+import Footer from "../app/layout/Footer/Footer";
 import BlogHero from "features/blog/BlogHero";
 import BlogFilters from "features/blog/BlogFilters";
 import PostList from "features/blog/PostList";
 import NewsletterCTA from "features/blog/NewsletterCTA";
 import { useBlogPosts } from "lib/blogApi";
-import Footer from "../features/footer/footer";
 
+const BlogBackground = () => (
+    <>
+        <div
+            aria-hidden
+            className="pointer-events-none absolute inset-0 -z-10 bg-gradient-to-b from-white via-indigo-50/50 to-slate-100 dark:from-slate-950 dark:via-slate-900/70 dark:to-slate-950"
+        />
+        <div
+            aria-hidden
+            className="pointer-events-none absolute inset-x-0 top-0 -z-10 h-72 bg-gradient-to-b from-indigo-200/30 via-white to-transparent dark:from-slate-900/70 dark:via-slate-900/0 dark:to-transparent"
+        />
+        <div
+            aria-hidden
+            className="pointer-events-none absolute inset-0 -z-10 bg-[radial-gradient(70rem_50rem_at_90%_-10%,rgba(99,102,241,0.14),transparent)] dark:bg-[radial-gradient(70rem_50rem_at_90%_-10%,rgba(99,102,241,0.22),transparent)]"
+        />
+    </>
+);
 
 const Blog = () => {
-    const { posts, isLoading, error } = useBlogPosts();
-
+    const { posts, isLoading, error, isFallback } = useBlogPosts();
 
     const [filter, setFilter] = useState({ tag: "all" });
     const filtered = useMemo(() => {
         if (!posts) return [];
         if (filter.tag === "all") return posts;
-        return posts.filter(p => p.tags?.includes(filter.tag));
+        return posts.filter((p) => p.tags?.includes(filter.tag));
     }, [posts, filter]);
-
 
     return (
         <>
-            <Navigation />
-            <ContentDecor>
-                <div className="mx-auto max-w-6xl px-4 sm:px-6 lg:px-8 pt-24 sm:pt-28 lg:pt-32 pb-16">
-                    <BlogHero />
+            <Header />
+            <div className="relative isolate min-h-screen bg-slate-50 text-slate-900 transition-colors dark:bg-slate-950 dark:text-slate-100">
+                <BlogBackground />
+                <main className="relative z-10">
+                    <div className="mx-auto max-w-6xl px-4 pb-24 pt-28 sm:px-6 lg:px-8 lg:pb-32 lg:pt-32">
+                        <BlogHero />
 
+                        <div className="mt-10 lg:mt-12">
+                            <BlogFilters posts={posts || []} value={filter} onChange={setFilter} />
+                        </div>
 
-                    <div className="mt-10">
-                        <BlogFilters posts={posts || []} value={filter} onChange={setFilter} />
+                        <div className="mt-8 lg:mt-10">
+                            <PostList
+                                posts={filtered}
+                                loading={isLoading}
+                                error={isFallback ? null : error}
+                                initialCount={6}
+                            />
+                        </div>
+
+                        <div className="mt-16 lg:mt-20">
+                            <NewsletterCTA />
+                        </div>
                     </div>
-
-
-                    <div className="mt-8">
-                        <PostList posts={filtered} loading={isLoading} error={error} initialCount={6} />
-                    </div>
-
-
-                    <div className="mt-16">
-                        <NewsletterCTA />
-                    </div>
-                </div>
-
-
+                </main>
                 <Footer />
-            </ContentDecor>
+            </div>
         </>
     );
 };
-
 
 export default Blog;

@@ -10,6 +10,7 @@ import {
     ExclamationTriangleIcon,
 } from "@heroicons/react/24/outline";
 import { previewAdminEmail, sendAdminEmail } from "../api/admin";
+import AdminPageTopBar from "../components/admin/AdminPageTopBar";
 
 const audienceOptions = [
     {
@@ -55,7 +56,6 @@ const AdminMail = () => {
     const [serverPreview, setServerPreview] = useState(null);
 
     useEffect(() => {
-        // 입력이 바뀌면 서버 미리보기는 무효화
         setServerPreview(null);
     }, [audience, customRecipients, subject, content]);
 
@@ -66,15 +66,16 @@ const AdminMail = () => {
         return normalizeEmails(customRecipients);
     }, [audience, customRecipients]);
 
-    const localPreview = useMemo(() => {
-        return {
+    const localPreview = useMemo(
+        () => ({
             subject: subject?.trim() || "제목이 아직 없습니다",
             body: content || "",
             recipients: parsedCustomRecipients,
             audience,
             stamp: new Date(),
-        };
-    }, [audience, content, parsedCustomRecipients, subject]);
+        }),
+        [audience, content, parsedCustomRecipients, subject]
+    );
 
     const activePreview = serverPreview ?? localPreview;
 
@@ -99,10 +100,7 @@ const AdminMail = () => {
                 body: data?.body ?? payload.body ?? "",
                 html: data?.html ?? data?.renderedBody ?? null,
                 audience: data?.audience ?? payload.audience,
-                recipients:
-                    data?.recipients ??
-                    data?.resolvedRecipients ??
-                    payload.customRecipients,
+                recipients: data?.recipients ?? data?.resolvedRecipients ?? payload.customRecipients,
                 stamp: new Date(),
             });
         } catch (error) {
@@ -170,35 +168,65 @@ const AdminMail = () => {
         }
     };
 
+    const pageClass =
+        "min-h-screen bg-slate-50 text-slate-900 transition-colors duration-300 dark:bg-slate-950 dark:text-slate-100";
+    const containerClass =
+        "mx-auto flex w-full max-w-6xl flex-col gap-8 px-4 py-10 sm:px-6 md:px-10 md:py-16";
+    const introTextClass = "max-w-3xl text-sm leading-6 text-slate-600 md:text-base dark:text-slate-400";
+    const feedbackBaseClass =
+        "flex items-start gap-3 rounded-2xl border px-4 py-3 text-sm md:text-base";
+    const formShellClass =
+        "flex flex-col gap-6 rounded-3xl border border-slate-200 bg-white p-6 shadow-[0_24px_65px_-30px_rgba(15,23,42,0.2)] dark:border-slate-800/80 dark:bg-slate-900/70 dark:shadow-[0_24px_65px_-30px_rgba(15,23,42,0.8)]";
+    const hintLabelClass = "text-sm font-semibold uppercase tracking-[0.3em] text-slate-500";
+    const inputClass =
+        "rounded-2xl border border-slate-200 bg-white px-4 py-3 text-sm text-slate-900 shadow-sm focus:border-sky-500 focus:outline-none dark:border-slate-700 dark:bg-slate-950/60 dark:text-slate-100 dark:shadow-inner dark:shadow-slate-900/40";
+    const textareaClass = inputClass + " min-h-[160px]";
+    const toggleLabelClass =
+        "mt-6 inline-flex items-center gap-3 rounded-2xl border border-slate-200 bg-slate-100 px-4 py-3 text-sm text-slate-700 transition hover:border-slate-300 hover:bg-slate-50 dark:border-slate-800 dark:bg-slate-950/40 dark:text-slate-200";
+    const previewButtonClass =
+        "inline-flex items-center gap-2 rounded-full border border-sky-500 bg-sky-50 px-5 py-2 text-sm font-medium text-sky-700 transition hover:border-sky-500 hover:bg-sky-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-sky-500 focus-visible:ring-offset-2 focus-visible:ring-offset-white disabled:cursor-wait disabled:opacity-70 dark:border-sky-500/50 dark:bg-sky-500/10 dark:text-sky-100 dark:hover:border-sky-300 dark:hover:bg-sky-500/20 dark:focus-visible:ring-offset-slate-950";
+    const submitButtonClass =
+        "inline-flex items-center gap-2 rounded-full border border-emerald-500 bg-emerald-50 px-5 py-2 text-sm font-medium text-emerald-700 transition hover:border-emerald-500 hover:bg-emerald-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500 focus-visible:ring-offset-2 focus-visible:ring-offset-white disabled:cursor-wait disabled:opacity-70 dark:border-emerald-500/60 dark:bg-emerald-500/20 dark:text-emerald-100 dark:hover:border-emerald-400 dark:hover:bg-emerald-500/30 dark:focus-visible:ring-offset-slate-950";
+    const audienceCardBase =
+        "flex cursor-pointer flex-col gap-2 rounded-2xl border px-4 py-3 transition";
+    const audienceSelectedClass =
+        "border-sky-500 bg-sky-50 shadow-inner shadow-sky-200/60 dark:border-sky-500/60 dark:bg-sky-500/10 dark:shadow-sky-900/40";
+    const audienceIdleClass =
+        "border-slate-200 bg-slate-100 hover:border-slate-300 hover:bg-slate-50 dark:border-slate-800 dark:bg-slate-950/60 dark:hover:border-slate-600 dark:hover:bg-slate-900/80";
+    const asideShellClass =
+        "flex flex-col gap-5 rounded-3xl border border-slate-200 bg-white p-6 shadow-[0_20px_55px_-32px_rgba(15,23,42,0.18)] dark:border-slate-800/80 dark:bg-slate-900/60";
+    const previewSurfaceClass =
+        "rounded-2xl border border-slate-200 bg-slate-50 p-4 text-sm text-slate-700 shadow-inner dark:border-slate-800 dark:bg-slate-950/70 dark:text-slate-200";
+
     return (
-        <main className="min-h-screen bg-slate-950 text-slate-100">
-            <div className="mx-auto flex w-full max-w-6xl flex-col gap-8 px-6 py-12 md:px-10 md:py-16">
-                <header className="flex flex-col gap-4">
-                    <div className="inline-flex items-center gap-2 text-xs uppercase tracking-[0.35em] text-slate-500">
-                        <UserGroupIcon className="h-4 w-4" aria-hidden="true" />
-                        <span>Admin</span>
-                        <span className="opacity-60">Communication</span>
+        <main className={pageClass}>
+            <div className={containerClass}>
+                <header className="flex flex-col gap-6">
+                    <AdminPageTopBar lng={lng} currentLabel="사용자 메일 발송" />
+                    <div className="flex flex-col gap-3">
+                        <div className="inline-flex items-center gap-2 text-xs uppercase tracking-[0.35em] text-slate-500 dark:text-slate-500">
+                            <UserGroupIcon className="h-4 w-4" aria-hidden="true" />
+                            <span>Admin</span>
+                            <span className="opacity-60">Communication</span>
+                        </div>
+                        <h1 className="text-3xl font-semibold md:text-4xl">사용자 메일 발송 도구</h1>
+                        <p className={introTextClass}>
+                            공지, 온보딩 가이드, 긴급 알림 등을 바로 전송할 수 있는 운영 전용 메일 작성 페이지입니다.
+                            대상 그룹을 선택하고 내용을 작성한 뒤 미리보기와 테스트 발송을 거쳐 메일을 전송하세요.
+                        </p>
                     </div>
-                    <h1 className="text-3xl font-semibold md:text-4xl">
-                        사용자 메일 발송 도구
-                    </h1>
-                    <p className="max-w-3xl text-sm leading-6 text-slate-400 md:text-base">
-                        공지, 온보딩 가이드, 긴급 알림 등을 바로 전송할 수 있는 운영 전용
-                        메일 작성 페이지입니다. 대상 그룹을 선택하고 내용을 작성한 뒤 미리보기와
-                        테스트 발송을 거쳐 메일을 전송하세요.
-                    </p>
                 </header>
 
                 {feedback && (
                     <div
                         className={clsx(
-                            "flex items-start gap-3 rounded-2xl border px-4 py-3 text-sm md:text-base",
+                            feedbackBaseClass,
                             feedback.type === "success" &&
-                                "border-emerald-500/40 bg-emerald-500/10 text-emerald-100",
+                                "border-emerald-500 bg-emerald-50 text-emerald-700 dark:border-emerald-500/40 dark:bg-emerald-500/10 dark:text-emerald-100",
                             feedback.type === "error" &&
-                                "border-rose-500/50 bg-rose-500/10 text-rose-100",
+                                "border-rose-500 bg-rose-50 text-rose-700 dark:border-rose-500/50 dark:bg-rose-500/10 dark:text-rose-100",
                             feedback.type === "warning" &&
-                                "border-amber-400/40 bg-amber-500/10 text-amber-100"
+                                "border-amber-400 bg-amber-50 text-amber-700 dark:border-amber-400/40 dark:bg-amber-500/10 dark:text-amber-100"
                         )}
                     >
                         {feedback.type === "success" ? (
@@ -211,23 +239,16 @@ const AdminMail = () => {
                 )}
 
                 <div className="grid gap-6 lg:grid-cols-[minmax(0,1fr)_minmax(320px,360px)]">
-                    <form
-                        className="flex flex-col gap-6 rounded-3xl border border-slate-800/80 bg-slate-900/70 p-6 shadow-[0_24px_65px_-30px_rgba(15,23,42,0.8)]"
-                        onSubmit={handleSubmit}
-                    >
+                    <form className={formShellClass} onSubmit={handleSubmit}>
                         <fieldset className="flex flex-col gap-3">
-                            <legend className="text-sm font-semibold uppercase tracking-[0.3em] text-slate-500">
-                                대상 그룹
-                            </legend>
+                            <legend className={hintLabelClass}>대상 그룹</legend>
                             <div className="grid gap-3 sm:grid-cols-2">
                                 {audienceOptions.map((option) => (
                                     <label
                                         key={option.value}
                                         className={clsx(
-                                            "flex cursor-pointer flex-col gap-2 rounded-2xl border px-4 py-3 transition",
-                                            audience === option.value
-                                                ? "border-sky-500/60 bg-sky-500/10 shadow-inner shadow-sky-900/40"
-                                                : "border-slate-800 bg-slate-950/60 hover:border-slate-600 hover:bg-slate-900/80"
+                                            audienceCardBase,
+                                            audience === option.value ? audienceSelectedClass : audienceIdleClass
                                         )}
                                     >
                                         <div className="flex items-center gap-2">
@@ -239,11 +260,11 @@ const AdminMail = () => {
                                                 onChange={(event) => setAudience(event.target.value)}
                                                 className="h-4 w-4 accent-sky-500"
                                             />
-                                            <span className="text-sm font-medium text-slate-50">
+                                            <span className="text-sm font-medium text-slate-900 dark:text-slate-50">
                                                 {option.label}
                                             </span>
                                         </div>
-                                        <p className="pl-6 text-xs leading-5 text-slate-400">
+                                        <p className="pl-6 text-xs leading-5 text-slate-500 dark:text-slate-400">
                                             {option.description}
                                         </p>
                                     </label>
@@ -253,10 +274,7 @@ const AdminMail = () => {
 
                         {audience === "custom" && (
                             <div className="flex flex-col gap-2">
-                                <label
-                                    htmlFor="customRecipients"
-                                    className="text-sm font-semibold uppercase tracking-[0.3em] text-slate-500"
-                                >
+                                <label htmlFor="customRecipients" className={hintLabelClass}>
                                     수신자 목록
                                 </label>
                                 <textarea
@@ -265,7 +283,7 @@ const AdminMail = () => {
                                     placeholder="예) user1@example.com, user2@example.com"
                                     value={customRecipients}
                                     onChange={(event) => setCustomRecipients(event.target.value)}
-                                    className="rounded-2xl border border-slate-800 bg-slate-950/60 px-4 py-3 text-sm text-slate-100 shadow-inner shadow-slate-900/60 focus:border-sky-500 focus:outline-none"
+                                    className={textareaClass}
                                 />
                                 <p className="text-xs text-slate-500">
                                     쉼표, 줄바꿈, 세미콜론으로 구분할 수 있습니다.
@@ -274,60 +292,44 @@ const AdminMail = () => {
                         )}
 
                         <div className="flex flex-col gap-2">
-                            <label
-                                htmlFor="subject"
-                                className="text-sm font-semibold uppercase tracking-[0.3em] text-slate-500"
-                            >
+                            <label htmlFor="subject" className={hintLabelClass}>
                                 제목
                             </label>
                             <input
                                 id="subject"
-                                type="text"
+                                placeholder="예) [공지] 모델 업데이트 안내"
                                 value={subject}
                                 onChange={(event) => setSubject(event.target.value)}
-                                placeholder="예) [공지] 4월 신규 기능 업데이트 안내"
-                                className="rounded-2xl border border-slate-800 bg-slate-950/60 px-4 py-3 text-sm text-slate-100 shadow-inner shadow-slate-900/60 focus:border-sky-500 focus:outline-none"
+                                className={inputClass}
                             />
                         </div>
 
                         <div className="flex flex-col gap-2">
-                            <label
-                                htmlFor="content"
-                                className="text-sm font-semibold uppercase tracking-[0.3em] text-slate-500"
-                            >
-                                본문 내용
-                            </label>
+                            <label className={hintLabelClass}>본문</label>
                             <textarea
-                                id="content"
                                 rows={12}
+                                placeholder="안녕하세요, TVB 운영팀입니다..."
                                 value={content}
                                 onChange={(event) => setContent(event.target.value)}
-                                placeholder={"안녕하세요,\nGraviFox 운영팀입니다.\n\n오늘은 ..."}
-                                className="rounded-2xl border border-slate-800 bg-slate-950/60 px-4 py-3 text-sm text-slate-100 shadow-inner shadow-slate-900/60 focus:border-sky-500 focus:outline-none"
+                                className={textareaClass}
                             />
-                            <p className="text-xs text-slate-500">
-                                Markdown 혹은 단순 텍스트 기반 초안입니다. 서버 미리보기에서
-                                최종 렌더링 결과를 확인하세요.
-                            </p>
                         </div>
 
-                        <div className="grid gap-4 md:grid-cols-2">
-                            <label className="flex flex-col gap-2">
-                                <span className="text-sm font-semibold uppercase tracking-[0.3em] text-slate-500">
-                                    테스트 메일
-                                </span>
-                                <input
-                                    type="email"
-                                    value={testAddress}
-                                    onChange={(event) => setTestAddress(event.target.value)}
-                                    placeholder="my-email@gravifox.ai"
-                                    className="rounded-2xl border border-slate-800 bg-slate-950/60 px-4 py-3 text-sm text-slate-100 shadow-inner shadow-slate-900/60 focus:border-sky-500 focus:outline-none"
-                                />
-                                <span className="text-xs text-slate-500">
-                                    입력 시 본 발송 전에 테스트 메일을 추가로 전송합니다.
-                                </span>
+                        <div className="flex flex-col gap-2">
+                            <label htmlFor="testAddress" className={hintLabelClass}>
+                                테스트 메일 주소
                             </label>
-                            <label className="mt-6 inline-flex items-center gap-3 rounded-2xl border border-slate-800 bg-slate-950/40 px-4 py-3 text-sm text-slate-200">
+                            <input
+                                id="testAddress"
+                                placeholder="예) admin@example.com"
+                                value={testAddress}
+                                onChange={(event) => setTestAddress(event.target.value)}
+                                className={inputClass}
+                            />
+                            <span className="text-xs text-slate-500">
+                                입력 시 발송 전에 테스트 메일이 먼저 전송됩니다.
+                            </span>
+                            <label className={toggleLabelClass}>
                                 <input
                                     type="checkbox"
                                     checked={sendCopyToSelf}
@@ -343,11 +345,7 @@ const AdminMail = () => {
                                 type="button"
                                 onClick={handlePreview}
                                 disabled={isPreviewing}
-                                className={clsx(
-                                    "inline-flex items-center gap-2 rounded-full border px-5 py-2 text-sm font-medium transition",
-                                    "border-sky-500/50 bg-sky-500/10 text-sky-100 hover:border-sky-300 hover:bg-sky-500/20",
-                                    isPreviewing && "cursor-wait opacity-70"
-                                )}
+                                className={clsx(previewButtonClass, isPreviewing && "cursor-wait opacity-70")}
                             >
                                 <EyeIcon className="h-4 w-4" />
                                 {isPreviewing ? "미리보기 준비 중..." : "서버 미리보기"}
@@ -355,10 +353,7 @@ const AdminMail = () => {
                             <button
                                 type="submit"
                                 disabled={isSubmitting}
-                                className={clsx(
-                                    "inline-flex items-center gap-2 rounded-full border border-emerald-500/60 bg-emerald-500/20 px-5 py-2 text-sm font-medium text-emerald-100 transition hover:border-emerald-400 hover:bg-emerald-500/30",
-                                    isSubmitting && "cursor-wait opacity-70"
-                                )}
+                                className={clsx(submitButtonClass, isSubmitting && "cursor-wait opacity-70")}
                             >
                                 <PaperAirplaneIcon className="h-4 w-4 rotate-6" />
                                 {isSubmitting ? "발송 중..." : "발송 요청"}
@@ -366,74 +361,72 @@ const AdminMail = () => {
                         </div>
                     </form>
 
-                    <aside className="flex flex-col gap-5 rounded-3xl border border-slate-800/80 bg-slate-900/60 p-6">
+                    <aside className={asideShellClass}>
                         <div className="flex items-center gap-3">
                             <div className="inline-flex h-12 w-12 items-center justify-center rounded-2xl bg-gradient-to-br from-sky-500 via-cyan-400 to-emerald-400 text-white shadow-lg shadow-sky-900/40">
                                 <EnvelopeOpenIcon className="h-6 w-6" aria-hidden="true" />
                             </div>
                             <div>
-                                <p className="text-xs uppercase tracking-[0.3em] text-slate-500">
+                                <p className="text-xs uppercase tracking-[0.3em] text-slate-500 dark:text-slate-500">
                                     미리보기
                                 </p>
-                                <p className="text-lg font-semibold text-slate-100">
-                                    실시간 렌더링
-                                </p>
+                                <p className="text-lg font-semibold text-slate-900 dark:text-slate-100">실시간 렌더링</p>
                             </div>
                         </div>
 
-                        <div className="rounded-2xl border border-slate-800 bg-slate-950/70 p-4 text-sm text-slate-200 shadow-inner shadow-slate-900/60">
+                        <div className={previewSurfaceClass}>
                             <div className="flex flex-col gap-1">
-                                <span className="text-xs uppercase tracking-[0.3em] text-slate-600">
+                                <span className="text-xs uppercase tracking-[0.3em] text-slate-500 dark:text-slate-600">
                                     Subject
                                 </span>
-                                <p className="text-base font-medium text-slate-50">
+                                <p className="text-base font-medium text-slate-900 dark:text-slate-50">
                                     {activePreview.subject}
                                 </p>
                             </div>
-                            <hr className="my-4 border-slate-800" />
+                            <hr className="my-4 border-slate-300 dark:border-slate-800" />
                             {activePreview.html ? (
                                 <div
-                                    className="prose prose-invert max-w-none text-sm leading-6 text-slate-200"
+                                    className="prose prose-sm max-w-none text-slate-700 dark:prose-invert dark:text-slate-200"
                                     dangerouslySetInnerHTML={{ __html: activePreview.html }}
                                 />
                             ) : (
-                                <p className="whitespace-pre-wrap text-sm leading-6 text-slate-200">
-                                    {activePreview.body}
+                                <p className="whitespace-pre-wrap text-sm leading-6">
+                                    {activePreview.body || "미리보기 본문이 아직 없습니다."}
                                 </p>
                             )}
                         </div>
 
-                        <div className="flex flex-col gap-3 rounded-2xl border border-slate-800 bg-slate-950/50 p-4 text-xs text-slate-400">
-                            <div className="flex items-center justify-between text-slate-300">
-                                <span>대상 그룹</span>
-                                <span className="text-slate-100">
-                                    {
-                                        audienceOptions.find(
-                                            (item) => item.value === activePreview.audience
-                                        )?.label
-                                    }
-                                </span>
+                        <div className="space-y-3 rounded-2xl border border-slate-200 bg-slate-100 p-4 text-sm text-slate-600 dark:border-slate-800 dark:bg-slate-950/40 dark:text-slate-300">
+                            <div className="flex flex-col gap-1">
+                                <p className="text-xs uppercase tracking-[0.3em] text-slate-500 dark:text-slate-600">
+                                    Audience
+                                </p>
+                                <p>
+                                    {audienceOptions.find((option) => option.value === activePreview.audience)?.label ??
+                                        "—"}
+                                </p>
                             </div>
-                            {activePreview.recipients?.length ? (
-                                <div className="flex flex-col gap-1">
-                                    <span className="text-slate-300">수신자 목록</span>
-                                    <ul className="max-h-32 overflow-y-auto rounded-xl border border-slate-800 bg-slate-950/60 px-3 py-2 text-[11px] text-slate-400">
-                                        {activePreview.recipients.map((email) => (
-                                            <li key={email}>{email}</li>
-                                        ))}
-                                    </ul>
-                                </div>
-                            ) : (
-                                <p>선택된 그룹 정책에 따라 수신자가 자동으로 계산됩니다.</p>
-                            )}
-                            <p className="text-right text-[11px] text-slate-500">
-                                {activePreview.stamp
-                                    ? `생성: ${new Intl.DateTimeFormat("ko-KR", {
-                                          hour: "2-digit",
-                                          minute: "2-digit",
-                                      }).format(activePreview.stamp)}`
-                                    : null}
+                            <div className="flex flex-col gap-1">
+                                <p className="text-xs uppercase tracking-[0.3em] text-slate-500 dark:text-slate-600">
+                                    Recipients
+                                </p>
+                                <p className="rounded-2xl border border-slate-200 bg-white px-4 py-3 text-xs text-slate-600 shadow-sm dark:border-slate-800 dark:bg-slate-950/60 dark:text-slate-200 dark:shadow-inner dark:shadow-slate-900/40">
+                                    {activePreview.recipients?.length
+                                        ? activePreview.recipients.join(", ")
+                                        : "수신자 정보 없음"}
+                                </p>
+                            </div>
+                        </div>
+
+                        <div className="rounded-2xl border border-slate-200 bg-slate-50 p-4 text-sm text-slate-600 dark:border-slate-800 dark:bg-slate-950/50 dark:text-slate-300">
+                            <p className="text-xs uppercase tracking-[0.3em] text-slate-500 dark:text-slate-600">
+                                빠른 안내
                             </p>
+                            <ul className="list-disc space-y-2 pl-4">
+                                <li>메일 발송 결과는 운영 로그 페이지에서 확인할 수 있습니다.</li>
+                                <li>고객 맞춤 안내 시 테스트 메일로 최종 확인 후 전송하세요.</li>
+                                <li>HTML 본문은 자동으로 인라인 스타일이 적용되어 전송됩니다.</li>
+                            </ul>
                         </div>
                     </aside>
                 </div>

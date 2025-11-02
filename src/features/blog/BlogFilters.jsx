@@ -20,10 +20,10 @@ export default function BlogFilters({ posts = [], value, onChange }) {
                         key={tag}
                         onClick={() => onChange?.({ tag })}
                         className={
-                            "inline-flex items-center rounded-full border px-3 py-1.5 text-xs font-medium transition " +
+                            "inline-flex items-center rounded-full border px-3 py-1.5 text-xs font-medium transition focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-400 " +
                             (active
-                                ? "border-indigo-600 bg-indigo-50 text-indigo-700"
-                                : "border-gray-200 bg-white text-gray-600 hover:bg-gray-50")
+                                ? "border-indigo-600 bg-indigo-50 text-indigo-700 dark:border-indigo-400 dark:bg-indigo-400/20 dark:text-indigo-200"
+                                : "border-slate-200/70 bg-white text-slate-600 hover:bg-slate-50 dark:border-slate-700 dark:bg-slate-900/60 dark:text-slate-300 dark:hover:bg-slate-900")
                         }
                     >
                         {tag === "all" ? t("filters.all") : `#${tag}`}

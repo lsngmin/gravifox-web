@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { styled } from '@mui/material/styles';
 import { Box, Typography, Button } from '@mui/material';
 import SendIcon from '@mui/icons-material/Send';
-import Navigation from '../features/navigation/navigation';
+import Header from '../app/layout/Header';
 
 const Section = styled(Box)(({ theme }) => ({
     padding: '4rem 0',
@@ -145,7 +145,7 @@ const Contact = () => {
 
     return (
         <Box sx={{ bgcolor: '#fff', width: '100%' }}>
-            <Navigation />
+            <Header />
             <Section>
                 <SectionTitle>Contact Us</SectionTitle>
                 <ContentWrapper>

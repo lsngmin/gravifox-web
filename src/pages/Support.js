@@ -6,8 +6,8 @@ import Paper from "@mui/material/Paper";
 import Button from "@mui/material/Button";
 import Stack from "@mui/material/Stack";
 import Avatar from "@mui/material/Avatar";
-import Navigation from "../features/navigation/navigation";
-import Footer from "../features/footer/footer";
+import Header from "../app/layout/Header";
+import Footer from "../app/layout/Footer/Footer";
 import { useNavigate, useParams } from "react-router-dom";
 import BugReportModal from "features/issues/components/BugReportModal";
 import FeatureRequestModal from "features/issues/components/FeatureRequestModal";
@@ -259,6 +259,7 @@ const Support = () => {
 
     return (
         <Box
+            className={isDark ? "dark" : ""}
             sx={{
                 minHeight: "100vh",
                 backgroundColor: palette.pageBg,
@@ -267,7 +268,7 @@ const Support = () => {
             }}
         >
             <Box sx={{ position: "fixed", top: 0, left: 0, width: "100%", zIndex: 1200 }}>
-                <Navigation variant={isDark ? "dark" : "light"} />
+                <Header />
             </Box>
 
             <PageWrapper component="main">

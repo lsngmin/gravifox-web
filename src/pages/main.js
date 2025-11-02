@@ -1,7 +1,7 @@
 import React from "react";
 
-import Navigation from "../features/navigation/navigation";
-import Footer from "../features/footer/footer";
+import Header from "../app/layout/Header";
+import Footer from "../app/layout/Footer/Footer";
 import PageSection from "features/main/pageSection";
 import Feature from "features/main/feature";
 import HowItWorks from "features/main/howItWorks";
@@ -16,7 +16,7 @@ import ContentDecor from "features/main/contentDecor";
 
 const Main = () => {
     return (<>
-            <Navigation/>
+            <Header />
             <PageSection/>
             <AnchorNav/>
             <ContentDecor>

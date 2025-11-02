@@ -1,5 +1,5 @@
 import React from 'react';
-import Navigation from '../features/navigation/navigation';
+import Header from '../app/layout/Header';
 import HeroSection from '../features/feature/components/HeroSection';
 import MetricsHighlights from '../features/feature/components/MetricsHighlights';
 import PillarsSection from '../features/feature/components/PillarsSection';
@@ -9,7 +9,7 @@ import CtaBanner from '../features/feature/components/CtaBanner';
 
 const Feature = () => (
   <div className="min-h-screen bg-white font-sans">
-    <Navigation />
+    <Header />
     <main>
       <HeroSection />
       <MetricsHighlights />

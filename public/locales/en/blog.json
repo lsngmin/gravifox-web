@@ -15,5 +15,12 @@
     "placeholder": "Enter your email",
     "submit": "Subscribe",
     "done": "Subscribed"
+  },
+  "list": {
+    "loadMore": "Load more",
+    "empty": "No posts yet."
+  },
+  "meta": {
+    "readTime": "{{minutes}} min read"
   }
 }

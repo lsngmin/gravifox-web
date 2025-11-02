@@ -1,13 +1,9 @@
 import React, { useEffect, useMemo, useState } from "react";
-import { Link, useParams } from "react-router-dom";
+import { useParams } from "react-router-dom";
 import clsx from "clsx";
 import { useTranslation } from "react-i18next";
-import {
-    ArrowLeftIcon,
-    MoonIcon,
-    ShieldCheckIcon,
-    SunIcon,
-} from "@heroicons/react/24/outline";
+import { ShieldCheckIcon } from "@heroicons/react/24/outline";
+import AdminPageTopBar from "../components/admin/AdminPageTopBar";
 
 const SERVICE_TRACKS = [
     { key: "backend", label: "백엔드 API" },
@@ -89,14 +85,14 @@ const buildStatusTimeline = () => {
     return entries;
 };
 
-const colorForState = (state, isDarkMode) => {
+const colorForState = (state) => {
     switch (state) {
         case "operational":
-            return isDarkMode ? "bg-emerald-400/80" : "bg-emerald-400";
+            return "bg-emerald-400 dark:bg-emerald-400/80";
         case "degraded":
-            return isDarkMode ? "bg-amber-400/80" : "bg-amber-400";
+            return "bg-amber-400 dark:bg-amber-400/80";
         default:
-            return isDarkMode ? "bg-rose-400/80" : "bg-rose-400";
+            return "bg-rose-400 dark:bg-rose-400/80";
     }
 };
 
@@ -129,8 +125,6 @@ const formatFullDate = (date, locale = "ko") => {
 const AdminServiceHealth = () => {
     const { lng = "ko" } = useParams();
     const { i18n } = useTranslation();
-    const adminHomePath = `/${lng}/admin`;
-    const [isDarkMode, setIsDarkMode] = useState(true);
     const statusTimeline = useMemo(() => buildStatusTimeline(), []);
     const [hoveredEntry, setHoveredEntry] = useState(() =>
         statusTimeline.length ? statusTimeline[statusTimeline.length - 1] : null
@@ -144,60 +138,33 @@ const AdminServiceHealth = () => {
 
     const latestEntry = statusTimeline.length ? statusTimeline[statusTimeline.length - 1] : null;
 
-    const surfaceClass = isDarkMode
-        ? "bg-slate-900/70 border-slate-800 shadow-slate-950/30"
-        : "bg-white border-slate-200 shadow-slate-900/5";
-    const subtleSurface = isDarkMode ? "bg-slate-900/60 border-slate-800" : "bg-slate-50 border-slate-200";
+    const pageClass =
+        "min-h-screen bg-slate-50 text-slate-900 transition-colors duration-300 dark:bg-slate-950 dark:text-slate-100";
+    const containerClass =
+        "mx-auto flex w-full max-w-6xl flex-col gap-10 px-4 py-10 sm:px-6 md:px-10 md:py-16";
+    const introTextClass = "max-w-3xl text-sm text-slate-600 md:text-base dark:text-slate-400";
+    const trackCardClass =
+        "flex flex-col gap-3 rounded-2xl border border-slate-200 bg-white p-6 shadow-[0_16px_34px_-24px_rgba(15,23,42,0.15)] dark:border-slate-800/80 dark:bg-slate-900/70";
+    const timelineCardClass =
+        "rounded-3xl border border-slate-200 bg-white p-6 shadow-[0_18px_40px_-28px_rgba(15,23,42,0.14)] dark:border-slate-800/80 dark:bg-slate-900/60";
+    const legendBadgeClass =
+        "inline-flex items-center gap-2 rounded-full border border-slate-300 bg-white px-3 py-1 text-xs font-medium text-slate-600 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-300";
 
     return (
-        <main className={clsx("min-h-screen transition-colors duration-300", isDarkMode ? "bg-slate-950 text-slate-50" : "bg-slate-100 text-slate-900")}>
-            <div className="mx-auto flex w-full max-w-6xl flex-col gap-10 px-6 py-12 md:px-10 md:py-16">
-                <header className="flex flex-col gap-4">
-                    <Link
-                        to={adminHomePath}
-                        className={clsx(
-                            "inline-flex w-fit items-center gap-2 rounded-full border px-4 py-2 text-sm font-medium transition",
-                            isDarkMode
-                                ? "border-slate-800 bg-slate-900/80 text-slate-200 hover:border-slate-500 hover:text-white"
-                                : "border-slate-300 bg-white text-slate-700 hover:border-slate-400 hover:text-slate-900"
-                        )}
-                    >
-                        <ArrowLeftIcon className="h-4 w-4" />
-                        운영 허브로 돌아가기
-                    </Link>
+        <main className={pageClass}>
+            <div className={containerClass}>
+                <header className="flex flex-col gap-6">
+                    <AdminPageTopBar lng={lng} currentLabel="서비스 상태" />
                     <div className="flex flex-col gap-3">
-                        <div className="flex items-center gap-2 text-xs uppercase tracking-[0.35em] text-slate-500">
+                        <div className="flex items-center gap-2 text-xs uppercase tracking-[0.35em] text-slate-500 dark:text-slate-500">
                             <span>Admin</span>
                             <span className="opacity-50">Service Health</span>
                         </div>
                         <h1 className="text-3xl font-semibold md:text-4xl">서비스 상태 모니터링</h1>
-                        <p className={clsx("max-w-3xl text-sm md:text-base", isDarkMode ? "text-slate-400" : "text-slate-600")}>
-                            핵심 서비스 트랙의 30일 운영 상태를 한눈에 확인하고, 날짜별 상세 이슈를 검토할 수 있습니다. 색상은 정상 운영·지연/부분 장애·점검 진행을 나타냅니다.
+                        <p className={introTextClass}>
+                            핵심 서비스 트랙의 30일 운영 상태를 한눈에 확인하고, 날짜별 상세 이슈를 검토할 수 있습니다.
+                            색은 정상 운영·지연/부분 장애·점검 진행을 나타냅니다.
                         </p>
-                    </div>
-                    <div className="flex flex-wrap gap-3">
-                        <button
-                            type="button"
-                            onClick={() => setIsDarkMode((prev) => !prev)}
-                            className={clsx(
-                                "inline-flex items-center gap-2 rounded-full border px-4 py-2 text-sm font-medium transition",
-                                isDarkMode
-                                    ? "border-slate-700 bg-slate-900/80 hover:border-slate-500 hover:bg-slate-800"
-                                    : "border-slate-300 bg-white hover:border-slate-400 hover:bg-slate-50"
-                            )}
-                        >
-                            {isDarkMode ? (
-                                <>
-                                    <SunIcon className="h-5 w-5 text-amber-400" />
-                                    라이트 모드
-                                </>
-                            ) : (
-                                <>
-                                    <MoonIcon className="h-5 w-5 text-slate-600" />
-                                    다크 모드
-                                </>
-                            )}
-                        </button>
                     </div>
                 </header>
 
@@ -206,13 +173,7 @@ const AdminServiceHealth = () => {
                         const state = latestEntry?.states?.[track.key] ?? "operational";
                         const issue = describeIssue(track.key, state);
                         return (
-                            <article
-                                key={track.key}
-                                className={clsx(
-                                    "flex flex-col gap-3 rounded-2xl border p-6 transition",
-                                    surfaceClass
-                                )}
-                            >
+                            <article key={track.key} className={trackCardClass}>
                                 <div className="flex items-center gap-3">
                                     <div
                                         className={clsx(
@@ -227,86 +188,49 @@ const AdminServiceHealth = () => {
                                         <ShieldCheckIcon className="h-6 w-6" aria-hidden="true" />
                                     </div>
                                     <div>
-                                        <p className={clsx("text-sm font-semibold", isDarkMode ? "text-slate-300" : "text-slate-600")}>
-                                            {track.label}
-                                        </p>
-                                        <p className="text-xs text-slate-500">
+                                        <p className="text-sm font-semibold text-slate-900 dark:text-slate-100">{track.label}</p>
+                                        <p className="text-xs text-slate-500 dark:text-slate-400">
                                             {latestEntry ? formatFullDate(latestEntry.date, i18n.language) : "데이터 없음"}
                                         </p>
                                     </div>
                                 </div>
-                                <div className="flex items-center justify-between">
-                                    <span
-                                        className={clsx(
-                                            "inline-flex items-center rounded-full px-3 py-1 text-xs font-semibold",
-                                            state === "operational"
-                                                ? isDarkMode
-                                                    ? "border border-emerald-400/80 bg-emerald-500/10 text-emerald-200"
-                                                    : "border border-emerald-100 bg-emerald-50 text-emerald-700"
-                                                : state === "degraded"
-                                                ? isDarkMode
-                                                    ? "border border-amber-400/80 bg-amber-500/10 text-amber-200"
-                                                    : "border border-amber-100 bg-amber-50 text-amber-700"
-                                                : isDarkMode
-                                                ? "border border-rose-400/80 bg-rose-500/10 text-rose-200"
-                                                : "border border-rose-100 bg-rose-50 text-rose-700"
-                                        )}
-                                    >
-                                        {labelForState(state)}
-                                    </span>
-                                    <span className={clsx("text-xs", isDarkMode ? "text-slate-400" : "text-slate-600")}>
-                                        {issue}
-                                    </span>
-                                </div>
+                                <span className={legendBadgeClass}>{labelForState(state)}</span>
+                                <p className="text-sm text-slate-600 dark:text-slate-300">{issue}</p>
                             </article>
                         );
                     })}
                 </section>
 
-                <section className="grid gap-6 xl:grid-cols-[3fr,2fr]">
-                    <article
-                        className={clsx(
-                            "rounded-2xl border p-6",
-                            surfaceClass
-                        )}
-                    >
-                        <header className="flex flex-wrap items-start justify-between gap-3">
-                            <div className="flex flex-col gap-1">
-                                <span
-                                    className={clsx(
-                                        "inline-flex items-center gap-2 rounded-full border px-4 py-2 text-xs font-semibold uppercase tracking-[0.25em]",
-                                        isDarkMode
-                                            ? "border-emerald-500/40 bg-emerald-400/10 text-emerald-200"
-                                            : "border-emerald-200 bg-emerald-50 text-emerald-600"
-                                    )}
-                                >
-                                    서비스 트랙 타임라인
-                                </span>
-                                <h2 className="text-xl font-semibold">30일 운영 추이</h2>
-                                <p className={clsx("text-xs", isDarkMode ? "text-slate-400" : "text-slate-600")}>
-                                    색상은 정상 운영(녹색), 지연/부분 장애(주황), 점검 진행(붉은색)을 의미합니다. 마우스를 올리거나 포커스하면 상세 이슈를 확인할 수 있습니다.
-                                </p>
-                            </div>
-                        </header>
+                <section className={timelineCardClass}>
+                    <header className="flex flex-col gap-2 border-b border-slate-200 pb-4 dark:border-slate-800">
+                        <h2 className="text-lg font-semibold text-slate-900 dark:text-slate-50">30일 히스토리</h2>
+                        <p className="text-xs text-slate-500 dark:text-slate-400">
+                            날짜를 가리키면 해당 서비스의 상세 이슈가 표시됩니다.
+                        </p>
+                        <div className="flex flex-wrap gap-2 text-xs text-slate-500 dark:text-slate-400">
+                            <span className={legendBadgeClass}>
+                                <span className="h-3 w-3 rounded-full bg-emerald-400 dark:bg-emerald-400/80" />
+                                정상
+                            </span>
+                            <span className={legendBadgeClass}>
+                                <span className="h-3 w-3 rounded-full bg-amber-400 dark:bg-amber-400/80" />
+                                지연/부분 장애
+                            </span>
+                            <span className={legendBadgeClass}>
+                                <span className="h-3 w-3 rounded-full bg-rose-400 dark:bg-rose-400/80" />
+                                점검
+                            </span>
+                        </div>
+                    </header>
 
-                        <div className="mt-6 flex flex-col gap-6">
+                    <div className="mt-6 grid gap-6 lg:grid-cols-[2fr,1fr]">
+                        <div className="flex flex-col gap-4">
                             {SERVICE_TRACKS.map((track, index) => (
-                                <div
-                                    key={track.key}
-                                    className={clsx(
-                                        "flex flex-col gap-3 pb-4",
-                                        index > 0
-                                            ? isDarkMode
-                                                ? "border-t border-slate-800 pt-4"
-                                                : "border-t border-slate-200 pt-4"
-                                            : null
-                                    )}
+                                <div key={track.key} className={clsx("flex flex-col gap-3", index > 0 && "border-t border-slate-200 pt-4 dark:border-slate-800")}
                                 >
                                     <div className="flex items-center justify-between">
-                                        <h3 className={clsx("text-sm font-semibold", isDarkMode ? "text-slate-200" : "text-slate-600")}>
-                                            {track.label}
-                                        </h3>
-                                        <span className="text-xs text-slate-500">
+                                        <h3 className="text-sm font-semibold text-slate-900 dark:text-slate-100">{track.label}</h3>
+                                        <span className="text-xs text-slate-500 dark:text-slate-400">
                                             {statusTimeline.length}일 히스토리
                                         </span>
                                     </div>
@@ -318,103 +242,52 @@ const AdminServiceHealth = () => {
                                             return (
                                                 <div
                                                     key={`${track.key}-${entry.key}`}
-                                                    role="button"
-                                                    tabIndex={0}
                                                     onMouseEnter={() => setHoveredEntry(entry)}
                                                     onFocus={() => setHoveredEntry(entry)}
+                                                    role="button"
+                                                    tabIndex={0}
                                                     className={clsx(
-                                                        "h-full w-full rounded-md transition-all duration-150",
-                                                        colorForState(state, isDarkMode),
-                                                        "hover:outline hover:outline-2 hover:outline-offset-1",
-                                                        isDarkMode
-                                                            ? "hover:outline-slate-100/40"
-                                                            : "hover:outline-slate-900/40",
-                                                        isActive
-                                                            ? isDarkMode
-                                                                ? "outline outline-2 outline-offset-2 outline-cyan-300/60"
-                                                                : "outline outline-2 outline-offset-2 outline-cyan-500/60"
-                                                            : null
+                                                        "flex h-full flex-col justify-end rounded-md border border-transparent bg-slate-200 transition focus:outline-none focus:ring-2 focus:ring-sky-500 dark:bg-slate-800",
+                                                        isActive && "border-sky-400 shadow-lg shadow-sky-500/20"
                                                     )}
-                                                    title={`${formatFullDate(entry.date, i18n.language)} · ${track.label} · ${labelForState(state)} (${issue})`}
-                                                />
+                                                >
+                                                    <div className={clsx("h-full w-full rounded-md", colorForState(state))} />
+                                                    <span className="sr-only">{track.label} {entry.key}</span>
+                                                </div>
                                             );
                                         })}
                                     </div>
                                 </div>
                             ))}
                         </div>
-                    </article>
 
-                    <aside
-                        className={clsx(
-                            "rounded-2xl border p-6",
-                            surfaceClass
-                        )}
-                    >
-                        <div className="flex items-center justify-between">
-                            <h3 className="text-base font-semibold">선택한 날짜 상세</h3>
-                            <span className={clsx("text-xs", isDarkMode ? "text-slate-500" : "text-slate-600")}>
-                                총 {statusTimeline.length}일치 기록
-                            </span>
-                        </div>
-                        <div className="mt-4">
+                        <aside className="flex flex-col gap-3 rounded-2xl border border-slate-200 bg-slate-100 p-4 text-sm text-slate-600 dark:border-slate-800 dark:bg-slate-900/70 dark:text-slate-300">
+                            <h3 className="text-sm font-semibold text-slate-900 dark:text-slate-100">상세 이슈</h3>
                             {hoveredEntry ? (
-                                <div className="flex flex-col gap-3">
-                                    <div className={clsx("rounded-xl border px-4 py-3", subtleSurface)}>
-                                        <p className="text-sm font-semibold">
-                                            {formatFullDate(hoveredEntry.date, i18n.language)}
-                                        </p>
-                                        <p className={clsx("text-xs", isDarkMode ? "text-slate-400" : "text-slate-600")}>
-                                            각 트랙별로 발생한 상태와 요약 이슈를 확인하세요.
-                                        </p>
-                                    </div>
-                                    <ul className="space-y-3">
-                                        {SERVICE_TRACKS.map((track) => {
-                                            const state = hoveredEntry.states[track.key];
-                                            const issue = hoveredEntry.issues[track.key];
-                                            return (
-                                                <li
-                                                    key={`${hoveredEntry.key}-${track.key}`}
-                                                    className={clsx("rounded-xl border px-4 py-3", subtleSurface)}
-                                                >
-                                                    <div className="flex items-center justify-between">
-                                                        <span className="text-sm font-semibold">
-                                                            {track.label}
-                                                        </span>
-                                                        <span
-                                                            className={clsx(
-                                                                "inline-flex items-center rounded-full px-3 py-1 text-[11px] font-semibold",
-                                                                state === "operational"
-                                                                    ? isDarkMode
-                                                                        ? "border border-emerald-400/70 bg-emerald-500/10 text-emerald-200"
-                                                                        : "border border-emerald-100 bg-emerald-50 text-emerald-700"
-                                                                    : state === "degraded"
-                                                                    ? isDarkMode
-                                                                        ? "border border-amber-400/70 bg-amber-500/10 text-amber-200"
-                                                                        : "border border-amber-100 bg-amber-50 text-amber-700"
-                                                                    : isDarkMode
-                                                                    ? "border border-rose-400/70 bg-rose-500/10 text-rose-200"
-                                                                    : "border border-rose-100 bg-rose-50 text-rose-700"
-                                                            )}
-                                                        >
-                                                            {labelForState(state)}
-                                                        </span>
-                                                    </div>
-                                                    <p className={clsx("mt-2 text-xs leading-relaxed", isDarkMode ? "text-slate-300" : "text-slate-600")}>
-                                                        {issue}
-                                                    </p>
-                                                </li>
-                                            );
-                                        })}
-                                    </ul>
+                                <div className="space-y-3">
+                                    <p className="text-xs text-slate-500 dark:text-slate-400">
+                                        {formatFullDate(hoveredEntry.date, i18n.language)}
+                                    </p>
+                                    {SERVICE_TRACKS.map((track) => {
+                                        const state = hoveredEntry.states[track.key];
+                                        return (
+                                            <div key={`detail-${track.key}`} className="rounded-xl border border-slate-200 bg-white p-3 dark:border-slate-700 dark:bg-slate-900">
+                                                <div className="flex items-center justify-between">
+                                                    <span className="text-sm font-semibold text-slate-900 dark:text-slate-100">{track.label}</span>
+                                                    <span className={legendBadgeClass}>{labelForState(state)}</span>
+                                                </div>
+                                                <p className="mt-2 text-xs text-slate-500 dark:text-slate-400">
+                                                    {hoveredEntry.issues[track.key]}
+                                                </p>
+                                            </div>
+                                        );
+                                    })}
                                 </div>
                             ) : (
-                                <p className={clsx("text-sm", isDarkMode ? "text-slate-400" : "text-slate-600")}>
-                                    상태 막대를 호버하거나 포커스하면 날짜별 이슈 요약을 확인할 수 있습니다.
-                                </p>
+                                <p>히스토리 바를 가리키면 상세 이슈가 표시됩니다.</p>
                             )}
-                        </div>
-                    </aside>
+                        </aside>
+                    </div>
                 </section>
             </div>
         </main>
@@ -422,4 +295,3 @@ const AdminServiceHealth = () => {
 };
 
 export default AdminServiceHealth;
-

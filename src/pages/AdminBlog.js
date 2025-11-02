@@ -1,5 +1,6 @@
 import React, { useEffect, useMemo, useState } from "react";
 import clsx from "clsx";
+import { useParams } from "react-router-dom";
 import {
     ArrowTopRightOnSquareIcon,
     DocumentCheckIcon,
@@ -15,6 +16,7 @@ import {
     saveDrafts,
     savePublishedPosts,
 } from "../lib/blogStorage";
+import AdminPageTopBar from "../components/admin/AdminPageTopBar";
 
 const defaultDate = () => new Date().toISOString().slice(0, 10);
 
@@ -57,19 +59,22 @@ const blankForm = {
 };
 
 const AdminBlog = () => {
+    const { lng = "ko" } = useParams();
     const [drafts, setDrafts] = useState([]);
     const [published, setPublished] = useState([]);
     const [form, setForm] = useState(blankForm);
     const [slugTouched, setSlugTouched] = useState(false);
     const [statusMessage, setStatusMessage] = useState(null);
 
-    const publishableDrafts = useMemo(() => {
-        return [...drafts].sort(
-            (a, b) =>
-                new Date(b.updatedAt || b.createdAt || 0).getTime() -
-                new Date(a.updatedAt || a.createdAt || 0).getTime()
-        );
-    }, [drafts]);
+    const publishableDrafts = useMemo(
+        () =>
+            [...drafts].sort(
+                (a, b) =>
+                    new Date(b.updatedAt || b.createdAt || 0).getTime() -
+                    new Date(a.updatedAt || a.createdAt || 0).getTime()
+            ),
+        [drafts]
+    );
 
     useEffect(() => {
         const hydrate = () => {
@@ -158,23 +163,6 @@ const AdminBlog = () => {
         saveDrafts(nextDrafts);
         setDrafts(nextDrafts);
         setStatusMessage("임시 저장되었습니다.");
-        setForm(nextDraft);
-    };
-
-    const handleEditDraft = (draft) => {
-        setForm({
-            id: draft.id,
-            title: draft.title,
-            slug: draft.slug,
-            excerpt: draft.excerpt,
-            content: draft.content,
-            tags: draft.tags?.join(", ") ?? "",
-            readTime: draft.readTime ?? "",
-            date: (draft.date || defaultDate()).slice(0, 10),
-            createdAt: draft.createdAt,
-        });
-        setSlugTouched(true);
-        setStatusMessage("임시 글을 편집 중입니다.");
     };
 
     const handleDeleteDraft = (id) => {
@@ -184,19 +172,24 @@ const AdminBlog = () => {
         if (form.id === id) {
             resetForm();
         }
-        setStatusMessage("임시 글이 삭제되었습니다.");
+    };
+
+    const handleEditDraft = (draft) => {
+        setForm({
+            ...draft,
+            tags: draft.tags?.join(", ") ?? "",
+        });
+        setSlugTouched(true);
+        setStatusMessage(`"${draft.title}" 초안을 수정 중입니다.`);
     };
 
     const handlePublish = (draft) => {
-        const slug = slugify(draft.slug || draft.title || generateDraftId());
         const now = new Date().toISOString();
+        const slug = slugify(draft.slug || draft.title || generateDraftId());
         const publishedPost = {
+            ...draft,
             slug,
-            title: draft.title,
-            excerpt: draft.excerpt,
-            content: draft.content,
-            tags: draft.tags ?? [],
-            readTime: draft.readTime ?? null,
+            updatedAt: now,
             date: draft.date || now,
             createdAt: now,
             source: "admin",
@@ -228,56 +221,70 @@ const AdminBlog = () => {
         [published]
     );
 
+    const pageClass =
+        "min-h-screen bg-slate-50 text-slate-900 transition-colors duration-300 dark:bg-slate-950 dark:text-slate-100";
+    const containerClass =
+        "mx-auto flex w-full max-w-6xl flex-col gap-10 px-4 py-10 sm:px-6 md:px-10 md:py-16";
+    const introTextClass = "max-w-3xl text-sm text-slate-600 md:text-base dark:text-slate-400";
+    const statusPillClass =
+        "rounded-full border border-slate-300 bg-white px-4 py-2 text-xs text-slate-600 dark:border-slate-700 dark:bg-slate-900/70 dark:text-slate-200";
+    const formCardClass =
+        "rounded-3xl border border-slate-200 bg-white p-6 shadow-[0_20px_45px_-25px_rgba(15,23,42,0.18)] dark:border-slate-800/80 dark:bg-slate-900/70";
+    const sidebarCardClass =
+        "rounded-3xl border border-slate-200 bg-white p-6 shadow-[0_18px_40px_-28px_rgba(15,23,42,0.16)] dark:border-slate-800/80 dark:bg-slate-900/60";
+    const labelClass = "text-xs font-medium uppercase tracking-[0.3em] text-slate-500";
+    const inputClass =
+        "rounded-xl border border-slate-200 bg-white px-4 py-3 text-sm text-slate-900 placeholder:text-slate-400 focus:border-sky-500 focus:outline-none dark:border-slate-700 dark:bg-slate-950 dark:text-slate-100";
+    const textareaClass =
+        "min-h-[140px] rounded-xl border border-slate-200 bg-white px-4 py-3 text-sm text-slate-900 placeholder:text-slate-400 focus:border-sky-500 focus:outline-none dark:border-slate-700 dark:bg-slate-950 dark:text-slate-100";
+    const secondaryButtonClass =
+        "inline-flex items-center gap-2 rounded-full border border-slate-300 bg-white px-4 py-2 text-sm font-medium text-slate-700 transition hover:border-slate-400 hover:text-slate-900 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-200 dark:hover:border-slate-500 dark:hover:text-white";
+    const primaryButtonClass =
+        "inline-flex items-center gap-2 rounded-full border border-emerald-500 bg-emerald-50 px-4 py-2 text-sm font-medium text-emerald-700 transition hover:border-emerald-500 hover:bg-emerald-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500 focus-visible:ring-offset-2 focus-visible:ring-offset-white dark:border-emerald-500/60 dark:bg-emerald-500/20 dark:text-emerald-100 dark:hover:border-emerald-400 dark:hover:bg-emerald-500/30 dark:focus-visible:ring-offset-slate-950";
+    const draftCardClass =
+        "flex flex-col gap-3 rounded-2xl border border-slate-200 bg-white p-4 shadow-sm transition hover:border-sky-300 hover:shadow-md dark:border-slate-800 dark:bg-slate-900/70 dark:hover:border-sky-400/60";
+    const publishedCardClass =
+        "flex flex-col gap-3 rounded-2xl border border-slate-200 bg-white p-4 shadow-sm dark:border-slate-800 dark:bg-slate-900/60";
+
     return (
-        <main className="min-h-screen bg-slate-950 text-slate-100">
-            <div className="mx-auto flex w-full max-w-6xl flex-col gap-10 px-6 py-12 md:px-10 md:py-16">
-                <header className="flex flex-col gap-3">
-                    <p className="text-xs uppercase tracking-[0.4em] text-slate-500">
-                        Admin · Console
-                    </p>
-                    <h1 className="text-3xl font-semibold md:text-4xl">
-                        블로그 글 관리
-                    </h1>
-                    <p className="max-w-3xl text-sm text-slate-400 md:text-base">
-                        운영 허브에서 새 블로그 글을 작성하고, 검토 대기칸에 저장한 뒤 업로드할 수 있습니다.
-                        저장 버튼으로 초안을 보관하고, 업로드 버튼으로 즉시 블로그 페이지에 반영하세요.
-                    </p>
-                    {statusMessage && (
-                        <p className="rounded-full border border-slate-700 bg-slate-900/70 px-4 py-2 text-xs text-slate-200">
-                            {statusMessage}
+        <main className={pageClass}>
+            <div className={containerClass}>
+                <header className="flex flex-col gap-6">
+                    <AdminPageTopBar lng={lng} currentLabel="블로그 글 관리" />
+                    <div className="flex flex-col gap-3">
+                        <p className="text-xs uppercase tracking-[0.4em] text-slate-500">Admin · Console</p>
+                        <h1 className="text-3xl font-semibold md:text-4xl">블로그 글 관리</h1>
+                        <p className={introTextClass}>
+                            운영 허브에서 새 블로그 글을 작성하고, 검토 대기칸에 저장한 뒤 업로드할 수 있습니다. 저장
+                            버튼으로 초안을 보관하고, 업로드 버튼으로 즉시 블로그 페이지에 반영하세요.
                         </p>
-                    )}
+                        {statusMessage && <p className={statusPillClass}>{statusMessage}</p>}
+                    </div>
                 </header>
 
                 <section className="grid gap-6 lg:grid-cols-[1.4fr,1fr]">
-                    <article className="rounded-3xl border border-slate-800/80 bg-slate-900/70 p-6 shadow-[0_20px_45px_-25px_rgba(15,23,42,0.6)]">
-                        <header className="flex flex-col gap-1 border-b border-slate-800 pb-4">
-                            <h2 className="text-lg font-semibold text-slate-50">
-                                새 글 작성
-                            </h2>
-                            <p className="text-xs text-slate-400">
+                    <article className={formCardClass}>
+                        <header className="flex flex-col gap-1 border-b border-slate-200 pb-4 dark:border-slate-800">
+                            <h2 className="text-lg font-semibold text-slate-900 dark:text-slate-50">새 글 작성</h2>
+                            <p className="text-xs text-slate-500 dark:text-slate-400">
                                 초안으로 저장한 뒤 언제든지 검토하고 업로드할 수 있어요.
                             </p>
                         </header>
 
                         <div className="mt-6 flex flex-col gap-5">
                             <div className="flex flex-col gap-2">
-                                <label className="text-xs font-medium uppercase tracking-[0.3em] text-slate-500">
-                                    제목
-                                </label>
+                                <label className={labelClass}>제목</label>
                                 <input
                                     value={form.title}
                                     onChange={(event) => handleFieldChange("title", event.target.value)}
                                     placeholder="예) 생성형 AI 이미지 검증, 이렇게 시작하세요"
-                                    className="rounded-xl border border-slate-700 bg-slate-950 px-4 py-3 text-sm text-slate-100 placeholder:text-slate-600 focus:border-sky-500 focus:outline-none"
+                                    className={inputClass}
                                 />
                             </div>
 
                             <div className="flex flex-col gap-2">
                                 <div className="flex items-center justify-between">
-                                    <label className="text-xs font-medium uppercase tracking-[0.3em] text-slate-500">
-                                        슬러그
-                                    </label>
+                                    <label className={labelClass}>슬러그</label>
                                     <button
                                         type="button"
                                         onClick={() => {
@@ -287,7 +294,7 @@ const AdminBlog = () => {
                                                 slug: slugify(prev.title),
                                             }));
                                         }}
-                                        className="text-xs text-sky-400 underline-offset-4 transition hover:underline"
+                                        className="text-xs text-sky-500 underline-offset-4 transition hover:underline"
                                     >
                                         자동 생성
                                     </button>
@@ -295,222 +302,220 @@ const AdminBlog = () => {
                                 <input
                                     value={form.slug}
                                     onChange={(event) => handleFieldChange("slug", event.target.value)}
-                                    placeholder="예) getting-started-with-gravifox"
-                                    className="rounded-xl border border-slate-700 bg-slate-950 px-4 py-3 text-sm text-slate-100 placeholder:text-slate-600 focus:border-sky-500 focus:outline-none"
+                                    placeholder="예) generative-ai-image-verification"
+                                    className={inputClass}
                                 />
                             </div>
 
-                            <div className="grid gap-4 md:grid-cols-2">
+                            <div className="grid gap-4 sm:grid-cols-2">
                                 <div className="flex flex-col gap-2">
-                                    <label className="text-xs font-medium uppercase tracking-[0.3em] text-slate-500">
-                                        발행일
-                                    </label>
+                                    <label className={labelClass}>발행일</label>
                                     <input
                                         type="date"
                                         value={form.date}
                                         onChange={(event) => handleFieldChange("date", event.target.value)}
-                                        className="rounded-xl border border-slate-700 bg-slate-950 px-4 py-3 text-sm text-slate-100 focus:border-sky-500 focus:outline-none"
+                                        className={inputClass}
                                     />
                                 </div>
                                 <div className="flex flex-col gap-2">
-                                    <label className="text-xs font-medium uppercase tracking-[0.3em] text-slate-500">
-                                        예상 읽기 시간 (분)
-                                    </label>
+                                    <label className={labelClass}>읽는 시간 (분)</label>
                                     <input
                                         type="number"
-                                        min="1"
+                                        min={0}
                                         value={form.readTime}
                                         onChange={(event) => handleFieldChange("readTime", event.target.value)}
-                                        placeholder="예) 6"
-                                        className="rounded-xl border border-slate-700 bg-slate-950 px-4 py-3 text-sm text-slate-100 placeholder:text-slate-600 focus:border-sky-500 focus:outline-none"
+                                        placeholder="예) 5"
+                                        className={inputClass}
                                     />
                                 </div>
                             </div>
 
                             <div className="flex flex-col gap-2">
-                                <label className="text-xs font-medium uppercase tracking-[0.3em] text-slate-500">
-                                    태그 (쉼표로 구분)
-                                </label>
-                                <input
-                                    value={form.tags}
-                                    onChange={(event) => handleFieldChange("tags", event.target.value)}
-                                    placeholder="예) genai, product, release"
-                                    className="rounded-xl border border-slate-700 bg-slate-950 px-4 py-3 text-sm text-slate-100 placeholder:text-slate-600 focus:border-sky-500 focus:outline-none"
-                                />
-                            </div>
-
-                            <div className="flex flex-col gap-2">
-                                <label className="text-xs font-medium uppercase tracking-[0.3em] text-slate-500">
-                                    요약
-                                </label>
+                                <label className={labelClass}>요약</label>
                                 <textarea
                                     value={form.excerpt}
                                     onChange={(event) => handleFieldChange("excerpt", event.target.value)}
-                                    rows={3}
-                                    placeholder="요약 문장을 입력하세요. 블로그 카드에 표시됩니다."
-                                    className="rounded-xl border border-slate-700 bg-slate-950 px-4 py-3 text-sm text-slate-100 placeholder:text-slate-600 focus:border-sky-500 focus:outline-none"
+                                    placeholder="글의 핵심 메시지를 2~3문장으로 정리해 주세요."
+                                    className={textareaClass}
                                 />
                             </div>
 
                             <div className="flex flex-col gap-2">
-                                <label className="text-xs font-medium uppercase tracking-[0.3em] text-slate-500">
-                                    본문 (마크다운 지원)
-                                </label>
+                                <label className={labelClass}>본문</label>
                                 <textarea
                                     value={form.content}
                                     onChange={(event) => handleFieldChange("content", event.target.value)}
-                                    rows={10}
-                                    placeholder="## 제목\n\n본문 내용을 마크다운으로 작성하세요."
-                                    className="rounded-xl border border-slate-700 bg-slate-950 px-4 py-3 text-sm text-slate-100 placeholder:text-slate-600 focus:border-sky-500 focus:outline-none"
+                                    placeholder="마크다운 또는 일반 텍스트를 입력할 수 있습니다."
+                                    className="min-h-[280px] rounded-xl border border-slate-200 bg-white px-4 py-3 text-sm text-slate-900 placeholder:text-slate-400 focus:border-sky-500 focus:outline-none dark:border-slate-700 dark:bg-slate-950 dark:text-slate-100"
                                 />
                             </div>
 
-                            <div className="flex flex-wrap items-center gap-3 border-t border-slate-800 pt-4">
-                                <button
-                                    type="button"
-                                    onClick={handleSaveDraft}
-                                    className="inline-flex items-center gap-2 rounded-full border border-slate-600 bg-slate-900/80 px-4 py-2 text-sm font-medium text-slate-100 transition hover:border-sky-400 hover:text-white"
-                                >
+                            <div className="flex flex-col gap-2">
+                                <label className={labelClass}>태그</label>
+                                <input
+                                    value={form.tags}
+                                    onChange={(event) => handleFieldChange("tags", event.target.value)}
+                                    placeholder="예) ai, product, release"
+                                    className={inputClass}
+                                />
+                                <p className="text-xs text-slate-500 dark:text-slate-400">
+                                    쉼표로 구분해 여러 태그를 추가할 수 있습니다.
+                                </p>
+                            </div>
+
+                            <div className="flex flex-wrap gap-3">
+                                <button type="button" onClick={handleSaveDraft} className={secondaryButtonClass}>
                                     <DocumentDuplicateIcon className="h-4 w-4" />
                                     임시 저장
                                 </button>
-                                <button
-                                    type="button"
-                                    onClick={resetForm}
-                                    className="inline-flex items-center gap-2 rounded-full border border-slate-800 px-4 py-2 text-sm font-medium text-slate-300 transition hover:border-slate-500 hover:text-white"
-                                >
+                                <button type="button" onClick={resetForm} className={secondaryButtonClass}>
                                     초기화
                                 </button>
-                                {form.id && (
-                                    <span className="text-xs text-slate-500">
-                                        초안 ID: {form.id}
-                                    </span>
-                                )}
                             </div>
                         </div>
                     </article>
 
-                    <aside
-                        className={clsx(
-                            "flex h-full flex-col gap-6 rounded-3xl border border-slate-800/80 bg-slate-900/70 p-6 shadow-[0_20px_45px_-25px_rgba(15,23,42,0.6)]"
-                        )}
-                    >
-                        <section className="flex flex-col gap-3">
-                            <div className="flex items-center justify-between">
-                                <h2 className="text-base font-semibold text-slate-50">
-                                    대기 중인 초안
+                    <aside className={sidebarCardClass}>
+                        <header className="flex items-center justify-between border-b border-slate-200 pb-4 dark:border-slate-800">
+                            <div>
+                                <h2 className="text-lg font-semibold text-slate-900 dark:text-slate-50">
+                                    임시 저장 목록
                                 </h2>
-                                <span className="rounded-full border border-slate-700 px-3 py-1 text-xs text-slate-300">
-                                    {publishableDrafts.length}건
-                                </span>
+                                <p className="text-xs text-slate-500 dark:text-slate-400">
+                                    최신 순으로 정렬된 초안 목록입니다.
+                                </p>
                             </div>
-                            <p className="text-xs text-slate-400">
-                                임시 저장된 글은 여기에서 검토 후 업로드할 수 있습니다.
-                            </p>
-                            <div className="flex flex-col gap-3">
-                                {publishableDrafts.length === 0 ? (
-                                    <p className="rounded-xl border border-slate-800 bg-slate-950/50 px-4 py-5 text-xs text-slate-500">
-                                        아직 저장된 초안이 없습니다. 새 글을 작성해 임시 저장해 보세요.
-                                    </p>
-                                ) : (
-                                    publishableDrafts.map((draft) => (
-                                        <div
-                                            key={draft.id}
-                                            className="rounded-2xl border border-slate-800 bg-slate-950/40 px-4 py-4 text-sm text-slate-200"
-                                        >
-                                            <div className="flex items-start justify-between gap-3">
-                                                <div className="flex flex-col gap-1">
-                                                    <h3 className="text-sm font-semibold text-slate-100">
-                                                        {draft.title}
-                                                    </h3>
-                                                    <p className="text-xs text-slate-500">
-                                                        최근 수정 {formatDateTime(draft.updatedAt || draft.createdAt)}
-                                                    </p>
-                                                </div>
-                                                <span className="rounded-full border border-slate-700 px-3 py-1 text-[11px] text-slate-300">
-                                                    {draft.tags?.slice(0, 2).join(", ") || "태그 없음"}
-                                                </span>
-                                            </div>
-                                            <p className="mt-3 line-clamp-2 text-xs text-slate-400">
-                                                {draft.excerpt}
-                                            </p>
-                                            <div className="mt-4 flex flex-wrap items-center gap-2">
-                                                <button
-                                                    type="button"
-                                                    onClick={() => handleEditDraft(draft)}
-                                                    className="inline-flex items-center gap-2 rounded-full border border-slate-700 px-3 py-1 text-xs text-slate-300 transition hover:border-slate-400 hover:text-white"
-                                                >
-                                                    <DocumentCheckIcon className="h-4 w-4" />
-                                                    편집
-                                                </button>
-                                                <button
-                                                    type="button"
-                                                    onClick={() => handlePublish(draft)}
-                                                    className="inline-flex items-center gap-2 rounded-full border border-sky-500/80 bg-sky-500/20 px-3 py-1 text-xs font-medium text-sky-200 transition hover:border-sky-400 hover:bg-sky-500/30"
-                                                >
-                                                    <ArrowTopRightOnSquareIcon className="h-4 w-4" />
-                                                    업로드
-                                                </button>
-                                                <button
-                                                    type="button"
-                                                    onClick={() => handleDeleteDraft(draft.id)}
-                                                    className="inline-flex items-center gap-2 rounded-full border border-slate-800 px-3 py-1 text-xs text-slate-500 transition hover:border-rose-500/60 hover:text-rose-300"
-                                                >
-                                                    <TrashIcon className="h-4 w-4" />
-                                                    삭제
-                                                </button>
-                                            </div>
-                                        </div>
-                                    ))
-                                )}
-                            </div>
-                        </section>
+                            <span className="text-xs font-semibold text-slate-500 dark:text-slate-400">
+                                {publishableDrafts.length}개
+                            </span>
+                        </header>
 
-                        <section className="flex flex-col gap-3">
-                            <div className="flex items-center justify-between">
-                                <h2 className="text-base font-semibold text-slate-50">
-                                    업로드된 글
-                                </h2>
-                                <span className="rounded-full border border-slate-700 px-3 py-1 text-xs text-slate-300">
-                                    {combinedPublished.length}건
-                                </span>
-                            </div>
-                            <p className="text-xs text-slate-400">
-                                바로 블로그 페이지에서 노출되는 글 목록입니다.
-                            </p>
-                            <div className="flex flex-col gap-3">
-                                {combinedPublished.length === 0 ? (
-                                    <p className="rounded-xl border border-slate-800 bg-slate-950/50 px-4 py-5 text-xs text-slate-500">
-                                        아직 업로드된 글이 없습니다. 초안을 업로드해 블로그를 채워보세요.
-                                    </p>
-                                ) : (
-                                    combinedPublished.slice(0, 6).map((post) => (
-                                        <div
-                                            key={post.slug}
-                                            className="rounded-2xl border border-slate-800 bg-slate-950/40 px-4 py-4 text-sm text-slate-200"
-                                        >
-                                            <div className="flex items-start justify-between gap-3">
-                                                <div className="flex flex-col gap-1">
-                                                    <h3 className="text-sm font-semibold text-slate-100">
-                                                        {post.title}
-                                                    </h3>
-                                                    <p className="text-xs text-slate-500">
-                                                        발행 {formatDateTime(post.date || post.createdAt)}
-                                                    </p>
-                                                </div>
-                                                <span className="rounded-full border border-slate-700 px-3 py-1 text-[11px] text-slate-300">
-                                                    {post.tags?.slice(0, 2).join(", ") || "태그 없음"}
-                                                </span>
-                                            </div>
-                                            <p className="mt-3 line-clamp-2 text-xs text-slate-400">
-                                                {post.excerpt}
+                        <div className="mt-4 space-y-3">
+                            {publishableDrafts.length === 0 ? (
+                                <p className="rounded-2xl border border-dashed border-slate-300 bg-slate-100 px-4 py-6 text-sm text-slate-500 dark:border-slate-700 dark:bg-slate-950/50 dark:text-slate-400">
+                                    아직 저장된 초안이 없습니다. 새로운 글을 작성해 임시 저장해 보세요.
+                                </p>
+                            ) : (
+                                publishableDrafts.map((draft) => (
+                                    <article key={draft.id} className={draftCardClass}>
+                                        <div>
+                                            <h3 className="text-sm font-semibold text-slate-900 dark:text-slate-100">
+                                                {draft.title}
+                                            </h3>
+                                            <p className="text-xs text-slate-500 dark:text-slate-400">
+                                                마지막 수정 {formatDateTime(draft.updatedAt)}
                                             </p>
                                         </div>
-                                    ))
-                                )}
-                            </div>
-                        </section>
+                                        <p className="text-xs text-slate-500 line-clamp-3 dark:text-slate-400">
+                                            {draft.excerpt}
+                                        </p>
+                                        <div className="flex flex-wrap gap-2 text-xs">
+                                            {draft.tags?.length
+                                                ? draft.tags.map((tag) => (
+                                                      <span
+                                                          key={`${draft.id}-${tag}`}
+                                                          className="rounded-full border border-slate-300 bg-slate-100 px-2 py-0.5 text-slate-500 dark:border-slate-700 dark:bg-slate-900/60 dark:text-slate-300"
+                                                      >
+                                                          #{tag}
+                                                      </span>
+                                                  ))
+                                                : (
+                                                      <span className="rounded-full border border-dashed border-slate-300 px-2 py-0.5 text-slate-400 dark:border-slate-700 dark:text-slate-500">
+                                                          태그 없음
+                                                      </span>
+                                                  )}
+                                        </div>
+                                        <div className="flex flex-wrap gap-2">
+                                            <button
+                                                type="button"
+                                                onClick={() => handleEditDraft(draft)}
+                                                className={secondaryButtonClass}
+                                            >
+                                                <DocumentCheckIcon className="h-4 w-4" />
+                                                편집하기
+                                            </button>
+                                            <button
+                                                type="button"
+                                                onClick={() => handlePublish(draft)}
+                                                className={primaryButtonClass}
+                                            >
+                                                <ArrowTopRightOnSquareIcon className="h-4 w-4" />
+                                                업로드
+                                            </button>
+                                            <button
+                                                type="button"
+                                                onClick={() => handleDeleteDraft(draft.id)}
+                                                className="inline-flex items-center gap-2 rounded-full border border-rose-500/50 bg-rose-50 px-4 py-2 text-sm font-medium text-rose-600 transition hover:border-rose-500 hover:bg-rose-100 dark:border-rose-500/60 dark:bg-rose-500/10 dark:text-rose-200"
+                                            >
+                                                <TrashIcon className="h-4 w-4" />
+                                                삭제
+                                            </button>
+                                        </div>
+                                    </article>
+                                ))
+                            )}
+                        </div>
                     </aside>
+                </section>
+
+                <section className="rounded-3xl border border-slate-200 bg-white p-6 shadow-[0_18px_40px_-28px_rgba(15,23,42,0.14)] dark:border-slate-800/80 dark:bg-slate-900/60">
+                    <header className="flex flex-col gap-2 border-b border-slate-200 pb-4 dark:border-slate-800">
+                        <h2 className="text-lg font-semibold text-slate-900 dark:text-slate-50">게시된 글</h2>
+                        <p className="text-xs text-slate-500 dark:text-slate-400">
+                            최신 게시글이 상단에 표시됩니다. 목록을 클릭하면 블로그 페이지에서 확인할 수 있습니다.
+                        </p>
+                    </header>
+
+                    <div className="mt-4 space-y-3">
+                        {combinedPublished.length === 0 ? (
+                            <p className="rounded-2xl border border-dashed border-slate-300 bg-slate-100 px-4 py-6 text-sm text-slate-500 dark:border-slate-700 dark:bg-slate-950/50 dark:text-slate-400">
+                                아직 게시된 글이 없습니다. 초안을 업로드하면 이곳에서 확인할 수 있어요.
+                            </p>
+                        ) : (
+                            combinedPublished.map((post) => (
+                                <article key={post.slug} className={publishedCardClass}>
+                                    <div className="flex items-center justify-between gap-3">
+                                        <div>
+                                            <h3 className="text-sm font-semibold text-slate-900 dark:text-slate-100">
+                                                {post.title}
+                                            </h3>
+                                            <p className="text-xs text-slate-500 dark:text-slate-400">
+                                                게시일 {formatDateTime(post.date || post.createdAt)}
+                                            </p>
+                                        </div>
+                                        <a
+                                            href={`/blog/${post.slug}`}
+                                            target="_blank"
+                                            rel="noreferrer"
+                                            className="inline-flex items-center gap-2 rounded-full border border-slate-300 bg-white px-3 py-1 text-xs font-medium text-slate-700 transition hover:border-slate-400 hover:text-slate-900 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-200 dark:hover:border-slate-500 dark:hover:text-white"
+                                        >
+                                            보기
+                                            <ArrowTopRightOnSquareIcon className="h-4 w-4" />
+                                        </a>
+                                    </div>
+                                    <p className="text-xs text-slate-500 line-clamp-2 dark:text-slate-400">
+                                        {post.excerpt}
+                                    </p>
+                                    <div className="flex flex-wrap gap-2 text-xs">
+                                        {post.tags?.length
+                                            ? post.tags.map((tag) => (
+                                                  <span
+                                                      key={`${post.slug}-${tag}`}
+                                                      className="rounded-full border border-slate-300 bg-slate-100 px-2 py-0.5 text-slate-500 dark:border-slate-700 dark:bg-slate-900/60 dark:text-slate-300"
+                                                  >
+                                                      #{tag}
+                                                  </span>
+                                              ))
+                                            : (
+                                                  <span className="rounded-full border border-dashed border-slate-300 px-2 py-0.5 text-slate-400 dark:border-slate-700 dark:text-slate-500">
+                                                      태그 없음
+                                                  </span>
+                                              )}
+                                    </div>
+                                </article>
+                            ))
+                        )}
+                    </div>
                 </section>
             </div>
         </main>

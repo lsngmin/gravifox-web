@@ -3,8 +3,8 @@ import { useLocation, useNavigate, useParams } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { AnimatePresence, motion } from 'framer-motion';
 import { CheckCircle2 } from 'lucide-react';
-import Navigation from '../features/navigation/navigation';
-import Footer from '../features/footer/footer';
+import Header from '../app/layout/Header';
+import Footer from '../app/layout/Footer/Footer';
 import { ANALYZE_ENDPOINTS } from '../api/endPointRoute';
 import MobileAnalysisReport from '../features/analyze/components/mobile/MobileAnalysisReport';
 import { normalizeAnalysisResult } from '../features/analyze/utils/normalizeResult';
@@ -336,8 +336,8 @@ export default function MobileAnalyzeResult() {
     '언제든지 다시 확인해 보세요.'
   );
   return (
-    <div className="flex min-h-screen flex-col bg-slate-950 text-slate-100">
-      <Navigation variant="dark" />
+    <div className="dark flex min-h-screen flex-col bg-slate-950 text-slate-100">
+      <Header />
       <main className="relative flex-1">
         <div
           className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_15%_10%,rgba(56,189,248,0.18),transparent_60%)]"

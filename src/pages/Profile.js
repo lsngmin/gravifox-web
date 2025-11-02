@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 
-import Navigation from "../features/navigation/navigation";
-import Footer from "../features/footer/footer";
+import Header from "../app/layout/Header";
+import Footer from "../app/layout/Footer/Footer";
 import UserInfo from "../features/profile/components/userInfo";
 
 const Profile = () => {
@@ -38,14 +38,14 @@ const Profile = () => {
   return (
     <div
       className={`relative flex min-h-screen flex-col overflow-hidden ${
-        isDark ? "bg-slate-950 text-slate-100" : "bg-gray-50 text-gray-900"
+        isDark ? "dark bg-slate-950 text-slate-100" : "bg-gray-50 text-gray-900"
       }`}
     >
       {isDark && (
         <div className="pointer-events-none absolute inset-x-0 top-[-220px] h-[520px] bg-[radial-gradient(circle_at_12%_18%,rgba(99,102,241,0.28),transparent_55%),radial-gradient(circle_at_88%_16%,rgba(56,189,248,0.22),transparent_60%),radial-gradient(circle_at_50%_120%,rgba(16,185,129,0.18),transparent_65%)] opacity-80 blur-3xl" />
       )}
       <header className="relative z-10">
-        <Navigation variant={isDark ? "dark" : "light"} />
+        <Header />
       </header>
 
       <main className="relative z-0 flex-1">

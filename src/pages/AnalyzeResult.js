@@ -1,7 +1,7 @@
 import React, { useEffect, useMemo, useRef, useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
-import Navigation from "../features/navigation/navigation";
-import Footer from "../features/footer/footer";
+import Header from "../app/layout/Header";
+import Footer from "../app/layout/Footer/Footer";
 import AnalysisReport from "../features/analyze/components/report/AnalysisReport";
 import { ANALYZE_ENDPOINTS } from "../api/endPointRoute";
 import { normalizeAnalysisResult } from "../features/analyze/utils/normalizeResult";
@@ -225,7 +225,7 @@ export default function AnalyzeResult() {
 
   return (
     <div className="flex min-h-screen flex-col bg-slate-100">
-      <Navigation />
+      <Header />
       <main className="flex-1">
         <section className="relative overflow-hidden bg-gradient-to-br from-slate-950 via-slate-900 to-indigo-900 text-slate-100">
           <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_top_left,rgba(99,102,241,0.28),transparent_60%)]" aria-hidden />

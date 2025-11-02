@@ -1,6 +1,6 @@
 import React, { useEffect, useMemo, useState } from "react";
-import Navigation from "../features/navigation/navigation";
-import Footer from "../features/footer/footer";
+import Header from "../app/layout/Header";
+import Footer from "../app/layout/Footer/Footer";
 import HowItWorksSection from "../features/analyze/HowItWorksSection";
 // ErrorModal, 테스트용 업로드 API는 제거
 
@@ -55,7 +55,7 @@ export default function MediaAnalyze() {
 
     const rootClass = useMemo(() => (
         `min-h-screen font-sans flex flex-col transition-colors duration-300 ${
-            isDark ? "bg-slate-950 text-slate-100" : "bg-white text-slate-900"
+            isDark ? "dark bg-slate-950 text-slate-100" : "bg-white text-slate-900"
         }`
     ), [isDark]);
 
@@ -69,7 +69,7 @@ export default function MediaAnalyze() {
         <div className={rootClass}>
             {/* 네비게이션 재사용 */}
             {/** Navigation은 전역 헤더 역할을 하며, 메인과 동일하게 재사용합니다. */}
-            <Navigation variant={isDark ? 'dark' : 'light'} />
+            <Header />
             <main className={mainClass}>
                 {/* 본문 카드 */}
                 <HowItWorksSection theme={theme} />

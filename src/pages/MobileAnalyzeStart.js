@@ -2,8 +2,8 @@ import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { useTranslation } from 'react-i18next';
 import { useNavigate, useParams } from 'react-router-dom';
 import { UploadCloud, ShieldCheck, Clapperboard, LifeBuoy } from 'lucide-react';
-import Navigation from '../features/navigation/navigation';
-import Footer from '../features/footer/footer';
+import Header from '../app/layout/Header';
+import Footer from '../app/layout/Footer/Footer';
 import { useAuth } from 'providers/authProvider';
 import {
   rememberReturnCheckpoint,
@@ -230,7 +230,7 @@ export default function MobileAnalyzeStart() {
   const rootClass = useMemo(
     () =>
       `min-h-screen flex flex-col ${
-        isDark ? 'bg-slate-950 text-slate-100' : 'bg-slate-50 text-slate-900'
+        isDark ? 'dark bg-slate-950 text-slate-100' : 'bg-slate-50 text-slate-900'
       }`,
     [isDark]
   );
@@ -415,7 +415,7 @@ export default function MobileAnalyzeStart() {
 
   return (
     <div className={rootClass}>
-      <Navigation variant={isDark ? 'dark' : 'light'} />
+      <Header />
       <main className="flex-1 flex justify-center">
         <div className="flex w-full max-w-sm flex-col gap-6 px-5 pb-12 pt-24">
           <header className="space-y-4">

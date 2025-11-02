@@ -115,3 +115,8 @@ export const ADMIN_ENDPOINTS = {
     EMAIL_PREVIEW: `${API_BASE}/admin/v1/communications/email/preview`,
     EMAIL_SEND: `${API_BASE}/admin/v1/communications/email/send`,
 };
+
+export const BLOG_ENDPOINTS = {
+    LIST: `${API_BASE}/api/v1/blog/posts`,
+    BY_SLUG: (slug = "") => `${API_BASE}/api/v1/blog/posts/slug/${encodeURIComponent(String(slug))}`,
+};

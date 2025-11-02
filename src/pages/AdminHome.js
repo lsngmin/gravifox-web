@@ -1,5 +1,5 @@
 import React, { useMemo } from "react";
-import { Link, useNavigate, useParams } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import {
     ArrowRightIcon,
     ChartPieIcon,
@@ -10,6 +10,7 @@ import {
     Squares2X2Icon,
 } from "@heroicons/react/24/outline";
 import clsx from "clsx";
+import AdminThemeToggle from "../components/admin/AdminThemeToggle";
 
 const AdminHome = () => {
     const navigate = useNavigate();
@@ -93,70 +94,47 @@ const AdminHome = () => {
         navigate(target);
     };
 
+    const pageClass =
+        "min-h-screen bg-slate-50 text-slate-900 transition-colors duration-300 dark:bg-slate-950 dark:text-slate-100";
+    const containerClass =
+        "mx-auto flex w-full max-w-6xl flex-col gap-10 px-5 py-12 sm:px-6 md:px-10 md:py-16";
+    const heroEyebrowClass = "text-xs uppercase tracking-[0.4em] text-slate-500";
+    const heroBodyClass = "max-w-3xl text-sm text-slate-600 md:text-base dark:text-slate-400";
+    const sectionGridClass = "grid gap-6 sm:grid-cols-2 xl:grid-cols-3";
+    const cardBaseClass =
+        "group relative flex h-full flex-col rounded-3xl border border-slate-200 bg-white/90 p-6 shadow-[0_32px_60px_-34px_rgba(15,23,42,0.28)] transition duration-300 hover:border-slate-400/60 hover:bg-slate-50 dark:border-slate-800/80 dark:bg-slate-900/70 dark:shadow-[0_26px_55px_-30px_rgba(15,23,42,0.65)] dark:hover:border-slate-300/40 dark:hover:bg-slate-900/90";
+    const cardClass = (isDisabled) =>
+        clsx(cardBaseClass, isDisabled && "cursor-not-allowed opacity-70");
+    const bodyTextClass = "mt-3 flex-1 text-sm leading-6 text-slate-600 dark:text-slate-300";
+    const hintClass = "text-xs font-medium uppercase tracking-[0.3em] text-slate-500";
+    const actionChipClass =
+        "inline-flex items-center gap-2 rounded-full border border-slate-300 bg-white px-4 py-2 text-sm font-medium text-slate-700 transition group-hover:border-slate-500 group-hover:text-slate-900 dark:border-slate-700 dark:bg-slate-900/80 dark:text-slate-100 dark:group-hover:border-slate-400 dark:group-hover:text-white";
+    const disabledChipClass =
+        "inline-flex items-center gap-2 rounded-full border border-slate-200 bg-slate-100 px-4 py-2 text-sm font-medium text-slate-400 dark:border-slate-800/80 dark:bg-slate-950/80 dark:text-slate-500";
+
     return (
-        <main className="min-h-screen bg-slate-950 text-slate-100">
-            <div className="mx-auto flex w-full max-w-6xl flex-col gap-10 px-6 py-12 md:px-10 md:py-16">
+        <main className={pageClass}>
+            <div className={containerClass}>
                 <header className="flex flex-col gap-4">
-                    <p className="text-xs uppercase tracking-[0.4em] text-slate-500">
-                        Admin · Console
-                    </p>
-                    <h1 className="text-3xl font-semibold md:text-4xl">
-                        운영 허브
-                    </h1>
-                    <p className="max-w-3xl text-sm text-slate-400 md:text-base">
+                    <div className="flex flex-wrap items-center justify-between gap-3">
+                        <p className={heroEyebrowClass}>Admin · Console</p>
+                        <AdminThemeToggle />
+                    </div>
+                    <h1 className="text-3xl font-semibold md:text-4xl">운영 허브</h1>
+                    <p className={heroBodyClass}>
                         주요 운영 기능을 한 곳에서 빠르게 접근할 수 있는 시작 화면입니다. 서비스 지표
                         확인부터 사용자 커뮤니케이션까지 작업 흐름에 맞춰 이동해 보세요.
                     </p>
-                    <div className="mt-2 flex flex-wrap gap-3">
-                        <Link
-                            to={previewPath}
-                            className="inline-flex items-center gap-2 rounded-full border border-slate-800 bg-slate-900/80 px-4 py-2 text-sm font-medium text-slate-200 transition hover:border-slate-500 hover:text-white"
-                        >
-                            현황 프리뷰 열기
-                            <ArrowRightIcon className="h-4 w-4" />
-                        </Link>
-                        <Link
-                            to={serviceHealthPath}
-                            className="inline-flex items-center gap-2 rounded-full border border-cyan-400/60 bg-cyan-500/10 px-4 py-2 text-sm font-medium text-cyan-100 transition hover:border-cyan-300 hover:bg-cyan-500/20"
-                        >
-                            서비스 상태 보기
-                            <ArrowRightIcon className="h-4 w-4" />
-                        </Link>
-                        <Link
-                            to={mailPath}
-                            className="inline-flex items-center gap-2 rounded-full border border-sky-600/60 bg-sky-500/10 px-4 py-2 text-sm font-medium text-sky-100 transition hover:border-sky-400 hover:bg-sky-500/20"
-                        >
-                            사용자 메일 작성
-                            <ArrowRightIcon className="h-4 w-4" />
-                        </Link>
-                        <Link
-                            to={blogPath}
-                            className="inline-flex items-center gap-2 rounded-full border border-amber-400/60 bg-amber-500/10 px-4 py-2 text-sm font-medium text-amber-100 transition hover:border-amber-300 hover:bg-amber-500/20"
-                        >
-                            블로그 글 쓰기
-                            <ArrowRightIcon className="h-4 w-4" />
-                        </Link>
-                        <Link
-                            to={inboxPath}
-                            className="inline-flex items-center gap-2 rounded-full border border-emerald-500/60 bg-emerald-500/10 px-4 py-2 text-sm font-medium text-emerald-100 transition hover:border-emerald-400 hover:bg-emerald-500/20"
-                        >
-                            피드백 수신함 열기
-                            <ArrowRightIcon className="h-4 w-4" />
-                        </Link>
-                    </div>
                 </header>
 
-                <section className="grid gap-6 md:grid-cols-2">
+                <section className={sectionGridClass}>
                     {sections.map((section) => {
                         const Icon = section.icon;
                         const isDisabled = !section.to;
                         return (
                             <article
                                 key={section.id}
-                                className={clsx(
-                                    "group relative flex h-full flex-col rounded-3xl border border-slate-800/80 bg-slate-900/70 p-6 shadow-[0_20px_45px_-25px_rgba(15,23,42,0.6)] transition duration-300 hover:border-slate-300/40 hover:bg-slate-900/90",
-                                    isDisabled && "cursor-not-allowed opacity-70"
-                                )}
+                                className={cardClass(isDisabled)}
                                 role={isDisabled ? "article" : "button"}
                                 tabIndex={isDisabled ? -1 : 0}
                                 onClick={() => handleNavigate(section.to)}
@@ -178,25 +156,19 @@ const AdminHome = () => {
                                 >
                                     <Icon className="h-6 w-6" aria-hidden="true" />
                                 </div>
-                                <h2 className="text-xl font-semibold text-slate-50">
+                                <h2 className="text-xl font-semibold text-slate-900 dark:text-slate-50">
                                     {section.title}
                                 </h2>
-                                <p className="mt-3 flex-1 text-sm leading-6 text-slate-300">
-                                    {section.description}
-                                </p>
+                                <p className={bodyTextClass}>{section.description}</p>
                                 <div className="mt-6 flex items-center justify-between">
-                                    <span className="text-xs font-medium uppercase tracking-[0.3em] text-slate-500">
-                                        {section.hint}
-                                    </span>
+                                    <span className={hintClass}>{section.hint}</span>
                                     {section.to ? (
-                                        <span className="inline-flex items-center gap-2 rounded-full border border-slate-700 bg-slate-900/80 px-4 py-2 text-sm font-medium text-slate-100 transition group-hover:border-slate-400 group-hover:text-white">
+                                        <span className={actionChipClass}>
                                             이동
                                             <ArrowRightIcon className="h-4 w-4" />
                                         </span>
                                     ) : (
-                                        <span className="inline-flex items-center gap-2 rounded-full border border-slate-800/80 bg-slate-950 px-4 py-2 text-sm font-medium text-slate-500">
-                                            준비 중
-                                        </span>
+                                        <span className={disabledChipClass}>준비 중</span>
                                     )}
                                 </div>
                             </article>

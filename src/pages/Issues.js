@@ -1,12 +1,12 @@
 import React from "react";
 
-import Navigation from "../features/navigation/navigation";
-import Footer from "../features/footer/footer";
+import Header from "../app/layout/Header";
+import Footer from "../app/layout/Footer/Footer";
 import IssueTable from "features/issues/issueTable";
 
 const Issues = () => {
     return (<>
-            <Navigation/>
+            <Header />
             <IssueTable/>
             <Footer />
         </>

@@ -7,11 +7,10 @@ import {
     ChartPieIcon,
     BoltIcon,
     ArrowTrendingUpIcon,
-    MoonIcon,
-    SunIcon,
     EnvelopeIcon,
 } from "@heroicons/react/24/outline";
 import { fetchAdminLatestAnalysisReports, fetchAdminUsers, resetAdminUserQuota } from "../api/admin";
+import AdminPageTopBar from "../components/admin/AdminPageTopBar";
 
 const activityFeed = [
     {
@@ -58,7 +57,7 @@ const AdminPreview = () => {
         return fallback.slice(0, 2);
     }, [paramsLng, i18n.language]);
     const mailPath = `/${resolvedLng}/admin/mail`;
-    const [isDarkMode, setIsDarkMode] = useState(true);
+
     const [recentAnalyses, setRecentAnalyses] = useState([]);
     const [recentLoading, setRecentLoading] = useState(false);
     const [recentError, setRecentError] = useState(null);
@@ -83,39 +82,64 @@ const AdminPreview = () => {
         }
     }, []);
 
-    const loadUsers = useCallback(async (nextPage = 0) => {
-        const append = nextPage > 0;
-        append ? setIsAppending(true) : setIsLoading(true);
-        setListError(null);
-        try {
-            const data = await fetchAdminUsers({ page: nextPage, size: PAGE_SIZE, sort: "userNo,DESC" });
-            const items = data?.items ?? [];
-            setUserItems((prev) => {
-                if (!append) {
-                    return items;
-                }
-                const existingIds = new Set(prev.map((item) => item.userNo));
-                const merged = [...prev];
-                items.forEach((item) => {
-                    if (!existingIds.has(item.userNo)) {
-                        merged.push(item);
-                        existingIds.add(item.userNo);
+    const loadUsers = useCallback(
+        async (nextPage = 0) => {
+            const append = nextPage > 0;
+            append ? setIsAppending(true) : setIsLoading(true);
+            setListError(null);
+            try {
+                const data = await fetchAdminUsers({ page: nextPage, size: PAGE_SIZE, sort: "userNo,DESC" });
+                const items = data?.items ?? [];
+                setUserItems((prev) => {
+                    if (!append) {
+                        return items;
                     }
+                    const existingIds = new Set(prev.map((item) => item.userNo));
+                    const merged = [...prev];
+                    items.forEach((item) => {
+                        if (!existingIds.has(item.userNo)) {
+                            merged.push(item);
+                            existingIds.add(item.userNo);
+                        }
+                    });
+                    return merged;
                 });
-                return merged;
-            });
-            setPageMeta((prev) => ({
-                page: data?.page ?? nextPage,
-                totalPages: data?.totalPages ?? prev.totalPages,
-                totalElements: data?.totalElements ?? prev.totalElements,
-                size: data?.size ?? prev.size,
-            }));
-        } catch (err) {
-            setListError(err);
+                setPageMeta({
+                    page: data?.page ?? nextPage,
+                    totalPages: data?.totalPages ?? 0,
+                    totalElements: data?.totalElements ?? items.length,
+                    size: data?.size ?? PAGE_SIZE,
+                });
+            } catch (err) {
+                setListError(err);
+            } finally {
+                append ? setIsAppending(false) : setIsLoading(false);
+            }
+        },
+        []
+    );
+
+    const handleResetQuota = async (userNo) => {
+        setResettingIds((prev) => new Set(prev).add(userNo));
+        try {
+            await resetAdminUserQuota({ userNo });
+            setUserItems((prev) =>
+                prev.map((item) =>
+                    item.userNo === userNo
+                        ? { ...item, monthlyQuotaUsed: 0, monthlyQuotaLimit: item.monthlyQuotaLimit ?? 0 }
+                        : item
+                )
+            );
+        } catch (error) {
+            console.error("reset quota failed", error);
         } finally {
-            append ? setIsAppending(false) : setIsLoading(false);
+            setResettingIds((prev) => {
+                const next = new Set(prev);
+                next.delete(userNo);
+                return next;
+            });
         }
-    }, []);
+    };
 
     useEffect(() => {
         loadRecentAnalyses();
@@ -131,7 +155,7 @@ const AdminPreview = () => {
         const simulatedPrevDayUsers = Math.max(totalUsers - 2, 1);
         const growthRaw = totalUsers - simulatedPrevDayUsers;
         const growthPercent =
-                simulatedPrevDayUsers > 0 ? (growthRaw / simulatedPrevDayUsers) * 100 : 0;
+            simulatedPrevDayUsers > 0 ? (growthRaw / simulatedPrevDayUsers) * 100 : 0;
 
         const totalReports = analysisTrend.reduce((acc, point) => acc + point.value, 0);
 
@@ -156,853 +180,355 @@ const AdminPreview = () => {
                 title: "총 가입 유저",
                 value: totalUsers,
                 icon: UserGroupIcon,
-                footer: { type: 'growth', percent: growthPercent },
+                footer: { type: "growth", percent: growthPercent },
             },
             {
-                title: "금주 분석 처리량",
-                value: totalReports.toLocaleString(),
+                title: "주간 리포트 처리량",
+                value: totalReports,
                 icon: ChartPieIcon,
-                footer: "일 평균 420건",
+                footer: { type: "trend", data: analysisTrend },
             },
             {
-                title: "평균 사용률",
+                title: "평균 사용량",
                 value: `${avgUsage}%`,
-                icon: ArrowTrendingUpIcon,
-                footer: "Starter 기준 40% 사용",
+                icon: BoltIcon,
+                footer: { type: "hint", text: "월별 할당량 대비" },
             },
             {
-                title: "실험 기능 활성",
-                value: "13개 조직",
-                icon: BoltIcon,
-                footer: "Heatmap Lab 베타 운영 중",
+                title: "지원 요청 미해결",
+                value: activityFeed.length,
+                icon: ArrowTrendingUpIcon,
+                footer: { type: "hint", text: "지난 24시간" },
             },
         ];
-    }, [userItems, pageMeta.totalElements]);
+    }, [analysisTrend, activityFeed, pageMeta.totalElements, userItems]);
 
-    const userSummaries = userItems;
-    const errorMessage = listError ? (listError?.response?.data?.message ?? listError.message ?? "사용자 정보를 불러오지 못했습니다.") : null;
-    const recentErrorMessage = recentError ? (recentError?.response?.data?.message ?? recentError.message ?? "최신 분석 정보를 불러오지 못했습니다.") : null;
-    const hasMore = pageMeta.page + 1 < pageMeta.totalPages;
+    const pageClass =
+        "min-h-screen bg-slate-50 text-slate-900 transition-colors duration-300 dark:bg-slate-950 dark:text-slate-100";
+    const containerClass =
+        "mx-auto flex w-full max-w-6xl flex-col gap-10 px-4 py-10 sm:px-6 md:px-10 md:py-16";
+    const introTextClass = "max-w-3xl text-sm text-slate-600 md:text-base dark:text-slate-400";
+    const statCardClass =
+        "flex flex-col gap-4 rounded-2xl border border-slate-200 bg-white p-6 shadow-[0_16px_32px_-24px_rgba(15,23,42,0.2)] transition hover:border-slate-400/60 hover:shadow-[0_20px_40px_-24px_rgba(15,23,42,0.25)] dark:border-slate-800/70 dark:bg-slate-900/70 dark:hover:border-slate-500/60";
+    const sectionCardClass =
+        "rounded-3xl border border-slate-200 bg-white p-6 shadow-[0_18px_40px_-28px_rgba(15,23,42,0.16)] dark:border-slate-800/80 dark:bg-slate-900/60";
+    const tableHeaderCellClass =
+        "px-6 py-4 text-left text-xs font-semibold uppercase tracking-wide text-slate-500 dark:text-slate-300";
+    const tableBodyCellClass = "px-6 py-4 text-sm text-slate-600 dark:text-slate-300";
+    const badgeClass =
+        "rounded-full border border-slate-300 bg-slate-100 px-3 py-1 text-xs font-medium text-slate-600 dark:border-slate-700 dark:bg-slate-800/70 dark:text-slate-200";
+    const errorBannerClass =
+        "rounded-2xl border border-rose-200 bg-rose-50 px-4 py-3 text-sm text-rose-600 dark:border-rose-900/40 dark:bg-rose-950/40 dark:text-rose-200";
 
-    const handleLoadMore = useCallback(() => {
-        if (isAppending || isLoading || !hasMore) {
-            return;
-        }
-        const nextPage = (pageMeta.page >= 0 ? pageMeta.page + 1 : 0);
-        loadUsers(nextPage);
-    }, [hasMore, isAppending, isLoading, loadUsers, pageMeta.page]);
-
-    const handleResetUsage = useCallback(async (userNo) => {
-        setResettingIds((prev) => {
-            const next = new Set(prev);
-            next.add(userNo);
-            return next;
-        });
-        try {
-            await resetAdminUserQuota(userNo);
-            setUserItems((prev) => prev.map((item) => {
-                if (item.userNo !== userNo) {
-                    return item;
-                }
-                const limit = item.monthlyQuotaLimit ?? 0;
-                return {
-                    ...item,
-                    monthlyQuotaUsed: 0,
-                    monthlyQuotaRemaining: limit,
-                };
-            }));
-        } catch (err) {
-            console.error("Failed to reset monthly usage", err);
-        } finally {
-            setResettingIds((prev) => {
-                const next = new Set(prev);
-                next.delete(userNo);
-                return next;
-            });
-        }
-    }, []);
-
-    const formatDateTime = (value) => {
-        if (!value) return "—";
-        try {
-            return new Intl.DateTimeFormat(i18n.language || "ko", {
-                dateStyle: "medium",
-                timeStyle: "short",
-            }).format(new Date(value));
-        } catch (err) {
-            return value;
-        }
-    };
-
-    const friendlyRecentError = useMemo(() => {
-        if (!recentError) return null;
-        return "최신 분석 데이터를 불러오지 못했어요. 서버 연결 상태를 확인한 뒤 다시 시도해 주세요.";
-    }, [recentError]);
-
-    const formatScore = (score) => {
-        if (score == null) return "—";
-        const numeric =
-            typeof score === "number"
-                ? score
-                : Number.isNaN(Number(score))
-                ? null
-                : Number(score);
-        if (numeric == null || !Number.isFinite(numeric)) {
-            return String(score);
-        }
-        return numeric.toFixed(3);
-    };
-
-    const formatInference = (value) => {
-        if (value == null) return "—";
-        const numeric = Number(value);
-        if (!Number.isFinite(numeric)) {
-            return String(value);
-        }
-        return `${numeric.toLocaleString()} ms`;
-    };
-
-    const surfaceClass = isDarkMode
-        ? "bg-slate-900/70 border-slate-800 shadow-slate-950/30"
-        : "bg-white border-slate-200 shadow-slate-900/5";
-    const subtleSurface = isDarkMode
-        ? "bg-slate-900/60 border-slate-800"
-        : "bg-slate-50 border-slate-200";
-    const tableStripe = isDarkMode ? "odd:bg-slate-900/40" : "odd:bg-slate-50";
-    const barTrack = isDarkMode ? "bg-slate-800" : "bg-slate-200";
-    const barFill = isDarkMode
-        ? "bg-gradient-to-r from-sky-500 via-cyan-400 to-emerald-300"
-        : "bg-gradient-to-r from-blue-500 via-sky-400 to-cyan-300";
-
-    const severityAccent = (severity) => {
-        switch (severity) {
-            case "warning":
-                return isDarkMode ? "text-amber-300" : "text-amber-600";
-            case "notice":
-                return isDarkMode ? "text-sky-300" : "text-sky-600";
-            default:
-                return isDarkMode ? "text-slate-300" : "text-slate-600";
-        }
-    };
-
-    const trendMax = Math.max(
-        ...analysisTrend.map((item) => item.value),
-        1
-    );
+    const friendlyRecentError = recentError
+        ? "최근 분석 데이터를 불러오지 못했습니다."
+        : null;
+    const recentErrorMessage =
+        recentError?.message || recentError?.response?.data?.message || null;
+    const listErrorMessage = listError?.message || listError?.response?.data?.message || null;
 
     return (
-        <main
-            className={clsx(
-                "min-h-screen transition-colors duration-300",
-                isDarkMode
-                    ? "bg-slate-950 text-slate-50"
-                    : "bg-slate-100 text-slate-900"
-            )}
-        >
-            <div className="mx-auto flex w-full max-w-7xl flex-col gap-8 px-6 py-10 md:px-8">
-                <header
-                    className={clsx(
-                        "flex flex-wrap items-center justify-between gap-4 rounded-3xl border px-6 py-5",
-                        surfaceClass
-                    )}
-                >
-                    <div className="flex flex-col gap-1">
-                        <div className="flex items-center gap-2 text-xs uppercase tracking-[0.25em] text-slate-400">
-                            <span>Console</span>
-                            <span className="opacity-60">Admin</span>
-                        </div>
-                        <h1 className="text-2xl font-semibold md:text-3xl">
-                            플랫폼 운영 대시보드
-                        </h1>
-                        <p
-                            className={clsx(
-                                "text-sm",
-                                isDarkMode ? "text-slate-300" : "text-slate-600"
-                            )}
-                        >
-                            실시간 사용자 활동, 분석 처리량, 알림 로그를 확인하고 필요 시 우측 상단의
-                            메일 발송 도구로 바로 이동해 사용자 커뮤니케이션을 이어갈 수 있습니다.
+        <main className={pageClass}>
+            <div className={containerClass}>
+                <header className="flex flex-col gap-6">
+                    <AdminPageTopBar lng={resolvedLng} currentLabel="운영 현황" />
+                    <div className="flex flex-col gap-3">
+                        <p className="text-xs uppercase tracking-[0.3em] text-slate-500 dark:text-slate-500">
+                            운영 현황 대시보드
                         </p>
-                    </div>
-                    <div className="flex flex-wrap items-center gap-3">
-                        <Link
-                            to={mailPath}
-                            className={clsx(
-                                "inline-flex items-center gap-2 rounded-full border px-4 py-2 text-sm font-medium transition",
-                                isDarkMode
-                                    ? "border-sky-500/50 bg-sky-500/10 text-sky-100 hover:border-sky-300 hover:bg-sky-500/20"
-                                    : "border-sky-500/50 bg-sky-50 text-sky-700 hover:border-sky-500 hover:bg-sky-100"
-                            )}
-                        >
-                            <EnvelopeIcon className="h-5 w-5" />
-                            사용자 메일 발송
-                        </Link>
-                        <button
-                            type="button"
-                            onClick={() => setIsDarkMode((prev) => !prev)}
-                            className={clsx(
-                                "inline-flex items-center gap-2 rounded-full border px-4 py-2 text-sm font-medium transition",
-                                isDarkMode
-                                    ? "border-slate-700 bg-slate-900/80 hover:border-slate-500 hover:bg-slate-800"
-                                    : "border-slate-300 bg-white hover:border-slate-400 hover:bg-slate-50"
-                            )}
-                        >
-                            {isDarkMode ? (
-                                <>
-                                    <SunIcon className="h-5 w-5 text-amber-400" />
-                                    라이트 모드
-                                </>
-                            ) : (
-                                <>
-                                    <MoonIcon className="h-5 w-5 text-slate-600" />
-                                    다크 모드
-                                </>
-                            )}
-                        </button>
+                        <h1 className="text-3xl font-semibold md:text-4xl">서비스 모니터링</h1>
+                        <p className={introTextClass}>
+                            실시간 사용자 활동, 분석 처리량, 알림 로그를 확인하고 필요 시 우측 상단의 메일 발송 도구로
+                            바로 이동해 사용자 커뮤니케이션을 이어갈 수 있습니다.
+                        </p>
+                        <div className="flex flex-wrap items-center gap-3">
+                            <Link
+                                to={mailPath}
+                                className="inline-flex items-center gap-2 rounded-full border border-sky-500 bg-sky-50 px-4 py-2 text-sm font-medium text-sky-700 transition hover:border-sky-500 hover:bg-sky-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-sky-500 focus-visible:ring-offset-2 focus-visible:ring-offset-white dark:border-sky-500/50 dark:bg-sky-500/10 dark:text-sky-100 dark:hover:border-sky-300 dark:hover:bg-sky-500/20 dark:focus-visible:ring-offset-slate-950"
+                            >
+                                <EnvelopeIcon className="h-5 w-5" />
+                                사용자 메일 발송
+                            </Link>
+                        </div>
                     </div>
                 </header>
 
-                <section className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
+                <section className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
                     {stats.map((item) => (
-                        <article
-                            key={item.title}
-                            className={clsx(
-                                "flex flex-col gap-4 rounded-2xl border p-6 transition",
-                                surfaceClass
-                            )}
-                        >
+                        <article key={item.title} className={statCardClass}>
                             <div className="flex items-center justify-between">
-                                <span
-                                    className={clsx(
-                                        "text-sm",
-                                        isDarkMode
-                                            ? "text-slate-400"
-                                            : "text-slate-500"
-                                    )}
-                                >
-                                    {item.title}
-                                </span>
-                                <item.icon
-                                    className={clsx(
-                                        "h-6 w-6",
-                                        isDarkMode
-                                            ? "text-slate-400"
-                                            : "text-slate-500"
-                                    )}
-                                />
+                                <span className="text-sm text-slate-500 dark:text-slate-400">{item.title}</span>
+                                <item.icon className="h-6 w-6 text-slate-400 dark:text-slate-500" />
                             </div>
-                            <div className="text-3xl font-semibold tracking-tight">
-                                {item.value}
-                            </div>
-                            <div className="mt-4 flex items-center justify-between gap-3">
-                                {item.footer && item.footer.type === 'growth' ? (
+                            <div className="text-3xl font-semibold tracking-tight">{item.value}</div>
+                            <div className="mt-3 flex items-center justify-between gap-3">
+                                {item.footer && item.footer.type === "growth" ? (
                                     <span
                                         className={clsx(
-                                            "font-display text-base font-semibold tracking-tight",
-                                            item.footer.percent >= 0
-                                                ? "text-[color:var(--brand)]"
-                                                : "text-rose-500"
+                                            "text-sm font-semibold",
+                                            item.footer.percent >= 0 ? "text-emerald-500" : "text-rose-500"
                                         )}
                                     >
-                                        전일 대비 {item.footer.percent >= 0 ? '+' : ''}{item.footer.percent.toFixed(1)}%
+                                        전일 대비 {item.footer.percent >= 0 ? "+" : ""}
+                                        {item.footer.percent.toFixed(1)}%
                                     </span>
+                                ) : item.footer && item.footer.type === "trend" ? (
+                                    <div className="flex flex-1 items-end gap-1 text-xs text-slate-500 dark:text-slate-400">
+                                        {item.footer.data.map((point) => (
+                                            <span
+                                                key={point.label}
+                                                className="flex-1 rounded bg-sky-500/20 py-2 text-center text-[0.7rem] font-medium text-sky-600 dark:bg-sky-500/20 dark:text-sky-200"
+                                            >
+                                                {point.value}
+                                            </span>
+                                        ))}
+                                    </div>
                                 ) : (
-                                    <span
-                                        className={clsx(
-                                            "text-xs",
-                                            isDarkMode
-                                                ? "text-slate-400"
-                                                : "text-slate-500"
-                                        )}
-                                    >
-                                        {item.footer}
+                                    <span className="text-xs text-slate-500 dark:text-slate-400">
+                                        {item.footer?.text ?? "실시간 집계"}
                                     </span>
                                 )}
-                                <button
-                                    type="button"
-                                    className={clsx(
-                                        "rounded-full border px-3 py-1 text-xs font-medium transition",
-                                        isDarkMode
-                                            ? "border-slate-700 text-slate-200 hover:border-slate-500 hover:text-white"
-                                            : "border-slate-200 text-slate-600 hover:border-slate-400 hover:text-slate-800"
-                                    )}
-                                >
-                                    상세 관리
-                                </button>
                             </div>
                         </article>
                     ))}
                 </section>
 
-                <section className="grid gap-6 xl:grid-cols-[2fr,1fr]">
-                    <div className="flex flex-col gap-6">
-                        <article
-                            className={clsx(
-                                "rounded-2xl border p-6",
-                                surfaceClass
-                            )}
-                        >
-                            <header className="flex flex-wrap items-start justify-between gap-3 border-b pb-4">
-                                <div className="flex flex-col gap-1">
-                                    <h2 className="text-base font-semibold md:text-lg">
-                                        최신 분석
-                                    </h2>
-                                    <p
-                                        className={clsx(
-                                            "text-xs",
-                                            isDarkMode
-                                                ? "text-slate-400"
-                                                : "text-slate-500"
-                                        )}
-                                    >
-                                        전체 사용자 최신 {RECENT_ANALYSIS_LIMIT}건을 생성일 기준으로 정렬합니다.
-                                    </p>
-                                </div>
-                                <button
-                                    type="button"
-                                    onClick={loadRecentAnalyses}
-                                    disabled={recentLoading}
-                                    className={clsx(
-                                        "rounded-full border px-3 py-1 text-xs font-medium transition",
-                                        isDarkMode
-                                            ? "border-slate-700 text-slate-200 hover:border-slate-500 hover:text-white"
-                                            : "border-slate-300 text-slate-600 hover:border-slate-400 hover:text-slate-800",
-                                        recentLoading && "opacity-60"
-                                    )}
-                                >
-                                    {recentLoading ? "불러오는 중..." : "새로고침"}
-                                </button>
-                            </header>
-                            <div className="mt-4 space-y-4">
-                                {recentLoading ? (
-                                    <div
-                                        className={clsx(
-                                            "rounded-xl border px-4 py-6 text-sm",
-                                            subtleSurface,
-                                            isDarkMode ? "text-slate-300" : "text-slate-600"
-                                        )}
-                                    >
-                                        최신 분석을 불러오는 중입니다...
-                                    </div>
-                                ) : recentError ? (
-                                    <div
-                                        className={clsx(
-                                            "rounded-xl border px-4 py-6 text-sm",
-                                            subtleSurface
-                                        )}
-                                    >
-                                        <p
-                                            className={clsx(
-                                                "font-medium",
-                                                isDarkMode ? "text-rose-300" : "text-rose-600"
-                                            )}
-                                        >
-                                            {friendlyRecentError}
-                                        </p>
-                                        {recentErrorMessage && (
-                                            <p
-                                                className={clsx(
-                                                    "mt-1 text-xs",
-                                                    isDarkMode
-                                                        ? "text-slate-400"
-                                                        : "text-slate-500"
-                                                )}
-                                            >
-                                                상세: {recentErrorMessage}
-                                            </p>
-                                        )}
-                                        <div className="pt-2">
-                                            <button
-                                                type="button"
-                                                onClick={loadRecentAnalyses}
-                                                className={clsx(
-                                                    "rounded-full border px-3 py-1 text-xs font-medium transition",
-                                                    isDarkMode
-                                                        ? "border-slate-600 text-slate-200 hover:border-slate-400 hover:text-white"
-                                                        : "border-slate-300 text-slate-600 hover:border-slate-400 hover:text-slate-800"
-                                                )}
-                                            >
-                                                다시 시도
-                                            </button>
-                                        </div>
-                                    </div>
-                                ) : recentAnalyses.length === 0 ? (
-                                    <div
-                                        className={clsx(
-                                            "rounded-xl border px-4 py-6 text-sm",
-                                            subtleSurface,
-                                            isDarkMode ? "text-slate-300" : "text-slate-600"
-                                        )}
-                                    >
-                                        아직 표시할 분석이 없습니다.
-                                    </div>
-                                ) : (
-                                    <div className="overflow-x-auto">
-                                        <table className="min-w-full divide-y text-xs sm:text-sm">
-                                            <thead
-                                                className={clsx(
-                                                    isDarkMode
-                                                        ? "bg-slate-900/60 text-slate-300"
-                                                        : "bg-slate-100 text-slate-600"
-                                                )}
-                                            >
-                                                <tr>
-                                                    <th className="px-4 py-3 text-left font-medium sm:px-6">
-                                                        사용자
-                                                    </th>
-                                                    <th className="px-4 py-3 text-left font-medium sm:px-6">
-                                                        라벨
-                                                    </th>
-                                                    <th className="px-4 py-3 text-left font-medium sm:px-6">
-                                                        점수
-                                                    </th>
-                                                    <th className="px-4 py-3 text-left font-medium sm:px-6">
-                                                        모델 버전
-                                                    </th>
-                                                    <th className="px-4 py-3 text-left font-medium sm:px-6">
-                                                        추론 시간
-                                                    </th>
-                                                    <th className="px-4 py-3 text-left font-medium sm:px-6">
-                                                        생성 시각
-                                                    </th>
-                                                </tr>
-                                            </thead>
-                                            <tbody
-                                                className={clsx(
-                                                    isDarkMode
-                                                        ? "divide-y divide-slate-800"
-                                                        : "divide-y divide-slate-200"
-                                                )}
-                                            >
-                                                {recentAnalyses.map((item, index) => {
-                                                    const userLabel =
-                                                        item.nickname ||
-                                                        item.userId ||
-                                                        (item.userNo != null
-                                                            ? `사용자 #${item.userNo}`
-                                                            : "알 수 없음");
-                                                    const secondaryId =
-                                                        item.nickname &&
-                                                        item.userId &&
-                                                        item.nickname !== item.userId
-                                                            ? item.userId
-                                                            : null;
-                                                    return (
-                                                        <tr
-                                                            key={
-                                                                item.uploadId ??
-                                                                `analysis-${item.userNo ?? "unknown"}-${index}`
-                                                            }
-                                                            className={clsx(
-                                                                "align-top transition-colors",
-                                                                isDarkMode
-                                                                    ? "hover:bg-slate-900/50"
-                                                                    : "hover:bg-slate-50"
-                                                            )}
-                                                        >
-                                                            <td className="px-4 py-3 sm:px-6">
-                                                                <div className="flex flex-col">
-                                                                    <span className="font-semibold">
-                                                                        {userLabel}
-                                                                    </span>
-                                                                    {secondaryId && (
-                                                                        <span
-                                                                            className={clsx(
-                                                                                "text-[11px]",
-                                                                                isDarkMode
-                                                                                    ? "text-slate-500"
-                                                                                    : "text-slate-500"
-                                                                            )}
-                                                                        >
-                                                                            {secondaryId}
-                                                                        </span>
-                                                                    )}
-                                                                    {item.uploadId && (
-                                                                        <span
-                                                                            className={clsx(
-                                                                                "text-[11px]",
-                                                                                isDarkMode
-                                                                                    ? "text-slate-500"
-                                                                                    : "text-slate-500"
-                                                                            )}
-                                                                        >
-                                                                            #{item.uploadId}
-                                                                        </span>
-                                                                    )}
-                                                                </div>
-                                                            </td>
-                                                            <td className="px-4 py-3 sm:px-6">
-                                                                {item.label ?? "—"}
-                                                            </td>
-                                                            <td className="px-4 py-3 sm:px-6">
-                                                                {formatScore(item.score)}
-                                                            </td>
-                                                            <td className="px-4 py-3 sm:px-6">
-                                                                {item.modelVersion ?? "—"}
-                                                            </td>
-                                                            <td className="px-4 py-3 sm:px-6">
-                                                                {formatInference(item.inferenceTimeMs)}
-                                                            </td>
-                                                            <td className="px-4 py-3 sm:px-6">
-                                                                {formatDateTime(item.createdAt)}
-                                                            </td>
-                                                        </tr>
-                                                    );
-                                                })}
-                                            </tbody>
-                                        </table>
-                                    </div>
-                                )}
+                <section className="grid gap-6 lg:grid-cols-[1.6fr,1fr]">
+                    <article className={sectionCardClass}>
+                        <header className="flex items-center justify-between border-b border-slate-200 pb-4 dark:border-slate-800">
+                            <div>
+                                <h2 className="text-lg font-semibold text-slate-900 dark:text-slate-50">
+                                    사용자 목록
+                                </h2>
+                                <p className="text-xs text-slate-500 dark:text-slate-400">
+                                    최근 가입 순으로 정렬된 사용자입니다.
+                                </p>
                             </div>
-                        </article>
-                        <article
-                            className={clsx(
-                                "rounded-2xl border",
-                                surfaceClass
-                            )}
-                        >
-                            <header className="border-b px-6 py-4 text-sm">
-                                <div className="flex flex-col gap-1">
-                                    <h2 className="text-base font-semibold md:text-lg">
-                                        사용자 계정 현황
-                                    </h2>
-                                    <p
-                                        className={clsx(
-                                            "text-xs",
-                                            isDarkMode
-                                                ? "text-slate-400"
-                                                : "text-slate-500"
-                                        )}
-                                    >
-                                        월간 사용량과 최근 분석 시각을 확인할 수 있습니다.
-                                    </p>
-                                </div>
-                            </header>
-                            <div className="overflow-x-auto">
-                                <table className="min-w-full divide-y text-sm">
-                                <thead
-                                    className={clsx(
-                                        isDarkMode
-                                            ? "bg-slate-900/80 text-slate-300"
-                                            : "bg-slate-100 text-slate-600"
-                                    )}
-                                >
-                                    <tr>
-                                        <th className="px-6 py-3 text-left font-medium">사용자</th>
-                                        <th className="px-6 py-3 text-left font-medium">로그인</th>
-                                        <th className="px-6 py-3 text-left font-medium">최근 분석</th>
-                                        <th className="px-6 py-3 text-left font-medium">월간 사용량</th>
-                                        <th className="px-6 py-3 text-left font-medium">계정 상태</th>
-                                    </tr>
-                                </thead>
-                                <tbody className={clsx(tableStripe)}>
-                                    {isLoading && userSummaries.length === 0 && (
+                            <button
+                                type="button"
+                                onClick={() => loadUsers(0)}
+                                className="rounded-full border border-slate-300 bg-white px-3 py-1 text-xs font-medium text-slate-700 transition hover:border-slate-400 hover:text-slate-900 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-200 dark:hover:border-slate-500 dark:hover:text-white"
+                            >
+                                새로고침
+                            </button>
+                        </header>
+
+                        {listError && (
+                            <div className={`${errorBannerClass} mt-4`}>
+                                데이터를 불러오지 못했습니다. {listErrorMessage ?? "잠시 후 다시 시도해 주세요."}
+                            </div>
+                        )}
+
+                        <div className="mt-4 overflow-hidden rounded-2xl border border-slate-200 dark:border-slate-800">
+                            <div className="max-h-[480px] overflow-y-auto">
+                                <table className="min-w-full divide-y divide-slate-200 text-sm dark:divide-slate-800">
+                                    <thead className="bg-slate-100/80 backdrop-blur dark:bg-slate-900/70">
                                         <tr>
-                                            <td colSpan={5} className="px-6 py-6 text-center text-sm text-slate-500 dark:text-slate-400">
-                                                사용자 정보를 불러오는 중입니다...
-                                            </td>
+                                            <th className={tableHeaderCellClass}>이메일</th>
+                                            <th className={tableHeaderCellClass}>플랜</th>
+                                            <th className={tableHeaderCellClass}>이번 달 사용량</th>
+                                            <th className={tableHeaderCellClass}>가입일</th>
+                                            <th className={tableHeaderCellClass}>조치</th>
                                         </tr>
-                                    )}
-                                    {errorMessage && !isLoading && userSummaries.length === 0 && (
-                                        <tr>
-                                            <td colSpan={5} className="px-6 py-6 text-center text-sm text-rose-500">
-                                                {errorMessage}
-                                            </td>
-                                        </tr>
-                                    )}
-                                    {!isLoading && !errorMessage && userSummaries.length === 0 && (
-                                        <tr>
-                                            <td colSpan={5} className="px-6 py-6 text-center text-sm text-slate-500 dark:text-slate-400">
-                                                표시할 사용자가 없습니다.
-                                            </td>
-                                        </tr>
-                                    )}
-                                    {!isLoading && userSummaries.length > 0 && userSummaries.map((user) => {
-                                        const limit = user.monthlyQuotaLimit ?? 0;
-                                        const used = user.monthlyQuotaUsed ?? 0;
-                                        const percent = limit > 0 ? Math.min(100, Math.round((used / limit) * 100)) : 0;
-                                        const loginLabel = user.loginType ? user.loginType : "-";
-                                        const limitDisplay = limit > 0 ? limit.toLocaleString() : "—";
-                                        const isResetting = resettingIds.has(user.userNo);
-                                        return (
-                                            <tr
-                                                key={user.userNo}
-                                                className={clsx(
-                                                    "border-b transition-colors",
-                                                    isDarkMode
-                                                        ? "border-slate-800 hover:bg-slate-900/60"
-                                                        : "border-slate-200 hover:bg-slate-100"
-                                                )}
-                                            >
-                                                <td className="whitespace-nowrap px-6 py-4">
-                                                    <div className="flex flex-col">
-                                                        <span className="font-medium">
-                                                            {user.nickname || user.userId}
-                                                        </span>
-                                                        <span
-                                                            className={clsx(
-                                                                "text-xs",
-                                                                isDarkMode
-                                                                    ? "text-slate-400"
-                                                                    : "text-slate-500"
-                                                            )}
-                                                        >
-                                                            {user.userId}
-                                                        </span>
-                                                        <span
-                                                            className={clsx(
-                                                                "text-xs",
-                                                                isDarkMode
-                                                                    ? "text-slate-500"
-                                                                    : "text-slate-600"
-                                                            )}
-                                                        >
-                                                            {user.emailVerified ? "이메일 인증 완료" : "이메일 인증 필요"}
-                                                        </span>
-                                                    </div>
-                                                </td>
-                                                <td className="px-6 py-4">
-                                                    <span
-                                                        className={clsx(
-                                                            "rounded-full border px-3 py-1 text-xs font-medium",
-                                                            isDarkMode
-                                                                ? "border-slate-700 text-slate-200"
-                                                                : "border-slate-300 text-slate-600"
-                                                        )}
-                                                        style={{ whiteSpace: "nowrap" }}
-                                                    >
-                                                        {loginLabel}
-                                                    </span>
-                                                </td>
-                                                <td className="px-6 py-4">
-                                                    <span
-                                                        className={clsx(
-                                                            "text-sm",
-                                                            isDarkMode
-                                                                ? "text-slate-300"
-                                                                : "text-slate-600"
-                                                        )}
-                                                    >
-                                                        {formatDateTime(user.lastAnalysisAt)}
-                                                    </span>
-                                                </td>
-                                                <td className="px-6 py-4">
-                                                    <div className="flex flex-col gap-1">
-                                                        <div className="flex items-center justify-between text-xs">
-                                                            <span
-                                                                className={clsx(
-                                                                    isDarkMode
-                                                                        ? "text-slate-300"
-                                                                        : "text-slate-600"
-                                                                )}
-                                                            >
-                                                                {used.toLocaleString()}
-                                                            </span>
-                                                            <span
-                                                                className={clsx(
-                                                                    isDarkMode
-                                                                        ? "text-slate-500"
-                                                                        : "text-slate-500"
-                                                                )}
-                                                            >
-                                                                / {limitDisplay}
-                                                            </span>
-                                                        </div>
-                                                        <div
-                                                            className={clsx(
-                                                                "h-1.5 w-full overflow-hidden rounded-full",
-                                                                barTrack
-                                                            )}
-                                                        >
-                                                            <div
-                                                                className={clsx(
-                                                                    "h-full rounded-full transition-all duration-500",
-                                                                    barFill
-                                                                )}
-                                                                style={{ width: `${percent}%` }}
-                                                            />
-                                                        </div>
-                                                    </div>
-                                                </td>
-                                                <td className="px-6 py-4">
-                                                    <button
-                                                        type="button"
-                                                        onClick={() => handleResetUsage(user.userNo)}
-                                                        disabled={isResetting}
-                                                        className={clsx(
-                                                            "rounded-full border px-3 py-1 text-xs font-medium transition",
-                                                            isDarkMode
-                                                                ? "border-slate-700 text-slate-200 hover:border-slate-500 hover:text-white"
-                                                                : "border-slate-200 text-slate-600 hover:border-slate-400 hover:text-slate-800",
-                                                            isResetting && "opacity-60"
-                                                        )}
-                                                        style={{ whiteSpace: "nowrap" }}
-                                                    >
-                                                        {isResetting ? "초기화 중..." : "사용량 초기화"}
-                                                    </button>
+                                    </thead>
+                                    <tbody className="divide-y divide-slate-200 dark:divide-slate-800">
+                                        {isLoading ? (
+                                            Array.from({ length: 5 }).map((_, index) => (
+                                                <tr key={`user-skeleton-${index}`}>
+                                                    {Array.from({ length: 5 }).map((__, idx) => (
+                                                        <td key={idx} className="px-6 py-4">
+                                                            <div className="h-4 rounded bg-slate-200 dark:bg-slate-800" />
+                                                        </td>
+                                                    ))}
+                                                </tr>
+                                            ))
+                                        ) : userItems.length === 0 ? (
+                                            <tr>
+                                                <td
+                                                    colSpan={5}
+                                                    className="px-6 py-6 text-center text-sm text-slate-500 dark:text-slate-400"
+                                                >
+                                                    표시할 사용자가 없습니다.
                                                 </td>
                                             </tr>
-                                        );
-                                    })}
-                                </tbody>
-                            </table>
+                                        ) : (
+                                            userItems.map((user) => {
+                                                const quota = user.monthlyQuotaLimit ?? 0;
+                                                const used = user.monthlyQuotaUsed ?? 0;
+                                                const ratio = quota > 0 ? Math.min((used / quota) * 100, 100) : 0;
+                                                return (
+                                                    <tr key={user.userNo}>
+                                                        <td className={tableBodyCellClass}>
+                                                            <div className="font-medium text-slate-900 dark:text-slate-100">
+                                                                {user.email ?? "이메일 미상"}
+                                                            </div>
+                                                            <div className="text-xs text-slate-500 dark:text-slate-400">
+                                                                #{user.userNo}
+                                                            </div>
+                                                        </td>
+                                                        <td className={tableBodyCellClass}>
+                                                            <span className={badgeClass}>
+                                                                {user.subscriptionPlan ?? "Free"}
+                                                            </span>
+                                                        </td>
+                                                        <td className={tableBodyCellClass}>
+                                                            <div className="flex flex-col gap-1">
+                                                                <div className="flex items-center justify-between text-xs text-slate-500 dark:text-slate-400">
+                                                                    <span>{used}/{quota || "∞"}</span>
+                                                                    <span>{ratio.toFixed(0)}%</span>
+                                                                </div>
+                                                                <div className="h-2 rounded-full bg-slate-200 dark:bg-slate-800">
+                                                                    <div
+                                                                        className="h-full rounded-full bg-emerald-500"
+                                                                        style={{ width: `${ratio}%` }}
+                                                                    />
+                                                                </div>
+                                                            </div>
+                                                        </td>
+                                                        <td className={tableBodyCellClass}>
+                                                            {user.createdAt
+                                                                ? new Date(user.createdAt).toLocaleDateString()
+                                                                : "—"}
+                                                        </td>
+                                                        <td className={tableBodyCellClass}>
+                                                            <button
+                                                                type="button"
+                                                                onClick={() => handleResetQuota(user.userNo)}
+                                                                disabled={resettingIds.has(user.userNo)}
+                                                                className="rounded-full border border-slate-300 px-3 py-1 text-xs font-medium text-slate-600 transition hover:border-slate-400 hover:text-slate-900 disabled:cursor-wait disabled:opacity-60 dark:border-slate-700 dark:text-slate-300 dark:hover:border-slate-500 dark:hover:text-white"
+                                                            >
+                                                                {resettingIds.has(user.userNo) ? "초기화 중..." : "할당량 초기화"}
+                                                            </button>
+                                                        </td>
+                                                    </tr>
+                                                );
+                                            })
+                                        )}
+                                    </tbody>
+                                </table>
+                            </div>
                         </div>
-                        {hasMore && (
-                            <div className={clsx(
-                                    "border-t px-6 py-4 text-center",
-                                    isDarkMode ? "border-slate-800/40" : "border-slate-200"
-                            )}>
+
+                        {pageMeta.totalPages > 1 && (
+                            <div className="mt-4 flex justify-end">
                                 <button
                                     type="button"
-                                    onClick={handleLoadMore}
-                                    disabled={isAppending}
-                                    className={clsx(
-                                        "inline-flex items-center justify-center rounded-full px-4 py-1.5 text-sm font-medium transition",
-                                        isDarkMode
-                                            ? "border border-slate-700 text-slate-200 hover:border-slate-500 hover:text-white"
-                                            : "border border-slate-300 text-slate-600 hover:border-slate-400 hover:text-slate-800",
-                                        isAppending && "opacity-70"
-                                    )}
+                                    onClick={() => loadUsers((pageMeta.page ?? 0) + 1)}
+                                    disabled={isAppending || (pageMeta.page ?? 0) >= (pageMeta.totalPages ?? 1) - 1}
+                                    className="inline-flex items-center gap-2 rounded-full border border-slate-300 bg-white px-4 py-2 text-sm font-medium text-slate-700 transition hover:border-slate-400 hover:text-slate-900 disabled:cursor-not-allowed disabled:opacity-60 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-200 dark:hover:border-slate-500 dark:hover:text-white"
                                 >
-                                    {isAppending ? "불러오는 중..." : "더 보기"}
+                                    {isAppending ? "불러오는 중..." : "다음 페이지"}
                                 </button>
                             </div>
                         )}
                     </article>
-                    </div>
 
-                    <aside
-                        className={clsx(
-                            "flex h-full flex-col gap-6 rounded-2xl border p-6",
-                            surfaceClass
-                        )}
-                    >
-                        <div className="flex flex-col gap-3">
-                            <div className="flex items-center justify-between">
-                                <h3 className="text-base font-semibold">
-                                    분석 트렌드
-                                </h3>
-                                <span
-                                    className={clsx(
-                                        "text-xs",
-                                        isDarkMode
-                                            ? "text-slate-400"
-                                            : "text-slate-500"
-                                    )}
-                                >
-                                    지난 5일
-                                </span>
+                    <aside className={sectionCardClass}>
+                        <header className="flex items-center justify-between border-b border-slate-200 pb-4 dark:border-slate-800">
+                            <div>
+                                <h2 className="text-lg font-semibold text-slate-900 dark:text-slate-50">
+                                    최신 분석
+                                </h2>
+                                <p className="text-xs text-slate-500 dark:text-slate-400">
+                                    전체 사용자 최신 {RECENT_ANALYSIS_LIMIT}건을 생성일 기준으로 정렬합니다.
+                                </p>
                             </div>
-                            <div className="space-y-3">
-                                {analysisTrend.map((item) => (
+                            <button
+                                type="button"
+                                onClick={loadRecentAnalyses}
+                                disabled={recentLoading}
+                                className="rounded-full border border-slate-300 bg-white px-3 py-1 text-xs font-medium text-slate-700 transition hover:border-slate-400 hover:text-slate-900 disabled:cursor-wait disabled:opacity-60 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-200 dark:hover:border-slate-500 dark:hover:text-white"
+                            >
+                                {recentLoading ? "불러오는 중..." : "새로고침"}
+                            </button>
+                        </header>
+
+                        {recentLoading ? (
+                            <div className="mt-4 space-y-3">
+                                {Array.from({ length: 4 }).map((_, index) => (
                                     <div
-                                        key={item.label}
-                                        className="flex items-center gap-3"
+                                        key={`recent-skeleton-${index}`}
+                                        className="rounded-2xl border border-slate-200 bg-slate-100 p-4 dark:border-slate-800 dark:bg-slate-900/50"
                                     >
-                                        <span className="w-8 shrink-0 text-xs font-medium">
-                                            {item.label}
-                                        </span>
-                                        <div className="flex-1">
-                                            <div
-                                                className={clsx(
-                                                    "h-2 rounded-full",
-                                                    barTrack
-                                                )}
-                                            >
-                                                <div
-                                                    className={clsx(
-                                                        "h-full rounded-full transition-all",
-                                                        barFill
-                                                    )}
-                                                    style={{
-                                                        width: `${Math.round(
-                                                            (item.value /
-                                                                trendMax) *
-                                                                100
-                                                        )}%`,
-                                                    }}
-                                                />
-                                            </div>
-                                        </div>
-                                        <span
-                                            className={clsx(
-                                                "w-12 text-right text-xs",
-                                                isDarkMode
-                                                    ? "text-slate-400"
-                                                    : "text-slate-600"
-                                            )}
-                                        >
-                                            {item.value}
-                                        </span>
+                                        <div className="h-4 rounded bg-slate-200 dark:bg-slate-800" />
+                                        <div className="mt-2 h-3 rounded bg-slate-200 dark:bg-slate-800" />
                                     </div>
                                 ))}
                             </div>
-                        </div>
-
-                        <div className="flex flex-col gap-3">
-                            <div className="flex items-center justify-between">
-                                <h3 className="text-base font-semibold">
-                                    운영 알림
-                                </h3>
-                                <button
-                                    type="button"
-                                    className={clsx(
-                                        "text-xs underline-offset-4 transition hover:underline",
-                                        isDarkMode
-                                            ? "text-slate-300"
-                                            : "text-slate-600"
-                                    )}
-                                >
-                                    전체 보기
-                                </button>
+                        ) : recentError ? (
+                            <div className={`${errorBannerClass} mt-4`}>
+                                <p className="font-medium">{friendlyRecentError}</p>
+                                {recentErrorMessage && <p className="mt-1 text-xs">상세: {recentErrorMessage}</p>}
                             </div>
-                            <ul className="space-y-4 text-sm">
-                                {activityFeed.map((item) => (
-                                    <li
-                                        key={item.id}
+                        ) : (
+                            <div className="mt-4 space-y-3">
+                                {recentAnalyses.length === 0 ? (
+                                    <p className="rounded-2xl border border-dashed border-slate-300 bg-slate-100 px-4 py-6 text-sm text-slate-500 dark:border-slate-700 dark:bg-slate-900/40 dark:text-slate-400">
+                                        최근 분석 기록이 없습니다.
+                                    </p>
+                                ) : (
+                                    recentAnalyses.map((analysis) => (
+                                        <article
+                                            key={analysis.reportId ?? analysis.id ?? analysis.createdAt}
+                                            className="rounded-2xl border border-slate-200 bg-white p-4 shadow-sm dark:border-slate-800 dark:bg-slate-900/60"
+                                        >
+                                            <h3 className="text-sm font-semibold text-slate-900 dark:text-slate-100">
+                                                {analysis.projectName ?? "이름 미상"}
+                                            </h3>
+                                            <p className="text-xs text-slate-500 dark:text-slate-400">
+                                                {analysis.modelName ?? analysis.modelVersion ?? "모델 정보 없음"}
+                                            </p>
+                                            <p className="mt-2 text-sm text-slate-600 dark:text-slate-300 line-clamp-2">
+                                                {analysis.summary ?? "요약 정보가 없습니다."}
+                                            </p>
+                                            <p className="mt-2 text-xs text-slate-500 dark:text-slate-400">
+                                                {analysis.createdAt
+                                                    ? new Date(analysis.createdAt).toLocaleString()
+                                                    : "—"}
+                                            </p>
+                                        </article>
+                                    ))
+                                )}
+                            </div>
+                        )}
+                    </aside>
+                </section>
+
+                <section className={sectionCardClass}>
+                    <header className="flex items-center justify-between border-b border-slate-200 pb-4 dark:border-slate-800">
+                        <div>
+                            <h2 className="text-lg font-semibold text-slate-900 dark:text-slate-50">활동 피드</h2>
+                            <p className="text-xs text-slate-500 dark:text-slate-400">
+                                운영 이벤트와 경고를 실시간으로 확인하세요.
+                            </p>
+                        </div>
+                    </header>
+                    <div className="mt-4 space-y-3">
+                        {activityFeed.map((item) => (
+                            <article
+                                key={item.id}
+                                className="rounded-2xl border border-slate-200 bg-white p-4 shadow-sm dark:border-slate-800 dark:bg-slate-900/60"
+                            >
+                                <div className="flex items-center justify-between">
+                                    <span
                                         className={clsx(
-                                            "rounded-xl border px-4 py-3",
-                                            subtleSurface
+                                            "rounded-full px-2.5 py-1 text-xs font-semibold uppercase tracking-wider",
+                                            item.severity === "warning" && "bg-amber-50 text-amber-600 dark:bg-amber-500/10 dark:text-amber-200",
+                                            item.severity === "info" && "bg-sky-50 text-sky-600 dark:bg-sky-500/10 dark:text-sky-200",
+                                            item.severity === "notice" && "bg-emerald-50 text-emerald-600 dark:bg-emerald-500/10 dark:text-emerald-200"
                                         )}
                                     >
-                                        <div className="flex items-center justify-between">
-                                            <span className="text-xs font-medium uppercase tracking-widest">
-                                                {item.id}
-                                            </span>
-                                            <span
-                                                className={clsx(
-                                                    "text-[11px]",
-                                                    isDarkMode
-                                                        ? "text-slate-500"
-                                                        : "text-slate-500"
-                                                )}
-                                            >
-                                                {item.time}
-                                            </span>
-                                        </div>
-                                        <p
-                                            className={clsx(
-                                                "mt-2 flex items-center gap-2 text-sm font-semibold",
-                                                severityAccent(item.severity)
-                                            )}
-                                        >
-                                            {item.title}
-                                        </p>
-                                        <p
-                                            className={clsx(
-                                                "mt-1 text-xs leading-relaxed",
-                                                isDarkMode
-                                                    ? "text-slate-300"
-                                                    : "text-slate-600"
-                                            )}
-                                        >
-                                            {item.detail}
-                                        </p>
-                                    </li>
-                                ))}
-                            </ul>
-                        </div>
-                    </aside>
+                                        {item.severity.toUpperCase()}
+                                    </span>
+                                    <span className="text-xs text-slate-500 dark:text-slate-400">{item.time}</span>
+                                </div>
+                                <h3 className="mt-2 text-sm font-semibold text-slate-900 dark:text-slate-100">
+                                    {item.title}
+                                </h3>
+                                <p className="text-sm text-slate-600 dark:text-slate-300">{item.detail}</p>
+                            </article>
+                        ))}
+                    </div>
                 </section>
             </div>
         </main>

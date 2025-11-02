@@ -5,7 +5,7 @@ import {UploadProvider} from "features/freeTrial/provider/uploadProvider";
 
 import AnalyzeProcess from "features/freeTrial/analyzeProcess";
 
-import Navigation from "../features/navigation/navigation";
+import Header from "../app/layout/Header";
 
 const FreeTrial = () => {
     const navigate = useNavigate();
@@ -24,7 +24,7 @@ const FreeTrial = () => {
     return (
         <UploadProvider>
             {/*<Banner/>*/}
-            <Navigation/>
+            <Header />
 
             <AnalyzeProcess/>
 

@@ -1,8 +1,8 @@
 import React, { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import Navigation from "../features/navigation/navigation";
+import Header from "../app/layout/Header";
 import SummaryDashboard from "../features/dashboard/summaryDashboard";
-import Footer from "../features/footer/footer";
+import Footer from "../app/layout/Footer/Footer";
 import { useAuth } from "../providers/authProvider";
 
 const Dashboard = () => {
@@ -19,13 +19,13 @@ const Dashboard = () => {
     if (isLoading) return null;
 
     return (
-        <>
-            <Navigation variant="dark" />
+        <div className="dark">
+            <Header />
             <main className="mt-14 min-h-screen bg-[#13213f] text-slate-100 md:mt-20">
                 <SummaryDashboard />
                 <Footer />
             </main>
-        </>
+        </div>
     );
 };
 

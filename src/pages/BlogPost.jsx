@@ -1,11 +1,11 @@
-import React, { useEffect, useMemo } from "react";
+import React, { useEffect, useMemo, useCallback } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
-import Navigation from "features/navigation";
-import ContentDecor from "features/layout/ContentDecor";
-import Footer from "features/footer";
-import { useBlogPosts } from "lib/blogApi";
+import Header from "../app/layout/Header";
+import Footer from "../app/layout/Footer/Footer";
+import { useBlogPost } from "lib/blogApi";
 import ReactMarkdown from "react-markdown"; // npm i react-markdown
+import { ArrowLeftIcon } from "@heroicons/react/24/outline";
 
 
 // 안전한 OG 메타 세팅 유틸
@@ -24,84 +24,195 @@ function setOgMeta(title, description) {
     ensure("og:description", description || "");
 }
 const BlogPost = () => {
-    const { slug } = useParams();
+    const { lng, slug } = useParams();
     const navigate = useNavigate();
     const { t } = useTranslation("blog");
-    const { posts, isLoading } = useBlogPosts();
+    const { post, isLoading, error, isFallback } = useBlogPost(slug);
+    const locale = (lng || "ko").toLowerCase();
 
+    const postMeta = useMemo(() => {
+        if (!post) {
+            return { formattedDate: "", readTime: "" };
+        }
+        const formattedDate = post.date
+            ? new Intl.DateTimeFormat(lng === "en" ? "en-US" : undefined, {
+                  year: "numeric",
+                  month: "short",
+                  day: "numeric",
+              }).format(new Date(post.date))
+            : "";
+        const readTime = post.readTime ? t("meta.readTime", { minutes: post.readTime }) : "";
+        return { formattedDate, readTime };
+    }, [post, lng, t]);
 
-    const post = useMemo(() => posts?.find(p => p.slug === slug), [posts, slug]);
+    const handleNavigateList = useCallback(() => {
+        const targetLng = locale || "ko";
+        navigate(`/${targetLng}/blog`, { replace: false });
+    }, [navigate, locale]);
 
+    const handleBack = useCallback(() => {
+        if (window.history.length > 2) {
+            navigate(-1);
+            return;
+        }
+        handleNavigateList();
+    }, [navigate, handleNavigateList]);
+
+    const backLabel = locale.startsWith("en") ? "Back to blog" : "블로그 목록으로";
+    const fallbackBadge =
+        isFallback && post
+            ? locale.startsWith("en")
+                ? "Temporary demo copy until the live API responds."
+                : "실제 API 연동 전까지 표시되는 예시 본문입니다."
+            : null;
 
 // 존재하지 않는 슬러그면 목록으로 복귀
     useEffect(() => {
-        if (!isLoading && posts && !post) {
+        if (!isLoading && !isFallback && error?.status === 404) {
             navigate("../blog", { replace: true });
         }
-    }, [isLoading, posts, post, navigate]);
+    }, [isLoading, error, navigate, isFallback]);
+
+    useEffect(() => {
+        if (!isLoading && !error && !post) {
+            navigate("../blog", { replace: true });
+        }
+    }, [isLoading, error, post, navigate]);
 
     useEffect(() => {
         if (post) setOgMeta(post.title, post.excerpt);
     }, [post]);
 
+    let body = null;
 
-if (isLoading || !post) {
-    return (
-        <>
-            <Navigation />
-            <ContentDecor>
-                <div className="mx-auto max-w-3xl px-4 sm:px-6 lg:px-8 py-16">
-                    <div className="animate-pulse h-6 w-1/2 bg-gray-200 rounded" />
-                    <div className="mt-4 space-y-3">
-                        <div className="h-4 bg-gray-200 rounded" />
-                        <div className="h-4 bg-gray-200 rounded w-11/12" />
-                        <div className="h-4 bg-gray-200 rounded w-10/12" />
-                    </div>
+    if (isLoading) {
+        body = (
+            <div className="rounded-3xl border border-slate-200/80 bg-white/90 px-6 py-12 shadow-xl shadow-slate-900/5 dark:border-slate-700 dark:bg-slate-900/60 dark:shadow-[0_28px_60px_rgba(2,6,23,0.55)] sm:px-10">
+                <div className="h-7 w-1/3 animate-pulse rounded bg-slate-200 dark:bg-slate-700" />
+                <div className="mt-6 space-y-3">
+                    <div className="h-4 rounded bg-slate-200 dark:bg-slate-700" />
+                    <div className="h-4 w-10/12 rounded bg-slate-200 dark:bg-slate-700" />
+                    <div className="h-4 w-11/12 rounded bg-slate-200 dark:bg-slate-700" />
                 </div>
-                <Footer />
-            </ContentDecor>
-        </>
-    );
-}
-
-
-return (
-    <>
-        <Navigation />
-        <ContentDecor>
-            <article className="mx-auto max-w-3xl px-4 sm:px-6 lg:px-8 py-12">
-                <h1 className="text-3xl sm:text-4xl font-extrabold tracking-tight text-gray-900">
-                    {post.title}
-                </h1>
-                <p className="mt-2 text-sm text-gray-500">
-                    {new Date(post.date).toLocaleDateString()} • {post.readTime} min
+                <div className="mt-10 space-y-4">
+                    {Array.from({ length: 5 }).map((_, idx) => (
+                        <div key={idx} className="h-3.5 w-full rounded bg-slate-200 dark:bg-slate-700" />
+                    ))}
+                </div>
+            </div>
+        );
+    } else if (error?.status === 404 && !isFallback) {
+        return null;
+    } else if (error && !isFallback) {
+        const errorCopy = locale.startsWith("en")
+            ? {
+                  title: "We couldn't load this post.",
+                  description: "Please try again in a moment.",
+              }
+            : {
+                  title: "게시글을 불러오는 중 문제가 발생했습니다.",
+                  description: "잠시 후 다시 시도해주세요.",
+              };
+        body = (
+            <article className="rounded-3xl border border-slate-200/80 bg-white/95 px-6 py-12 shadow-xl shadow-slate-900/5 dark:border-slate-700 dark:bg-slate-900/70 dark:shadow-[0_28px_60px_rgba(2,6,23,0.55)] sm:px-10">
+                <h1 className="text-2xl font-bold text-slate-900 dark:text-slate-100">{errorCopy.title}</h1>
+                <p className="mt-4 text-sm text-slate-600 dark:text-slate-300">
+                    {error.message || errorCopy.description}
                 </p>
-
-
-                {/* 태그 */}
-                {post.tags?.length ? (
-                    <div className="mt-4 flex flex-wrap gap-2">
-                        {post.tags.map(tag => (
-                            <span key={tag} className="inline-flex items-center rounded-full border border-gray-200 px-2.5 py-0.5 text-xs text-gray-600">
-#{tag}
-</span>
-                        ))}
+                <button
+                    type="button"
+                    onClick={handleNavigateList}
+                    className="mt-8 inline-flex items-center gap-2 rounded-xl border border-slate-300 bg-white px-4 py-2 text-sm font-medium text-slate-700 transition hover:border-slate-400 hover:bg-slate-50 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-400 dark:border-slate-600 dark:bg-slate-900 dark:text-slate-200 dark:hover:bg-slate-800"
+                >
+                    <ArrowLeftIcon className="h-4 w-4" aria-hidden />
+                    {backLabel}
+                </button>
+            </article>
+        );
+    } else if (post) {
+        body = (
+            <article className="rounded-3xl border border-slate-200/80 bg-white/95 px-6 py-12 shadow-xl shadow-slate-900/5 backdrop-blur-sm dark:border-slate-700 dark:bg-slate-900/70 dark:shadow-[0_32px_70px_rgba(2,6,23,0.55)] sm:px-12 lg:py-14">
+                <header>
+                    <h1 className="text-3xl font-extrabold tracking-tight text-slate-900 dark:text-slate-100 sm:text-4xl">
+                        {post.title}
+                    </h1>
+                    <div className="mt-3 flex flex-wrap items-center gap-2 text-sm text-slate-500 dark:text-slate-400">
+                        {postMeta.formattedDate}
+                        {postMeta.readTime ? <span aria-hidden>•</span> : null}
+                        {postMeta.readTime}
                     </div>
-                ) : null}
+                    {post.tags?.length ? (
+                        <div className="mt-5 flex flex-wrap gap-2">
+                            {post.tags.map((tag) => (
+                                <span
+                                    key={tag}
+                                    className="inline-flex items-center rounded-full border border-slate-200 bg-slate-50 px-3 py-1 text-xs font-medium text-slate-600 dark:border-slate-700 dark:bg-slate-800/70 dark:text-slate-300"
+                                >
+                                    #{tag}
+                                </span>
+                            ))}
+                        </div>
+                    ) : null}
+                    {fallbackBadge ? (
+                        <p className="mt-5 inline-flex rounded-full bg-indigo-50 px-3 py-1 text-xs font-medium text-indigo-700 dark:bg-indigo-500/20 dark:text-indigo-200">
+                            {fallbackBadge}
+                        </p>
+                    ) : null}
+                </header>
 
-
-                {/* 본문 */}
-                <div className="prose prose-indigo max-w-none mt-8">
+                <div className="prose prose-slate mt-10 max-w-none prose-headings:text-slate-900 prose-a:text-indigo-600 hover:prose-a:text-indigo-500 dark:prose-invert dark:prose-headings:text-white dark:prose-a:text-indigo-300 dark:hover:prose-a:text-indigo-200">
                     <ReactMarkdown>{post.content}</ReactMarkdown>
                 </div>
             </article>
+        );
+    }
 
+    if (!body) {
+        return null;
+    }
 
-            <Footer />
-        </ContentDecor>
-    </>
-);
+    const TopDecoration = () => (
+        <>
+            <div
+                className="absolute inset-0 -z-10 bg-gradient-to-b from-white via-indigo-50/40 to-slate-100 dark:from-slate-950 dark:via-slate-900/60 dark:to-slate-950"
+                aria-hidden
+            />
+            <div
+                className="absolute inset-x-0 top-0 -z-10 h-72 bg-gradient-to-b from-indigo-200/40 via-white to-transparent dark:from-slate-900/70 dark:via-slate-900/0 dark:to-transparent"
+                aria-hidden
+            />
+            <div
+                className="pointer-events-none absolute inset-0 -z-10 bg-[radial-gradient(60rem_40rem_at_90%_-10%,rgba(99,102,241,0.18),transparent)] dark:bg-[radial-gradient(60rem_40rem_at_90%_-10%,rgba(129,140,248,0.28),transparent)]"
+                aria-hidden
+            />
+        </>
+    );
+
+    return (
+        <>
+            <Header />
+            <div className="relative isolate min-h-screen bg-slate-50 text-slate-900 transition-colors dark:bg-slate-950 dark:text-slate-100">
+                <TopDecoration />
+                <main className="relative z-10">
+                    <div className="mx-auto max-w-5xl px-4 pb-24 pt-32 sm:px-6 lg:px-8">
+                        <div className="mb-8 flex flex-wrap items-center gap-4 text-sm font-medium text-slate-600 dark:text-slate-300">
+                            <button
+                                type="button"
+                                onClick={handleBack}
+                                className="inline-flex items-center gap-2 rounded-full border border-slate-200 bg-white/90 px-4 py-2 text-sm font-medium text-slate-700 shadow-sm shadow-slate-900/5 transition hover:border-slate-300 hover:bg-slate-50 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-400 disabled:cursor-not-allowed dark:border-slate-600 dark:bg-slate-900/80 dark:text-slate-200 dark:hover:border-slate-500 dark:hover:bg-slate-800"
+                                disabled={isLoading}
+                            >
+                                <ArrowLeftIcon className="h-4 w-4" aria-hidden />
+                                {backLabel}
+                            </button>
+                        </div>
+                        {body}
+                    </div>
+                </main>
+                <Footer />
+            </div>
+        </>
+    );
 };
-
 
 export default BlogPost;

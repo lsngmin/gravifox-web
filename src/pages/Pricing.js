@@ -1,5 +1,5 @@
 import React, { useMemo } from 'react';
-import Navigation from '../features/navigation/navigation';
+import Header from '../app/layout/Header';
 import { useTranslation } from 'react-i18next';
 import { motion } from 'framer-motion';
 import { useMediaQuery } from 'react-responsive';
@@ -13,7 +13,7 @@ import {
   Share2,
   Layers3
 } from "lucide-react";
-import Footer from "../features/footer/footer";
+import Footer from "../app/layout/Footer/Footer";
 const Check = ({ className = 'text-emerald-500', size = 12 }) => (
   <svg width={size} height={size} viewBox="0 0 16 16" fill="none" className={className}>
     <path d="M13.4 4.36L6.12 11.64 2.6 8.12" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" />
@@ -71,7 +71,7 @@ export default function Pricing() {
 
   return (
     <div className="min-h-screen bg-white font-sans">
-      <Navigation />
+      <Header />
 
       <main className="relative">
         {/* Hero */}
