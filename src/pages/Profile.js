@@ -15,6 +15,24 @@ const Profile = () => {
     window.localStorage.setItem("preferred-theme", theme);
   }, [theme]);
 
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    const syncTheme = () => {
+      const stored = window.localStorage.getItem("preferred-theme");
+      if (stored === "dark" || stored === "light") {
+        setTheme(stored);
+      }
+    };
+    window.addEventListener("preferred-theme-change", syncTheme);
+    window.addEventListener("focus", syncTheme);
+    window.addEventListener("storage", syncTheme);
+    return () => {
+      window.removeEventListener("preferred-theme-change", syncTheme);
+      window.removeEventListener("focus", syncTheme);
+      window.removeEventListener("storage", syncTheme);
+    };
+  }, []);
+
   const isDark = theme === "dark";
 
   return (
@@ -42,7 +60,7 @@ const Profile = () => {
       </main>
 
       <footer className={`relative z-10 ${isDark ? "bg-transparent" : "bg-gray-50"}`}>
-        <Footer variant={isDark ? "dark" : "light"} transparent={isDark} />
+        <Footer />
       </footer>
     </div>
   );

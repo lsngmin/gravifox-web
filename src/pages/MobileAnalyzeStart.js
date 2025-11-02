@@ -5,27 +5,39 @@ import { UploadCloud, ShieldCheck, Clapperboard, LifeBuoy } from 'lucide-react';
 import Navigation from '../features/navigation/navigation';
 import Footer from '../features/footer/footer';
 import { useAuth } from 'providers/authProvider';
-import useNumberFormatter from '../hooks/useNumberFormatter';
 import {
   rememberReturnCheckpoint,
   getReturnCheckpoint,
   clearReturnCheckpoint,
 } from '../lib/returnCheckpoint/index.js';
 import { CHECKPOINT_TYPES } from '../lib/returnCheckpoint/constants.js';
-import {
-  DEFAULT_MEMBER_DAILY_QUOTA,
-  GUEST_DAILY_QUOTA,
-  MAX_IMAGE_FILES,
-} from '../features/analyze/constants';
+import { MAX_IMAGE_FILES } from '../features/analyze/constants';
 import { fetchQuotaSummary } from '../features/analyze/api/quotaSummary';
 import LoginRequiredModal from '../features/analyze/components/LoginRequiredModal';
 import ErrorModal from '../features/analyze/components/ErrorModal';
 
+const THEME_STORAGE_KEY = 'preferred-theme';
+const resolveInitialTheme = () => {
+  if (typeof window === 'undefined') return 'dark';
+  try {
+    const stored =
+      window.sessionStorage?.getItem(THEME_STORAGE_KEY) ||
+      window.localStorage?.getItem(THEME_STORAGE_KEY);
+    if (stored === 'dark' || stored === 'light') {
+      return stored;
+    }
+    return 'dark';
+  } catch {
+    return 'dark';
+  }
+};
+
 export default function MobileAnalyzeStart() {
-  const { t, i18n } = useTranslation('common');
+  const { t } = useTranslation('common');
   const navigate = useNavigate();
   const { lng } = useParams();
   const { userInfo, accessToken } = useAuth();
+  const [theme, setTheme] = useState(resolveInitialTheme);
   const [loginModalOpen, setLoginModalOpen] = useState(false);
   const [pendingAction, setPendingAction] = useState(null);
   const [errorOpen, setErrorOpen] = useState(false);
@@ -34,6 +46,34 @@ export default function MobileAnalyzeStart() {
   const [checkingQuota, setCheckingQuota] = useState(false);
   const loginCompletedRef = useRef(false);
 
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
+    try {
+      window.localStorage.setItem(THEME_STORAGE_KEY, theme);
+      window.sessionStorage?.setItem(THEME_STORAGE_KEY, theme);
+    } catch {}
+  }, [theme]);
+
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
+    const refreshTheme = () => setTheme(resolveInitialTheme());
+    const handleStorage = (event) => {
+      if (event.storageArea === window.localStorage && event.key === THEME_STORAGE_KEY) {
+        refreshTheme();
+      }
+    };
+    const handleFocus = () => refreshTheme();
+    window.addEventListener('storage', handleStorage);
+    window.addEventListener('focus', handleFocus);
+    window.addEventListener('preferred-theme-change', refreshTheme);
+    return () => {
+      window.removeEventListener('storage', handleStorage);
+      window.removeEventListener('focus', handleFocus);
+      window.removeEventListener('preferred-theme-change', refreshTheme);
+    };
+  }, []);
+
+  const isDark = theme === 'dark';
   const localizedPath = useCallback((path) => {
     const prefix = lng ? `/${lng}` : '';
     if (path === '/' && prefix) {
@@ -41,18 +81,6 @@ export default function MobileAnalyzeStart() {
     }
     return `${prefix}${path}`;
   }, [lng]);
-
-  const formatNumber = useNumberFormatter(i18n.language);
-
-  const guestDailyQuota = GUEST_DAILY_QUOTA;
-  const memberDailyQuota = userInfo?.dailyQuota ?? DEFAULT_MEMBER_DAILY_QUOTA;
-  const totalQuota = userInfo ? memberDailyQuota : guestDailyQuota;
-  const usedToday = userInfo?.todayAnalyzeCount ?? 0;
-  const remainingSessions = Math.max(totalQuota - usedToday, 0);
-  const formattedRemaining = formatNumber.format(remainingSessions);
-  const formattedTotal = formatNumber.format(totalQuota);
-  const formattedUpgrade = formatNumber.format(memberDailyQuota);
-  const isLoggedIn = Boolean(userInfo);
 
   const uploadRoute = useMemo(
     () => (lng ? `/${lng}/analyze/upload` : '/analyze/upload'),
@@ -199,6 +227,184 @@ export default function MobileAnalyzeStart() {
     [t]
   );
 
+  const rootClass = useMemo(
+    () =>
+      `min-h-screen flex flex-col ${
+        isDark ? 'bg-slate-950 text-slate-100' : 'bg-slate-50 text-slate-900'
+      }`,
+    [isDark]
+  );
+
+  const headerTitleClass = useMemo(
+    () =>
+      `text-[1.75rem] font-semibold leading-tight ${
+        isDark ? 'text-white' : 'text-slate-900'
+      }`,
+    [isDark]
+  );
+
+  const headerSubtitleClass = useMemo(
+    () => `mt-2 text-sm ${isDark ? 'text-slate-400' : 'text-slate-600'}`,
+    [isDark]
+  );
+
+  const guidanceClass = useMemo(
+    () =>
+      `border-l-2 ${
+        isDark ? 'border-indigo-500/40 text-slate-400' : 'border-indigo-200 text-slate-600'
+      } pl-3 text-xs`,
+    [isDark]
+  );
+
+  const analysisCardClass = useMemo(
+    () =>
+      `rounded-3xl border p-5 ${
+        isDark
+          ? 'border-slate-800/70 bg-slate-900/70 shadow-[0_20px_44px_-26px_rgba(15,23,42,0.9)]'
+          : 'border-slate-200 bg-white shadow-[0_16px_32px_-20px_rgba(148,163,184,0.35)]'
+      }`,
+    [isDark]
+  );
+
+  const iconUploadClass = useMemo(
+    () =>
+      `inline-flex h-11 w-11 items-center justify-center rounded-2xl ${
+        isDark ? 'bg-indigo-500/15 text-indigo-300' : 'bg-indigo-100 text-indigo-600'
+      }`,
+    [isDark]
+  );
+
+  const iconShieldClass = useMemo(
+    () =>
+      `inline-flex h-11 w-11 items-center justify-center rounded-2xl ${
+        isDark ? 'bg-emerald-500/15 text-emerald-300' : 'bg-emerald-100 text-emerald-600'
+      }`,
+    [isDark]
+  );
+
+  const infoTitleClass = useMemo(
+    () => `text-sm font-medium ${isDark ? 'text-slate-100' : 'text-slate-900'}`,
+    [isDark]
+  );
+
+  const infoCaptionClass = useMemo(
+    () => `text-xs ${isDark ? 'text-slate-500' : 'text-slate-600'}`,
+    [isDark]
+  );
+
+  const highlightCardClass = useMemo(
+    () =>
+      `flex w-full items-center gap-3 rounded-[26px] border px-4 py-4 ${
+        isDark
+          ? 'border-indigo-400/35 bg-indigo-500/12 text-slate-100 shadow-[0_20px_40px_-28px_rgba(79,70,229,0.55)]'
+          : 'border-indigo-200 bg-indigo-50 text-slate-900 shadow-[0_16px_30px_-22px_rgba(79,70,229,0.35)]'
+      }`,
+    [isDark]
+  );
+
+  const highlightIconClass = useMemo(
+    () =>
+      `inline-flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-full ${
+        isDark ? 'bg-indigo-500/25 text-white' : 'bg-indigo-100 text-indigo-600'
+      }`,
+    [isDark]
+  );
+
+  const highlightBodyTitleClass = useMemo(
+    () => `text-sm font-semibold leading-tight ${isDark ? 'text-white' : 'text-slate-900'}`,
+    [isDark]
+  );
+
+  const highlightBodyTextClass = useMemo(
+    () =>
+      `mt-1 text-[12px] leading-relaxed ${
+        isDark ? 'text-indigo-100/80' : 'text-indigo-700/80'
+      }`,
+    [isDark]
+  );
+
+  const supportButtonClass = useMemo(
+    () =>
+      `flex w-full items-center gap-3 rounded-[26px] border px-4 py-4 text-left text-[12px] transition ${
+        isDark
+          ? 'border-indigo-400/35 bg-indigo-500/12 text-indigo-100 shadow-[0_20px_40px_-28px_rgba(79,70,229,0.55)] hover:border-indigo-300/60 hover:bg-indigo-500/20'
+          : 'border-indigo-200 bg-indigo-50 text-indigo-700 shadow-[0_16px_30px_-24px_rgba(79,70,229,0.35)] hover:border-indigo-300 hover:bg-indigo-100'
+      }`,
+    [isDark]
+  );
+
+  const supportIconClass = useMemo(
+    () =>
+      `inline-flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-full ${
+        isDark ? 'bg-indigo-500/20 text-indigo-100' : 'bg-indigo-100 text-indigo-600'
+      }`,
+    [isDark]
+  );
+
+  const supportArrowClass = useMemo(
+    () =>
+      `inline-flex h-6 w-6 flex-shrink-0 items-center justify-center rounded-full border ${
+        isDark
+          ? 'border-indigo-300/60 bg-indigo-500/10 text-indigo-100'
+          : 'border-indigo-300 bg-indigo-100 text-indigo-600'
+      }`,
+    [isDark]
+  );
+
+  const sampleButtonClass = useMemo(
+    () =>
+      `flex items-center justify-between gap-3 rounded-2xl border px-3 py-3 transition ${
+        isDark
+          ? 'border-indigo-400/40 text-indigo-100 bg-indigo-500/15 hover:border-indigo-300 hover:bg-indigo-500/25'
+          : 'border-indigo-200 text-indigo-700 bg-indigo-50 hover:border-indigo-300 hover:bg-indigo-100'
+      }`,
+    [isDark]
+  );
+
+  const sampleIconClass = useMemo(
+    () =>
+      `inline-flex h-10 w-10 items-center justify-center rounded-full ${
+        isDark ? 'bg-indigo-500/25 text-white' : 'bg-indigo-100 text-indigo-600'
+      }`,
+    [isDark]
+  );
+
+  const sampleBodyTitleClass = useMemo(
+    () =>
+      `text-[11px] font-semibold uppercase tracking-[0.12em] ${
+        isDark ? 'text-indigo-200' : 'text-indigo-700'
+      }`,
+    [isDark]
+  );
+
+  const sampleBodyTextClass = useMemo(
+    () =>
+      `mt-1 text-[11px] ${
+        isDark ? 'text-indigo-100/80' : 'text-indigo-600/80'
+      }`,
+    [isDark]
+  );
+
+  const sampleArrowClass = useMemo(
+    () =>
+      `inline-flex h-6 w-6 items-center justify-center rounded-full border ${
+        isDark
+          ? 'border-indigo-300/50 bg-indigo-500/10 text-indigo-100'
+          : 'border-indigo-200 bg-indigo-100 text-indigo-600'
+      }`,
+    [isDark]
+  );
+
+  const primaryButtonClass = useMemo(
+    () =>
+      `inline-flex w-full items-center justify-center rounded-2xl px-4 py-3 text-base font-semibold shadow-lg transition-transform duration-200 ${
+        isDark
+          ? 'text-white shadow-indigo-500/25 bg-gradient-to-r from-indigo-500 to-indigo-400'
+          : 'text-white shadow-indigo-400/30 bg-gradient-to-r from-indigo-500 to-indigo-400'
+      }`,
+    [isDark]
+  );
+
   // const handleHistory = () => {
   //   if (lng) {
   //     navigate(`/${lng}/analyze/result`);
@@ -208,16 +414,16 @@ export default function MobileAnalyzeStart() {
   // };
 
   return (
-    <div className="min-h-screen bg-slate-950 text-slate-100 flex flex-col">
-      <Navigation variant="dark" />
+    <div className={rootClass}>
+      <Navigation variant={isDark ? 'dark' : 'light'} />
       <main className="flex-1 flex justify-center">
         <div className="flex w-full max-w-sm flex-col gap-6 px-5 pb-12 pt-24">
           <header className="space-y-4">
             <div>
-              <h1 className="text-[1.75rem] font-semibold leading-tight">
+              <h1 className={headerTitleClass}>
                 {t('mobileAnalyze.heading', 'Start a new authenticity check')}
               </h1>
-              <p className="mt-2 text-sm text-slate-400">
+              <p className={headerSubtitleClass}>
                 {t(
                   'mobileAnalyze.subheading',
                   'Upload up to {{count}} images. We detect synthetic traces in seconds.',
@@ -228,52 +434,25 @@ export default function MobileAnalyzeStart() {
               {guidanceMessages.map((message, index) => (
                 <p
                   key={index}
-                  className={`border-l-2 border-indigo-500/40 pl-3 text-xs text-slate-400 ${
-                    index === 0 ? 'mt-3' : 'mt-0.5'
-                  }`}
+                  className={`${guidanceClass} ${index === 0 ? 'mt-3' : 'mt-0.5'}`}
                 >
                   {message}
                 </p>
               ))}
             </div>
           </header>
-
-          {/*<div className="rounded-3xl border border-indigo-500/25 bg-gradient-to-br from-indigo-600/20 via-slate-900/70 to-slate-900/60 p-5 shadow-[0_22px_50px_-30px_rgba(99,102,241,0.6)]">*/}
-          {/*  <div className="flex items-center gap-4">*/}
-          {/*    <div>*/}
-          {/*      <p className="text-xs uppercase tracking-[0.25em] text-slate-500">*/}
-          {/*        {t('mobileAnalyze.sessions.title', 'Sessions left today')}*/}
-          {/*      </p>*/}
-          {/*      <p className="mt-2 text-sm font-medium text-slate-200">*/}
-          {/*        {isLoggedIn*/}
-          {/*          ? t('mobileAnalyze.sessions.memberDescription', {*/}
-          {/*              remaining: formattedRemaining,*/}
-          {/*              total: formattedTotal,*/}
-          {/*            })*/}
-          {/*          : t('mobileAnalyze.sessions.guestDescription', {*/}
-          {/*              remaining: formattedRemaining,*/}
-          {/*              upgrade: formattedUpgrade,*/}
-          {/*            })}*/}
-          {/*      </p>*/}
-          {/*    </div>*/}
-          {/*  </div>*/}
-          {/*  <p className="mt-3 text-[11px] text-slate-500">*/}
-          {/*    {t('mobileAnalyze.sessions.resetHint', 'Usage resets every midnight.')}*/}
-          {/*  </p>*/}
-          {/*</div>*/}
-
           <section className="space-y-4">
-            <article className="rounded-3xl border border-slate-800/70 bg-slate-900/70 p-5 shadow-[0_20px_44px_-26px_rgba(15,23,42,0.9)]">
+            <article className={analysisCardClass}>
               <div className="flex flex-col gap-4">
                 <div className="flex items-center gap-3">
-                  <span className="inline-flex h-11 w-11 items-center justify-center rounded-2xl bg-indigo-500/15 text-indigo-300">
+                  <span className={iconUploadClass}>
                     <UploadCloud size={20} />
                   </span>
                   <div className="flex-1">
-                    <p className="text-sm font-medium text-slate-100">
+                    <p className={infoTitleClass}>
                       {t('mobileAnalyze.actions.upload.title', 'Upload from device')}
                     </p>
-                    <p className="text-xs text-slate-500">
+                    <p className={infoCaptionClass}>
                       {t(
                         'mobileAnalyze.actions.upload.caption',
                         'Supports PNG, JPG, and HEIC up to 25MB each.'
@@ -283,14 +462,14 @@ export default function MobileAnalyzeStart() {
                 </div>
 
                 <div className="flex items-center gap-3">
-                  <span className="inline-flex h-11 w-11 items-center justify-center rounded-2xl bg-emerald-500/15 text-emerald-300">
+                  <span className={iconShieldClass}>
                     <ShieldCheck size={20} />
                   </span>
                   <div className="flex-1">
-                    <p className="text-sm font-medium text-slate-100">
+                    <p className={infoTitleClass}>
                       {t('mobileAnalyze.actions.verify.title', 'Trusted verification')}
                     </p>
-                    <p className="text-xs text-slate-500">
+                    <p className={infoCaptionClass}>
                       {t(
                         'mobileAnalyze.actions.verify.caption',
                         'We cross-check watermark, EXIF, and neural noise patterns.'
@@ -298,20 +477,18 @@ export default function MobileAnalyzeStart() {
                     </p>
                   </div>
                 </div>
-
-                {/* Sample button moved below near the primary CTA */}
               </div>
             </article>
 
-            <div className="flex w-full items-center gap-3 rounded-[26px] border border-indigo-400/35 bg-indigo-500/12 px-4 py-4 text-slate-100 shadow-[0_20px_40px_-28px_rgba(79,70,229,0.55)]">
-              <span className="inline-flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-full bg-indigo-500/25 text-white">
+            <div className={highlightCardClass}>
+              <span className={highlightIconClass}>
                 <Clapperboard size={20} />
               </span>
               <div className="flex-1 min-w-0">
-                <p className="text-sm font-semibold text-white leading-tight">
+                <p className={highlightBodyTitleClass}>
                   {t('mobileAnalyze.videoNoticeTitle', 'Video analysis coming soon')}
                 </p>
-                <p className="mt-1 text-[12px] leading-relaxed text-indigo-100/80">
+                <p className={highlightBodyTextClass}>
                   {t('mobileAnalyze.videoNotice', "Video analysis is being prepared. We'll notify you as soon as it's ready.")}
                 </p>
               </div>
@@ -320,22 +497,30 @@ export default function MobileAnalyzeStart() {
             <button
               type="button"
               onClick={handleSupport}
-              className="flex w-full items-center gap-3 rounded-[26px] border border-indigo-400/35 bg-indigo-500/12 px-4 py-4 text-left text-[12px] text-slate-100 shadow-[0_20px_40px_-28px_rgba(79,70,229,0.55)] transition hover:border-indigo-300/60 hover:bg-indigo-500/20"
+              className={supportButtonClass}
             >
               <div className="flex items-center gap-3 flex-1 min-w-0">
-                <span className="inline-flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-full bg-indigo-500/20 text-indigo-100">
+                <span className={supportIconClass}>
                   <LifeBuoy className="h-5 w-5" />
                 </span>
                 <div className="flex-1 min-w-0">
-                  <p className="text-xs font-semibold uppercase tracking-[0.12em] text-indigo-200 leading-tight">
+                  <p
+                    className={`text-xs font-semibold uppercase tracking-[0.12em] ${
+                      isDark ? 'text-indigo-200' : 'text-indigo-700'
+                    } leading-tight`}
+                  >
                     {t('mobileAnalyze.supportNotice.title', 'Need assistance?')}
                   </p>
-                  <p className="mt-1 leading-relaxed text-[12px] text-indigo-50/85">
+                  <p
+                    className={`mt-1 leading-relaxed text-[12px] ${
+                      isDark ? 'text-indigo-50/85' : 'text-indigo-700/80'
+                    }`}
+                  >
                     {t('mobileAnalyze.supportNotice.body', 'If something feels off during the process, reach out and we’ll help you right away.')}
                   </p>
                 </div>
               </div>
-              <span className="inline-flex h-6 w-6 flex-shrink-0 items-center justify-center rounded-full border border-indigo-300/60 bg-indigo-500/10 text-indigo-100">
+              <span className={supportArrowClass}>
                 <svg viewBox="0 0 24 24" className="h-3.5 w-3.5" fill="none" stroke="currentColor" strokeWidth="2">
                   <path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" />
                 </svg>
@@ -346,46 +531,38 @@ export default function MobileAnalyzeStart() {
               type="button"
               onClick={handleSampleStart}
               disabled={checkingQuota}
-              className={`flex items-center justify-between gap-3 rounded-2xl border border-indigo-400/40 px-3 py-3 text-indigo-100 transition ${
-                checkingQuota
-                  ? 'cursor-not-allowed bg-indigo-500/10 opacity-60'
-                  : 'bg-indigo-500/15 hover:border-indigo-300 hover:bg-indigo-500/25'
+              className={`${sampleButtonClass} ${
+                checkingQuota ? 'cursor-not-allowed opacity-60' : 'hover:shadow-sm'
               }`}
           >
-              <span className="inline-flex h-10 w-10 items-center justify-center rounded-full bg-indigo-500/25 text-white">
+              <span className={sampleIconClass}>
                 <svg viewBox="0 0 24 24" className="h-5 w-5" fill="none" stroke="currentColor" strokeWidth="1.8">
                   <path strokeLinecap="round" strokeLinejoin="round" d="M12 16l4-4m0 0l-4-4m4 4H4" />
                   <path strokeLinecap="round" strokeLinejoin="round" d="M16 20h1.25A2.75 2.75 0 0 0 20 17.25v-10.5A2.75 2.75 0 0 0 17.25 4H16" />
                 </svg>
               </span>
             <div className="flex-1 text-left">
-              <p className="text-[11px] font-semibold uppercase tracking-[0.12em] text-indigo-200">
+              <p className={sampleBodyTitleClass}>
                 {t('mobileAnalyze.sampleTitle', 'Sample run available')}
               </p>
-              <p className="mt-1 text-[11px] text-indigo-100/80">
+              <p className={sampleBodyTextClass}>
                 {t('mobileAnalyze.sampleNotice', 'Try our sample file first—this one-time test does not count against your daily quota.')}
               </p>
             </div>
-            <span className="inline-flex h-6 w-6 items-center justify-center rounded-full border border-indigo-300/50 bg-indigo-500/10 text-indigo-100">
+            <span className={sampleArrowClass}>
                 <svg viewBox="0 0 24 24" className="h-3.5 w-3.5" fill="none" stroke="currentColor" strokeWidth="2">
                   <path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" />
                 </svg>
               </span>
           </button>
-          {/* Separated sample file entry placed above the main upload button */}
           <div className="mt-auto space-y-3">
-
-
-            {/* Primary upload action */}
             <div className="space-y-3">
               <button
                 type="button"
                 onClick={handleStart}
                 disabled={checkingQuota}
-                className={`inline-flex w-full items-center justify-center rounded-2xl px-4 py-3 text-base font-semibold text-white shadow-lg shadow-indigo-500/25 transition-transform duration-200 ${
-                  checkingQuota
-                    ? 'cursor-not-allowed bg-slate-800/60 opacity-60'
-                    : 'bg-gradient-to-r from-indigo-500 to-indigo-400 active:scale-[0.99]'
+                className={`${primaryButtonClass} ${
+                  checkingQuota ? 'cursor-not-allowed opacity-60' : 'active:scale-[0.99]'
                 }`}
               >
                 {checkingQuota
@@ -396,7 +573,7 @@ export default function MobileAnalyzeStart() {
           </div>
         </div>
       </main>
-      <Footer transparent inline variant="dark" showLinks={false} />
+      <Footer />
       <ErrorModal
         open={errorOpen}
         messages={errorMsgs}
@@ -405,7 +582,7 @@ export default function MobileAnalyzeStart() {
           setErrorMsgs([]);
         }}
         title={t('mobileAnalyze.uploadPage.errors.title', '업로드 오류')}
-        theme="dark"
+        theme={isDark ? 'dark' : 'light'}
       />
       <LoginRequiredModal
         open={loginModalOpen}

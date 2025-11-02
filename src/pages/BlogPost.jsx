@@ -58,7 +58,7 @@ if (isLoading || !post) {
                         <div className="h-4 bg-gray-200 rounded w-10/12" />
                     </div>
                 </div>
-                <Footer transparent />
+                <Footer />
             </ContentDecor>
         </>
     );
@@ -97,7 +97,7 @@ return (
             </article>
 
 
-            <Footer transparent />
+            <Footer />
         </ContentDecor>
     </>
 );

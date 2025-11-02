@@ -15,10 +15,12 @@ import UploadPanel from "./components/upload/UploadPanel";
  *
  * Tailwind only. Drop into any page (e.g., /app/page.tsx) and place under the hero.
  */
-export default function HowItWorksSection() {
+export default function HowItWorksSection({ theme = 'light' }) {
     const [files, setFiles] = useState([]);
     const [picking, setPicking] = useState(null);
     const uploadRef = useRef(null);
+    const isDark = theme === 'dark';
+
     useEffect(() => {
         try {
             if (typeof window !== 'undefined' && window.location?.hash === '#upload') {
@@ -54,15 +56,19 @@ export default function HowItWorksSection() {
 
 
     return (
-        <section className="mt-12 mx-auto w-full max-w-5xl px-4 sm:px-6 lg:px-8">
-            <HowItWorksHeader />
-            <SampleChoiceBox onPick={handleSamplePick} picking={picking}/>
-            <StepsGrid/>
-            <ToolTip/>
+        <section
+            className={`mt-12 mx-auto w-full max-w-5xl px-4 sm:px-6 lg:px-8 transition-colors duration-300 ${
+                isDark ? 'text-slate-100' : 'text-slate-900'
+            }`}
+        >
+            <HowItWorksHeader theme={theme} />
+            <SampleChoiceBox onPick={handleSamplePick} picking={picking} theme={theme} />
+            <StepsGrid theme={theme} />
+            <ToolTip theme={theme} />
             <div id="upload" ref={uploadRef}>
-                <UploadPanel files={files} setFiles={setFiles} />
+                <UploadPanel files={files} setFiles={setFiles} theme={theme} />
             </div>
-            <Faq/>
+            <Faq theme={theme} />
 
 
         </section>

@@ -1,0 +1,95 @@
+{
+  "hero": {
+    "eyebrow": "Need a hand?",
+    "title": "Find answers, implementation guides, and live status updates in one place.",
+    "body": "Pick the option that matches what you need—we’ll guide you to the right team or resources."
+  },
+  "optionsHeading": "Choose how we can help",
+  "optionsIntro": "Select an option to reach the right team instantly.",
+  "options": [
+    {
+      "id": "bug-report",
+      "title": "Report a bug",
+      "description": "Share reproduction steps and any analysis IDs so we can triage within minutes.",
+      "buttonLabel": "Report an issue"
+    },
+    {
+      "id": "feature-request",
+      "title": "Suggest a feature",
+      "description": "Pitch improvements or workflow ideas directly to the product crew.",
+      "buttonLabel": "Submit feedback"
+    },
+    {
+      "id": "contact",
+      "title": "Contact support",
+      "description": "Need help with billing, access, or SLAs? Reach the response desk.",
+      "buttonLabel": "Email support"
+    },
+    {
+      "id": "faq",
+      "title": "Browse FAQs",
+      "description": "Review quick answers for setup, authentication, and analysis workflows.",
+      "buttonLabel": "View FAQ"
+    }
+  ],
+  "faq": {
+    "heading": "Frequently asked questions",
+    "intro": "Quick answers to the most common setup and troubleshooting topics.",
+    "items": [
+      {
+        "question": "How do I report a critical or time-sensitive bug?",
+        "answer": "Create a priority ticket and include the affected analysis IDs or media hashes. The on-call responder will reply within 20 minutes and keep you updated until resolution."
+      },
+      {
+        "question": "Where should I send feature ideas or UX feedback?",
+        "answer": "Email product@gravifox.com with context on your workflow, the pain point, and any mockups or references. Every submission is reviewed during our weekly roadmap sync."
+      },
+      {
+        "question": "Can I receive billing invoices and receipts in Korean?",
+        "answer": "Yes. Contact support@gravifox.com with your workspace ID and billing cycle. Finance will update your account and resend the latest statements in Korean."
+      },
+      {
+        "question": "Do you provide office-hour style consultations?",
+        "answer": "Absolutely. Request a consultation via support@gravifox.com and include preferred times. We host 30-minute sessions to review integration plans or advanced use cases."
+      }
+    ]
+  },
+  "modals": {
+    "bug": {
+      "heading": "Report a bug",
+      "description": "Let us know when something doesn’t work as expected so we can triage quickly.",
+      "titleLabel": "Bug title",
+      "titlePlaceholder": "e.g. Charts are missing on the analysis result page",
+      "bodyLabel": "Bug description",
+      "bodyPlaceholder": "Share reproduction steps, expected behaviour, and the actual result you observed.",
+      "attachmentLabel": "Screenshot (optional)",
+      "attachmentHint": "Attach PNG or JPG files up to 10MB.",
+      "submitLabel": "Submit report",
+      "successMessage": "Thanks! We’ll triage this issue shortly."
+    },
+    "feature": {
+      "heading": "Suggest a feature",
+      "description": "Share new ideas or workflow improvements with the product team.",
+      "titleLabel": "Feature title",
+      "titlePlaceholder": "e.g. Let teammates review analysis results collaboratively",
+      "bodyLabel": "Feature description",
+      "bodyPlaceholder": "Explain the current workflow, the gap you’re seeing, and what outcome you expect.",
+      "attachmentLabel": "Reference image (optional)",
+      "attachmentHint": "Attach PNG or JPG files up to 10MB.",
+      "submitLabel": "Send suggestion",
+      "successMessage": "Thanks for the idea! We’ll review it with the product roadmap."
+    },
+    "contact": {
+      "heading": "Contact support",
+      "description": "Reach out about billing, account access, or SLA questions.",
+      "titleLabel": "Subject",
+      "titlePlaceholder": "e.g. Need to update billing card",
+      "bodyLabel": "Message",
+      "bodyPlaceholder": "Tell us what you need help with, include workspace details, and note any deadlines.",
+      "attachmentLabel": "Attachments (optional)",
+      "attachmentHint": "Attach relevant screenshots or documents up to 10MB.",
+      "submitLabel": "Send message",
+      "successMessage": "Thanks! We’ll reply as soon as possible."
+    }
+  }
+}

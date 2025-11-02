@@ -544,7 +544,7 @@ export default function Pricing() {
           </div>
         </section>
       </main>
-      <Footer/>
+      <Footer />
     </div>
   );
 }

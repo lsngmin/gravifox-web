@@ -774,7 +774,7 @@ export default function MobileAnalyzeUpload() {
               </div>
         </div>
       </main>
-      <Footer transparent inline variant="dark" showLinks={false} />
+      <Footer />
 
       <input
         ref={albumInputRef}

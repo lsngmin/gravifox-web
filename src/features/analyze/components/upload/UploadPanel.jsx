@@ -79,6 +79,7 @@ export default function UploadPanel({
     onAnalyzeOverride = null,
     hideReset = false,
     selectedModelKey,
+    theme = 'light',
 }) {
     const [dragOver, setDragOver] = useState(false);
     const [errorOpen, setErrorOpen] = useState(false);
@@ -231,8 +232,21 @@ export default function UploadPanel({
         }
     };
 
+    const isDark = theme === 'dark';
+    const containerClass = [
+        "mx-auto mt-6 rounded-2xl border p-4 transition-colors duration-300",
+        isDark
+            ? "border-slate-700 bg-slate-900/70 text-slate-100 shadow-lg shadow-slate-900/40"
+            : "border-slate-200 bg-white text-slate-900 shadow-sm shadow-slate-200/60",
+        className,
+    ].filter(Boolean).join(" ");
+    const dropzoneThemeClass = isDark
+        ? "border-slate-600 bg-slate-900/40 text-slate-200 hover:border-indigo-400/60 hover:bg-indigo-500/10"
+        : "border-slate-300 bg-slate-50 hover:border-indigo-300 hover:bg-indigo-50/30";
+    const hintThemeClass = isDark ? "text-slate-200" : "";
+
     return (
-        <div className={`mx-auto mt-6 rounded-2xl border bg-white p-4 border-slate-200 ${className}`}>
+        <div className={containerClass}>
             <ErrorModal
                 open={errorOpen}
                 messages={errorMsgs}
@@ -246,30 +260,32 @@ export default function UploadPanel({
                     }
                 }}
                 title="업로드 오류"
-                theme={className?.includes('bg-slate-') ? 'dark' : 'light'}
+                theme={isDark ? 'dark' : 'light'}
             />
             {files.length === 0 && (
                 <UploadDropzone
                     dragOver={dragOver}
                     setDragOver={setDragOver}
                     onDropFiles={(fl) => addFiles(fl)}
-                    className={dropzoneClassName}
+                    className={`${dropzoneThemeClass} ${dropzoneClassName}`.trim()}
+                    theme={theme}
                 >
-                    <CloudUploadIcon />
+                    <CloudUploadIcon theme={theme} />
                     <UploadHint
                         multiple
                         onFiles={(fl) => addFiles(fl)}
                         accept={ACCEPT_MIME}
                         className={hintClassName}
-                        textClassName={hintClassName}
+                        textClassName={`${hintThemeClass} ${hintClassName}`.trim()}
                         labelClassName={hintClassName}
+                        theme={theme}
                     />
                 </UploadDropzone>
             )}
             {files.length > 0 && (
                 <>
                     {/* 선택 파일 카운터 (타입별) */}
-                    <TypeCounters files={files} dark={className?.includes('bg-slate-')} />
+                    <TypeCounters files={files} dark={isDark} />
 
                     {variant === 'mobile' ? (
                         <div className="grid grid-cols-1 gap-4">
@@ -284,7 +300,7 @@ export default function UploadPanel({
                                     key={`${f.name}_${f.size}_${i}`}
                                     file={f}
                                     onRemove={() => removeAt(i)}
-                                    variant={className?.includes('bg-slate-') ? 'dark' : 'light'}
+                                    variant={isDark ? 'dark' : 'light'}
                                 />
                             ))}
                         </div>
@@ -295,6 +311,7 @@ export default function UploadPanel({
                         className="mt-3"
                         onAdd={(file) => addFiles([file])}
                         accept={ACCEPT_MIME}
+                        theme={theme}
                     />
                 </>
             )}
@@ -306,9 +323,10 @@ export default function UploadPanel({
                 analyzeLabel={analyzeLabel}
                 hideReset={hideReset}
                 className="mt-6"
+                theme={theme}
             />
             {submitting && (
-                <div className="mt-3 text-sm text-slate-600">분석을 시작하고 있어요…</div>
+                <div className={`mt-3 text-sm ${isDark ? 'text-slate-300' : 'text-slate-600'}`}>분석을 시작하고 있어요…</div>
             )}
         </div>
     );

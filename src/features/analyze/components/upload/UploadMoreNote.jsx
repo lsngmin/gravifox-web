@@ -7,12 +7,18 @@ export default function UploadMoreNote({
                                            onAdd, // (file) => void
                                            accept = "image/*,video/*",
                                            className = "",
+                                           theme = 'light',
                                        }) {
     const id = useId();
+    const isDark = theme === 'dark';
+    const textClass = isDark ? "text-xs text-slate-300" : "text-xs text-slate-600";
+    const primaryLabel = isDark
+        ? "cursor-pointer border border-indigo-400/35 bg-indigo-500/15 px-2.5 py-1 text-[11px] font-medium text-indigo-100 hover:border-indigo-300/40 hover:bg-indigo-500/25 rounded-md"
+        : "cursor-pointer bg-white px-2.5 py-1 text-[11px] font-medium text-indigo-700 rounded-md";
 
     return (
         <div className={`mt-3 flex items-center justify-between ${className}`}>
-            <p className="text-xs text-slate-600">
+            <p className={textClass}>
                 <span className="underline decoration-inherit">이미지는 3장</span>
                 {" "}· <span className="underline decoration-inherit">동영상은 1개</span>만 업로드할 수 있어요.
             </p>
@@ -20,7 +26,7 @@ export default function UploadMoreNote({
             <div className="flex items-center">
                 <label
                     htmlFor={id}
-                    className="cursor-pointer  bg-white px-2.5 py-1 text-[11px] font-medium text-indigo-700"
+                    className={primaryLabel}
                 >
                     파일을 추가할게요
                 </label>

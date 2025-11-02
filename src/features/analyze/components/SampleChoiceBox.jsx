@@ -1,9 +1,28 @@
 import { useEffect, useRef, useState } from "react";
 
-export default function SampleChoiceBox({ onPick, picking }) {
+export default function SampleChoiceBox({ onPick, picking, theme = 'light' }) {
     const [showSamples, setShowSamples] = useState(false);  // '사용할게요' 클릭 전/후
     const [phase, setPhase] = useState("idle");             // idle | options | loading | done
     const timerRef = useRef(null);
+    const isDark = theme === 'dark';
+
+    const containerClass = isDark
+        ? 'mt-8 flex flex-col gap-4 rounded-xl border border-slate-700 bg-slate-900/70 p-4 sm:flex-row sm:items-center sm:justify-between'
+        : 'mt-8 flex flex-col gap-4 rounded-xl border border-slate-200 bg-slate-50 p-4 sm:flex-row sm:items-center sm:justify-between';
+    const descriptionClass = isDark ? 'm-0 min-w-0 text-center text-sm text-slate-300 sm:flex-1 sm:text-left' : 'm-0 min-w-0 text-center text-sm text-slate-600 sm:flex-1 sm:text-left';
+    const highlightText = isDark ? 'font-medium text-slate-100' : 'font-medium text-slate-800';
+    const primaryButton = isDark
+        ? 'inline-flex w-[104px] items-center justify-center whitespace-nowrap rounded-md border border-indigo-300/50 bg-indigo-500/15 px-2.5 py-1 text-[11px] font-medium text-indigo-100 hover:border-indigo-300 hover:bg-indigo-500/25'
+        : 'inline-flex w-[104px] items-center justify-center whitespace-nowrap rounded-md border border-indigo-200 bg-indigo-50 px-2.5 py-1 text-[11px] font-medium text-indigo-700 hover:bg-indigo-100';
+    const sampleButton = isDark
+        ? 'inline-flex w-[104px] items-center justify-center whitespace-nowrap rounded-md border border-slate-600 bg-slate-900 px-2.5 py-1 text-[11px] font-medium text-slate-200 hover:bg-slate-800 disabled:opacity-60'
+        : 'inline-flex w-[104px] items-center justify-center whitespace-nowrap rounded-md border border-slate-200 bg-white px-2.5 py-1 text-[11px] font-medium text-slate-700 hover:bg-slate-100 disabled:opacity-60';
+    const loadingBadge = isDark
+        ? 'inline-flex max-w-[60vw] sm:max-w-[260px] items-center gap-2 truncate rounded-full border border-slate-600 bg-slate-900/90 px-3 py-1 text-[11px] font-medium text-slate-200 shadow-sm backdrop-blur whitespace-nowrap'
+        : 'inline-flex max-w-[60vw] sm:max-w-[260px] items-center gap-2 truncate rounded-full border border-slate-200 bg-white/90 px-3 py-1 text-[11px] font-medium text-slate-700 shadow-sm backdrop-blur whitespace-nowrap';
+    const doneBadge = isDark
+        ? 'inline-flex max-w-[60vw] sm:max-w-[260px] items-center gap-2 truncate rounded-full border border-emerald-400/40 bg-emerald-500/20 px-3 py-1 text-[11px] font-medium text-emerald-200 shadow-sm whitespace-nowrap'
+        : 'inline-flex max-w-[60vw] sm:max-w-[260px] items-center gap-2 truncate rounded-full border border-emerald-200 bg-emerald-50 px-3 py-1 text-[11px] font-medium text-emerald-700 shadow-sm whitespace-nowrap';
 
     // '사용할게요' 누르면 샘플 버튼 노출
     useEffect(() => {
@@ -29,11 +48,11 @@ export default function SampleChoiceBox({ onPick, picking }) {
     }
 
     return (
-        <div className="mt-8 flex flex-col gap-4 rounded-xl border border-slate-200 bg-slate-50 p-4 sm:flex-row sm:items-center sm:justify-between">
+        <div className={containerClass}>
             {/* 왼쪽 문구 */}
-            <p className="m-0 min-w-0 text-center text-sm text-slate-600 sm:flex-1 sm:text-left">
+            <p className={descriptionClass}>
                 파일이 없어도 괜찮아요. 준비된{" "}
-                <span className="font-medium text-slate-800">샘플 파일</span>로
+                <span className={highlightText}>샘플 파일</span>로
                 바로 테스트할 수 있어요.
             </p>
 
@@ -48,7 +67,7 @@ export default function SampleChoiceBox({ onPick, picking }) {
                     <button
                         onMouseDown={(e) => e.preventDefault()}
                         onClick={() => setShowSamples(true)}
-                        className="inline-flex w-[104px] items-center justify-center whitespace-nowrap rounded-md border border-indigo-200 bg-indigo-50 px-2.5 py-1 text-[11px] font-medium text-indigo-700 hover:bg-indigo-100"
+                        className={primaryButton}
                     >
                         사용할게요
                     </button>
@@ -64,7 +83,7 @@ export default function SampleChoiceBox({ onPick, picking }) {
                         onMouseDown={(e) => e.preventDefault()}
                         onClick={() => handlePick("image")}
                         disabled={picking === "image"}
-                        className="inline-flex w-[104px] items-center justify-center whitespace-nowrap rounded-md border border-slate-200 bg-white px-2.5 py-1 text-[11px] font-medium text-slate-700 hover:bg-slate-100 disabled:opacity-60"
+                        className={sampleButton}
                     >
                         {picking === "image" ? "불러오는 중…" : "이미지 샘플"}
                     </button>
@@ -72,7 +91,7 @@ export default function SampleChoiceBox({ onPick, picking }) {
                         onMouseDown={(e) => e.preventDefault()}
                         onClick={() => handlePick("video")}
                         disabled={picking === "video"}
-                        className="inline-flex w-[104px] items-center justify-center whitespace-nowrap rounded-md border border-slate-200 bg-white px-2.5 py-1 text-[11px] font-medium text-slate-700 hover:bg-slate-100 disabled:opacity-60"
+                        className={sampleButton}
                     >
                         {picking === "video" ? "불러오는 중…" : "비디오 샘플"}
                     </button>
@@ -87,7 +106,7 @@ export default function SampleChoiceBox({ onPick, picking }) {
           <span
               role="status"
               aria-live="polite"
-              className="inline-flex max-w-[60vw] sm:max-w-[260px] items-center gap-2 truncate rounded-full border border-slate-200 bg-white/90 px-3 py-1 text-[11px] font-medium text-slate-700 shadow-sm backdrop-blur whitespace-nowrap"
+              className={loadingBadge}
           >
             {/* 간단 스피너 */}
               <svg viewBox="0 0 24 24" className="h-3.5 w-3.5 animate-spin" fill="none">
@@ -106,7 +125,7 @@ export default function SampleChoiceBox({ onPick, picking }) {
                 >
           <span
               aria-live="polite"
-              className="inline-flex max-w-[60vw] sm:max-w-[260px] items-center gap-2 truncate rounded-full border border-emerald-200 bg-emerald-50 px-3 py-1 text-[11px] font-medium text-emerald-700 shadow-sm whitespace-nowrap"
+              className={doneBadge}
           >
             {/* 체크 아이콘 */}
               <svg viewBox="0 0 24 24" className="h-3.5 w-3.5" fill="none" stroke="currentColor" strokeWidth="2">

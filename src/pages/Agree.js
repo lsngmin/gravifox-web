@@ -35,7 +35,7 @@ export default function Agree() {
           <AgreementBox variant="mobile-dark" />
         </div>
       </main>
-      <Footer transparent variant="dark" showLinks={false} inline />
+      <Footer />
     </div>
   );
 }

@@ -9,6 +9,7 @@ import { useAuth } from 'providers/authProvider';
 import NavigationAuthButton from 'features/navigation/components/navigationAuthButton';
 import MobileNavigationAuthButton from 'features/navigation/components/mobileNavigationAuthButton';
 import AvatarButton from 'features/navigation/components/avatarButton';
+import { fetchQuotaSummary } from 'features/analyze/api/quotaSummary';
 
 // PortalOverlay: forwards Transition props to a real element rendered into document.body
 const PortalOverlay = React.forwardRef(function PortalOverlay({ className, ...props }, ref) {
@@ -21,16 +22,20 @@ const PortalPanel = React.forwardRef(function PortalPanel({ className, style, ..
 });
 
 const Navigation = ({ variant = 'light' }) => {
-    const { t } = useTranslation('common');
+    const { t, i18n } = useTranslation('common');
     const { userInfo } = useAuth();
     const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
     const [shrink, setShrink] = useState(0);
     const [reducedMotion, setReducedMotion] = useState(false);
+    const [quotaSummary, setQuotaSummary] = useState(null);
+    const [quotaLoading, setQuotaLoading] = useState(false);
+    const [quotaError, setQuotaError] = useState(null);
 
     const navigate = useNavigate();
     const location = useLocation();
     const localeMatch = location.pathname.match(/^\/([a-zA-Z-]{2,5})(?=\/|$)/);
     const localePrefix = localeMatch ? `/${localeMatch[1]}` : '';
+    const userAuthenticated = Boolean(userInfo);
 
     const navItems = useMemo(
         () => [
@@ -39,18 +44,6 @@ const Navigation = ({ variant = 'light' }) => {
                 labelKey: 'navigation.items.analyze',
                 to: localePrefix ? `${localePrefix}/analyze` : '/analyze',
                 path: '/analyze',
-            },
-            {
-                key: 'features',
-                labelKey: 'navigation.items.features',
-                to: localePrefix ? `${localePrefix}/feature` : '/feature',
-                path: '/feature',
-            },
-            {
-                key: 'docs',
-                labelKey: 'navigation.items.docs',
-                to: localePrefix ? `${localePrefix}/docs` : '/docs',
-                path: '/docs',
             },
             {
                 key: 'blog',
@@ -68,6 +61,48 @@ const Navigation = ({ variant = 'light' }) => {
         ],
         [localePrefix]
     );
+
+    useEffect(() => {
+        if (!mobileMenuOpen) return;
+        if (!userAuthenticated) return;
+        if (quotaSummary || quotaLoading) return;
+
+        let cancelled = false;
+
+        const loadQuota = async () => {
+            try {
+                setQuotaError(null);
+                setQuotaLoading(true);
+                const summary = await fetchQuotaSummary();
+                if (!cancelled) {
+                    setQuotaSummary(summary);
+                }
+            } catch (error) {
+                if (!cancelled) {
+                    setQuotaError(t('navigation.usage.errorFallback', '사용량 정보를 불러오는 중 문제가 발생했어요.'));
+                }
+            } finally {
+                if (!cancelled) {
+                    setQuotaLoading(false);
+                }
+            }
+        };
+
+        loadQuota();
+
+        return () => {
+            cancelled = true;
+        };
+    }, [mobileMenuOpen, userAuthenticated, quotaSummary, quotaLoading, t]);
+
+    useEffect(() => {
+        if (userAuthenticated) {
+            return;
+        }
+        setQuotaSummary(null);
+        setQuotaError(null);
+        setQuotaLoading(false);
+    }, [userAuthenticated]);
 
     useEffect(() => {
         let ticking = false;
@@ -161,6 +196,46 @@ const Navigation = ({ variant = 'light' }) => {
         return { ...headerStyle, zIndex: 60 };
     }, [headerStyle, mobileMenuOpen]);
 
+    const quotaFormatter = useMemo(
+        () => new Intl.NumberFormat(i18n?.language || undefined),
+        [i18n?.language]
+    );
+    const quotaLimit = Number.isFinite(quotaSummary?.limit) ? Math.max(0, quotaSummary.limit) : null;
+    const quotaRemaining = Number.isFinite(quotaSummary?.remaining) ? Math.max(0, quotaSummary.remaining) : null;
+    const quotaUsed = quotaLimit != null && quotaRemaining != null ? Math.max(0, quotaLimit - quotaRemaining) : null;
+    const quotaPercent =
+        quotaLimit != null && quotaLimit > 0 && quotaUsed != null
+            ? Math.min(100, Math.max(0, (quotaUsed / quotaLimit) * 100))
+            : quotaUsed != null && quotaLimit === 0
+                  ? 100
+                  : null;
+    const quotaSummaryText = useMemo(() => {
+        if (quotaLimit != null && quotaUsed != null) {
+            return t('navigation.usage.summary', {
+                defaultValue: '총 {{limit}}회 중 {{used}}회 사용',
+                limit: quotaFormatter.format(quotaLimit),
+                used: quotaFormatter.format(quotaUsed),
+            });
+        }
+        if (quotaRemaining != null) {
+            return t('navigation.usage.remainingOnly', {
+                defaultValue: '남은 분석 {{count}}회',
+                count: quotaFormatter.format(quotaRemaining),
+            });
+        }
+        return null;
+    }, [quotaLimit, quotaUsed, quotaRemaining, quotaFormatter, t]);
+    const quotaRemainingLabel = useMemo(() => {
+        if (quotaRemaining != null && quotaLimit != null) {
+            return t('navigation.usage.remainingShort', {
+                defaultValue: '잔여 {{count}}회',
+                count: quotaFormatter.format(quotaRemaining),
+            });
+        }
+        return null;
+    }, [quotaRemaining, quotaLimit, quotaFormatter, t]);
+    const quotaHasData = Boolean(quotaSummary) && (quotaLimit != null || quotaRemaining != null);
+
     const normalizePath = useCallback(
         (path) => {
             if (!path) return '/';
@@ -203,7 +278,6 @@ const Navigation = ({ variant = 'light' }) => {
         return Number.isFinite(eased) ? eased : 0;
     }, [shrink]);
 
-    const isLoggedIn = Boolean(userInfo);
     const displayName = userInfo?.nickname || userInfo?.userId || '';
     const displayEmail = userInfo?.userId || '';
     const loginPath = localePrefix ? `${localePrefix}/login` : '/login';
@@ -231,14 +305,20 @@ const Navigation = ({ variant = 'light' }) => {
                 >
                     <div className="flex items-center gap-x-6 lg:gap-x-10 lg:flex-1">
                         <a href="/" className="-m-1.5 p-1.5 relative z-20 mr-4 lg:mr-6">
-                            <span className="sr-only">gravifox</span>
+                            <span className="sr-only">REKWIEM</span>
                             <div className="flex justify-center">
                                 <h1
                                     onClick={() => navigate('/')}
                                     translate="no"
-                                    className="cursor-pointer select-none text-[clamp(16px,3vw,28px)] font-extrabold tracking-tight leading-none text-indigo-500 drop-shadow-md"
+                                    className={`cursor-pointer select-none text-[clamp(18px,5.5vw,32px)] md:text-[clamp(24px,4vw,38px)] font-extrabold tracking-tight leading-none ${
+                                        isDark
+                                            ? 'drop-shadow-[0_18px_36px_rgba(249,115,22,0.32)]'
+                                            : 'drop-shadow-[0_18px_34px_rgba(99,102,241,0.26)]'
+                                    }`}
                                 >
-                                    GRAVIFOX.
+                                    <span className="bg-gradient-to-r from-indigo-500 via-fuchsia-500 to-rose-500 bg-clip-text text-transparent transition-all duration-300">
+                                        REKWIEM
+                                    </span>
                                 </h1>
                             </div>
                         </a>
@@ -250,32 +330,32 @@ const Navigation = ({ variant = 'light' }) => {
                                 const linkClasses = `group relative inline-flex text-[1.05rem] font-bold tracking-wide transition-colors duration-200 ${
                                     isDark
                                         ? isActive
-                                            ? 'text-indigo-200'
+                                            ? 'text-emerald-200'
                                             : 'text-slate-300 hover:text-white'
                                         : isActive
-                                              ? 'text-indigo-600'
+                                              ? 'text-emerald-600'
                                               : 'text-gray-700 hover:text-gray-900'
                                 }`;
                                 const pillClasses = `inline-flex items-center justify-center rounded-full border px-3.5 py-1.5 text-current transition-all duration-300 leading-tight ${
                                     showHighlight
                                         ? isDark
-                                            ? 'bg-indigo-500/15 border-indigo-400/50'
-                                            : 'bg-indigo-50/90 border-indigo-200'
+                                            ? 'bg-emerald-500/15 border-emerald-400/50'
+                                            : 'bg-emerald-50/90 border-emerald-200'
                                         : isDark
-                                            ? 'border-slate-700/70 group-hover:border-indigo-500/40 group-hover:bg-indigo-500/10'
-                                            : 'border-transparent group-hover:border-indigo-100 group-hover:bg-indigo-50/70'
+                                            ? 'border-slate-700/70 group-hover:border-emerald-500/40 group-hover:bg-emerald-500/10'
+                                            : 'border-transparent group-hover:border-emerald-100 group-hover:bg-emerald-50/70'
                                 }`;
                                 const highlightStyle = showHighlight
                                     ? isDark
                                         ? {
-                                              boxShadow: `0 12px 28px -18px rgba(99, 102, 241, ${(0.28 + 0.15 * highlightLevel).toFixed(2)})`,
-                                              borderColor: `rgba(99, 102, 241, ${(0.55 + 0.25 * highlightLevel).toFixed(2)})`,
-                                              backgroundColor: `rgba(76, 81, 191, ${(0.18 + 0.1 * highlightLevel).toFixed(2)})`,
+                                              boxShadow: `0 12px 28px -18px rgba(16, 185, 129, ${(0.28 + 0.15 * highlightLevel).toFixed(2)})`,
+                                              borderColor: `rgba(52, 211, 153, ${(0.55 + 0.25 * highlightLevel).toFixed(2)})`,
+                                              backgroundColor: `rgba(6, 95, 70, ${(0.22 + 0.1 * highlightLevel).toFixed(2)})`,
                                           }
                                         : {
-                                              boxShadow: `0 12px 28px -18px rgba(79, 70, 229, ${(0.35 + 0.2 * highlightLevel).toFixed(2)})`,
-                                              borderColor: `rgba(129, 140, 248, ${(0.6 + 0.25 * highlightLevel).toFixed(2)})`,
-                                              backgroundColor: `rgba(238, 242, 255, ${(0.9 + 0.08 * highlightLevel).toFixed(2)})`,
+                                              boxShadow: `0 12px 28px -18px rgba(16, 185, 129, ${(0.35 + 0.2 * highlightLevel).toFixed(2)})`,
+                                              borderColor: `rgba(110, 231, 183, ${(0.6 + 0.25 * highlightLevel).toFixed(2)})`,
+                                              backgroundColor: `rgba(236, 253, 245, ${(0.9 + 0.08 * highlightLevel).toFixed(2)})`,
                                           }
                                     : undefined;
                                 const label = t(item.labelKey);
@@ -291,10 +371,10 @@ const Navigation = ({ variant = 'light' }) => {
                         </PopoverGroup>
                     </div>
                     <div className="flex items-center gap-3 lg:hidden relative z-20">
-                        {!mobileMenuOpen && !isLoggedIn && (
+                        {!mobileMenuOpen && !userAuthenticated && (
                             <Link
                                 to={loginPath}
-                                className="inline-flex items-center justify-center gap-1 rounded-full bg-gradient-to-r from-indigo-500 via-violet-500 to-purple-500 px-4 py-2 text-sm font-semibold text-white shadow-lg shadow-indigo-500/30 transition hover:shadow-indigo-500/40 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-indigo-300 focus-visible:ring-offset-2 focus-visible:ring-offset-white"
+                                className="inline-flex items-center justify-center gap-1 rounded-full bg-gradient-to-r from-emerald-500 via-teal-500 to-cyan-500 px-4 py-2 text-sm font-semibold text-white shadow-lg shadow-emerald-500/30 transition hover:shadow-emerald-500/40 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-300 focus-visible:ring-offset-2 focus-visible:ring-offset-white"
                             >
                                 {t('navigation.actions.login')}
                             </Link>
@@ -371,12 +451,12 @@ const Navigation = ({ variant = 'light' }) => {
                                     >
                                         <div className="flex items-center justify-between gap-3">
                                             <div className="min-w-0 flex-1">
-                                                {isLoggedIn ? (
+                                                {userAuthenticated ? (
                                                     <div
                                                         className={`flex items-center gap-3 rounded-2xl px-4 py-3 ${
                                                             isDark
-                                                                ? 'bg-indigo-500/15 text-indigo-100'
-                                                                : 'bg-indigo-50/70 text-slate-700'
+                                                                ? 'bg-emerald-500/15 text-emerald-100'
+                                                                : 'bg-emerald-50/70 text-slate-700'
                                                         }`}
                                                     >
                                                         <div className="min-w-0">
@@ -403,8 +483,8 @@ const Navigation = ({ variant = 'light' }) => {
                                                             aria-label={t('navigation.actions.settings', 'Settings')}
                                                             className={`ml-auto flex h-9 w-9 shrink-0 items-center justify-center rounded-xl transition active:scale-95 ${
                                                                 isDark
-                                                                    ? 'text-indigo-100 hover:bg-indigo-500/30 hover:text-white'
-                                                                    : 'text-indigo-500 hover:bg-indigo-100/80 hover:text-indigo-600'
+                                                                    ? 'text-emerald-100 hover:bg-emerald-500/30 hover:text-white'
+                                                                    : 'text-emerald-500 hover:bg-emerald-100/80 hover:text-emerald-600'
                                                             }`}
                                                         >
                                                             <Cog6ToothIcon aria-hidden="true" className="size-5" />
@@ -421,7 +501,7 @@ const Navigation = ({ variant = 'light' }) => {
                                                 )}
                                             </div>
                                             <div className="flex items-center gap-2">
-                                                {!isLoggedIn && (
+                                                {!userAuthenticated && (
                                                     <Link
                                                         to={settingsPath}
                                                         onClick={() => setMobileMenuOpen(false)}
@@ -450,8 +530,81 @@ const Navigation = ({ variant = 'light' }) => {
                                             </div>
                                         </div>
 
-                                        <div className="mt-6">
-                                            <nav aria-label={t('navigation.mobileMenuLabel', '주요 내비게이션')}>
+                                        <div className="mt-6 space-y-6">
+                                            <div
+                                                className={`rounded-2xl border px-4 py-4 transition-colors ${
+                                                    isDark
+                                                        ? 'border-emerald-500/40 bg-emerald-500/12 text-emerald-100'
+                                                        : 'border-emerald-200 bg-emerald-50/80 text-emerald-700'
+                                                }`}
+                                            >
+                                                <div className="space-y-3">
+                                                    <div className="flex items-center justify-between gap-3">
+                                                        <p className="text-xs font-semibold uppercase tracking-[0.14em]">
+                                                            {t('navigation.usage.title', '현재 분석 사용량')}
+                                                        </p>
+                                                        {quotaRemainingLabel && quotaHasData && (
+                                                            <span className="text-[11px] font-semibold">{quotaRemainingLabel}</span>
+                                                        )}
+                                                    </div>
+                                                    {quotaLoading ? (
+                                                        <div className="space-y-2">
+                                                            <div className="h-2 w-full overflow-hidden rounded-full bg-emerald-500/15">
+                                                                <div
+                                                                    className={`h-full w-1/3 rounded-full ${
+                                                                        isDark ? 'bg-emerald-300/70' : 'bg-emerald-400/80'
+                                                                    } animate-pulse`}
+                                                                    aria-hidden="true"
+                                                                />
+                                                            </div>
+                                                            <p className={`text-[11px] ${isDark ? 'text-emerald-100/75' : 'text-emerald-700/70'}`}>
+                                                                {t('navigation.usage.loading', '사용량을 불러오는 중이에요…')}
+                                                            </p>
+                                                        </div>
+                                                    ) : quotaError ? (
+                                                        <p className={`text-[11px] ${isDark ? 'text-rose-200/85' : 'text-rose-500/80'}`}>
+                                                            {quotaError}
+                                                        </p>
+                                                    ) : quotaHasData ? (
+                                                        quotaPercent != null ? (
+                                                            <div className="space-y-2">
+                                                                <div className="h-2 w-full overflow-hidden rounded-full bg-emerald-500/15">
+                                                                    <div
+                                                                        className={`h-full rounded-full ${
+                                                                            isDark ? 'bg-emerald-300/90' : 'bg-emerald-500'
+                                                                        } transition-all duration-500 ease-out`}
+                                                                        style={{ width: `${quotaPercent}%` }}
+                                                                        aria-hidden="true"
+                                                                    />
+                                                                </div>
+                                                                {quotaSummaryText && (
+                                                                    <p className={`text-[11px] ${isDark ? 'text-emerald-100/80' : 'text-emerald-700/80'}`}>
+                                                                        {quotaSummaryText}
+                                                                    </p>
+                                                                )}
+                                                            </div>
+                                                        ) : (
+                                                            quotaSummaryText && (
+                                                                <p className={`text-[11px] ${isDark ? 'text-emerald-100/80' : 'text-emerald-700/80'}`}>
+                                                                    {quotaSummaryText}
+                                                                </p>
+                                                            )
+                                                        )
+                                                    ) : userAuthenticated ? (
+                                                        <p className={`text-[11px] ${isDark ? 'text-emerald-100/75' : 'text-emerald-700/70'}`}>
+                                                            {t('navigation.usage.empty', '사용량 정보가 아직 준비되지 않았어요. 잠시 후 다시 확인해 주세요.')}
+                                                        </p>
+                                                    ) : (
+                                                        <p className={`text-[11px] ${isDark ? 'text-emerald-100/75' : 'text-emerald-700/70'}`}>
+                                                            {t('navigation.usage.loginPrompt', '로그인하면 이번 달 분석 사용량을 확인할 수 있어요.')}
+                                                        </p>
+                                                    )}
+                                                </div>
+                                            </div>
+                                            <nav
+                                                aria-label={t('navigation.mobileMenuLabel', '주요 내비게이션')}
+                                                className={`border-t pt-6 ${isDark ? 'border-slate-700/60' : 'border-slate-200'}`}
+                                            >
                                                 <ul className="flex flex-col gap-2">
                                                     {navItems.map((item) => {
                                                         const isActive = activeItemKey === item.key;
@@ -464,21 +617,21 @@ const Navigation = ({ variant = 'light' }) => {
                                                                     className={`flex items-center justify-between rounded-2xl border px-4 py-3 text-base font-semibold transition-all duration-200 ${
                                                                         isActive
                                                                             ? isDark
-                                                                                ? 'border-indigo-500/50 bg-indigo-500/20 text-indigo-100 shadow-sm'
-                                                                                : 'border-indigo-200 bg-indigo-50 text-indigo-600 shadow-sm'
+                                                                                ? 'border-emerald-500/50 bg-emerald-500/20 text-emerald-100 shadow-sm'
+                                                                                : 'border-emerald-200 bg-emerald-50 text-emerald-600 shadow-sm'
                                                                             : isDark
-                                                                                  ? 'border-slate-700/70 bg-slate-900/70 text-slate-200 hover:border-indigo-500/40 hover:bg-indigo-500/15 hover:text-indigo-100'
-                                                                                  : 'border-slate-200/60 bg-white text-slate-700 hover:border-indigo-100 hover:bg-indigo-50/70 hover:text-indigo-600'
-                                                                    }`}
-                                                                >
+                                                                                  ? 'border-slate-700/70 bg-slate-900/70 text-slate-200 hover:border-emerald-500/40 hover:bg-emerald-500/15 hover:text-emerald-100'
+                                                                                  : 'border-slate-200/60 bg-white text-slate-700 hover:border-emerald-100 hover:bg-emerald-50/70 hover:text-emerald-600'
+                                                                   }`}
+                                                               >
                                                                     <span>{t(item.labelKey)}</span>
                                                                     <span
                                                                         aria-hidden="true"
                                                                         className={`text-sm font-medium transition-transform duration-200 ${
                                                                             isActive
                                                                                 ? isDark
-                                                                                    ? 'translate-x-0 text-indigo-300'
-                                                                                    : 'translate-x-0 text-indigo-500'
+                                                                                    ? 'translate-x-0 text-emerald-300'
+                                                                                    : 'translate-x-0 text-emerald-500'
                                                                                 : isDark
                                                                                       ? 'translate-x-1 text-slate-500'
                                                                                       : 'translate-x-1 text-slate-400'

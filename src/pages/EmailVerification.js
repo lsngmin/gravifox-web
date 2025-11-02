@@ -79,7 +79,7 @@ export default function EmailVerification() {
             <p className="text-sm text-slate-300">잠시 후 홈으로 이동합니다.</p>
           </div>
         </main>
-        <Footer transparent variant="dark" showLinks={false} inline />
+        <Footer />
       </div>
     );
   }
@@ -145,7 +145,7 @@ export default function EmailVerification() {
           </section>
         </div>
       </main>
-      <Footer transparent variant="dark" showLinks={false} inline />
+      <Footer />
     </div>
   );
 }

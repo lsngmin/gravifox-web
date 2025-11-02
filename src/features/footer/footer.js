@@ -1,12 +1,37 @@
-import React, { useMemo } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
+import { SunIcon, MoonIcon } from '@heroicons/react/24/solid';
 
-const Footer = ({ transparent = false, inline = false, variant = 'light', showLinks = true }) => {
+const THEME_STORAGE_KEY = 'preferred-theme';
+
+const getPreferredTheme = () => {
+    if (typeof window === 'undefined') return 'light';
+    const read = () => {
+        try {
+            const stored =
+                window.localStorage?.getItem(THEME_STORAGE_KEY) ??
+                window.sessionStorage?.getItem(THEME_STORAGE_KEY) ??
+                null;
+            if (stored === 'dark' || stored === 'light') return stored;
+        } catch {}
+        return null;
+    };
+    const stored = read();
+    if (stored) return stored;
+
+    try {
+        if (window.matchMedia?.('(prefers-color-scheme: dark)').matches) return 'dark';
+    } catch {}
+    return 'light';
+};
+
+const Footer = () => {
     const { i18n } = useTranslation();
     const navigate = useNavigate();
     const location = useLocation();
     const currentLng = useMemo(() => (i18n.language || 'en').slice(0,2), [i18n.language]);
+    const [theme, setTheme] = useState(() => getPreferredTheme());
 
     const changeLanguage = (next) => {
         const supported = ['en','ko'];
@@ -28,69 +53,134 @@ const Footer = ({ transparent = false, inline = false, variant = 'light', showLi
         navigate(`/${currentLng}${next}`);
     };
 
-    const isDark = variant === 'dark';
+    useEffect(() => {
+        if (typeof window === 'undefined') return;
+        const syncTheme = () => setTheme(getPreferredTheme());
+        window.addEventListener('focus', syncTheme);
+        window.addEventListener('storage', syncTheme);
+        window.addEventListener('preferred-theme-change', syncTheme);
+        return () => {
+            window.removeEventListener('focus', syncTheme);
+            window.removeEventListener('storage', syncTheme);
+            window.removeEventListener('preferred-theme-change', syncTheme);
+        };
+    }, []);
 
-    const darkSectionClass = transparent ? "bg-transparent" : "bg-slate-950";
-    const darkLinkClass = "text-slate-300 hover:text-white";
-    const darkSeparatorClass = "text-slate-700";
-    const darkLanguageIdle = "bg-slate-900/70 text-slate-200 hover:bg-slate-800/70";
-    const darkRingClass = "ring-slate-800";
-    const darkCaptionClass = "text-slate-500";
+    const applyTheme = (next) => {
+        if (next !== 'dark' && next !== 'light') return;
+        setTheme(next);
+        if (typeof window === 'undefined') return;
+        try {
+            window.localStorage?.setItem(THEME_STORAGE_KEY, next);
+            window.sessionStorage?.setItem(THEME_STORAGE_KEY, next);
+        } catch {}
+        window.dispatchEvent(new CustomEvent('preferred-theme-change', { detail: next }));
+    };
 
-    const lightSectionClass = "bg-gray-50";
+    const isDark = theme === 'dark';
+
+    const languageShellClass = isDark
+        ? 'inline-flex items-center gap-1 rounded-full border border-white/20 bg-white/10 px-1.5 py-1 shadow-sm shadow-black/30 backdrop-blur'
+        : 'inline-flex items-center gap-1 rounded-full border border-slate-300 bg-white/80 px-1.5 py-1 shadow-sm shadow-slate-200/70 backdrop-blur';
+    const languageTabClass = (active) => [
+        'px-3 py-1 text-xs font-semibold uppercase tracking-wide rounded-full transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2',
+        active
+            ? isDark
+                ? 'bg-white text-slate-900 shadow-sm shadow-white/40 ring-white/70 ring-offset-0'
+                : 'bg-slate-900 text-white shadow-sm shadow-slate-900/30 ring-slate-900/40 ring-offset-white'
+            : isDark
+                ? 'text-white/80 hover:bg-white/10 hover:text-white ring-white/60 ring-offset-0'
+                : 'text-slate-600 hover:bg-slate-100 hover:text-slate-900 ring-slate-400/60 ring-offset-white'
+    ].join(' ');
+    const themeShellClass = isDark
+        ? 'inline-flex items-center gap-1 rounded-full border border-white/20 bg-white/10 px-1 py-1 shadow-sm shadow-black/30 backdrop-blur'
+        : 'inline-flex items-center gap-1 rounded-full border border-slate-300 bg-white/80 px-1 py-1 shadow-sm shadow-slate-200/70 backdrop-blur';
+    const themeTabClass = (active) => [
+        'px-2.5 py-1 text-xs font-semibold uppercase tracking-wide rounded-full flex items-center justify-center gap-1 transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2',
+        active
+            ? isDark
+                ? 'bg-white text-slate-900 shadow-sm shadow-white/40 ring-white/70 ring-offset-0'
+                : 'bg-slate-900 text-white shadow-sm shadow-slate-900/30 ring-slate-900/40 ring-offset-white'
+            : isDark
+                ? 'text-white/80 hover:bg-white/10 hover:text-white ring-white/60 ring-offset-0'
+                : 'text-slate-600 hover:bg-slate-100 hover:text-slate-900 ring-slate-400/60 ring-offset-white'
+    ].join(' ');
+    const linkClass = 'text-sm leading-6 text-inherit transition-opacity hover:opacity-80 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-current focus-visible:ring-offset-2';
 
     return (
-        <section className={transparent ? "bg-transparent" : isDark ? darkSectionClass : lightSectionClass}>
-            <div className="mx-auto max-w-screen-xl space-y-6 overflow-hidden px-4 py-12 sm:px-6 lg:px-8">
-                <nav className={`${inline ? 'flex flex-nowrap overflow-x-auto whitespace-nowrap' : 'flex flex-wrap'} items-center justify-center gap-x-6 gap-y-4 text-sm`}>
-                    {showLinks && (
-                        <div className={`${inline ? 'flex flex-nowrap' : 'flex flex-wrap'} items-center justify-center gap-x-4 gap-y-2 text-sm`}>
-                            <button
-                                type="button"
-                                onClick={() => goTo('/feature')}
-                                className={`text-sm leading-6 ${isDark ? darkLinkClass : 'text-gray-500 hover:text-gray-900'}`}
-                            >
-                                About
-                            </button>
-                            <span className={isDark ? darkSeparatorClass : 'text-gray-300'}>·</span>
-                            <button
-                                type="button"
-                                onClick={() => goTo('/support')}
-                                className={`text-sm leading-6 ${isDark ? darkLinkClass : 'text-gray-500 hover:text-gray-900'}`}
-                            >
-                                Contact
-                            </button>
-                            <span className={isDark ? darkSeparatorClass : 'text-gray-300'}>·</span>
-                            <button
-                                type="button"
-                                onClick={() => goTo('/docs')}
-                                className={`text-sm leading-6 ${isDark ? darkLinkClass : 'text-gray-500 hover:text-gray-900'}`}
-                            >
-                                Terms
-                            </button>
-                        </div>
-                    )}
-                    <div className={`${inline ? 'flex flex-nowrap' : 'flex flex-wrap'} items-center justify-center gap-2`}>
-                        <span className={`text-sm ${isDark ? 'text-slate-300' : 'text-gray-500'}`}>Language</span>
-                        <div className={`inline-flex overflow-hidden rounded-md ring-1 ${isDark ? darkRingClass : 'ring-gray-200'}`}>
+        <section className="bg-inherit text-inherit">
+            <div className="mx-auto max-w-screen-xl px-4 py-12 sm:px-6 lg:px-8">
+                <div className="flex flex-wrap items-center justify-center gap-x-6 gap-y-4 text-sm text-inherit">
+                    <div className="flex flex-wrap items-center justify-center gap-2">
+                        <div className={languageShellClass}>
                             <button
                                 type="button"
                                 onClick={() => changeLanguage('en')}
-                                className={`px-3 py-1.5 text-sm font-medium ${currentLng === 'en' ? 'bg-indigo-600 text-white' : isDark ? darkLanguageIdle : 'bg-white text-gray-600 hover:bg-gray-50'}`}
+                                className={languageTabClass(currentLng === 'en')}
+                                aria-pressed={currentLng === 'en'}
                             >
                                 EN
                             </button>
                             <button
                                 type="button"
                                 onClick={() => changeLanguage('ko')}
-                                className={`px-3 py-1.5 text-sm font-medium ${currentLng === 'ko' ? 'bg-indigo-600 text-white' : isDark ? darkLanguageIdle : 'bg-white text-gray-600 hover:bg-gray-50'}`}
+                                className={languageTabClass(currentLng === 'ko')}
+                                aria-pressed={currentLng === 'ko'}
                             >
                                 KO
                             </button>
                         </div>
                     </div>
-                </nav>
-                <p className={`mt-6 text-center text-xs leading-6 ${isDark ? darkCaptionClass : 'text-gray-400'}`}>
+                    <span className="text-base leading-none opacity-50" aria-hidden="true">·</span>
+                    <div className="flex flex-wrap items-center justify-center gap-2">
+                        <div className={themeShellClass}>
+                            <button
+                                type="button"
+                                onClick={() => applyTheme('light')}
+                                className={themeTabClass(theme !== 'dark')}
+                                aria-pressed={theme !== 'dark'}
+                            >
+                                <SunIcon className="h-4 w-4" />
+                            </button>
+                            <button
+                                type="button"
+                                onClick={() => applyTheme('dark')}
+                                className={themeTabClass(theme === 'dark')}
+                                aria-pressed={theme === 'dark'}
+                            >
+                                <MoonIcon className="h-4 w-4" />
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <div className="mt-4 flex flex-wrap items-center justify-center gap-x-4 gap-y-2 text-sm text-inherit">
+                    <button
+                        type="button"
+                        onClick={() => goTo('/feature')}
+                        className={linkClass}
+                    >
+                        About
+                    </button>
+                    <span className="opacity-50">·</span>
+                    <button
+                        type="button"
+                        onClick={() => goTo('/support')}
+                        className={linkClass}
+                    >
+                        Contact
+                    </button>
+                    <span className="opacity-50">·</span>
+                    <button
+                        type="button"
+                        onClick={() => goTo('/docs')}
+                        className={linkClass}
+                    >
+                        Terms
+                    </button>
+                </div>
+
+                <p className="mt-6 text-center text-xs leading-6 opacity-60">
                     © 2025 Gravifox Project. All rights reserved.
                 </p>
             </div>

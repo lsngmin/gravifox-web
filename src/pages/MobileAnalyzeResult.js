@@ -626,7 +626,7 @@ export default function MobileAnalyzeResult() {
           )}
         </div>
       </main>
-      <Footer transparent inline variant="dark" showLinks={false} />
+      <Footer />
     </div>
   );
 }

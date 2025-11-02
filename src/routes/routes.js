@@ -23,7 +23,12 @@ import Blog from "../pages/Blog";
 import MobileAnalyzeStart from "../pages/MobileAnalyzeStart";
 import MobileAnalyzeUpload from "../pages/MobileAnalyzeUpload";
 import MobileAnalyzeResult from "../pages/MobileAnalyzeResult";
+import AdminHome from "../pages/AdminHome";
 import AdminPreview from "../pages/AdminPreview";
+import AdminMail from "../pages/AdminMail";
+import AdminBlog from "../pages/AdminBlog";
+import AdminIssueInbox from "../pages/AdminIssueInbox";
+import AdminServiceHealth from "../pages/AdminServiceHealth";
 
 // Create/update canonical link to point to language-prefixed URL
 function CanonicalLink() {
@@ -148,7 +153,12 @@ function AnimatedRoutes() {
                 <Route path=":lng/feature" element={<motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -20 }} transition={{ duration: 0.3 }}><Feature /></motion.div>} />
                 <Route path=":lng/support" element={<motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -20 }} transition={{ duration: 0.3 }}><Support /></motion.div>} />
                 <Route path=":lng/blog" element={<motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -20 }} transition={{ duration: 0.3 }}><Blog /></motion.div>} />
+                <Route path=":lng/admin" element={<motion.div initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -16 }} transition={{ duration: 0.35, ease: "easeOut" }}><AdminHome /></motion.div>} />
                 <Route path=":lng/admin/preview" element={<motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -12 }} transition={{ duration: 0.4, ease: "easeOut" }}><AdminPreview /></motion.div>} />
+                <Route path=":lng/admin/mail" element={<motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -12 }} transition={{ duration: 0.35, ease: "easeOut" }}><AdminMail /></motion.div>} />
+                <Route path=":lng/admin/blog" element={<motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -12 }} transition={{ duration: 0.35, ease: "easeOut" }}><AdminBlog /></motion.div>} />
+                <Route path=":lng/admin/issues" element={<motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -12 }} transition={{ duration: 0.35, ease: "easeOut" }}><AdminIssueInbox /></motion.div>} />
+                <Route path=":lng/admin/service-health" element={<motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -12 }} transition={{ duration: 0.4, ease: "easeOut" }}><AdminServiceHealth /></motion.div>} />
 
                 {/* Legacy non-prefixed routes → redirect to localized */}
                 <Route path="/login" element={<LegacyToLocalized />} />
@@ -172,7 +182,12 @@ function AnimatedRoutes() {
                 <Route path="/support" element={<LegacyToLocalized />} />
                 <Route path="/feature" element={<LegacyToLocalized />} />
                 <Route path="/blog" element={<LegacyToLocalized />} />
+                <Route path="/admin" element={<LegacyToLocalized />} />
                 <Route path="/admin/preview" element={<LegacyToLocalized />} />
+                <Route path="/admin/mail" element={<LegacyToLocalized />} />
+                <Route path="/admin/blog" element={<LegacyToLocalized />} />
+                <Route path="/admin/issues" element={<LegacyToLocalized />} />
+                <Route path="/admin/service-health" element={<LegacyToLocalized />} />
 
                 <Route path="/*" element={<motion.div><CustomErrorPage status={"404"} /></motion.div>} />
                 </Routes>

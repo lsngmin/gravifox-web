@@ -12,7 +12,7 @@ export default function Login() {
                 <SignInForm />
             </main>
 
-            <Footer transparent variant="dark" showLinks={false} inline />
+            <Footer />
         </div>
     );
 }

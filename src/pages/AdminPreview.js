@@ -1,4 +1,5 @@
 import React, { useCallback, useEffect, useMemo, useState } from "react";
+import { Link, useParams } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import clsx from "clsx";
 import {
@@ -8,46 +9,9 @@ import {
     ArrowTrendingUpIcon,
     MoonIcon,
     SunIcon,
-    ShieldCheckIcon,
+    EnvelopeIcon,
 } from "@heroicons/react/24/outline";
-import { fetchAdminUsers, resetAdminUserQuota } from "../api/admin";
-
-const SERVICE_TRACKS = [
-    { key: "backend", label: "백엔드 API" },
-    { key: "ai", label: "AI 추론 서버" },
-    { key: "queue", label: "메시지 큐" },
-];
-
-const describeIssue = (serviceKey, state) => {
-    if (state === "operational") {
-        return "이슈 없음";
-    }
-    if (state === "degraded") {
-        switch (serviceKey) {
-            case "backend":
-                return "API 응답 지연 감지";
-            case "ai":
-                return "추론 대기열 증가";
-            case "queue":
-                return "큐 처리 속도 저하";
-            default:
-                return "성능 저하 감지";
-        }
-    }
-    if (state === "maintenance") {
-        switch (serviceKey) {
-            case "backend":
-                return "정기 배포 및 캐시 재구성";
-            case "ai":
-                return "모델 업데이트/가중치 재적재";
-            case "queue":
-                return "브로커 클러스터 점검";
-            default:
-                return "점검 진행 중";
-        }
-    }
-    return "상태 정보 없음";
-};
+import { fetchAdminLatestAnalysisReports, fetchAdminUsers, resetAdminUserQuota } from "../api/admin";
 
 const activityFeed = [
     {
@@ -82,17 +46,42 @@ const analysisTrend = [
 ];
 
 const PAGE_SIZE = 10;
+const RECENT_ANALYSIS_LIMIT = 10;
 
 const AdminPreview = () => {
+    const params = useParams();
     const { i18n } = useTranslation();
+    const paramsLng = params?.lng;
+    const resolvedLng = useMemo(() => {
+        if (paramsLng) return paramsLng;
+        const fallback = i18n.language || "ko";
+        return fallback.slice(0, 2);
+    }, [paramsLng, i18n.language]);
+    const mailPath = `/${resolvedLng}/admin/mail`;
     const [isDarkMode, setIsDarkMode] = useState(true);
-    const [hoveredEntry, setHoveredEntry] = useState(null);
+    const [recentAnalyses, setRecentAnalyses] = useState([]);
+    const [recentLoading, setRecentLoading] = useState(false);
+    const [recentError, setRecentError] = useState(null);
     const [userItems, setUserItems] = useState([]);
     const [pageMeta, setPageMeta] = useState({ page: -1, totalPages: 0, totalElements: 0, size: PAGE_SIZE });
     const [isLoading, setIsLoading] = useState(false);
     const [isAppending, setIsAppending] = useState(false);
     const [listError, setListError] = useState(null);
     const [resettingIds, setResettingIds] = useState(() => new Set());
+
+    const loadRecentAnalyses = useCallback(async () => {
+        setRecentLoading(true);
+        setRecentError(null);
+        try {
+            const items = await fetchAdminLatestAnalysisReports({ size: RECENT_ANALYSIS_LIMIT });
+            setRecentAnalyses(Array.isArray(items) ? items : []);
+        } catch (err) {
+            setRecentAnalyses([]);
+            setRecentError(err);
+        } finally {
+            setRecentLoading(false);
+        }
+    }, []);
 
     const loadUsers = useCallback(async (nextPage = 0) => {
         const append = nextPage > 0;
@@ -127,6 +116,10 @@ const AdminPreview = () => {
             append ? setIsAppending(false) : setIsLoading(false);
         }
     }, []);
+
+    useEffect(() => {
+        loadRecentAnalyses();
+    }, [loadRecentAnalyses]);
 
     useEffect(() => {
         loadUsers(0);
@@ -188,6 +181,7 @@ const AdminPreview = () => {
 
     const userSummaries = userItems;
     const errorMessage = listError ? (listError?.response?.data?.message ?? listError.message ?? "사용자 정보를 불러오지 못했습니다.") : null;
+    const recentErrorMessage = recentError ? (recentError?.response?.data?.message ?? recentError.message ?? "최신 분석 정보를 불러오지 못했습니다.") : null;
     const hasMore = pageMeta.page + 1 < pageMeta.totalPages;
 
     const handleLoadMore = useCallback(() => {
@@ -240,68 +234,32 @@ const AdminPreview = () => {
         }
     };
 
-    const statusTimeline = useMemo(() => {
-        const totalDays = 30;
-        const anchor = new Date();
-        anchor.setHours(0, 0, 0, 0);
-        const entries = [];
-        for (let offset = totalDays - 1; offset >= 0; offset--) {
-            const date = new Date(anchor);
-            date.setDate(anchor.getDate() - offset);
-            const weekday = date.getDay();
-            const dayIndex = totalDays - 1 - offset;
+    const friendlyRecentError = useMemo(() => {
+        if (!recentError) return null;
+        return "최신 분석 데이터를 불러오지 못했어요. 서버 연결 상태를 확인한 뒤 다시 시도해 주세요.";
+    }, [recentError]);
 
-            const states = {};
-            const issues = {};
-
-            SERVICE_TRACKS.forEach((track, trackIndex) => {
-                let state = "operational";
-                const seed = (dayIndex + 1) * (trackIndex + 3);
-                if (seed % 17 === 0 || (weekday === 0 && track.key === "queue")) {
-                    state = "maintenance";
-                } else if (
-                    seed % 9 === 0 ||
-                    (weekday === 2 && track.key === "ai") ||
-                    (weekday === 3 && track.key === "backend" && seed % 5 === 0)
-                ) {
-                    state = "degraded";
-                }
-
-                states[track.key] = state;
-                issues[track.key] = describeIssue(track.key, state);
-            });
-
-            entries.push({
-                key: date.toISOString().slice(0, 10),
-                date,
-                states,
-                issues,
-            });
+    const formatScore = (score) => {
+        if (score == null) return "—";
+        const numeric =
+            typeof score === "number"
+                ? score
+                : Number.isNaN(Number(score))
+                ? null
+                : Number(score);
+        if (numeric == null || !Number.isFinite(numeric)) {
+            return String(score);
         }
-        return entries;
-    }, []);
+        return numeric.toFixed(3);
+    };
 
-    useEffect(() => {
-        if (statusTimeline.length) {
-            setHoveredEntry(statusTimeline[statusTimeline.length - 1]);
+    const formatInference = (value) => {
+        if (value == null) return "—";
+        const numeric = Number(value);
+        if (!Number.isFinite(numeric)) {
+            return String(value);
         }
-    }, [statusTimeline]);
-
-    const formatFullDate = (date) => {
-        try {
-            return new Intl.DateTimeFormat(i18n.language || "ko", {
-                year: "numeric",
-                month: "2-digit",
-                day: "2-digit",
-                weekday: "short",
-            }).format(date);
-        } catch (e) {
-            const pad = (num) => num.toString().padStart(2, "0");
-            const weekdays = ["일", "월", "화", "수", "목", "금", "토"];
-            return `${date.getFullYear()}-${pad(
-                date.getMonth() + 1
-            )}-${pad(date.getDate())} (${weekdays[date.getDay()]})`;
-        }
+        return `${numeric.toLocaleString()} ms`;
     };
 
     const surfaceClass = isDarkMode
@@ -324,34 +282,6 @@ const AdminPreview = () => {
                 return isDarkMode ? "text-sky-300" : "text-sky-600";
             default:
                 return isDarkMode ? "text-slate-300" : "text-slate-600";
-        }
-    };
-
-    const colorForState = (state) => {
-        switch (state) {
-            case "operational":
-                return isDarkMode
-                    ? "bg-emerald-400/80"
-                    : "bg-emerald-400";
-            case "degraded":
-                return isDarkMode
-                    ? "bg-amber-400/80"
-                    : "bg-amber-400";
-            default:
-                return isDarkMode
-                    ? "bg-rose-400/80"
-                    : "bg-rose-400";
-        }
-    };
-
-    const labelForState = (state) => {
-        switch (state) {
-            case "operational":
-                return "정상 운영";
-            case "degraded":
-                return "지연/부분 장애";
-            default:
-                return "점검 진행";
         }
     };
 
@@ -390,11 +320,23 @@ const AdminPreview = () => {
                                 isDarkMode ? "text-slate-300" : "text-slate-600"
                             )}
                         >
-                            실시간 사용자 활동, 분석 처리량, 알림 로그를 한
-                            화면에서 파악할 수 있는 미리보기입니다.
+                            실시간 사용자 활동, 분석 처리량, 알림 로그를 확인하고 필요 시 우측 상단의
+                            메일 발송 도구로 바로 이동해 사용자 커뮤니케이션을 이어갈 수 있습니다.
                         </p>
                     </div>
-                    <div className="flex items-center gap-3">
+                    <div className="flex flex-wrap items-center gap-3">
+                        <Link
+                            to={mailPath}
+                            className={clsx(
+                                "inline-flex items-center gap-2 rounded-full border px-4 py-2 text-sm font-medium transition",
+                                isDarkMode
+                                    ? "border-sky-500/50 bg-sky-500/10 text-sky-100 hover:border-sky-300 hover:bg-sky-500/20"
+                                    : "border-sky-500/50 bg-sky-50 text-sky-700 hover:border-sky-500 hover:bg-sky-100"
+                            )}
+                        >
+                            <EnvelopeIcon className="h-5 w-5" />
+                            사용자 메일 발송
+                        </Link>
                         <button
                             type="button"
                             onClick={() => setIsDarkMode((prev) => !prev)}
@@ -419,170 +361,6 @@ const AdminPreview = () => {
                         </button>
                     </div>
                 </header>
-
-                <section
-                    className={clsx(
-                        "rounded-2xl border px-6 py-5",
-                        surfaceClass
-                    )}
-                >
-                    <div className="flex flex-wrap items-center justify-between gap-3">
-                        <div className="flex items-center gap-2 text-xs font-semibold uppercase tracking-[0.2em]">
-                            <span
-                                className={clsx(
-                                    "inline-flex items-center gap-2 rounded-full border px-4 py-2 text-xs",
-                                    isDarkMode
-                                        ? "border-emerald-500/30 bg-emerald-400/10 text-emerald-200"
-                                        : "border-emerald-200 bg-emerald-50 text-emerald-700"
-                                )}
-                            >
-                                <ShieldCheckIcon className="h-5 w-5" />
-                                운영 상태
-                            </span>
-                        </div>
-                    </div>
-
-                    <div className="mt-3 flex flex-col">
-                        {SERVICE_TRACKS.map((track, index) => (
-                            <div
-                                key={track.key}
-                                className={clsx(
-                                    "flex flex-col gap-2 py-4",
-                                    index > 0
-                                        ? isDarkMode
-                                            ? "border-t border-slate-800"
-                                            : "border-t border-slate-200"
-                                        : null
-                                )}
-                            >
-                                <div className="flex items-center justify-between gap-3">
-                                    <span
-                                        className={clsx(
-                                            "text-sm font-semibold tracking-wide",
-                                            isDarkMode ? "text-slate-200" : "text-slate-600"
-                                        )}
-                                    >
-                                        {track.label}
-                                    </span>
-                                </div>
-                                <div
-                                    className={clsx(
-                                        "grid h-12 grid-flow-col auto-cols-fr items-end gap-2",
-                                        isDarkMode ? "" : ""
-                                    )}
-                                    role="list"
-                                >
-                                    {statusTimeline.map((entry) => {
-                                        const state = entry.states[track.key];
-                                        const issue = entry.issues[track.key];
-                                        const isActive = hoveredEntry?.key === entry.key;
-                                        return (
-                                            <div
-                                                key={`${track.key}-${entry.key}`}
-                                                role="button"
-                                                tabIndex={0}
-                                                onMouseEnter={() => setHoveredEntry(entry)}
-                                                onFocus={() => setHoveredEntry(entry)}
-                                                className={clsx(
-                                                    "h-full w-full rounded-md transition-all duration-150",
-                                                    colorForState(state),
-                                                    "hover:outline hover:outline-2 hover:outline-offset-1",
-                                                    isDarkMode
-                                                        ? "hover:outline-slate-100/40"
-                                                        : "hover:outline-slate-900/40",
-                                                    isActive
-                                                        ? isDarkMode
-                                                            ? "outline outline-2 outline-offset-2 outline-cyan-300/60"
-                                                            : "outline outline-2 outline-offset-2 outline-cyan-500/60"
-                                                        : null
-                                                )}
-                                                title={`${formatFullDate(entry.date)} · ${track.label} · ${labelForState(state)} (${issue})`}
-                                                aria-label={`${formatFullDate(entry.date)} ${track.label} ${labelForState(state)}`}
-                                            />
-                                        );
-                                    })}
-                                </div>
-                                <div
-                                    className={clsx(
-                                        "flex justify-between text-[10px] uppercase tracking-widest",
-                                        isDarkMode ? "text-slate-500" : "text-slate-500"
-                                    )}
-                                >
-                                    <span>30일 전</span>
-                                    <span>오늘</span>
-                                </div>
-                            </div>
-                        ))}
-                    </div>
-
-                    <div
-                        className={clsx(
-                            "mt-4 rounded-xl border px-4 py-3 text-sm",
-                            isDarkMode
-                                ? "border-slate-700 bg-slate-900/70"
-                                : "border-slate-200 bg-slate-50"
-                        )}
-                    >
-                        {hoveredEntry ? (
-                            <div className="flex flex-col gap-2">
-                                <p
-                                    className={clsx(
-                                        "text-sm font-semibold",
-                                        isDarkMode ? "text-slate-200" : "text-slate-700"
-                                    )}
-                                >
-                                    {formatFullDate(hoveredEntry.date)} 기준
-                                </p>
-                                <ul className="space-y-1 text-xs">
-                                    {SERVICE_TRACKS.map((track) => {
-                                        const state = hoveredEntry.states[track.key];
-                                        const issue = hoveredEntry.issues[track.key];
-                                        return (
-                                            <li
-                                                key={`${hoveredEntry.key}-${track.key}`}
-                                                className="flex items-center justify-between gap-4"
-                                            >
-                                                <span
-                                                    className={clsx(
-                                                        "font-medium",
-                                                        isDarkMode ? "text-slate-300" : "text-slate-600"
-                                                    )}
-                                                >
-                                                    {track.label}
-                                                </span>
-                                                <span
-                                                    className={clsx(
-                                                        "text-right",
-                                                        state === "operational"
-                                                            ? isDarkMode
-                                                                ? "text-emerald-300"
-                                                                : "text-emerald-600"
-                                                            : state === "degraded"
-                                                            ? isDarkMode
-                                                                ? "text-amber-300"
-                                                                : "text-amber-600"
-                                                            : isDarkMode
-                                                            ? "text-rose-300"
-                                                            : "text-rose-600"
-                                                    )}
-                                                >
-                                                    {labelForState(state)} · {issue}
-                                                </span>
-                                            </li>
-                                        );
-                                    })}
-                                </ul>
-                            </div>
-                        ) : (
-                            <p className={clsx(
-                                "text-sm",
-                                isDarkMode ? "text-slate-400" : "text-slate-600"
-                            )}>
-                                상태 막대를 호버하면 날짜별 이슈 요약을 확인할 수 있습니다.
-                            </p>
-                        )}
-                    </div>
-                </section>
 
                 <section className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
                     {stats.map((item) => (
@@ -657,43 +435,251 @@ const AdminPreview = () => {
                 </section>
 
                 <section className="grid gap-6 xl:grid-cols-[2fr,1fr]">
-                    <article
-                        className={clsx(
-                            "rounded-2xl border",
-                            surfaceClass
-                        )}
-                    >
-                        <header className="flex items-center justify-between border-b px-6 py-4 text-sm">
-                            <div className="flex flex-col gap-1">
-                                <h2 className="font-semibold text-base md:text-lg">
-                                    사용자 계정 현황 (샘플 데이터)
-                                </h2>
-                                <p
+                    <div className="flex flex-col gap-6">
+                        <article
+                            className={clsx(
+                                "rounded-2xl border p-6",
+                                surfaceClass
+                            )}
+                        >
+                            <header className="flex flex-wrap items-start justify-between gap-3 border-b pb-4">
+                                <div className="flex flex-col gap-1">
+                                    <h2 className="text-base font-semibold md:text-lg">
+                                        최신 분석
+                                    </h2>
+                                    <p
+                                        className={clsx(
+                                            "text-xs",
+                                            isDarkMode
+                                                ? "text-slate-400"
+                                                : "text-slate-500"
+                                        )}
+                                    >
+                                        전체 사용자 최신 {RECENT_ANALYSIS_LIMIT}건을 생성일 기준으로 정렬합니다.
+                                    </p>
+                                </div>
+                                <button
+                                    type="button"
+                                    onClick={loadRecentAnalyses}
+                                    disabled={recentLoading}
                                     className={clsx(
-                                        "text-xs",
+                                        "rounded-full border px-3 py-1 text-xs font-medium transition",
                                         isDarkMode
-                                            ? "text-slate-400"
-                                            : "text-slate-500"
+                                            ? "border-slate-700 text-slate-200 hover:border-slate-500 hover:text-white"
+                                            : "border-slate-300 text-slate-600 hover:border-slate-400 hover:text-slate-800",
+                                        recentLoading && "opacity-60"
                                     )}
                                 >
-                                    역할/요금제에 따라 테이블 컬럼을 확장하여
-                                    운영 정책을 구성할 수 있습니다.
-                                </p>
-                            </div>
-                            <button
-                                type="button"
-                                className={clsx(
-                                    "rounded-full border px-3 py-1 text-xs transition",
-                                    isDarkMode
-                                        ? "border-slate-700 text-slate-300 hover:border-slate-500 hover:text-white"
-                                        : "border-slate-300 text-slate-600 hover:border-slate-400 hover:text-slate-800"
+                                    {recentLoading ? "불러오는 중..." : "새로고침"}
+                                </button>
+                            </header>
+                            <div className="mt-4 space-y-4">
+                                {recentLoading ? (
+                                    <div
+                                        className={clsx(
+                                            "rounded-xl border px-4 py-6 text-sm",
+                                            subtleSurface,
+                                            isDarkMode ? "text-slate-300" : "text-slate-600"
+                                        )}
+                                    >
+                                        최신 분석을 불러오는 중입니다...
+                                    </div>
+                                ) : recentError ? (
+                                    <div
+                                        className={clsx(
+                                            "rounded-xl border px-4 py-6 text-sm",
+                                            subtleSurface
+                                        )}
+                                    >
+                                        <p
+                                            className={clsx(
+                                                "font-medium",
+                                                isDarkMode ? "text-rose-300" : "text-rose-600"
+                                            )}
+                                        >
+                                            {friendlyRecentError}
+                                        </p>
+                                        {recentErrorMessage && (
+                                            <p
+                                                className={clsx(
+                                                    "mt-1 text-xs",
+                                                    isDarkMode
+                                                        ? "text-slate-400"
+                                                        : "text-slate-500"
+                                                )}
+                                            >
+                                                상세: {recentErrorMessage}
+                                            </p>
+                                        )}
+                                        <div className="pt-2">
+                                            <button
+                                                type="button"
+                                                onClick={loadRecentAnalyses}
+                                                className={clsx(
+                                                    "rounded-full border px-3 py-1 text-xs font-medium transition",
+                                                    isDarkMode
+                                                        ? "border-slate-600 text-slate-200 hover:border-slate-400 hover:text-white"
+                                                        : "border-slate-300 text-slate-600 hover:border-slate-400 hover:text-slate-800"
+                                                )}
+                                            >
+                                                다시 시도
+                                            </button>
+                                        </div>
+                                    </div>
+                                ) : recentAnalyses.length === 0 ? (
+                                    <div
+                                        className={clsx(
+                                            "rounded-xl border px-4 py-6 text-sm",
+                                            subtleSurface,
+                                            isDarkMode ? "text-slate-300" : "text-slate-600"
+                                        )}
+                                    >
+                                        아직 표시할 분석이 없습니다.
+                                    </div>
+                                ) : (
+                                    <div className="overflow-x-auto">
+                                        <table className="min-w-full divide-y text-xs sm:text-sm">
+                                            <thead
+                                                className={clsx(
+                                                    isDarkMode
+                                                        ? "bg-slate-900/60 text-slate-300"
+                                                        : "bg-slate-100 text-slate-600"
+                                                )}
+                                            >
+                                                <tr>
+                                                    <th className="px-4 py-3 text-left font-medium sm:px-6">
+                                                        사용자
+                                                    </th>
+                                                    <th className="px-4 py-3 text-left font-medium sm:px-6">
+                                                        라벨
+                                                    </th>
+                                                    <th className="px-4 py-3 text-left font-medium sm:px-6">
+                                                        점수
+                                                    </th>
+                                                    <th className="px-4 py-3 text-left font-medium sm:px-6">
+                                                        모델 버전
+                                                    </th>
+                                                    <th className="px-4 py-3 text-left font-medium sm:px-6">
+                                                        추론 시간
+                                                    </th>
+                                                    <th className="px-4 py-3 text-left font-medium sm:px-6">
+                                                        생성 시각
+                                                    </th>
+                                                </tr>
+                                            </thead>
+                                            <tbody
+                                                className={clsx(
+                                                    isDarkMode
+                                                        ? "divide-y divide-slate-800"
+                                                        : "divide-y divide-slate-200"
+                                                )}
+                                            >
+                                                {recentAnalyses.map((item, index) => {
+                                                    const userLabel =
+                                                        item.nickname ||
+                                                        item.userId ||
+                                                        (item.userNo != null
+                                                            ? `사용자 #${item.userNo}`
+                                                            : "알 수 없음");
+                                                    const secondaryId =
+                                                        item.nickname &&
+                                                        item.userId &&
+                                                        item.nickname !== item.userId
+                                                            ? item.userId
+                                                            : null;
+                                                    return (
+                                                        <tr
+                                                            key={
+                                                                item.uploadId ??
+                                                                `analysis-${item.userNo ?? "unknown"}-${index}`
+                                                            }
+                                                            className={clsx(
+                                                                "align-top transition-colors",
+                                                                isDarkMode
+                                                                    ? "hover:bg-slate-900/50"
+                                                                    : "hover:bg-slate-50"
+                                                            )}
+                                                        >
+                                                            <td className="px-4 py-3 sm:px-6">
+                                                                <div className="flex flex-col">
+                                                                    <span className="font-semibold">
+                                                                        {userLabel}
+                                                                    </span>
+                                                                    {secondaryId && (
+                                                                        <span
+                                                                            className={clsx(
+                                                                                "text-[11px]",
+                                                                                isDarkMode
+                                                                                    ? "text-slate-500"
+                                                                                    : "text-slate-500"
+                                                                            )}
+                                                                        >
+                                                                            {secondaryId}
+                                                                        </span>
+                                                                    )}
+                                                                    {item.uploadId && (
+                                                                        <span
+                                                                            className={clsx(
+                                                                                "text-[11px]",
+                                                                                isDarkMode
+                                                                                    ? "text-slate-500"
+                                                                                    : "text-slate-500"
+                                                                            )}
+                                                                        >
+                                                                            #{item.uploadId}
+                                                                        </span>
+                                                                    )}
+                                                                </div>
+                                                            </td>
+                                                            <td className="px-4 py-3 sm:px-6">
+                                                                {item.label ?? "—"}
+                                                            </td>
+                                                            <td className="px-4 py-3 sm:px-6">
+                                                                {formatScore(item.score)}
+                                                            </td>
+                                                            <td className="px-4 py-3 sm:px-6">
+                                                                {item.modelVersion ?? "—"}
+                                                            </td>
+                                                            <td className="px-4 py-3 sm:px-6">
+                                                                {formatInference(item.inferenceTimeMs)}
+                                                            </td>
+                                                            <td className="px-4 py-3 sm:px-6">
+                                                                {formatDateTime(item.createdAt)}
+                                                            </td>
+                                                        </tr>
+                                                    );
+                                                })}
+                                            </tbody>
+                                        </table>
+                                    </div>
                                 )}
-                            >
-                                CSV 내보내기
-                            </button>
-                        </header>
-                        <div className="overflow-x-auto">
-                            <table className="min-w-full divide-y text-sm">
+                            </div>
+                        </article>
+                        <article
+                            className={clsx(
+                                "rounded-2xl border",
+                                surfaceClass
+                            )}
+                        >
+                            <header className="border-b px-6 py-4 text-sm">
+                                <div className="flex flex-col gap-1">
+                                    <h2 className="text-base font-semibold md:text-lg">
+                                        사용자 계정 현황
+                                    </h2>
+                                    <p
+                                        className={clsx(
+                                            "text-xs",
+                                            isDarkMode
+                                                ? "text-slate-400"
+                                                : "text-slate-500"
+                                        )}
+                                    >
+                                        월간 사용량과 최근 분석 시각을 확인할 수 있습니다.
+                                    </p>
+                                </div>
+                            </header>
+                            <div className="overflow-x-auto">
+                                <table className="min-w-full divide-y text-sm">
                                 <thead
                                     className={clsx(
                                         isDarkMode
@@ -883,6 +869,7 @@ const AdminPreview = () => {
                             </div>
                         )}
                     </article>
+                    </div>
 
                     <aside
                         className={clsx(

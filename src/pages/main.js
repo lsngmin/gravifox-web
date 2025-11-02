@@ -28,7 +28,7 @@ const Main = () => {
                 <SecurityPrivacy/>
                 <FAQ/>
                 {/* Removed MainText per request */}
-                <Footer transparent />
+                <Footer />
             </ContentDecor>
             {/* BottomDecor not needed; gradient now extends to the footer */}
         </>

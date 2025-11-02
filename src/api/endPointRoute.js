@@ -59,6 +59,7 @@ export const FREETRIAL_ENDPOINTS = {
 
 export const ISSUE_ENDPOINTS = {
     GET_ISSUE:    `${API_BASE}/api/v1/issue/`,
+    CREATE_ISSUE: `${API_BASE}/api/v1/issue/`,
 };
 
 export const DASHBOARD_ENDPOINTS = {
@@ -110,4 +111,7 @@ export const FASTAPI_ENDPOINTS = {
 
 export const ADMIN_ENDPOINTS = {
     USERS: `${API_BASE}/admin/v1/users`,
+    ANALYSIS_REPORTS_LATEST: `${API_BASE}/admin/v1/analysis/reports/latest`,
+    EMAIL_PREVIEW: `${API_BASE}/admin/v1/communications/email/preview`,
+    EMAIL_SEND: `${API_BASE}/admin/v1/communications/email/send`,
 };

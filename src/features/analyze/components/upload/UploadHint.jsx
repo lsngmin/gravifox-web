@@ -15,8 +15,14 @@ export default function UploadHint({
                                        textClassName = "",
                                        labelClassName = "",
                                        hintRight = null, // 오른쪽에 붙일 보조 텍스트
+                                       theme = 'light',
                                    }) {
     const inputId = useId();
+    const isDark = theme === 'dark';
+    const textBase = `${isDark ? 'text-sm text-slate-200' : 'text-sm text-slate-700'} text-center`;
+    const labelBase = isDark
+        ? "ml-1 font-semibold text-indigo-300 hover:text-indigo-200 cursor-pointer"
+        : "ml-1 font-semibold text-indigo-600 hover:text-indigo-700 cursor-pointer";
 
     const handleChange = (e) => {
         const fl = e.target.files;
@@ -29,11 +35,11 @@ export default function UploadHint({
 
     return (
         <div className={`flex items-center ${className}`}>
-            <p className={`text-sm text-slate-700 text-center ${textClassName}`}>
+            <p className={`${textBase} ${textClassName}`.trim()}>
                 여기에 파일을 끌어다 놓거나
                 <label
                     htmlFor={inputId}
-                    className={`ml-1 font-semibold text-indigo-600 hover:text-indigo-700 cursor-pointer ${labelClassName}`}
+                    className={`${labelBase} ${labelClassName}`.trim()}
                 >
                     {label}
                 </label>

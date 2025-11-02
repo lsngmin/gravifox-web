@@ -5,7 +5,14 @@ import React from "react";
  * - 업로드 드롭존에서 사용하는 기본 아이콘
  * - Tailwind 색상/크기 조정 가능
  */
-export default function CloudUploadIcon({ className = "h-9 w-9 text-indigo-500" }) {
+export default function CloudUploadIcon({ className = "", theme = 'light' }) {
+    const isDark = theme === 'dark';
+    const iconClass = [
+        "mb-3 h-9 w-9 transition-colors",
+        isDark ? "text-indigo-300 group-hover:text-indigo-200" : "text-indigo-500 group-hover:text-indigo-600",
+        className,
+    ].filter(Boolean).join(" ");
+
     return (
         <svg
             xmlns="http://www.w3.org/2000/svg"
@@ -13,7 +20,7 @@ export default function CloudUploadIcon({ className = "h-9 w-9 text-indigo-500" 
             fill="none"
             strokeWidth="1.8"
             stroke="currentColor"
-            className="h-9 w-9 text-indigo-500 mb-3 transition-colors group-hover:text-indigo-600"
+            className={iconClass}
         >
             <path
                 strokeLinecap="round"

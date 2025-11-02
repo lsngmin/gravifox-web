@@ -47,7 +47,7 @@ const Blog = () => {
                 </div>
 
 
-                <Footer transparent />
+                <Footer />
             </ContentDecor>
         </>
     );

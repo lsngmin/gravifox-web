@@ -30,7 +30,7 @@ export default function Register() {
           <RegisterBox variant="mobile-dark" />
         </div>
       </main>
-      <Footer transparent variant="dark" showLinks={false} inline />
+      <Footer />
     </div>
   );
 }

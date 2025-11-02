@@ -86,6 +86,18 @@ export default function UserInfo({ theme = "dark", onThemeChange }) {
               이메일과 푸시 알림 수신 방식을 자유롭게 구성하세요.
             </p>
             <div className={`mt-3 h-px ${isDark ? "bg-white/5" : "bg-gray-200"}`} />
+            <div
+              className={`mt-4 rounded-xl border border-dashed ${
+                isDark ? "border-white/15 bg-white/[0.03]" : "border-gray-300 bg-gray-50"
+              } p-5`}
+            >
+              <p className={`text-sm font-semibold ${isDark ? "text-slate-100" : "text-gray-800"}`}>
+                아직 제공되지 않는 기능이에요.
+              </p>
+              <p className={`mt-1 text-sm leading-6 ${isDark ? "text-slate-300/80" : "text-gray-500"}`}>
+                알림 설정은 준비 중입니다. 알림 채널을 직접 선택할 수 있는 기능이 열리면 대시보드와 이메일로 먼저 알려드릴게요.
+              </p>
+            </div>
           </div>
         </section>
 
