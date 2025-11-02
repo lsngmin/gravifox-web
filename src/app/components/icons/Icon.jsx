@@ -11,6 +11,16 @@ import {
     ArrowRightOnRectangleIcon,
 } from "@heroicons/react/24/outline";
 import { MoonIcon, SunIcon } from "@heroicons/react/24/solid";
+import ArrowOutwardIcon from "@mui/icons-material/ArrowOutward";
+import {
+    MessageSquare,
+    Sparkles,
+    Upload,
+    ScanSearch,
+    CheckCircle2,
+    Mail,
+    Map,
+} from "lucide-react";
 
 const ICON_REGISTRY = Object.freeze({
     moon: MoonIcon,
@@ -25,6 +35,14 @@ const ICON_REGISTRY = Object.freeze({
     "credit-card": CreditCardIcon,
     dashboard: Squares2X2Icon,
     logout: ArrowRightOnRectangleIcon,
+    "arrow-outward": ArrowOutwardIcon,
+    sparkles: Sparkles,
+    "message-square": MessageSquare,
+    upload: Upload,
+    "scan-search": ScanSearch,
+    "check-circle": CheckCircle2,
+    mail: Mail,
+    map: Map,
 });
 
 const Icon = ({ name, ...props }) => {

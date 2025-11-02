@@ -4337,6 +4337,10 @@ video {
   background-color: rgb(203 213 225 / 0.7);
 }
 
+.bg-white\/\[0\.07\] {
+  background-color: rgb(255 255 255 / 0.07);
+}
+
 .bg-\[conic-gradient\(from_120deg_at_80\%_15\%\2c rgba\(16\2c 185\2c 129\2c 0\.28\)_0deg\2c transparent_120deg\)\] {
   background-image: conic-gradient(from 120deg at 80% 15%,rgba(16,185,129,0.28) 0deg,transparent 120deg);
 }
@@ -8178,6 +8182,11 @@ img, a, button {
   color: rgb(255 255 255 / 0.9);
 }
 
+.hover\:text-indigo-100:hover {
+  --tw-text-opacity: 1;
+  color: rgb(224 231 255 / var(--tw-text-opacity, 1));
+}
+
 .hover\:underline:hover {
   -webkit-text-decoration-line: underline;
           text-decoration-line: underline;
@@ -10135,6 +10144,10 @@ img, a, button {
 
   .md\:p-8 {
     padding: 2rem;
+  }
+
+  .md\:p-10 {
+    padding: 2.5rem;
   }
 
   .md\:px-10 {

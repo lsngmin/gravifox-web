@@ -25,7 +25,7 @@ const BlogBackground = () => (
 );
 
 const Blog = () => {
-    const { posts, isLoading, error, isFallback } = useBlogPosts();
+    const { posts, isLoading, error } = useBlogPosts();
 
     const [filter, setFilter] = useState({ tag: "all" });
     const filtered = useMemo(() => {
@@ -48,12 +48,7 @@ const Blog = () => {
                         </div>
 
                         <div className="mt-8 lg:mt-10">
-                            <PostList
-                                posts={filtered}
-                                loading={isLoading}
-                                error={isFallback ? null : error}
-                                initialCount={6}
-                            />
+                            <PostList posts={filtered} loading={isLoading} error={error} initialCount={6} />
                         </div>
 
                         <div className="mt-16 lg:mt-20">

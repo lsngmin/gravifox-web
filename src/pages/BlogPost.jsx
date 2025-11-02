@@ -27,7 +27,7 @@ const BlogPost = () => {
     const { lng, slug } = useParams();
     const navigate = useNavigate();
     const { t } = useTranslation("blog");
-    const { post, isLoading, error, isFallback } = useBlogPost(slug);
+    const { post, isLoading, error } = useBlogPost(slug);
     const locale = (lng || "ko").toLowerCase();
 
     const postMeta = useMemo(() => {
@@ -59,19 +59,12 @@ const BlogPost = () => {
     }, [navigate, handleNavigateList]);
 
     const backLabel = locale.startsWith("en") ? "Back to blog" : "블로그 목록으로";
-    const fallbackBadge =
-        isFallback && post
-            ? locale.startsWith("en")
-                ? "Temporary demo copy until the live API responds."
-                : "실제 API 연동 전까지 표시되는 예시 본문입니다."
-            : null;
-
 // 존재하지 않는 슬러그면 목록으로 복귀
     useEffect(() => {
-        if (!isLoading && !isFallback && error?.status === 404) {
+        if (!isLoading && error?.status === 404) {
             navigate("../blog", { replace: true });
         }
-    }, [isLoading, error, navigate, isFallback]);
+    }, [isLoading, error, navigate]);
 
     useEffect(() => {
         if (!isLoading && !error && !post) {
@@ -101,9 +94,9 @@ const BlogPost = () => {
                 </div>
             </div>
         );
-    } else if (error?.status === 404 && !isFallback) {
+    } else if (error?.status === 404) {
         return null;
-    } else if (error && !isFallback) {
+    } else if (error) {
         const errorCopy = locale.startsWith("en")
             ? {
                   title: "We couldn't load this post.",
@@ -152,11 +145,6 @@ const BlogPost = () => {
                                 </span>
                             ))}
                         </div>
-                    ) : null}
-                    {fallbackBadge ? (
-                        <p className="mt-5 inline-flex rounded-full bg-indigo-50 px-3 py-1 text-xs font-medium text-indigo-700 dark:bg-indigo-500/20 dark:text-indigo-200">
-                            {fallbackBadge}
-                        </p>
                     ) : null}
                 </header>
 
