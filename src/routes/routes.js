@@ -3,7 +3,7 @@ import { AnimatePresence, motion } from "framer-motion";
 import { useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 
-import Main from "pages/main";
+import MainPage from "../app/features/main/MainPage";
 import Login from "pages/login";
 import FreeTrial from "pages/freeTrial";
 import Issues from "pages/Issues";
@@ -135,7 +135,7 @@ function AnimatedRoutes() {
                 {/* Root -> language prefixed redirect */}
                 <Route path="/" element={<LangRedirect />} />
                 {/* Language-prefixed duplicates */}
-                <Route path=":lng" element={<motion.div><Main/></motion.div>} />
+                <Route path=":lng" element={<motion.div><MainPage /></motion.div>} />
                 <Route path=":lng/login" element={<motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -20 }} transition={{ duration: 0.3 }}><Login /></motion.div>} />
                 <Route path=':lng/free-trial' element={<motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} transition={{ duration: 0.6, ease: "easeOut" }}><FreeTrial /></motion.div>} />
                 <Route path=':lng/settings' element={<motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} transition={{ duration: 0.6, ease: "easeOut" }}><Profile /></motion.div>} />
