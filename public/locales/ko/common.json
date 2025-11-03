@@ -148,6 +148,27 @@
       "forgotPrompt": "비밀번호를 잊으셨나요?",
       "forgotAction": "도움 요청"
     },
+    "loginPage": {
+      "title": "계정으로 로그인",
+      "subtitle": "로그인하면 바로 이용할 수 있어요.",
+      "emailLabel": "이메일",
+      "passwordLabel": "비밀번호",
+      "forgotPassword": "비밀번호 찾기",
+      "submit": "로그인",
+      "or": "또는",
+      "signupPrompt": "아직 멤버가 아니신가요?",
+      "signupAction": "가입하기",
+      "placeholders": {
+        "email": "you@example.com",
+        "password": "••••••••"
+      },
+      "errors": {
+        "oops": "입력값이 올바르지 않습니다.",
+        "invalid": "이메일 또는 비밀번호가 올바르지 않습니다.",
+        "mismatch": "입력값을 다시 확인해 주세요.",
+        "unexpected": "예기치 못한 오류가 발생했습니다."
+      }
+    },
     "processing": {
       "title": "분석 중입니다…",
       "subtitle": "평균 30초 내에 결과가 준비돼요. 페이지를 닫지 말고 잠시만 기다려 주세요.",

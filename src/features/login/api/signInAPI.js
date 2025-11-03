@@ -15,7 +15,8 @@ const SignInAPI = () => {
         //이전의 URL 을 기억합니다
         localeMatch = location.pathname?.match(/^\/([a-zA-Z-]{2,5})(?=\/|$)/),
         prefix = localeMatch ? `/${localeMatch[1]}` : "",
-        defaultPath = `${prefix}/analyze/upload`,
+        // Default to site root when no previous path exists
+        defaultPath = `/`,
         fromLocation = location.state?.from,
         fromPath = fromLocation?.pathname || defaultPath,
         fromSearch = fromLocation?.search || "",

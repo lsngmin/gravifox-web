@@ -95,7 +95,7 @@ export default function EmailVerification() {
               translate="no"
               className="cursor-pointer select-none text-[clamp(22px,5vw,36px)] font-extrabold tracking-tight leading-none text-indigo-400 drop-shadow mb-2"
             >
-              GRAVIFOX.
+              REKWIEM
             </h2>
             <p className="text-sm text-slate-300">가입을 마무리하려면 이메일을 확인해 주세요.</p>
           </header>

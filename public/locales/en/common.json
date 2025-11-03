@@ -148,6 +148,27 @@
       "forgotPrompt": "Forgot your password?",
       "forgotAction": "Get help"
     },
+    "loginPage": {
+      "title": "Sign in to your account",
+      "subtitle": "Access your features right away after signing in.",
+      "emailLabel": "Email",
+      "passwordLabel": "Password",
+      "forgotPassword": "Forgot password",
+      "submit": "Sign in",
+      "or": "OR",
+      "signupPrompt": "Need an account?",
+      "signupAction": "Sign up",
+      "placeholders": {
+        "email": "you@example.com",
+        "password": "••••••••"
+      },
+      "errors": {
+        "oops": "Oops! Something doesn’t match.",
+        "invalid": "Invalid credentials.",
+        "mismatch": "Something doesn’t match.",
+        "unexpected": "Unexpected error occurred."
+      }
+    },
     "processing": {
       "title": "Processing…",
       "subtitle": "Most analyses finish within 30 seconds. Keep this page open while we work.",

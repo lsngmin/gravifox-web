@@ -1,12 +1,12 @@
 import { useAuth } from "providers/authProvider";
 import axios from "axios";
 import { useLocation, useNavigate } from "react-router-dom";
-import { AUTH_ENDPOINTS } from "../../../api/endPointRoute";
+import { AUTH_ENDPOINTS } from "../../../../api/endPointRoute";
 import {
     rememberReturnCheckpoint,
     clearReturnCheckpoint,
-} from "../../../lib/returnCheckpoint/index.js";
-import { CHECKPOINT_TYPES } from "../../../lib/returnCheckpoint/constants.js";
+} from "../../../../lib/returnCheckpoint/index.js";
+import { CHECKPOINT_TYPES } from "../../../../lib/returnCheckpoint/constants.js";
 
 const SignInAPI = () => {
     const location = useLocation();
@@ -15,7 +15,8 @@ const SignInAPI = () => {
 
     const localeMatch = location.pathname?.match(/^\/([a-zA-Z-]{2,5})(?=\/|$)/);
     const prefix = localeMatch ? `/${localeMatch[1]}` : "";
-    const defaultPath = `${prefix}/analyze/upload`;
+    // Default to site root when no previous path exists
+    const defaultPath = "/";
     const fromLocation = location.state?.from;
     const fromPath = fromLocation?.pathname || defaultPath;
     const fromSearch = fromLocation?.search || "";
@@ -55,4 +56,3 @@ const SignInAPI = () => {
 };
 
 export default SignInAPI;
-
