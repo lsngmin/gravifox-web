@@ -119,4 +119,5 @@ export const ADMIN_ENDPOINTS = {
 export const BLOG_ENDPOINTS = {
     LIST: `${API_BASE}/api/v1/blog/posts`,
     BY_SLUG: (slug = "") => `${API_BASE}/api/v1/blog/posts/slug/${encodeURIComponent(String(slug))}`,
+    BY_ID: (id = "") => `${API_BASE}/api/v1/blog/posts/${encodeURIComponent(String(id))}`,
 };

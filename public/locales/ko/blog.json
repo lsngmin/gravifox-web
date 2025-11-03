@@ -18,9 +18,7 @@
   },
   "list": {
     "loadMore": "더 보기",
+    "readMore": "자세히 보기",
     "empty": "아직 등록된 글이 없어요."
-  },
-  "meta": {
-    "readTime": "{{minutes}}분 소요"
   }
 }

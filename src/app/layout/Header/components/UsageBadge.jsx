@@ -116,18 +116,30 @@ const UsageBadge = () => {
         );
     }
 
+    const labelShort = (() => {
+        if (remaining != null) {
+            return t('navigation.usage.remainingShort', {
+                defaultValue: '잔여 {{count}}회',
+                count: numberFormatter.format(remaining),
+            });
+        }
+        if (limit != null && used != null) {
+            return t('navigation.usage.compact', {
+                defaultValue: '{{used}}/{{limit}}',
+                used: numberFormatter.format(used),
+                limit: numberFormatter.format(limit),
+            });
+        }
+        return '';
+    })();
+
     return (
         <div className="inline-flex items-center gap-2 rounded-full border border-slate-200/80 bg-white/80 px-2.5 py-1 shadow-sm dark:border-slate-700 dark:bg-slate-800/80">
             <span className="relative flex h-4 w-4 items-center justify-center" aria-hidden="true">
                 <span className="absolute inset-0 rounded-full" style={ringStyle} />
                 <span className="absolute inset-[2px] rounded-full bg-white dark:bg-slate-900" />
             </span>
-            <span className="relative h-1.5 w-12 overflow-hidden rounded-full bg-slate-200 dark:bg-slate-700" aria-hidden="true">
-                <span
-                    className="absolute inset-y-0 left-0 rounded-full"
-                    style={{ width: `${clampedPercent}%`, backgroundColor: accent }}
-                />
-            </span>
+            <span className="text-[11px] font-semibold text-slate-700 dark:text-slate-200">{labelShort}</span>
             <span className="sr-only">{srLabel}</span>
         </div>
     );

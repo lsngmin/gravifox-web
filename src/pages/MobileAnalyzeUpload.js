@@ -49,7 +49,7 @@ function FileMetaCard({ file, onRemove, labels }) {
   }, [previewUrl]);
 
   return (
-    <div className="overflow-hidden rounded-[28px] border border-slate-800/70 bg-[radial-gradient(circle_at_20%_20%,rgba(79,70,229,0.18),rgba(15,23,42,0.9))] shadow-[0_34px_68px_-36px_rgba(15,23,42,0.85)]">
+    <div className="overflow-hidden rounded-[28px] border shadow-sm border-slate-200 bg-white dark:border-slate-800/70 dark:bg-[radial-gradient(circle_at_20%_20%,rgba(79,70,229,0.18),rgba(15,23,42,0.9))] dark:shadow-[0_34px_68px_-36px_rgba(15,23,42,0.85)]">
       <div className="relative">
         <img src={previewUrl} alt={file?.name || labels.untitled} className="h-48 w-full object-cover" loading="lazy" />
         <div className="absolute inset-x-0 bottom-0 h-20 bg-gradient-to-t from-black/55 via-black/0" aria-hidden="true" />
@@ -65,7 +65,7 @@ function FileMetaCard({ file, onRemove, labels }) {
         </button>
       </div>
       <div className="px-5 py-3">
-        <p className="truncate text-sm font-semibold text-white/90">{file?.name || labels.untitled}</p>
+        <p className="truncate text-sm font-semibold text-slate-800 dark:text-white/90">{file?.name || labels.untitled}</p>
       </div>
     </div>
   );
@@ -539,14 +539,14 @@ export default function MobileAnalyzeUpload() {
   }, [localizedPath, location.pathname, location.search, navigate]);
 
   return (
-    <div className="dark min-h-screen bg-slate-950 text-slate-100 flex flex-col">
+    <div className="min-h-screen flex flex-col bg-white text-slate-900 dark:bg-slate-950 dark:text-slate-100">
       <Header />
       <main className="flex-1 flex justify-center">
         <div className="flex w-full max-w-sm flex-col gap-6 px-5 pb-14 pt-24">
               <button
                 type="button"
                 onClick={() => navigate(lng ? `/${lng}/analyze` : '/analyze')}
-                className="inline-flex w-fit items-center gap-1 self-start text-xs font-semibold text-indigo-300 transition hover:text-indigo-200"
+                className="inline-flex w-fit items-center gap-1 self-start text-xs font-semibold text-indigo-600 transition hover:text-indigo-700 dark:text-indigo-300 dark:hover:text-indigo-200"
               >
                 <span aria-hidden="true">←</span>
                 {t('mobileAnalyze.uploadPage.back', '모바일 분석 홈')}
@@ -556,34 +556,34 @@ export default function MobileAnalyzeUpload() {
                   <h1 className="text-[1.75rem] font-semibold leading-tight">
                     {t('mobileAnalyze.uploadPage.heading', '모바일에서 바로 업로드')}
                   </h1>
-                  <p className="mt-2 text-sm text-slate-400">
+                  <p className="mt-2 text-sm text-slate-600 dark:text-slate-400">
                     {t('mobileAnalyze.uploadPage.subheading', '촬영하거나 앨범에서 선택해 AI 흔적을 확인해 보세요.')}
                   </p>
-                  <p className="mt-3 border-l-2 border-indigo-500/40 pl-3 text-xs text-slate-400">
+                  <p className="mt-3 border-l-2 border-indigo-300 pl-3 text-xs text-slate-600 dark:border-indigo-500/40 dark:text-slate-400">
                     {t('mobileAnalyze.uploadPage.hint', '이미지 3장까지 한 번에 업로드할 수 있어요.')}
                   </p>
                 </div>
               </header>
 
               {loadingQuota && !quotaSummary && (
-                <div className="rounded-3xl border border-indigo-400/30 bg-indigo-500/12 px-4 py-4 text-[12px] text-indigo-100/80 shadow-[0_20px_40px_-28px_rgba(79,70,229,0.4)]">
+                <div className="rounded-3xl border px-4 py-4 text-[12px] shadow-[0_20px_40px_-28px_rgba(79,70,229,0.25)] border-indigo-200 bg-indigo-50 text-indigo-700 dark:border-slate-800/60 dark:bg-slate-900/70 dark:text-slate-200 dark:shadow-[0_20px_40px_-28px_rgba(15,23,42,0.7)]">
                   {t('mobileAnalyze.uploadPage.quota.loading', '사용 가능 횟수를 불러오는 중이에요…')}
                 </div>
               )}
 
               {quotaSummary && (
-                <div className="rounded-3xl border border-indigo-400/35 bg-indigo-500/12 px-4 py-4 text-indigo-100 shadow-[0_20px_40px_-28px_rgba(79,70,229,0.55)]">
-                  <p className="text-[11px] font-semibold uppercase tracking-[0.14em] text-indigo-200">
+                <div className="rounded-3xl border px-4 py-4 shadow-[0_20px_40px_-28px_rgba(79,70,229,0.35)] border-indigo-200 bg-indigo-50 text-slate-900 dark:border-slate-800/60 dark:bg-slate-900/70 dark:text-slate-100 dark:shadow-[0_20px_40px_-28px_rgba(15,23,42,0.8)]">
+                  <p className="text-[11px] font-semibold uppercase tracking-[0.14em] text-indigo-700/80 dark:text-indigo-200">
                     {t('mobileAnalyze.uploadPage.quota.title', '이번 달 남은 분석')}
                   </p>
-                  <p className="mt-2 text-2xl font-semibold text-white">
+                  <p className="mt-2 text-2xl font-semibold text-slate-900 dark:text-white">
                     {quotaNumberFormatter.format(quotaSummary.remaining)}
-                    <span className="ml-2 text-sm text-indigo-100/75">
+                    <span className="ml-2 text-sm text-indigo-700/80 dark:text-indigo-100/75">
                       / {quotaNumberFormatter.format(quotaSummary.limit)}
                     </span>
                   </p>
                   {quotaPeriodLabel && (
-                    <p className="mt-2 text-[11px] text-indigo-100/70">
+                    <p className="mt-2 text-[11px] text-indigo-700/70 dark:text-indigo-100/70">
                       {t('mobileAnalyze.uploadPage.quota.period', {
                         defaultValue: '집계 기간: {{period}}',
                         period: quotaPeriodLabel,
@@ -591,7 +591,7 @@ export default function MobileAnalyzeUpload() {
                     </p>
                   )}
                   {quotaSummary.loginType === 'EMAIL' && !quotaSummary.emailVerified && (
-                    <p className="mt-2 text-[11px] text-amber-200/80">
+                    <p className="mt-2 text-[11px] text-amber-700 dark:text-amber-200/80">
                       {t('mobileAnalyze.uploadPage.quota.emailPending', '이메일 인증이 완료되면 바로 이용할 수 있어요.')}
                     </p>
                   )}
@@ -602,16 +602,16 @@ export default function MobileAnalyzeUpload() {
                 <div className="px-1 space-y-3">
                   <div className="flex items-center justify-between gap-4">
                     <div>
-                      <p className="text-[15px] font-semibold text-slate-100 tracking-tight">
+                      <p className="text-[15px] font-semibold tracking-tight text-slate-900 dark:text-slate-100">
                         {t('mobileAnalyze.uploadPage.modelSection.title', '분석 모델 선택')}
                       </p>
-                      <p className="mt-1 text-[12px] text-slate-400">
+                      <p className="mt-1 text-[12px] text-slate-600 dark:text-slate-400">
                         {t('mobileAnalyze.uploadPage.modelSection.hint', '사용할 분석 모델을 고르면 결과가 더 정확해져요.')}
                       </p>
                     </div>
                   </div>
                   {loadingModels && (
-                    <p className="text-[12px] text-slate-500">
+                    <p className="text-[12px] text-slate-500 dark:text-slate-400">
                       {t('mobileAnalyze.uploadPage.modelSection.loading', '모델 정보를 불러오는 중이에요…')}
                     </p>
                   )}
@@ -621,7 +621,7 @@ export default function MobileAnalyzeUpload() {
                     </p>
                   )}
                   {!loadingModels && !modelError && models.length === 0 && (
-                    <p className="text-[12px] text-slate-500">
+                    <p className="text-[12px] text-slate-500 dark:text-slate-400">
                       {t('mobileAnalyze.uploadPage.modelSection.empty', '사용 가능한 모델이 없어요. 기본 설정으로 진행합니다.')}
                     </p>
                   )}
@@ -638,15 +638,15 @@ export default function MobileAnalyzeUpload() {
                             aria-pressed={selected}
                             className={`flex w-full items-center justify-between gap-3 rounded-2xl border px-4 py-3 text-left transition ${
                               selected
-                                ? 'border-indigo-400/70 bg-indigo-500/15 text-indigo-50 shadow-[0_18px_36px_-28px_rgba(99,102,241,0.45)]'
-                                : 'border-slate-800/70 bg-slate-900/70 text-slate-200 hover:border-indigo-400/40 hover:bg-slate-900/60'
+                                ? 'border-indigo-300 bg-indigo-50 text-slate-900 shadow-[0_18px_36px_-28px_rgba(99,102,241,0.45)] dark:border-indigo-400/70 dark:bg-indigo-500/15 dark:text-indigo-50'
+                                : 'border-slate-200 bg-white text-slate-700 hover:border-indigo-300 hover:bg-indigo-50 dark:border-slate-800/70 dark:bg-slate-900/70 dark:text-slate-200 dark:hover:border-indigo-400/40 dark:hover:bg-slate-900/60'
                             }`}
                           >
                             <div className="flex flex-1 flex-col justify-center">
                               <p className="flex items-center text-sm font-semibold text-inherit">
                                 {model.name}
                                 {isDefault && (
-                                  <span className="ml-2 inline-flex items-center rounded-full bg-indigo-500/20 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wide text-indigo-200">
+                                  <span className="ml-2 inline-flex items-center rounded-full px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wide bg-indigo-100 text-indigo-700 dark:bg-indigo-500/20 dark:text-indigo-200">
                                     {t('mobileAnalyze.uploadPage.modelSection.recommended', '기본')}
                                   </span>
                                 )}
@@ -655,8 +655,8 @@ export default function MobileAnalyzeUpload() {
                             <span
                               className={`inline-flex h-6 w-6 items-center justify-center self-center rounded-full border ${
                                 selected
-                                  ? 'border-indigo-300 bg-indigo-500/30 text-white'
-                                  : 'border-slate-700 text-slate-500'
+                                  ? 'border-indigo-300 bg-indigo-500/20 text-indigo-700 dark:bg-indigo-500/30 dark:text-white'
+                                  : 'border-slate-300 text-slate-500 dark:border-slate-700'
                               }`}
                               aria-hidden="true"
                             >
@@ -670,14 +670,14 @@ export default function MobileAnalyzeUpload() {
                 </div>
                 <div className="px-1">
                   <div className="flex items-start gap-3">
-                    <div className="pt-0.5 text-indigo-200/80">
+                    <div className="pt-0.5 text-indigo-600/80 dark:text-indigo-200/80">
                       <UploadCloud size={18} />
                     </div>
                     <div>
-                      <p className="text-[15px] font-semibold text-slate-100 tracking-tight">
+                      <p className="text-[15px] font-semibold tracking-tight text-slate-900 dark:text-slate-100">
                         {t('mobileAnalyze.uploadPage.actions.album', '앨범에서 선택')}
                       </p>
-                      <p className="mt-2 text-xs text-slate-400">
+                      <p className="mt-2 text-xs text-slate-600 dark:text-slate-400">
                         {t('mobileAnalyze.uploadPage.steps.selectHint', 'PNG, JPG, WEBP 형식을 지원해요.')}
                       </p>
                     </div>
@@ -685,22 +685,22 @@ export default function MobileAnalyzeUpload() {
                 </div>
 
                 {files.length === 0 ? (
-                  <div className="rounded-[28px] border border-slate-800/70 bg-[linear-gradient(150deg,rgba(15,23,42,0.85),rgba(17,24,39,0.7))] px-6 py-12 text-center text-sm text-slate-300 shadow-[0_24px_54px_-32px_rgba(15,23,42,0.85)]">
+                  <div className="rounded-[28px] border px-6 py-12 text-center text-sm shadow-sm border-slate-200 bg-slate-50 text-slate-600 dark:border-slate-800/70 dark:bg-[linear-gradient(150deg,rgba(15,23,42,0.85),rgba(17,24,39,0.7))] dark:text-slate-300 dark:shadow-[0_24px_54px_-32px_rgba(15,23,42,0.85)]">
                     <p>{t('mobileAnalyze.uploadPage.emptyState', '아직 선택한 파일이 없어요.')}</p>
-                    <p className="mt-2 text-[12px] text-slate-400">
+                    <p className="mt-2 text-[12px] text-slate-500 dark:text-slate-400">
                       {t('mobileAnalyze.uploadPage.emptyHint', '아래 버튼을 눌러 바로 시작해 보세요.')}
                     </p>
                   </div>
                 ) : (
                   <div className="space-y-5">
                     <div
-                      className="flex items-center justify-between rounded-[26px] border px-5 py-3 text-[11px] font-semibold text-indigo-100"
+                      className="flex items-center justify-between rounded-[26px] border px-5 py-3 text-[11px] font-semibold text-indigo-700 dark:text-indigo-100"
                       style={countCardStyle}
                     >
                       <span className="tracking-wide">{imageCountLabel}</span>
-                      <span className="inline-flex h-2 w-8 items-center rounded-full bg-indigo-200/30">
+                      <span className="inline-flex h-2 w-8 items-center rounded-full bg-indigo-300/30 dark:bg-indigo-200/30">
                         <span
-                          className="h-full rounded-full bg-indigo-100"
+                          className="h-full rounded-full bg-indigo-600 dark:bg-indigo-100"
                           style={{ width: `${Math.min(100, Math.max(12, gradientIntensity * 100))}%` }}
                         />
                       </span>
@@ -720,12 +720,12 @@ export default function MobileAnalyzeUpload() {
               </section>
 
               {hasFiles && canAddMoreImages && (
-                <div className="flex flex-col items-center gap-2 rounded-[26px] border border-slate-800/60 bg-slate-900/60 px-4 py-4 text-center text-xs text-slate-300 shadow-[0_22px_48px_-34px_rgba(15,23,42,0.8)]">
+                <div className="flex flex-col items-center gap-2 rounded-[26px] border px-4 py-4 text-center text-xs shadow-sm border-slate-200 bg-slate-50 text-slate-600 dark:border-slate-800/60 dark:bg-slate-900/60 dark:text-slate-300 dark:shadow-[0_22px_48px_-34px_rgba(15,23,42,0.8)]">
                   <span>{t('mobileAnalyze.uploadPage.moreHint', '추가로 업로드할 이미지가 있으신가요?')}</span>
                   <button
                     type="button"
                     onClick={triggerAlbum}
-                    className="inline-flex items-center justify-center rounded-full border border-indigo-400/40 px-3 py-1 text-[11px] font-semibold text-indigo-200 transition hover:border-indigo-300 hover:text-white"
+                    className="inline-flex items-center justify-center rounded-full border px-3 py-1 text-[11px] font-semibold transition border-indigo-300 text-indigo-700 hover:border-indigo-400 hover:text-indigo-800 dark:border-indigo-400/40 dark:text-indigo-200 dark:hover:border-indigo-300 dark:hover:text-white"
                   >
                     {t('mobileAnalyze.uploadPage.moreAction', '이미지 더 올리기')}
                   </button>
@@ -736,7 +736,7 @@ export default function MobileAnalyzeUpload() {
                 <button
                   type="button"
                   onClick={handleReset}
-                  className="mt-3 w-full text-center text-xs font-semibold text-slate-400 underline-offset-4 transition hover:text-slate-200 hover:underline"
+                  className="mt-3 w-full text-center text-xs font-semibold text-slate-500 underline-offset-4 transition hover:text-slate-700 hover:underline dark:text-slate-400 dark:hover:text-slate-200"
                 >
                   {t('mobileAnalyze.uploadPage.reset', '모든 파일 비우기')}
                 </button>
@@ -750,8 +750,8 @@ export default function MobileAnalyzeUpload() {
                     disabled={uploadDisabled}
                     className={`inline-flex w-full items-center justify-center rounded-[28px] px-4 py-3 text-base font-semibold transition ${
                       uploadDisabled
-                        ? 'cursor-not-allowed border border-slate-700 bg-slate-800/60 text-slate-500'
-                        : 'border border-indigo-400/40 bg-indigo-500/15 text-indigo-100 hover:border-indigo-300 hover:bg-indigo-500/25'
+                        ? 'cursor-not-allowed border border-slate-300 bg-slate-100 text-slate-500 dark:border-slate-700 dark:bg-slate-800/60'
+                        : 'border border-indigo-300 bg-indigo-50 text-indigo-700 hover:border-indigo-400 hover:bg-indigo-100 dark:border-indigo-400/40 dark:bg-indigo-500/15 dark:text-indigo-100 dark:hover:border-indigo-300 dark:hover:bg-indigo-500/25'
                     }`}
                   >
                     {t('mobileAnalyze.uploadPage.primaryAction', '이미지 업로드하기')}
@@ -764,7 +764,7 @@ export default function MobileAnalyzeUpload() {
                   className={`inline-flex w-full items-center justify-center rounded-[28px] px-4 py-3 text-base font-semibold shadow-[0_26px_60px_-34px_rgba(99,102,241,0.55)] transition ${
                     !analyzeDisabled
                       ? 'bg-gradient-to-r from-indigo-500 via-indigo-400 to-sky-400 text-white active:scale-[0.99]'
-                      : 'cursor-not-allowed bg-slate-800/60 text-slate-500'
+                      : 'cursor-not-allowed bg-slate-200 text-slate-500 dark:bg-slate-800/60'
                   }`}
                 >
                   {submitting
@@ -798,7 +798,6 @@ export default function MobileAnalyzeUpload() {
           }
         }}
         title={t('mobileAnalyze.uploadPage.errors.title', '업로드 오류')}
-        theme="dark"
       />
       <LoginRequiredModal
         open={loginModalOpen}

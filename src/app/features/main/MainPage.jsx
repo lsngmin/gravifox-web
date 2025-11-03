@@ -3,10 +3,10 @@ import Footer from "../../layout/Footer/Footer";
 
 import PageHero from "./sections/PageHero";
 
-import AnchorNav from "../../../features/main/anchorNav";
-import ContentDecor from "../../../features/main/contentDecor";
-import Feature from "../../../features/main/feature";
-import HowItWorks from "../../../features/main/howItWorks";
+import AnchorNav from "./components/AnchorNav";
+import ContentDecor from "./components/ContentDecor";
+import FeatureHighlights from "./sections/FeatureHighlights";
+import HowItWorksSection from "./sections/HowItWorksSection";
 import UseCases from "../../../features/main/useCases";
 import SupportedInputs from "../../../features/main/supportedInputs";
 import SampleOutput from "../../../features/main/sampleOutput";
@@ -21,8 +21,8 @@ export default function MainPage() {
                 <PageHero />
                 <AnchorNav />
                 <ContentDecor>
-                    <HowItWorks />
-                    <Feature />
+                    <HowItWorksSection />
+                    <FeatureHighlights />
                     <UseCases />
                     <SupportedInputs />
                     <SampleOutput />

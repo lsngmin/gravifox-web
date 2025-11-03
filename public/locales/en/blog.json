@@ -18,9 +18,7 @@
   },
   "list": {
     "loadMore": "Load more",
+    "readMore": "Read more",
     "empty": "No posts yet."
-  },
-  "meta": {
-    "readTime": "{{minutes}} min read"
   }
 }
