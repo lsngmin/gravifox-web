@@ -132,7 +132,7 @@ export default function AnchorNav() {
     return (
         <nav
             id="anchor-nav"
-            className="sticky z-30 w-full border-b border-indigo-200/70 bg-white/85 backdrop-blur-md transition-colors duration-300 dark:border-slate-800/80 dark:bg-slate-900/75"
+            className="sticky z-30 w-full border-b border-indigo-200/70 bg-gradient-to-b from-white via-slate-50/60 to-white backdrop-blur-md transition-colors duration-300 dark:border-slate-800/80 dark:from-slate-900 dark:via-slate-900/80 dark:to-slate-950"
             style={{ top: headerOffset }}
         >
             <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
