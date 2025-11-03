@@ -63,17 +63,24 @@ export const AuthProvider = ({ children }) => {
         setAccessTokenState(token);
     }, []);
 
-    const logout = () => {
+    const logout = async () => {
         setAutoRefreshEnabled(false);
         unauthorizedCountRef.current = 0;
         clearSession();
 
-        axios.post(AUTH_ENDPOINTS.SIGNOUT, {}, {
-            withCredentials: true
-        })
-        setTimeout(() => {
+        // Try to notify server to clear refresh token; then hard-reload regardless.
+        try {
+            await axios.post(
+                AUTH_ENDPOINTS.SIGNOUT,
+                {},
+                { withCredentials: true, timeout: 5000 }
+            );
+        } catch (e) {
+            // Ignore network/server errors and still proceed to reload
+        } finally {
+            // Force a full page reload to ensure all in-memory state is cleared
             window.location.reload();
-        }, 1000)
+        }
     }
 
     useEffect(() => {

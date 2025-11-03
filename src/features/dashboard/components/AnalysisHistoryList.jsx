@@ -174,30 +174,30 @@ export default function AnalysisHistoryList() {
       {hasTopStats && (
         <div className="space-y-1.5">
           {filtered.length > 0 && (
-            <p className="text-xl font-semibold text-slate-200 sm:text-2xl">
+            <p className="text-xl font-semibold text-slate-900 dark:text-slate-200 sm:text-2xl">
               지난 일주일 동안 총 {filtered.length}건의 분석 결과가 있어요
             </p>
           )}
           {averageProb !== null && (
-            <p className="text-sm text-slate-500 sm:text-base">
+            <p className="text-sm text-slate-600 dark:text-slate-500 sm:text-base">
               사용자님이 업로드한 이미지의 평균 생성 확률은 {averageProb.toFixed(1)}%예요.
             </p>
           )}
         </div>
       )}
       {items.length > 0 && (
-        <div className="rounded-xl border border-indigo-500/35 bg-slate-900/75 px-4 py-3 text-xs text-indigo-100 shadow-lg shadow-indigo-900/35 backdrop-blur">
+        <div className="rounded-xl border border-indigo-200 bg-indigo-50 px-4 py-3 text-xs text-indigo-700 shadow-sm backdrop-blur dark:border-indigo-500/35 dark:bg-slate-900/75 dark:text-indigo-100 dark:shadow-lg dark:shadow-indigo-900/35">
           <div className="flex items-center justify-between gap-4">
             <div className="min-w-0 space-y-1">
-              <p className="text-sm font-semibold text-indigo-100">최근 분석 데이터를 불러오는 중이에요</p>
-              <p className="text-xs leading-relaxed text-indigo-200/85">
+              <p className="text-sm font-semibold text-indigo-700 dark:text-indigo-100">최근 분석 데이터를 불러오는 중이에요</p>
+              <p className="text-xs leading-relaxed text-indigo-600 dark:text-indigo-200/85">
                 결과가 보이지 않는다면 오른쪽 새로고침을 눌러주세요.
               </p>
             </div>
             <button
               type="button"
               onClick={() => setLocal(readLocalReports())}
-              className="inline-flex h-12 w-12 flex-none items-center justify-center rounded-full border border-indigo-400/40 bg-indigo-500/25 text-indigo-100 transition hover:bg-indigo-500/35 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-300"
+              className="inline-flex h-12 w-12 flex-none items-center justify-center rounded-full border border-indigo-300 bg-indigo-100 text-indigo-800 transition hover:bg-indigo-200 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-300 dark:border-indigo-400/40 dark:bg-indigo-500/25 dark:text-indigo-100 dark:hover:bg-indigo-500/35"
               aria-label="최근 분석 새로고침"
             >
               <ArrowPathIcon className="h-6 w-6" aria-hidden="true" />
@@ -211,26 +211,26 @@ export default function AnalysisHistoryList() {
           type="button"
           onClick={() => setFavOnly((prev) => !prev)}
           className={`inline-flex items-center gap-1.5 rounded-md border px-3 py-1.5 text-[13px] font-semibold transition ${
-            favOnly ? 'border-indigo-500 bg-indigo-600 text-white shadow-sm' : 'border-slate-200 bg-white text-slate-700 hover:bg-slate-50'
+            favOnly ? 'border-indigo-500 bg-indigo-600 text-white shadow-sm' : 'border-slate-200 bg-white text-slate-700 hover:bg-slate-50 dark:border-slate-600 dark:bg-slate-800 dark:text-slate-200 dark:hover:bg-slate-700'
           }`}
         >
           <StarIcon className="h-4 w-4" aria-hidden="true" />
           즐겨찾기만
         </button>
         <div className="flex flex-wrap items-center justify-end gap-3">
-          <div className="inline-flex rounded-lg border border-slate-200 bg-white p-0.5">
+          <div className="inline-flex rounded-lg border border-slate-200 bg-white p-0.5 dark:border-slate-600 dark:bg-slate-800">
           {['ALL','REAL','FAKE','UNKNOWN'].map(L => (
             <button
               key={L}
               onClick={() => setLabelTab(L)}
-              className={`rounded-md px-3 py-1.5 text-[13px] font-semibold ${labelTab===L ? 'bg-indigo-600 text-white shadow-sm' : 'text-slate-700 hover:bg-slate-50'}`}
+              className={`rounded-md px-3 py-1.5 text-[13px] font-semibold ${labelTab===L ? 'bg-indigo-600 text-white shadow-sm' : 'text-slate-700 hover:bg-slate-50 dark:text-slate-200 dark:hover:bg-slate-700'}`}
             >{L}</button>
           ))}
         </div>
           <div className="hidden items-center gap-1 text-xs text-slate-500 sm:flex">
             <span className="text-slate-400">정렬</span>
             <select
-              className="rounded border border-slate-200 bg-white px-1.5 py-1 text-xs font-medium text-slate-700"
+              className="rounded border border-slate-200 bg-white px-1.5 py-1 text-xs font-medium text-slate-700 dark:border-slate-600 dark:bg-slate-800 dark:text-slate-200"
               value={sortKey}
               onChange={(e)=>setSortKey(e.target.value)}
             >
@@ -247,7 +247,7 @@ export default function AnalysisHistoryList() {
       </div>
 
       {items.length === 0 && (
-        <div className="rounded-xl border border-slate-200 bg-white p-4 text-sm text-slate-600">
+        <div className="rounded-xl border border-slate-200 bg-white p-4 text-sm text-slate-600 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-300">
           분석 기록이 없어요. Analyze에서 파일을 업로드해 보세요.
         </div>
       )}
@@ -301,23 +301,32 @@ function HistoryCard({
   const prob = probValue !== null ? `${probValue}%` : '-';
   const labelText = String(label).toUpperCase();
   const labelTone = labelText === 'FAKE'
-    ? { wrapper: 'border-rose-400/55 bg-rose-500/20 text-rose-100', dot: 'bg-rose-300' }
+    ? {
+        wrapper: 'border-rose-200 bg-rose-50 text-rose-700 dark:border-rose-400/55 dark:bg-rose-500/20 dark:text-rose-100',
+        dot: 'bg-rose-500 dark:bg-rose-300',
+      }
     : labelText === 'REAL'
-      ? { wrapper: 'border-emerald-400/55 bg-emerald-500/20 text-emerald-100', dot: 'bg-emerald-300' }
-      : { wrapper: 'border-amber-400/55 bg-amber-500/20 text-amber-100', dot: 'bg-amber-300' };
+      ? {
+          wrapper: 'border-emerald-200 bg-emerald-50 text-emerald-700 dark:border-emerald-400/55 dark:bg-emerald-500/20 dark:text-emerald-100',
+          dot: 'bg-emerald-500 dark:bg-emerald-300',
+        }
+      : {
+          wrapper: 'border-amber-200 bg-amber-50 text-amber-700 dark:border-amber-400/55 dark:bg-amber-500/20 dark:text-amber-100',
+          dot: 'bg-amber-500 dark:bg-amber-300',
+        };
   const mediaKind = typeof meta?.type === 'string' ? meta.type.split('/')[0] : null;
   const previewFallbackText = mediaKind === 'video' ? 'VIDEO' : mediaKind === 'audio' ? 'AUDIO' : mediaKind === 'image' ? 'IMAGE' : 'MEDIA';
 
   return (
-    <div className="relative overflow-hidden rounded-2xl border border-slate-700/40 bg-slate-950/70 p-5 shadow-lg shadow-slate-900/40">
-      <div className="absolute inset-0 bg-gradient-to-br from-indigo-500/10 via-transparent to-slate-900/60" aria-hidden="true" />
+    <div className="relative overflow-hidden rounded-2xl border border-slate-200 bg-white p-5 shadow-md dark:border-slate-700/40 dark:bg-slate-950/70 dark:shadow-lg dark:shadow-slate-900/40">
+      <div className="absolute inset-0 bg-gradient-to-br from-indigo-100/40 via-transparent to-slate-200/60 dark:from-indigo-500/10 dark:to-slate-900/60" aria-hidden="true" />
       <div className="relative space-y-4">
         <div className="space-y-2">
           <div className="flex items-center justify-between gap-2">
-            <span className="inline-flex items-center gap-1.5 rounded-lg border border-indigo-400/50 bg-indigo-500/20 px-3 py-1 text-[12px] font-semibold text-indigo-100">
-              <span className="h-2.5 w-2.5 rounded-full bg-indigo-200/90" />
+            <span className="inline-flex items-center gap-1.5 rounded-lg border border-indigo-300 bg-indigo-50 px-3 py-1 text-[12px] font-semibold text-indigo-700 dark:border-indigo-400/50 dark:bg-indigo-500/20 dark:text-indigo-100">
+              <span className="h-2.5 w-2.5 rounded-full bg-indigo-400 dark:bg-indigo-200/90" />
               생성 확률
-              <span className="text-white">{prob}</span>
+              <span className="text-indigo-900 dark:text-white">{prob}</span>
             </span>
             <span className={`inline-flex items-center gap-1.5 rounded-lg border px-3 py-1 text-[12px] font-semibold uppercase tracking-[0.18em] ${labelTone.wrapper}`}>
               <span className={`h-2.5 w-2.5 rounded-full ${labelTone.dot}`} />
@@ -325,9 +334,9 @@ function HistoryCard({
             </span>
           </div>
         </div>
-        <p className="truncate text-right text-xs font-medium text-slate-300 sm:text-sm">{meta?.name || '파일명 없음'}</p>
+        <p className="truncate text-right text-xs font-medium text-slate-500 dark:text-slate-300 sm:text-sm">{meta?.name || '파일명 없음'}</p>
 
-        <div className="relative overflow-hidden rounded-2xl border border-slate-700/35 bg-slate-900/80">
+        <div className="relative overflow-hidden rounded-2xl border border-slate-200 bg-white dark:border-slate-700/35 dark:bg-slate-900/80">
           {previewUrl ? (
             <img
               src={previewUrl}
@@ -336,7 +345,7 @@ function HistoryCard({
               loading="lazy"
             />
           ) : (
-            <div className="flex h-52 w-full items-center justify-center bg-slate-900/70 text-xs font-semibold uppercase tracking-[0.18em] text-slate-500 sm:h-64">
+            <div className="flex h-52 w-full items-center justify-center bg-slate-100 text-xs font-semibold uppercase tracking-[0.18em] text-slate-500 dark:bg-slate-900/70 dark:text-slate-400 sm:h-64">
               {previewFallbackText}
             </div>
           )}
@@ -347,7 +356,7 @@ function HistoryCard({
               type="button"
               onClick={() => onToggleFav(jobId)}
               title={favs.has(jobId) ? '즐겨찾기 해제' : '즐겨찾기'}
-              className="inline-flex h-9 w-9 items-center justify-center rounded-full border border-amber-400/30 bg-amber-500/10 text-amber-300 transition hover:bg-amber-500/20"
+              className="inline-flex h-9 w-9 items-center justify-center rounded-full border border-amber-200 bg-amber-50 text-amber-600 transition hover:bg-amber-100 dark:border-amber-400/30 dark:bg-amber-500/10 dark:text-amber-300 dark:hover:bg-amber-500/20"
             >
               {favs.has(jobId) ? (
                 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" className="h-[18px] w-[18px]">
@@ -371,7 +380,7 @@ function HistoryCard({
             <button
               type="button"
               onClick={onToggleRe}
-              className="inline-flex items-center rounded-lg border border-indigo-400/40 bg-indigo-500/10 px-3 py-1.5 text-xs font-semibold text-indigo-200 transition hover:bg-indigo-500/20"
+              className="inline-flex items-center rounded-lg border border-indigo-300 bg-indigo-50 px-3 py-1.5 text-xs font-semibold text-indigo-700 transition hover:bg-indigo-100 dark:border-indigo-400/40 dark:bg-indigo-500/10 dark:text-indigo-200 dark:hover:bg-indigo-500/20"
             >
               {isReOpen ? '재분석 닫기' : '재분석'}
             </button>
@@ -524,12 +533,12 @@ function ReAnalyzePane({ onFinish }) {
             {submitting ? '분석 중…' : '재분석 시작'}
           </button>
           {stage && (
-            <span className="text-[11px] text-slate-600">상태: {stage}{progress!=null ? ` (${Math.round(progress*100)}%)` : ''}</span>
+            <span className="text-[11px] text-slate-600 dark:text-slate-400">상태: {stage}{progress!=null ? ` (${Math.round(progress*100)}%)` : ''}</span>
           )}
         </div>
       )}
       {error && (
-        <div className="mt-2 rounded-md border border-rose-200 bg-rose-50 p-2 text-xs text-rose-700">{error}</div>
+        <div className="mt-2 rounded-md border border-rose-200 bg-rose-50 p-2 text-xs text-rose-700 dark:border-rose-700 dark:bg-rose-950/30 dark:text-rose-200">{error}</div>
       )}
       {result && (
         <div className="mt-3">

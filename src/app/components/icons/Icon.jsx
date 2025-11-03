@@ -9,6 +9,7 @@ import {
     UserIcon,
     XMarkIcon,
     ArrowRightOnRectangleIcon,
+    ArrowLeftOnRectangleIcon,
 } from "@heroicons/react/24/outline";
 import { MoonIcon, SunIcon } from "@heroicons/react/24/solid";
 import ArrowOutwardIcon from "@mui/icons-material/ArrowOutward";
@@ -35,6 +36,7 @@ const ICON_REGISTRY = Object.freeze({
     "credit-card": CreditCardIcon,
     dashboard: Squares2X2Icon,
     logout: ArrowRightOnRectangleIcon,
+    login: ArrowLeftOnRectangleIcon,
     "arrow-outward": ArrowOutwardIcon,
     sparkles: Sparkles,
     "message-square": MessageSquare,

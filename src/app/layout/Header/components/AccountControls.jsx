@@ -1,9 +1,8 @@
 import React from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, Link } from 'react-router-dom';
 
 import { useAuth } from 'providers/authProvider';
 
-import LoginButton from './LoginButton';
 import UsageBadge from './UsageBadge';
 import { useHeaderContext } from '../context';
 import { useThemeMode } from '../../../hooks/useThemeMode';
@@ -113,7 +112,51 @@ const AccountControls = () => {
                     />
                 </>
             ) : (
-                <LoginButton />
+                <>
+                    <TooltipIconButton
+                        label={t('navigation.actions.toggleTheme', '테마 전환')}
+                        onClick={toggleTheme}
+                        icon={<Icon name={themeMode === 'dark' ? 'sun' : 'moon'} className="h-5 w-5" />}
+                    />
+
+                    {/* Language quick menu (available even when logged out) */}
+                    <div className="relative group">
+                        <Menu as="div" className="relative z-10">
+                            <MenuButton
+                                type="button"
+                                className="inline-flex h-9 w-9 items-center justify-center rounded-full border border-slate-200/80 bg-white/70 text-gray-600 shadow-sm transition hover:border-slate-300 hover:bg-white hover:text-gray-900 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-indigo-400 focus-visible:ring-offset-2 focus-visible:ring-offset-white dark:border-slate-700 dark:bg-slate-800 dark:text-slate-200 dark:hover:border-slate-600 dark:hover:bg-slate-700 dark:hover:text-white dark:focus-visible:ring-offset-slate-900"
+                                aria-label={t('navigation.actions.changeLanguage', '언어 변경')}
+                                title={t('navigation.actions.changeLanguage', '언어 변경')}
+                            >
+                                <Icon name="globe" className="h-5 w-5" />
+                            </MenuButton>
+                            <MenuItems
+                                transition
+                                className="absolute right-0 z-50 mt-2 w-48 origin-top-right rounded-xl bg-white text-gray-700 shadow-xl ring-1 ring-black/5 transition data-[closed]:scale-95 data-[closed]:opacity-0 data-[enter]:duration-150 data-[leave]:duration-100 data-[enter]:ease-out data-[leave]:ease-in dark:bg-slate-900 dark:text-slate-200 dark:ring-slate-700/70"
+                            >
+                                <LocaleSelector variant="menu" />
+                            </MenuItems>
+                        </Menu>
+                        <span className="pointer-events-none absolute -bottom-8 left-1/2 -translate-x-1/2 whitespace-nowrap rounded-md bg-gray-900 px-2 py-1 text-[10px] font-medium text-white opacity-0 shadow-lg transition-opacity group-hover:opacity-100 dark:bg-slate-700">
+                            {t('navigation.actions.changeLanguage', '언어 변경')}
+                        </span>
+                    </div>
+
+                    {/* Logged-out: login icon button with tooltip */}
+                    <div className="relative group">
+                        <Link
+                            to={localePrefix ? `${localePrefix}/login` : '/login'}
+                            aria-label={t('navigation.actions.login', '로그인')}
+                            title={t('navigation.actions.login', '로그인')}
+                            className="inline-flex h-9 w-9 items-center justify-center rounded-full border border-slate-200/80 bg-white/70 text-gray-600 shadow-sm transition hover:border-slate-300 hover:text-gray-900 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-indigo-400 focus-visible:ring-offset-2 focus-visible:ring-offset-white dark:border-slate-700 dark:bg-slate-800 dark:text-slate-200 dark:hover:border-slate-600 dark:hover:text-white dark:focus-visible:ring-offset-slate-900"
+                        >
+                            <Icon name="login" className="h-5 w-5" />
+                        </Link>
+                        <span className="pointer-events-none absolute -bottom-8 left-1/2 -translate-x-1/2 whitespace-nowrap rounded-md bg-gray-900 px-2 py-1 text-[10px] font-medium text-white opacity-0 shadow-lg transition-opacity group-hover:opacity-100 dark:bg-slate-700">
+                            {t('navigation.actions.login', '로그인')}
+                        </span>
+                    </div>
+                </>
             )}
         </div>
     );

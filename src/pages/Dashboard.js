@@ -19,9 +19,9 @@ const Dashboard = () => {
     if (isLoading) return null;
 
     return (
-        <div className="dark">
+        <div>
             <Header />
-            <main className="mt-14 min-h-screen bg-[#13213f] text-slate-100 md:mt-20">
+            <main className="mt-14 min-h-screen bg-gray-50 text-slate-900 dark:bg-[#13213f] dark:text-slate-100 md:mt-20">
                 <SummaryDashboard />
                 <Footer />
             </main>
