@@ -20,6 +20,13 @@ export function setHttpHandlers({ onTokenUpdated: onUpdated, onUnauthorized: onU
   if (typeof onUnauth === "function") onUnauthorized = onUnauth;
 }
 
+// Heuristic: only attach JWT-like tokens (x.y.z)
+const isLikelyJwt = (value) => {
+  if (typeof value !== 'string') return false;
+  const parts = value.split('.');
+  return parts.length === 3 && parts.every((p) => p && p.length > 0);
+};
+
 // Request: attach Authorization automatically
 axios.interceptors.request.use((config) => {
   try {
@@ -29,7 +36,7 @@ axios.interceptors.request.use((config) => {
       url.includes("/api/v1/auth/login") ||
       url.includes("/api/v1/auth/refresh") ||
       url.includes("/api/v1/auth/logout");
-    if (!isAuthCall && currentAccessToken) {
+    if (!isAuthCall && currentAccessToken && isLikelyJwt(currentAccessToken)) {
       config.headers = config.headers || {};
       config.headers["Authorization"] = `Bearer ${currentAccessToken}`;
     }

@@ -1,12 +1,13 @@
 import React, { useState, useEffect } from "react";
-import { useNavigate, useSearchParams } from "react-router-dom";
+import { useNavigate, useParams, useSearchParams } from "react-router-dom";
 import signupAPI from "../../../../features/login/api/signupAPI";
 import { useTranslation } from 'react-i18next';
 
 const RegisterBox = ({ variant = 'default' }) => {
   const [searchParams] = useSearchParams();
   const navigate = useNavigate();
-  const { t } = useTranslation('common');
+  const { t, i18n } = useTranslation('common');
+  const { lng } = useParams();
 
   const termsCookieParam = searchParams.get("termsCookie");
   const termsMarketingParam = searchParams.get("termsMarketing");
@@ -47,12 +48,25 @@ const RegisterBox = ({ variant = 'default' }) => {
     }));
   }, [termsCookieParam, termsMarketingParam, navigate]);
 
+  // Ensure i18n language tracks URL prefix (en/ko)
+  useEffect(() => {
+    const supported = ['en','ko'];
+    const current = (i18n.language || '').slice(0,2);
+    const target = supported.includes(lng) ? lng : current;
+    if (target && current !== target) {
+      i18n.changeLanguage(target);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [lng]);
+
   const { signup } = signupAPI();
 
   const validateEmail = (value) => {
     if (!value) return t('registerPage.errors.emailRequired', 'Email is required.');
-    const re = /^\S+@\S+\.\S+$/;
-    return re.test(value) ? null : t('registerPage.errors.invalidEmail', 'Invalid email format.');
+    const v = String(value).trim();
+    // Align with backend validator in RegisterController.userIdValidator
+    const re = /^[a-zA-Z0-9_+&*-]+(?:\.[a-zA-Z0-9_+&*-]+)*@(?:[a-zA-Z0-9-]+\.)+[a-zA-Z]{2,7}$/;
+    return re.test(v) ? null : t('registerPage.errors.invalidEmail', 'Invalid email format.');
   };
 
   const validatePassword = (value) => {

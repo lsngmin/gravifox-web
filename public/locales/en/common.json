@@ -2,6 +2,33 @@
   "app": {
     "name": "GraviFox"
   },
+  "registerPage": {
+    "subtitle": "Enter your details to create your account.",
+    "emailLabel": "Email",
+    "passwordLabel": "Password",
+    "nameLabel": "Name",
+    "dobLabel": "Date of Birth (YYYYMMDD)",
+    "placeholders": {
+      "email": "you@example.com",
+      "password": "8–20 chars incl. uppercase, letter, number, special",
+      "name": "Your name",
+      "dob": "YYYYMMDD"
+    },
+    "submit": "Sign Up",
+    "actions": {
+      "showPassword": "Show password",
+      "hidePassword": "Hide password"
+    },
+    "errors": {
+      "emailRequired": "Email is required.",
+      "invalidEmail": "Invalid email format.",
+      "passwordRequired": "Password is required.",
+      "passwordPolicy": "8–20 chars incl. uppercase, letter, number, special",
+      "nameRequired": "Name is required.",
+      "dobRequired": "Date of Birth is required.",
+      "dobFormat": "Use YYYYMMDD format."
+    }
+  },
   "navigation": {
     "items": {
       "analyze": "Analyze",

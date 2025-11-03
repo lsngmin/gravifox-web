@@ -6,7 +6,6 @@ import AccountControls from './AccountControls';
 import HeaderBrand from './HeaderBrand';
 import MenuToggleButton from './MenuToggleButton';
 import PrimaryNav from './PrimaryNav';
-import QuickAuthAccess from './QuickAuthAccess';
 
 const HeaderContainer = () => {
     const { shrinkValue, isMenuOpen } = useHeaderContext();
@@ -54,7 +53,6 @@ const HeaderContainer = () => {
                     </div>
                     <AccountControls />
                     <div className="flex items-center gap-3 lg:hidden relative z-20">
-                        <QuickAuthAccess />
                         <MenuToggleButton />
                     </div>
                 </nav>

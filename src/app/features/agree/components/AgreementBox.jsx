@@ -1,11 +1,12 @@
 import React, { useEffect, useState } from "react";
 import TermsBox from "features/register/components/termsBox";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import { useTranslation } from 'react-i18next';
 
 const AgreementBox = () => {
   const navigate = useNavigate();
   const { i18n, t } = useTranslation('common');
+  const { lng } = useParams();
   const isKo = (i18n?.language || '').slice(0,2) === 'ko';
 
   const [tos, setTos] = useState(false);
@@ -53,7 +54,8 @@ const AgreementBox = () => {
       termsCookie: cookie.toString(),
       termsMarketing: marketing.toString(),
     });
-    navigate(`/register?${params.toString()}`);
+    const prefix = lng ? `/${lng}` : '';
+    navigate(`${prefix}/register?${params.toString()}`);
   };
 
   return (
@@ -136,4 +138,3 @@ const AgreementBox = () => {
 };
 
 export default AgreementBox;
-
