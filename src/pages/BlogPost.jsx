@@ -1,6 +1,5 @@
 import React, { useEffect, useMemo, useCallback } from "react";
 import { useParams, useNavigate } from "react-router-dom";
-import { useTranslation } from "react-i18next";
 import Header from "../app/layout/Header";
 import Footer from "../app/layout/Footer/Footer";
 import { useBlogPost } from "lib/blogApi";
@@ -26,24 +25,17 @@ function setOgMeta(title, description) {
 const BlogPost = () => {
     const { lng, slug } = useParams();
     const navigate = useNavigate();
-    const { t } = useTranslation("blog");
     const { post, isLoading, error } = useBlogPost(slug);
     const locale = (lng || "ko").toLowerCase();
 
-    const postMeta = useMemo(() => {
-        if (!post) {
-            return { formattedDate: "", readTime: "" };
-        }
-        const formattedDate = post.date
-            ? new Intl.DateTimeFormat(lng === "en" ? "en-US" : undefined, {
-                  year: "numeric",
-                  month: "short",
-                  day: "numeric",
-              }).format(new Date(post.date))
-            : "";
-        const readTime = post.readTime ? t("meta.readTime", { minutes: post.readTime }) : "";
-        return { formattedDate, readTime };
-    }, [post, lng, t]);
+    const publishedDate = useMemo(() => {
+        if (!post?.date) return "";
+        return new Intl.DateTimeFormat(lng === "en" ? "en-US" : undefined, {
+            year: "numeric",
+            month: "short",
+            day: "numeric",
+        }).format(new Date(post.date));
+    }, [post, lng]);
 
     const handleNavigateList = useCallback(() => {
         const targetLng = locale || "ko";
@@ -129,11 +121,11 @@ const BlogPost = () => {
                     <h1 className="text-3xl font-extrabold tracking-tight text-slate-900 dark:text-slate-100 sm:text-4xl">
                         {post.title}
                     </h1>
-                    <div className="mt-3 flex flex-wrap items-center gap-2 text-sm text-slate-500 dark:text-slate-400">
-                        {postMeta.formattedDate}
-                        {postMeta.readTime ? <span aria-hidden>•</span> : null}
-                        {postMeta.readTime}
-                    </div>
+                    {publishedDate ? (
+                        <div className="mt-3 flex flex-wrap items-center gap-2 text-sm text-slate-500 dark:text-slate-400">
+                            {publishedDate}
+                        </div>
+                    ) : null}
                     {post.tags?.length ? (
                         <div className="mt-5 flex flex-wrap gap-2">
                             {post.tags.map((tag) => (

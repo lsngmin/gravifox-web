@@ -9655,6 +9655,12 @@ img, a, button {
   --tw-gradient-stops: var(--tw-gradient-from), var(--tw-gradient-to);
 }
 
+.dark\:from-indigo-500\/15:is(.dark *) {
+  --tw-gradient-from: rgb(99 102 241 / 0.15) var(--tw-gradient-from-position);
+  --tw-gradient-to: rgb(99 102 241 / 0) var(--tw-gradient-to-position);
+  --tw-gradient-stops: var(--tw-gradient-from), var(--tw-gradient-to);
+}
+
 .dark\:via-slate-900\/0:is(.dark *) {
   --tw-gradient-to: rgb(15 23 42 / 0)  var(--tw-gradient-to-position);
   --tw-gradient-stops: var(--tw-gradient-from), rgb(15 23 42 / 0) var(--tw-gradient-via-position), var(--tw-gradient-to);
@@ -10078,6 +10084,11 @@ img, a, button {
   --tw-shadow: var(--tw-shadow-colored);
 }
 
+.dark\:shadow-indigo-900\/30:is(.dark *) {
+  --tw-shadow-color: rgb(49 46 129 / 0.3);
+  --tw-shadow: var(--tw-shadow-colored);
+}
+
 .dark\:ring-slate-700\/70:is(.dark *) {
   --tw-ring-color: rgb(51 65 85 / 0.7);
 }
@@ -10089,6 +10100,10 @@ img, a, button {
 
 .dark\:ring-indigo-400\/30:is(.dark *) {
   --tw-ring-color: rgb(129 140 248 / 0.3);
+}
+
+.dark\:ring-indigo-400\/40:is(.dark *) {
+  --tw-ring-color: rgb(129 140 248 / 0.4);
 }
 
 .dark\:drop-shadow-\[0_18px_48px_rgba\(30\2c 64\2c 175\2c 0\.26\)\]:is(.dark *) {
