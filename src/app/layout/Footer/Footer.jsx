@@ -9,12 +9,10 @@ const Footer = () => {
     const currentLng = useMemo(() => (i18n.language || "en").slice(0, 2), [i18n.language]);
 
     return (
-        <footer className="bg-transparent text-inherit border-t border-slate-200/40 dark:border-slate-800/60 transition-colors">
-            <div className="mx-auto max-w-screen-xl px-4 py-12 sm:px-6 lg:px-8">
-                <FooterActions />
-                <FooterNavLinks currentLng={currentLng} />
-                <FooterCopyright />
-            </div>
+        <footer className="mx-auto max-w-screen-xl px-4 py-12 text-inherit transition-colors sm:px-6 lg:px-8">
+            <FooterActions />
+            <FooterNavLinks currentLng={currentLng} />
+            <FooterCopyright />
         </footer>
     );
 };

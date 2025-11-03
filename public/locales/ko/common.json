@@ -21,7 +21,20 @@
       "logout": "로그아웃",
       "freeTrial": "무료 체험",
       "viewDashboard": "대시보드 보기",
-      "settings": "설정"
+      "settings": "설정",
+      "toggleTheme": "테마 전환",
+      "changeLanguage": "언어 변경"
+    },
+    "usage": {
+      "title": "이번 달 사용량",
+      "loading": "사용량 정보를 불러오는 중",
+      "empty": "사용량 정보가 아직 준비되지 않았어요.",
+      "emptyShort": "사용량 준비 중",
+      "summary": "총 {{limit}}회 중 {{used}}회 사용",
+      "remainingOnly": "남은 분석 {{count}}회",
+      "remainingShort": "잔여 {{count}}회",
+      "compact": "{{used}}/{{limit}}",
+      "errorFallback": "사용량 정보를 불러오는 중 문제가 발생했어요."
     }
   },
   "mobileAnalyze": {

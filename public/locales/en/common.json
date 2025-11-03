@@ -21,7 +21,20 @@
       "logout": "Log out",
       "freeTrial": "Free Trial",
       "viewDashboard": "View Dashboard",
-      "settings": "Settings"
+      "settings": "Settings",
+      "toggleTheme": "Toggle theme",
+      "changeLanguage": "Change language"
+    },
+    "usage": {
+      "title": "Usage this month",
+      "loading": "Fetching usage information…",
+      "empty": "Usage information isn’t ready yet.",
+      "emptyShort": "Usage pending",
+      "summary": "{{used}} of {{limit}} used",
+      "remainingOnly": "{{count}} analyses remaining",
+      "remainingShort": "{{count}} left",
+      "compact": "{{used}}/{{limit}}",
+      "errorFallback": "There was a problem fetching your usage info."
     }
   },
   "mobileAnalyze": {

@@ -4,8 +4,31 @@
     "title": "Check image and video authenticity with ease",
     "title2": "See instant results right in your browser",
     "subtitle": "Drop a photo and we tell you right away if AI made it. We point out the clues so you can understand at a glance.",
+    "subcaption": "During the test period, you can try AI detection for free with limited usage — no login required.",
     "ribbon": "AI-FIRST DEFENSE STACK",
-    "feedback": "Talk to our team in under 24 hours",
+    "feedback": "Send feedback and feature ideas",
+    "feedbackNote": "Share bugs or suggestions that help us improve. Early supporters may receive Pro plan benefits at launch.",
+    "feedbackCta": "→ Leave feedback",
+    "contact": "Contact us",
+    "contactNote": "Partnerships, questions, and technical inquiries are always welcome. We reply as fast as we can.",
+    "contactCta": "→ Get connected",
+    "roadmap": "View roadmap",
+    "roadmapNote": "See upcoming features and improvements. Help shape where we’re headed.",
+    "roadmapCta": "→ View roadmap",
+    "highlight": {
+      "precision": {
+        "title": "97%+ verification accuracy",
+        "description": "Confidence scores backed by thousands of synthetic-content benchmarks."
+      },
+      "automation": {
+        "title": "Enterprise automation",
+        "description": "Built-in webhooks, queue processing, and role-based access control."
+      },
+      "coverage": {
+        "title": "Multi-language & multi-format support",
+        "description": "Analyze images, videos, and thumbnails together with multilingual reports."
+      }
+    },
     "metrics": {
       "latency": {
         "value": "4.1s",
