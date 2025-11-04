@@ -66,7 +66,7 @@ const FloatingMenu = () => {
                     leaveFrom={shouldReduceMotion ? '' : 'translate-y-0 opacity-100'}
                     leaveTo={shouldReduceMotion ? '' : 'translate-y-6 opacity-0'}
                 >
-                    <div className="relative my-10 w-full max-w-sm translate-y-0 overflow-hidden rounded-3xl border border-white/10 bg-white shadow-2xl focus:outline-none dark:border-slate-700 dark:bg-slate-900 sm:my-12 lg:hidden mx-4">
+                    <div className="relative w-full max-w-sm translate-y-0 overflow-auto max-h-[90vh] rounded-3xl border border-white/10 bg-white shadow-2xl focus:outline-none dark:border-slate-700 dark:bg-slate-900 lg:hidden mx-4">
                         <div className="flex flex-col">
                             <MenuHeader />
                             <MenuUserBadge onNavigate={closeMenu} />

@@ -14,13 +14,21 @@ const SignupAPI = () => {
      * @returns {Promise<void>} 비동기로 회원가입 요청을 처리
      */
     const signup = async (formState) => {
+        // Sanitize email to avoid backend regex mismatch due to stray whitespaces
+        const cleanEmail = String(formState.email || '')
+            .replace(/\s+/g, '') // remove any whitespace characters
+            .trim()
+            .toLowerCase();
+
+        const nick = String(formState.name || '').trim();
+
         const requestData = {
             user: {
-                userId: formState.email,
+                userId: cleanEmail,
                 loginType: "EMAIL"
             },
             profile: {
-                nickname: formState.name
+                nickname: nick
             },
             password: {
                 password: formState.password
@@ -33,14 +41,14 @@ const SignupAPI = () => {
         try {
             // 닉네임이 비어있다면 이메일 로컬파트로 대체
             if (!requestData.profile.nickname || !requestData.profile.nickname.trim()) {
-                requestData.profile.nickname = String(formState.email || '').split('@')[0] || 'user';
+                requestData.profile.nickname = cleanEmail.split('@')[0] || 'user';
             }
             const response = await axios.post(AUTH_ENDPOINTS.SIGNUP, requestData, { withCredentials: true });
 
             const { userId } = response.data;
-            if (userId === formState.email) {
+            if (userId === cleanEmail) {
                 // 회원가입 직후 이메일 인증 안내 페이지로 이동 (토큰 발급 없음)
-                navigate("/verify", { state: { email: formState.email } });
+                navigate("/verify", { state: { email: cleanEmail } });
             }
         } catch (error) {
             // 에러 발생 시 호출한 컴포넌트에 에러를 전달합니다

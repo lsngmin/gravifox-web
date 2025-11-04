@@ -65,13 +65,14 @@ const RegisterBox = ({ variant = 'default' }) => {
     if (!value) return t('registerPage.errors.emailRequired', 'Email is required.');
     const v = String(value).trim();
     // Align with backend validator in RegisterController.userIdValidator
-    const re = /^[a-zA-Z0-9_+&*-]+(?:\.[a-zA-Z0-9_+&*-]+)*@(?:[a-zA-Z0-9-]+\.)+[a-zA-Z]{2,7}$/;
+    const re = /^[a-zA-Z0-9_+&*-]+(?:\.[a-zA-Z0-9_+&*-]+)*@(?:[a-zA-Z0-9-]+\.)+[a-zA-Z]{2,63}$/;
     return re.test(v) ? null : t('registerPage.errors.invalidEmail', 'Invalid email format.');
   };
 
   const validatePassword = (value) => {
     if (!value) return t('registerPage.errors.passwordRequired', 'Password is required.');
-    const re = /^(?=.*[A-Za-z])(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*()_+\-={}\[\]:";'<>?,./]).{8,20}$/;
+    // Keep in sync with backend: hyphen first in the class to avoid ranges
+    const re = /^(?=.*[A-Za-z])(?=.*[A-Z])(?=.*\d)(?=.*[-!@#$%^&*()_+={}\[\]:";'<>?,./]).{8,20}$/;
     return re.test(value)
       ? null
       : t('registerPage.errors.passwordPolicy', '8–20 chars incl. uppercase, letter, number, special');
@@ -131,7 +132,15 @@ const RegisterBox = ({ variant = 'default' }) => {
   const handleBlur = (field) => () => {
     setTouched((prev) => ({ ...prev, [field]: true }));
     let errorMsg = null;
-    const value = formState[field] || "";
+    let value = formState[field] || "";
+    // Normalize email on blur: remove whitespaces and lowercase
+    if (field === 'email') {
+      const cleaned = String(value).replace(/\s+/g, '').trim().toLowerCase();
+      if (cleaned !== value) {
+        value = cleaned;
+        setFormState((prev) => ({ ...prev, email: cleaned }));
+      }
+    }
     switch (field) {
       case "email":
         errorMsg = validateEmail(value);
