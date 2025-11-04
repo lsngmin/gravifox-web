@@ -57,12 +57,9 @@ export const FREETRIAL_ENDPOINTS = {
     ANALYZE:    `${API_BASE}/api/v1/images`
 };
 
-// Prefer FastAPI if configured; fallback to legacy API_BASE
-const preferFastApi = (path) => (FASTAPI_BASE ? `${FASTAPI_BASE}${path}` : `${API_BASE}${path}`);
-
 export const ISSUE_ENDPOINTS = {
-    GET_ISSUE:    preferFastApi(`/api/v1/issue/`),
-    CREATE_ISSUE: preferFastApi(`/api/v1/issue/`),
+    GET_ISSUE:    `${API_BASE}/api/v1/issue/`,
+    CREATE_ISSUE: `${API_BASE}/api/v1/issue/`,
 };
 
 export const DASHBOARD_ENDPOINTS = {
@@ -120,7 +117,7 @@ export const ADMIN_ENDPOINTS = {
 };
 
 export const BLOG_ENDPOINTS = {
-    LIST: preferFastApi(`/api/v1/blog/posts`),
-    BY_SLUG: (slug = "") => preferFastApi(`/api/v1/blog/posts/slug/${encodeURIComponent(String(slug))}`),
-    BY_ID: (id = "") => preferFastApi(`/api/v1/blog/posts/${encodeURIComponent(String(id))}`),
+    LIST: `${API_BASE}/api/v1/blog/posts`,
+    BY_SLUG: (slug = "") => `${API_BASE}/api/v1/blog/posts/slug/${encodeURIComponent(String(slug))}`,
+    BY_ID: (id = "") => `${API_BASE}/api/v1/blog/posts/${encodeURIComponent(String(id))}`,
 };
