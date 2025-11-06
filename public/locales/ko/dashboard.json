@@ -1,0 +1,49 @@
+{
+  "hero": {
+    "titleMain": "Dashboard",
+    "titleSub": "Control Center",
+    "desc": "최근 분석 결과를 모아놨어요."
+  },
+  "actions": {
+    "newAnalysis": "+ 새 분석"
+  },
+  "summary": {
+    "weeklyCount": "지난 일주일 동안 총 {{count}}건의 분석 결과가 있어요",
+    "averageProb": "사용자님이 업로드한 이미지의 평균 생성 확률은 {{value}}%예요."
+  },
+  "callout": {
+    "loadingTitle": "최근 분석 데이터를 불러오는 중이에요",
+    "loadingHint": "결과가 보이지 않는다면 오른쪽 새로고침을 눌러주세요."
+  },
+  "filters": {
+    "favoritesOnly": "즐겨찾기만",
+    "sortLabel": "정렬",
+    "sort": {
+      "NEWEST": "최신순",
+      "OLDEST": "오래된순",
+      "LABEL": "레이블",
+      "NAME_ASC": "파일명 A→Z",
+      "NAME_DESC": "파일명 Z→A",
+      "SIZE_ASC": "파일 크기 ↑",
+      "SIZE_DESC": "파일 크기 ↓"
+    }
+  },
+  "empty": {
+    "noHistory": "분석 기록이 없어요. Analyze에서 파일을 업로드해 보세요."
+  },
+  "card": {
+    "genProb": "생성 확률",
+    "noFilename": "파일명 없음",
+    "previewAlt": "{{name}} 미리보기",
+    "previewAltFallback": "업로드 미디어 미리보기",
+    "viewReport": "리포트 보기",
+    "reanalyze": "재분석",
+    "reanalyzeClose": "재분석 닫기",
+    "favorite": "즐겨찾기",
+    "unfavorite": "즐겨찾기 해제"
+  },
+  "toolbar": {
+    "refreshAria": "최근 분석 새로고침"
+  }
+}
+

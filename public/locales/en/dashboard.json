@@ -1,0 +1,49 @@
+{
+  "hero": {
+    "titleMain": "Dashboard",
+    "titleSub": "Control Center",
+    "desc": "We’ve collected your recent analysis results."
+  },
+  "actions": {
+    "newAnalysis": "+ New analysis"
+  },
+  "summary": {
+    "weeklyCount": "Total of {{count}} analysis results in the last week",
+    "averageProb": "Average generation probability of your uploads is {{value}}%"
+  },
+  "callout": {
+    "loadingTitle": "Loading recent analyses",
+    "loadingHint": "If nothing appears, try refreshing on the right."
+  },
+  "filters": {
+    "favoritesOnly": "Favorites only",
+    "sortLabel": "Sort",
+    "sort": {
+      "NEWEST": "Newest",
+      "OLDEST": "Oldest",
+      "LABEL": "Label",
+      "NAME_ASC": "File name A→Z",
+      "NAME_DESC": "File name Z→A",
+      "SIZE_ASC": "File size ↑",
+      "SIZE_DESC": "File size ↓"
+    }
+  },
+  "empty": {
+    "noHistory": "No analysis history yet. Upload files in Analyze."
+  },
+  "card": {
+    "genProb": "Generation probability",
+    "noFilename": "No filename",
+    "previewAlt": "{{name}} preview",
+    "previewAltFallback": "Uploaded media preview",
+    "viewReport": "View report",
+    "reanalyze": "Re-analyze",
+    "reanalyzeClose": "Close re-analyze",
+    "favorite": "Favorite",
+    "unfavorite": "Unfavorite"
+  },
+  "toolbar": {
+    "refreshAria": "Refresh recent analyses"
+  }
+}
+

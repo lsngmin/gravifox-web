@@ -182,7 +182,7 @@ const BlogPost = () => {
             <div className="relative isolate min-h-screen bg-slate-50 text-slate-900 transition-colors dark:bg-slate-950 dark:text-slate-100">
                 <TopDecoration />
                 <main className="relative z-10">
-                    <div className="mx-auto w-full max-w-sm md:max-w-md lg:max-w-lg xl:max-w-xl 2xl:max-w-2xl px-5 pb-24 pt-28 lg:pt-32">
+                    <div className="mx-auto w-full max-w-sm md:max-w-md lg:max-w-lg xl:max-w-2xl 2xl:max-w-3xl px-5 pb-24 pt-28 lg:pt-32">
                         <div className="mb-6 flex flex-wrap items-center gap-4 text-sm font-medium text-slate-600 dark:text-slate-300">
                             <button
                                 type="button"

@@ -403,7 +403,12 @@ export default function MobileAnalyzeUpload() {
           modelKey,
           modelName: selectedModel?.name,
           modelVersion: selectedModel?.version,
-          modelDescription: selectedModel?.description,
+          modelDescription: (() => {
+            const lang = i18n?.resolvedLanguage || i18n?.language;
+            const base = typeof lang === 'string' ? lang.split('-')[0] : undefined;
+            const map = selectedModel?.descriptions || {};
+            return (lang && map[lang]) || (base && map[base]) || selectedModel?.description;
+          })(),
         }),
         afterAnalyze: async (file, analyzeJson) => {
           if (!file || !analyzeJson?.jobId) return;
@@ -632,6 +637,9 @@ export default function MobileAnalyzeUpload() {
                       {models.map((model) => {
                         const selected = model.key === modelKey;
                         const isDefault = model.key === defaultModelKey;
+                        const lang = i18n?.resolvedLanguage || i18n?.language;
+                        const base = typeof lang === 'string' ? lang.split('-')[0] : undefined;
+                        const localizedDesc = (model?.descriptions && ((lang && model.descriptions[lang]) || (base && model.descriptions[base]))) || model?.description;
                         return (
                           <button
                             key={model.key}
@@ -653,9 +661,9 @@ export default function MobileAnalyzeUpload() {
                                   </span>
                                 )}
                               </p>
-                              {model?.description && (
+                              {localizedDesc && (
                                 <p className="mt-1 text-[12px] text-slate-600 dark:text-slate-400">
-                                  {model.description}
+                                  {localizedDesc}
                                 </p>
                               )}
                             </div>

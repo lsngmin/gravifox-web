@@ -2,7 +2,7 @@ import React, { useEffect, useMemo } from "react";
 import { useTranslation } from "react-i18next";
 
 export default function ConfirmModelModal({ open, model, onConfirm, onCancel }) {
-  const { t } = useTranslation('common');
+  const { t, i18n } = useTranslation('common');
 
   useEffect(() => {
     if (!open) return;
@@ -70,11 +70,17 @@ export default function ConfirmModelModal({ open, model, onConfirm, onCancel }) 
                       model: model?.name || ''
                     })}
                   </p>
-                  {model?.description && (
+                  {(() => {
+                    const lang = i18n?.resolvedLanguage || i18n?.language;
+                    const base = typeof lang === 'string' ? lang.split('-')[0] : undefined;
+                    const map = model?.descriptions || {};
+                    const desc = (lang && map[lang]) || (base && map[base]) || model?.description;
+                    return desc ? (
                     <p className="text-slate-500 dark:text-slate-400">
-                      {t('confirmModelModal.generic.desc', '설명: {{desc}}', { desc: model.description })}
+                      {t('confirmModelModal.generic.desc', '설명: {{desc}}', { desc: desc })}
                     </p>
-                  )}
+                    ) : null;
+                  })()}
                   <p>
                     {t('confirmModelModal.generic.line2', '업로드한 이미지와 분석 목적에 적합한 모델인지 확인해 주세요. 맞다면 계속 진행할게요.')}
                   </p>
@@ -107,8 +113,15 @@ export default function ConfirmModelModal({ open, model, onConfirm, onCancel }) 
 
 function detectSpecialization(model) {
   if (!model) return 'generic';
-  const hay = `${model.name || ''} ${model.description || ''}`.toLowerCase();
-  const koHay = `${model.name || ''} ${model.description || ''}`;
+  const descs = [];
+  if (model.description) descs.push(String(model.description));
+  if (model.descriptions && typeof model.descriptions === 'object') {
+    try {
+      descs.push(...Object.values(model.descriptions).map((v) => String(v || '')));
+    } catch {}
+  }
+  const hay = `${model.name || ''} ${descs.join(' ')}`.toLowerCase();
+  const koHay = `${model.name || ''} ${descs.join(' ')}`;
   const personHints = [
     'face', 'person', 'people', 'human',
     '인물', '얼굴', '사람'

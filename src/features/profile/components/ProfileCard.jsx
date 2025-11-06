@@ -218,7 +218,7 @@ export default function ProfileCard({ theme = 'dark' }) {
                           setNicknameError('');
                           setEditing(true);
                         }}
-                        className={`inline-flex items-center gap-2 rounded-md px-3 py-1.5 text-[13px] font-semibold transition focus:outline-none ${
+                        className={`inline-flex items-center gap-2 rounded-md px-3 py-1.5 text-[13px] font-semibold transition focus:outline-none whitespace-nowrap shrink-0 ${
                           isDark ? 'text-indigo-200 hover:text-white' : 'text-indigo-600 hover:text-indigo-700'
                         }`}
                       >

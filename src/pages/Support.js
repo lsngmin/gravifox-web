@@ -21,12 +21,12 @@ import { useTranslation } from "react-i18next";
 
 const PageWrapper = styled(Box)(({ theme }) => ({
     width: "100%",
-    // Narrow, centered column like ko/analyze (24rem → 42rem)
+    // Desktop width expanded; keep mobile narrow
     maxWidth: "24rem", // 384px
     [theme.breakpoints.up('md')]: { maxWidth: "28rem" }, // 448px
-    [theme.breakpoints.up('lg')]: { maxWidth: "32rem" }, // 512px
-    '@media (min-width:1280px)': { maxWidth: "36rem" }, // 576px (Tailwind xl)
-    '@media (min-width:1536px)': { maxWidth: "42rem" }, // 672px (Tailwind 2xl)
+    [theme.breakpoints.up('lg')]: { maxWidth: "64rem" }, // 1024px
+    '@media (min-width:1280px)': { maxWidth: "72rem" }, // 1152px
+    '@media (min-width:1536px)': { maxWidth: "80rem" }, // 1280px
     margin: "0 auto",
     paddingTop: theme.spacing(9),
     paddingBottom: theme.spacing(10),
@@ -79,9 +79,10 @@ const QuickActionCard = styled(Paper, { shouldForwardProp: (prop) => prop !== "$
 const QuickActionGrid = styled(Box)(({ theme }) => ({
     display: "grid",
     gap: theme.spacing(3),
-    gridTemplateColumns: "repeat(auto-fit, minmax(260px, 1fr))",
-    [theme.breakpoints.down("sm")]: {
-        gridTemplateColumns: "1fr",
+    // Desktop: fixed 2 columns; mobile stacks
+    gridTemplateColumns: "1fr",
+    [theme.breakpoints.up('md')]: {
+        gridTemplateColumns: "repeat(2, 1fr)",
     },
 }));
 
@@ -102,7 +103,11 @@ const ArticleCard = styled(Paper, { shouldForwardProp: (prop) => prop !== "$isDa
 const ArticleGrid = styled(Box)(({ theme }) => ({
     display: "grid",
     gap: theme.spacing(3),
-    gridTemplateColumns: "repeat(auto-fit, minmax(280px, 1fr))",
+    // Keep FAQ readable with two columns on desktop
+    gridTemplateColumns: "1fr",
+    [theme.breakpoints.up('md')]: {
+        gridTemplateColumns: "repeat(2, 1fr)",
+    },
 }));
 
 const OPTION_ICON_MAP = {

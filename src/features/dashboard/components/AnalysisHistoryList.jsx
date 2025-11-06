@@ -1,4 +1,5 @@
 import React, { useEffect, useMemo, useRef, useState } from "react";
+import { useTranslation } from 'react-i18next';
 import { ArrowPathIcon, StarIcon } from "@heroicons/react/24/outline";
 import AnalysisReport from "../../analyze/components/report/AnalysisReport";
 import { persistPreviewForJob } from "../../../utils/previewStore";
@@ -55,6 +56,7 @@ function formatFileSize(bytes) {
 }
 
 export default function AnalysisHistoryList() {
+  const { t } = useTranslation('dashboard');
   const [local, setLocal] = useState(() => readLocalReports());
   const [search, setSearch] = useState("");
   const [labelTab, setLabelTab] = useState("ALL"); // ALL | REAL | FAKE | UNKNOWN
@@ -175,12 +177,12 @@ export default function AnalysisHistoryList() {
         <div className="space-y-1.5">
           {filtered.length > 0 && (
             <p className="text-xl font-semibold text-slate-900 dark:text-slate-200 sm:text-2xl">
-              지난 일주일 동안 총 {filtered.length}건의 분석 결과가 있어요
+              {t('summary.weeklyCount', { count: filtered.length, defaultValue: `지난 일주일 동안 총 ${filtered.length}건의 분석 결과가 있어요` })}
             </p>
           )}
           {averageProb !== null && (
             <p className="text-sm text-slate-600 dark:text-slate-500 sm:text-base">
-              사용자님이 업로드한 이미지의 평균 생성 확률은 {averageProb.toFixed(1)}%예요.
+              {t('summary.averageProb', { value: averageProb.toFixed(1), defaultValue: `사용자님이 업로드한 이미지의 평균 생성 확률은 ${averageProb.toFixed(1)}%예요.` })}
             </p>
           )}
         </div>
@@ -189,16 +191,16 @@ export default function AnalysisHistoryList() {
         <div className="rounded-xl border border-indigo-200 bg-indigo-50 px-4 py-3 text-xs text-indigo-700 shadow-sm backdrop-blur dark:border-indigo-500/35 dark:bg-slate-900/75 dark:text-indigo-100 dark:shadow-lg dark:shadow-indigo-900/35">
           <div className="flex items-center justify-between gap-4">
             <div className="min-w-0 space-y-1">
-              <p className="text-sm font-semibold text-indigo-700 dark:text-indigo-100">최근 분석 데이터를 불러오는 중이에요</p>
+              <p className="text-sm font-semibold text-indigo-700 dark:text-indigo-100">{t('callout.loadingTitle', { defaultValue: '최근 분석 데이터를 불러오는 중이에요' })}</p>
               <p className="text-xs leading-relaxed text-indigo-600 dark:text-indigo-200/85">
-                결과가 보이지 않는다면 오른쪽 새로고침을 눌러주세요.
+                {t('callout.loadingHint', { defaultValue: '결과가 보이지 않는다면 오른쪽 새로고침을 눌러주세요.' })}
               </p>
             </div>
             <button
               type="button"
               onClick={() => setLocal(readLocalReports())}
               className="inline-flex h-12 w-12 flex-none items-center justify-center rounded-full border border-indigo-300 bg-indigo-100 text-indigo-800 transition hover:bg-indigo-200 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-300 dark:border-indigo-400/40 dark:bg-indigo-500/25 dark:text-indigo-100 dark:hover:bg-indigo-500/35"
-              aria-label="최근 분석 새로고침"
+              aria-label={t('toolbar.refreshAria', { defaultValue: '최근 분석 새로고침' })}
             >
               <ArrowPathIcon className="h-6 w-6" aria-hidden="true" />
             </button>
@@ -215,7 +217,7 @@ export default function AnalysisHistoryList() {
           }`}
         >
           <StarIcon className="h-4 w-4" aria-hidden="true" />
-          즐겨찾기만
+          {t('filters.favoritesOnly', { defaultValue: '즐겨찾기만' })}
         </button>
         <div className="flex flex-wrap items-center justify-end gap-3">
           <div className="inline-flex rounded-lg border border-slate-200 bg-white p-0.5 dark:border-slate-600 dark:bg-slate-800">
@@ -228,19 +230,19 @@ export default function AnalysisHistoryList() {
           ))}
         </div>
           <div className="hidden items-center gap-1 text-xs text-slate-500 sm:flex">
-            <span className="text-slate-400">정렬</span>
+            <span className="text-slate-400">{t('filters.sortLabel', { defaultValue: '정렬' })}</span>
             <select
               className="rounded border border-slate-200 bg-white px-1.5 py-1 text-xs font-medium text-slate-700 dark:border-slate-600 dark:bg-slate-800 dark:text-slate-200"
               value={sortKey}
               onChange={(e)=>setSortKey(e.target.value)}
             >
-              <option value="NEWEST">최신순</option>
-              <option value="OLDEST">오래된순</option>
-              <option value="LABEL">레이블</option>
-              <option value="NAME_ASC">파일명 A→Z</option>
-              <option value="NAME_DESC">파일명 Z→A</option>
-              <option value="SIZE_ASC">파일 크기 ↑</option>
-              <option value="SIZE_DESC">파일 크기 ↓</option>
+              <option value="NEWEST">{t('filters.sort.NEWEST', { defaultValue: '최신순' })}</option>
+              <option value="OLDEST">{t('filters.sort.OLDEST', { defaultValue: '오래된순' })}</option>
+              <option value="LABEL">{t('filters.sort.LABEL', { defaultValue: '레이블' })}</option>
+              <option value="NAME_ASC">{t('filters.sort.NAME_ASC', { defaultValue: '파일명 A→Z' })}</option>
+              <option value="NAME_DESC">{t('filters.sort.NAME_DESC', { defaultValue: '파일명 Z→A' })}</option>
+              <option value="SIZE_ASC">{t('filters.sort.SIZE_ASC', { defaultValue: '파일 크기 ↑' })}</option>
+              <option value="SIZE_DESC">{t('filters.sort.SIZE_DESC', { defaultValue: '파일 크기 ↓' })}</option>
             </select>
           </div>
         </div>
@@ -248,29 +250,31 @@ export default function AnalysisHistoryList() {
 
       {items.length === 0 && (
         <div className="rounded-xl border border-slate-200 bg-white p-4 text-sm text-slate-600 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-300">
-          분석 기록이 없어요. Analyze에서 파일을 업로드해 보세요.
+          {t('empty.noHistory', { defaultValue: '분석 기록이 없어요. Analyze에서 파일을 업로드해 보세요.' })}
         </div>
       )}
 
-      {filtered.map(({ jobId, data, meta }) => (
-        <HistoryCard
-          key={jobId}
-          jobId={jobId}
-          data={data}
-          meta={meta}
-          computeLabel={computeLabel}
-          favs={favs}
-          onToggleFav={toggleFav}
-          onOpenReport={() => setDrawerReport({ jobId, data, meta })}
-          isReOpen={openRe.has(jobId)}
-          onToggleRe={() => {
-            const next = new Set(openRe);
-            if (next.has(jobId)) next.delete(jobId); else next.add(jobId);
-            setOpenRe(next);
-          }}
-          onReanalyzeFinish={() => setLocal(readLocalReports())}
-        />
-      ))}
+      <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+        {filtered.map(({ jobId, data, meta }) => (
+          <HistoryCard
+            key={jobId}
+            jobId={jobId}
+            data={data}
+            meta={meta}
+            computeLabel={computeLabel}
+            favs={favs}
+            onToggleFav={toggleFav}
+            onOpenReport={() => setDrawerReport({ jobId, data, meta })}
+            isReOpen={openRe.has(jobId)}
+            onToggleRe={() => {
+              const next = new Set(openRe);
+              if (next.has(jobId)) next.delete(jobId); else next.add(jobId);
+              setOpenRe(next);
+            }}
+            onReanalyzeFinish={() => setLocal(readLocalReports())}
+          />
+        ))}
+      </div>
 
       <MobileReportDrawer
         open={!!drawerReport}
@@ -295,6 +299,7 @@ function HistoryCard({
   onToggleRe,
   onReanalyzeFinish,
 }) {
+  const { t } = useTranslation('dashboard');
   const previewUrl = usePreviewUrl(meta);
   const label = computeLabel(data);
   const probValue = typeof data?.prob_fake === 'number' ? (data.prob_fake * 100).toFixed(1) : null;
@@ -325,7 +330,7 @@ function HistoryCard({
           <div className="flex items-center justify-between gap-2">
             <span className="inline-flex items-center gap-1.5 rounded-lg border border-indigo-300 bg-indigo-50 px-3 py-1 text-[12px] font-semibold text-indigo-700 dark:border-indigo-400/50 dark:bg-indigo-500/20 dark:text-indigo-100">
               <span className="h-2.5 w-2.5 rounded-full bg-indigo-400 dark:bg-indigo-200/90" />
-              생성 확률
+              {t('card.genProb', { defaultValue: '생성 확률' })}
               <span className="text-indigo-900 dark:text-white">{prob}</span>
             </span>
             <span className={`inline-flex items-center gap-1.5 rounded-lg border px-3 py-1 text-[12px] font-semibold uppercase tracking-[0.18em] ${labelTone.wrapper}`}>
@@ -334,13 +339,13 @@ function HistoryCard({
             </span>
           </div>
         </div>
-        <p className="truncate text-right text-xs font-medium text-slate-500 dark:text-slate-300 sm:text-sm">{meta?.name || '파일명 없음'}</p>
+        <p className="truncate text-right text-xs font-medium text-slate-500 dark:text-slate-300 sm:text-sm">{meta?.name || t('card.noFilename', { defaultValue: '파일명 없음' })}</p>
 
         <div className="relative overflow-hidden rounded-2xl border border-slate-200 bg-white dark:border-slate-700/35 dark:bg-slate-900/80">
           {previewUrl ? (
             <img
               src={previewUrl}
-              alt={meta?.name ? `${meta.name} 미리보기` : '업로드 미디어 미리보기'}
+              alt={meta?.name ? t('card.previewAlt', { name: meta.name, defaultValue: `${meta?.name} 미리보기` }) : t('card.previewAltFallback', { defaultValue: '업로드 미디어 미리보기' })}
               className="h-52 w-full object-cover sm:h-64"
               loading="lazy"
             />
@@ -355,7 +360,7 @@ function HistoryCard({
             <button
               type="button"
               onClick={() => onToggleFav(jobId)}
-              title={favs.has(jobId) ? '즐겨찾기 해제' : '즐겨찾기'}
+              title={favs.has(jobId) ? t('card.unfavorite', { defaultValue: '즐겨찾기 해제' }) : t('card.favorite', { defaultValue: '즐겨찾기' })}
               className="inline-flex h-9 w-9 items-center justify-center rounded-full border border-amber-200 bg-amber-50 text-amber-600 transition hover:bg-amber-100 dark:border-amber-400/30 dark:bg-amber-500/10 dark:text-amber-300 dark:hover:bg-amber-500/20"
             >
               {favs.has(jobId) ? (
@@ -375,14 +380,14 @@ function HistoryCard({
               onClick={onOpenReport}
               className="inline-flex items-center rounded-lg bg-indigo-500/80 px-3 py-1.5 text-xs font-semibold text-white transition hover:bg-indigo-500"
             >
-              리포트 보기
+              {t('card.viewReport', { defaultValue: '리포트 보기' })}
             </button>
             <button
               type="button"
               onClick={onToggleRe}
               className="inline-flex items-center rounded-lg border border-indigo-300 bg-indigo-50 px-3 py-1.5 text-xs font-semibold text-indigo-700 transition hover:bg-indigo-100 dark:border-indigo-400/40 dark:bg-indigo-500/10 dark:text-indigo-200 dark:hover:bg-indigo-500/20"
             >
-              {isReOpen ? '재분석 닫기' : '재분석'}
+              {isReOpen ? t('card.reanalyzeClose', { defaultValue: '재분석 닫기' }) : t('card.reanalyze', { defaultValue: '재분석' })}
             </button>
           </div>
         </div>

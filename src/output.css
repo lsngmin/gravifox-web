@@ -10638,6 +10638,10 @@ body {
   .\32xl\:max-w-2xl {
     max-width: 42rem;
   }
+
+  .\32xl\:max-w-3xl {
+    max-width: 48rem;
+  }
 }
 
 .\[\&\:\:-webkit-scrollbar-thumb\]\:rounded-lg::-webkit-scrollbar-thumb {

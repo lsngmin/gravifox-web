@@ -54,7 +54,7 @@ const Profile = () => {
         ) : (
           <div className="pointer-events-none absolute inset-x-0 top-[160px] h-[420px] bg-[radial-gradient(circle_at_20%_0%,rgba(147,197,253,0.2),transparent_55%),radial-gradient(circle_at_80%_30%,rgba(167,243,208,0.25),transparent_60%)] opacity-70 blur-[120px]" />
         )}
-        <div className="flex w-full max-w-sm md:max-w-md lg:max-w-lg xl:max-w-xl 2xl:max-w-2xl flex-col gap-6 px-5 pb-24 pt-16">
+        <div className="flex w-full max-w-sm md:max-w-md lg:max-w-lg xl:max-w-2xl 2xl:max-w-3xl flex-col gap-6 px-5 pb-24 pt-16">
           <UserInfo theme={theme} onThemeChange={setTheme} />
         </div>
       </main>
