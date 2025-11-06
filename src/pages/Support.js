@@ -21,12 +21,17 @@ import { useTranslation } from "react-i18next";
 
 const PageWrapper = styled(Box)(({ theme }) => ({
     width: "100%",
-    maxWidth: "1100px",
+    // Narrow, centered column like ko/analyze (24rem → 42rem)
+    maxWidth: "24rem", // 384px
+    [theme.breakpoints.up('md')]: { maxWidth: "28rem" }, // 448px
+    [theme.breakpoints.up('lg')]: { maxWidth: "32rem" }, // 512px
+    '@media (min-width:1280px)': { maxWidth: "36rem" }, // 576px (Tailwind xl)
+    '@media (min-width:1536px)': { maxWidth: "42rem" }, // 672px (Tailwind 2xl)
     margin: "0 auto",
     paddingTop: theme.spacing(9),
     paddingBottom: theme.spacing(10),
-    paddingLeft: theme.spacing(2),
-    paddingRight: theme.spacing(2),
+    paddingLeft: theme.spacing(2.5), // ~20px (Tailwind px-5)
+    paddingRight: theme.spacing(2.5),
 }));
 
 const HeroCard = styled(Paper, { shouldForwardProp: (prop) => prop !== "$isDark" })(({ theme, $isDark }) => ({
