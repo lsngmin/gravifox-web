@@ -40,7 +40,7 @@ export default function PostList({ posts = [], loading, error, initialCount = 6 
                             {t("list.empty")}
                         </div>
                     ) : (
-                        <div className="space-y-14">
+                        <div className="space-y-10 sm:space-y-14">
                             {items.map((post, index) => (
                                 <PostCard key={post.slug || index} post={post} index={index} />
                             ))}

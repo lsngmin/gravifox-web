@@ -4,7 +4,6 @@ import { createPortal } from 'react-dom';
 
 import { useHeaderContext } from '../context';
 
-import LocaleSelector from './LocaleSelector';
 import MenuAccountSection from './MenuAccountSection';
 import MenuHeader from './MenuHeader';
 import MenuNavigation from './MenuNavigation';
@@ -70,12 +69,13 @@ const FloatingMenu = () => {
                         <div className="flex flex-col">
                             <MenuHeader />
                             <MenuUserBadge onNavigate={closeMenu} />
+                            <div className="px-5 mt-3">
+                                <UsageSummary />
+                            </div>
                             <div className="px-5 pb-6">
                                 <MenuNavigation />
                                 <div className="mt-5 space-y-4">
-                                    <UsageSummary />
                                     <MenuAccountSection />
-                                    <LocaleSelector variant="list" onSelect={closeMenu} />
                                 </div>
                             </div>
                         </div>

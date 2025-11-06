@@ -46,9 +46,15 @@ export default function PostCard({ post, index = 0 }) {
             .shift() || null;
     const hasCover = Boolean(coverImage);
 
+    const containerClass = hasCover
+        ? "relative flex flex-col gap-8 border-b border-slate-200 pb-12 sm:flex-row sm:items-start sm:gap-10 dark:border-slate-800"
+        : "relative flex flex-row items-start gap-8 border-b border-slate-200 pb-12 dark:border-slate-800";
+
+    const leftColClass = hasCover ? "w-full sm:w-auto" : "w-auto shrink-0";
+
     return (
-        <article className="relative flex flex-col gap-8 border-b border-slate-200 pb-12 sm:flex-row sm:items-center sm:gap-10 dark:border-slate-800">
-            <div className="w-full sm:w-auto">
+        <article className={containerClass}>
+            <div className={leftColClass}>
                 {hasCover ? (
                     <div className="relative h-32 w-full overflow-hidden rounded-3xl bg-slate-100 sm:h-32 sm:w-44 lg:h-36 lg:w-48 dark:bg-slate-800">
                         <img
@@ -79,7 +85,7 @@ export default function PostCard({ post, index = 0 }) {
                     </div>
                 ) : null}
 
-                <h3 className="mt-3 text-2xl font-semibold tracking-tight text-slate-900 dark:text-slate-50">
+                <h3 className="mt-3 text-xl font-semibold tracking-tight text-slate-900 dark:text-slate-50 sm:text-2xl">
                     <Link to={`/${lng}/blog/${post.slug}`} className="inline-flex items-baseline gap-2 text-inherit">
                         {post.title}
                     </Link>
@@ -87,7 +93,7 @@ export default function PostCard({ post, index = 0 }) {
 
                 <p className="mt-3 text-sm leading-relaxed text-slate-600 dark:text-slate-300">{post.excerpt}</p>
 
-                <div className="mt-4 flex flex-wrap items-center gap-4 text-xs text-slate-500 dark:text-slate-400">
+                <div className="hidden">
                     {meta.formattedDate ? (
                         <span className="font-medium tracking-wide">{meta.formattedDate}</span>
                     ) : null}
@@ -95,7 +101,7 @@ export default function PostCard({ post, index = 0 }) {
 
                 <Link
                     to={`/${lng}/blog/${post.slug}`}
-                    className="mt-6 inline-flex items-center gap-2 text-sm font-semibold text-emerald-600 dark:text-emerald-300"
+                    className="mt-3 inline-flex items-center gap-2 text-sm font-semibold text-emerald-600 dark:text-emerald-300"
                 >
                     {t("list.readMore")}
                     <span aria-hidden className="text-base leading-none">→</span>
