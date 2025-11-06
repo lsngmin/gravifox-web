@@ -156,12 +156,17 @@ export default function ProfileCard({ theme = 'dark' }) {
                       placeholder="표시할 이름을 입력하세요"
                       aria-invalid={nicknameError ? 'true' : 'false'}
                     />
+                    {/* Guide + counter under input, right-aligned */}
+                    <div className={`mt-1 text-right text-[10px] ${isDark ? 'text-slate-300/70' : 'text-gray-500'}`}>
+                      <span>한글 포함 {NICKNAME_MAX_LENGTH}자 이내로 입력할 수 있어요.</span>
+                      <span className="ml-2">{nickname.length}/{NICKNAME_MAX_LENGTH}</span>
+                    </div>
                     <div className="flex items-center gap-2">
                       <button
                         type="button"
                         onClick={handleConfirmNickname}
                         disabled={savingName}
-                        className={`inline-flex items-center gap-1 rounded-md px-3 py-1.5 text-[13px] font-semibold transition focus:outline-none focus-visible:ring-2 focus-visible:ring-indigo-200/70 disabled:opacity-60 ${
+                        className={`inline-flex items-center gap-1 rounded-md px-3 py-1.5 text-[13px] font-semibold transition focus:outline-none focus-visible:ring-2 focus-visible:ring-indigo-200/70 disabled:opacity-60 whitespace-nowrap shrink-0 ${
                           isDark
                             ? 'bg-gradient-to-r from-indigo-500 via-indigo-600 to-indigo-500 text-white shadow-[0_12px_20px_-16px_rgba(79,70,229,0.9)] hover:from-indigo-500 hover:via-indigo-500 hover:to-indigo-600'
                             : 'bg-indigo-600 text-white shadow-sm hover:bg-indigo-700'
@@ -181,21 +186,13 @@ export default function ProfileCard({ theme = 'dark' }) {
                           setNicknameError('');
                           setEditing(false);
                         }}
-                        className={`inline-flex items-center gap-1 rounded-md px-3 py-1.5 text-[13px] font-semibold transition focus:outline-none ${
+                        className={`inline-flex items-center gap-1 rounded-md px-3 py-1.5 text-[13px] font-semibold transition focus:outline-none whitespace-nowrap shrink-0 ${
                           isDark ? 'text-slate-300 hover:text-white/90' : 'text-gray-500 hover:text-gray-700'
                         }`}
                       >
                         <XMarkIcon className="h-4 w-4" />
                         취소
                       </button>
-                    </div>
-                    <div className="flex items-center justify-between text-[10px]">
-                      <span className={isDark ? 'text-slate-400/70' : 'text-gray-500'}>
-                        한글 포함 {NICKNAME_MAX_LENGTH}자 이내로 입력할 수 있어요.
-                      </span>
-                      <span className={isDark ? 'text-slate-300/70' : 'text-gray-500'}>
-                        {nickname.length}/{NICKNAME_MAX_LENGTH}
-                      </span>
                     </div>
                     {nicknameError && (
                       <p className={`mt-2 text-xs ${isDark ? 'text-rose-300' : 'text-rose-600'}`}>{nicknameError}</p>
