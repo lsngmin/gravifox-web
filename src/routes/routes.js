@@ -20,6 +20,7 @@ import MediaAnalyze from "pages/MediaAnalyze";
 import EmailVerification from "pages/EmailVerification";
 import AnalyzeResult from "pages/AnalyzeResult";
 import Blog from "../pages/Blog";
+import BlogRoute from "../pages/BlogRoute";
 import MobileAnalyzeStart from "../pages/MobileAnalyzeStart";
 import MobileAnalyzeUpload from "../pages/MobileAnalyzeUpload";
 import MobileAnalyzeResult from "../pages/MobileAnalyzeResult";
@@ -153,7 +154,7 @@ function AnimatedRoutes() {
                 <Route path=":lng/pricing" element={<motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -20 }} transition={{ duration: 0.3 }}><Pricing /></motion.div>} />
                 <Route path=":lng/feature" element={<motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -20 }} transition={{ duration: 0.3 }}><Feature /></motion.div>} />
                 <Route path=":lng/support" element={<motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -20 }} transition={{ duration: 0.3 }}><Support /></motion.div>} />
-                <Route path=":lng/blog" element={<motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -20 }} transition={{ duration: 0.3 }}><Blog /></motion.div>} />
+                <Route path=":lng/blog" element={<motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -20 }} transition={{ duration: 0.3 }}><BlogRoute /></motion.div>} />
                 <Route path=":lng/blog/:slug" element={<motion.div initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -16 }} transition={{ duration: 0.3, ease: "easeOut" }}><BlogPost /></motion.div>} />
                 <Route path=":lng/admin" element={<motion.div initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -16 }} transition={{ duration: 0.35, ease: "easeOut" }}><AdminHome /></motion.div>} />
                 <Route path=":lng/admin/preview" element={<motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -12 }} transition={{ duration: 0.4, ease: "easeOut" }}><AdminPreview /></motion.div>} />

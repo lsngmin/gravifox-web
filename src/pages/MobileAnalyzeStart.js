@@ -417,7 +417,7 @@ export default function MobileAnalyzeStart() {
     <div className={rootClass}>
       <Header />
       <main className="flex-1 flex justify-center">
-        <div className="flex w-full max-w-sm flex-col gap-6 px-5 pb-12 pt-24">
+        <div className="flex w-full max-w-sm md:max-w-md lg:max-w-lg xl:max-w-xl 2xl:max-w-2xl flex-col gap-6 px-5 pb-12 pt-24">
           <header className="space-y-4">
             <div>
               <h1 className={headerTitleClass}>

@@ -250,3 +250,72 @@ export function useBlogPost(slug) {
 
     return { post, isLoading, error };
 }
+
+export function useBlogPostById(id) {
+    const [post, setPost] = useState(null);
+    const [isLoading, setIsLoading] = useState(Boolean(id));
+    const [error, setError] = useState(null);
+
+    useEffect(() => {
+        const safeId = typeof id === "string" || typeof id === "number" ? String(id).trim() : "";
+
+        if (!safeId) {
+            setPost(null);
+            setIsLoading(false);
+            setError(null);
+            return;
+        }
+
+        if (typeof BLOG_ENDPOINTS?.BY_ID !== "function") {
+            setPost(null);
+            setIsLoading(false);
+            setError(new Error("Blog detail endpoint is not configured."));
+            return;
+        }
+
+        const controller = new AbortController();
+        setPost(null);
+        setError(null);
+        setIsLoading(true);
+
+        const fetchPost = async () => {
+            try {
+                const url = BLOG_ENDPOINTS.BY_ID(safeId);
+                if (!isConfiguredEndpoint(url)) {
+                    throw new Error("Blog detail endpoint is not configured.");
+                }
+
+                const payload = await requestJson(url, controller.signal);
+                const normalized = normalizeBlogPost(payload, 0);
+
+                if (!controller.signal.aborted) {
+                    setPost(normalized);
+                }
+            } catch (err) {
+                if (controller.signal.aborted || err?.name === "AbortError") {
+                    return;
+                }
+                console.error("Failed to load blog post", err);
+                if (err?.status === 404) {
+                    setError(err);
+                    setPost(null);
+                    return;
+                }
+                setError(err);
+                setPost(null);
+            } finally {
+                if (!controller.signal.aborted) {
+                    setIsLoading(false);
+                }
+            }
+        };
+
+        fetchPost();
+
+        return () => {
+            controller.abort();
+        };
+    }, [id]);
+
+    return { post, isLoading, error };
+}

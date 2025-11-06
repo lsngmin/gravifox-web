@@ -5,6 +5,7 @@ import { UploadCloud, Check } from 'lucide-react';
 import Header from '../app/layout/Header';
 import Footer from '../app/layout/Footer/Footer';
 import ErrorModal from '../features/analyze/components/ErrorModal';
+import ConfirmModelModal from '../features/analyze/components/ConfirmModelModal';
 import LoginRequiredModal from '../features/analyze/components/LoginRequiredModal';
 import { useAuth } from 'providers/authProvider';
 import { useAnalyzeFlow } from '../features/analyze/contexts/AnalyzeFlowContext';
@@ -88,6 +89,7 @@ export default function MobileAnalyzeUpload() {
   const [modelError, setModelError] = useState(null);
   const [loadingModels, setLoadingModels] = useState(true);
   const [submitting, setSubmitting] = useState(false);
+  const [confirmOpen, setConfirmOpen] = useState(false);
   const [pendingResultPath, setPendingResultPath] = useState(null);
   const [quotaSummary, setQuotaSummary] = useState(null);
   const [loadingQuota, setLoadingQuota] = useState(false);
@@ -385,14 +387,7 @@ export default function MobileAnalyzeUpload() {
     event.target.value = '';
   };
 
-  const handleAnalyze = async () => {
-    if (!files.length || submitting) return;
-
-    const allowed = await ensureQuotaBeforeSubmit();
-    if (!allowed) {
-      return;
-    }
-
+  const runAnalysis = async () => {
     setSubmitting(true);
     setErrorMsgs([]);
     setErrorOpen(false);
@@ -477,6 +472,13 @@ export default function MobileAnalyzeUpload() {
     }
   };
 
+  const handleAnalyze = async () => {
+    if (!files.length || submitting) return;
+    const allowed = await ensureQuotaBeforeSubmit();
+    if (!allowed) return;
+    setConfirmOpen(true);
+  };
+
   const handleReset = () => setFiles([]);
 
   const imageCount = useMemo(() => files.length, [files]);
@@ -542,7 +544,7 @@ export default function MobileAnalyzeUpload() {
     <div className="min-h-screen flex flex-col bg-white text-slate-900 dark:bg-slate-950 dark:text-slate-100">
       <Header />
       <main className="flex-1 flex justify-center">
-        <div className="flex w-full max-w-sm flex-col gap-6 px-5 pb-14 pt-24">
+        <div className="flex w-full max-w-sm md:max-w-md lg:max-w-lg xl:max-w-xl 2xl:max-w-2xl flex-col gap-6 px-5 pb-14 pt-24">
               <button
                 type="button"
                 onClick={() => navigate(lng ? `/${lng}/analyze` : '/analyze')}
@@ -651,6 +653,11 @@ export default function MobileAnalyzeUpload() {
                                   </span>
                                 )}
                               </p>
+                              {model?.description && (
+                                <p className="mt-1 text-[12px] text-slate-600 dark:text-slate-400">
+                                  {model.description}
+                                </p>
+                              )}
                             </div>
                             <span
                               className={`inline-flex h-6 w-6 items-center justify-center self-center rounded-full border ${
@@ -808,6 +815,16 @@ export default function MobileAnalyzeUpload() {
         returnPath={location.pathname + location.search}
         onNavigateSignup={handleNavigateSignup}
         onNavigateForgot={handleNavigateForgot}
+      />
+
+      <ConfirmModelModal
+        open={confirmOpen}
+        model={selectedModel}
+        onCancel={() => setConfirmOpen(false)}
+        onConfirm={() => {
+          setConfirmOpen(false);
+          runAnalysis();
+        }}
       />
     </div>
   );

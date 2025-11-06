@@ -1,8 +1,8 @@
 import React, { useEffect, useMemo, useCallback } from "react";
-import { useParams, useNavigate } from "react-router-dom";
+import { useParams, useNavigate, useSearchParams } from "react-router-dom";
 import Header from "../app/layout/Header";
 import Footer from "../app/layout/Footer/Footer";
-import { useBlogPost } from "lib/blogApi";
+import { useBlogPost, useBlogPostById } from "lib/blogApi";
 import ReactMarkdown from "react-markdown"; // npm i react-markdown
 import { ArrowLeftIcon } from "@heroicons/react/24/outline";
 
@@ -24,8 +24,16 @@ function setOgMeta(title, description) {
 }
 const BlogPost = () => {
     const { lng, slug } = useParams();
+    const [searchParams] = useSearchParams();
     const navigate = useNavigate();
-    const { post, isLoading, error } = useBlogPost(slug);
+    const querySlug = searchParams.get("slug") || undefined;
+    const queryId = searchParams.get("id") || undefined;
+    const effectiveSlug = slug || querySlug || "";
+    const byId = useBlogPostById(queryId);
+    const bySlug = useBlogPost(effectiveSlug);
+    const post = queryId ? byId.post : bySlug.post;
+    const isLoading = queryId ? byId.isLoading : bySlug.isLoading;
+    const error = queryId ? byId.error : bySlug.error;
     const locale = (lng || "ko").toLowerCase();
 
     const publishedDate = useMemo(() => {
@@ -116,7 +124,7 @@ const BlogPost = () => {
         );
     } else if (post) {
         body = (
-            <article className="rounded-3xl border border-slate-200/80 bg-white/95 px-6 py-12 shadow-xl shadow-slate-900/5 backdrop-blur-sm dark:border-slate-700 dark:bg-slate-900/70 dark:shadow-[0_32px_70px_rgba(2,6,23,0.55)] sm:px-12 lg:py-14">
+            <article className="px-1 sm:px-2 lg:px-0">
                 <header>
                     <h1 className="text-3xl font-extrabold tracking-tight text-slate-900 dark:text-slate-100 sm:text-4xl">
                         {post.title}
@@ -140,7 +148,7 @@ const BlogPost = () => {
                     ) : null}
                 </header>
 
-                <div className="prose prose-slate mt-10 max-w-none prose-headings:text-slate-900 prose-a:text-indigo-600 hover:prose-a:text-indigo-500 dark:prose-invert dark:prose-headings:text-white dark:prose-a:text-indigo-300 dark:hover:prose-a:text-indigo-200">
+                <div className="prose prose-slate mt-8 max-w-none prose-headings:text-slate-900 prose-a:text-indigo-600 hover:prose-a:text-indigo-500 dark:prose-invert dark:prose-headings:text-white dark:prose-a:text-indigo-300 dark:hover:prose-a:text-indigo-200">
                     <ReactMarkdown>{post.content}</ReactMarkdown>
                 </div>
             </article>
@@ -154,16 +162,16 @@ const BlogPost = () => {
     const TopDecoration = () => (
         <>
             <div
-                className="absolute inset-0 -z-10 bg-gradient-to-b from-white via-indigo-50/40 to-slate-100 dark:from-slate-950 dark:via-slate-900/60 dark:to-slate-950"
                 aria-hidden
+                className="pointer-events-none absolute inset-0 -z-10 bg-gradient-to-b from-white via-indigo-50/50 to-slate-100 dark:from-slate-950 dark:via-slate-900/70 dark:to-slate-950"
             />
             <div
-                className="absolute inset-x-0 top-0 -z-10 h-72 bg-gradient-to-b from-indigo-200/40 via-white to-transparent dark:from-slate-900/70 dark:via-slate-900/0 dark:to-transparent"
                 aria-hidden
+                className="pointer-events-none absolute inset-x-0 top-0 -z-10 h-72 bg-gradient-to-b from-indigo-200/30 via-white to-transparent dark:from-slate-900/70 dark:via-slate-900/0 dark:to-transparent"
             />
             <div
-                className="pointer-events-none absolute inset-0 -z-10 bg-[radial-gradient(60rem_40rem_at_90%_-10%,rgba(99,102,241,0.18),transparent)] dark:bg-[radial-gradient(60rem_40rem_at_90%_-10%,rgba(129,140,248,0.28),transparent)]"
                 aria-hidden
+                className="pointer-events-none absolute inset-0 -z-10 bg-[radial-gradient(70rem_50rem_at_90%_-10%,rgba(99,102,241,0.14),transparent)] dark:bg-[radial-gradient(70rem_50rem_at_90%_-10%,rgba(99,102,241,0.22),transparent)]"
             />
         </>
     );
@@ -174,8 +182,8 @@ const BlogPost = () => {
             <div className="relative isolate min-h-screen bg-slate-50 text-slate-900 transition-colors dark:bg-slate-950 dark:text-slate-100">
                 <TopDecoration />
                 <main className="relative z-10">
-                    <div className="mx-auto max-w-5xl px-4 pb-24 pt-32 sm:px-6 lg:px-8">
-                        <div className="mb-8 flex flex-wrap items-center gap-4 text-sm font-medium text-slate-600 dark:text-slate-300">
+                    <div className="mx-auto w-full max-w-sm md:max-w-md lg:max-w-lg xl:max-w-xl 2xl:max-w-2xl px-5 pb-24 pt-28 lg:pt-32">
+                        <div className="mb-6 flex flex-wrap items-center gap-4 text-sm font-medium text-slate-600 dark:text-slate-300">
                             <button
                                 type="button"
                                 onClick={handleBack}

@@ -48,13 +48,13 @@ const Profile = () => {
         <Header />
       </header>
 
-      <main className="relative z-0 flex-1">
+      <main className="relative z-0 flex-1 flex justify-center">
         {isDark ? (
           <div className="pointer-events-none absolute inset-x-0 top-[180px] h-[480px] bg-[radial-gradient(circle_at_20%_0%,rgba(236,72,153,0.12),transparent_55%),radial-gradient(circle_at_80%_25%,rgba(59,130,246,0.14),transparent_60%),radial-gradient(circle_at_50%_90%,rgba(14,165,233,0.18),transparent_70%)] opacity-80 blur-3xl" />
         ) : (
           <div className="pointer-events-none absolute inset-x-0 top-[160px] h-[420px] bg-[radial-gradient(circle_at_20%_0%,rgba(147,197,253,0.2),transparent_55%),radial-gradient(circle_at_80%_30%,rgba(167,243,208,0.25),transparent_60%)] opacity-70 blur-[120px]" />
         )}
-        <div className="relative mx-auto max-w-[1360px] px-2.5 sm:px-4 pb-24 pt-16">
+        <div className="flex w-full max-w-sm md:max-w-md lg:max-w-lg xl:max-w-xl 2xl:max-w-2xl flex-col gap-6 px-5 pb-24 pt-16">
           <UserInfo theme={theme} onThemeChange={setTheme} />
         </div>
       </main>

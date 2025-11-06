@@ -230,7 +230,7 @@ export default function AnalyzeResult() {
         <section className="relative overflow-hidden bg-gradient-to-br from-slate-950 via-slate-900 to-indigo-900 text-slate-100">
           <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_top_left,rgba(99,102,241,0.28),transparent_60%)]" aria-hidden />
           <div className="pointer-events-none absolute inset-x-0 bottom-0 h-32 bg-gradient-to-t from-slate-900/60 via-transparent" aria-hidden />
-          <div className="relative z-10 mx-auto w-full max-w-6xl px-5 py-16 sm:px-6 lg:px-8 lg:py-20">
+          <div className="relative z-10 mx-auto w-full max-w-7xl px-5 py-16 sm:px-6 lg:px-8 lg:py-20">
             <div className="flex flex-col gap-10 lg:flex-row lg:items-end">
               <div className="flex-1">
                 <span className="inline-flex items-center rounded-full border border-white/10 bg-white/10 px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.18em] text-slate-200">
@@ -300,7 +300,7 @@ export default function AnalyzeResult() {
         </section>
 
         <section className="relative z-10 -mt-10 pb-16 sm:-mt-14 sm:pb-24">
-          <div className="mx-auto w-full max-w-6xl px-5 sm:px-6 lg:px-8">
+          <div className="mx-auto w-full max-w-7xl px-5 sm:px-6 lg:px-8">
             {ids.length > 0 && (
               <div className="grid gap-6">
                 {ids.map((jid) => {

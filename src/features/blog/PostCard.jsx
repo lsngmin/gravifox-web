@@ -86,7 +86,7 @@ export default function PostCard({ post, index = 0 }) {
                 ) : null}
 
                 <h3 className="mt-3 text-xl font-semibold tracking-tight text-slate-900 dark:text-slate-50 sm:text-2xl">
-                    <Link to={`/${lng}/blog/${post.slug}`} className="inline-flex items-baseline gap-2 text-inherit">
+                    <Link to={`/${lng}/blog?${post?.id != null ? `id=${post.id}` : `slug=${post.slug}`}`} className="inline-flex items-baseline gap-2 text-inherit">
                         {post.title}
                     </Link>
                 </h3>
@@ -100,7 +100,7 @@ export default function PostCard({ post, index = 0 }) {
                 </div>
 
                 <Link
-                    to={`/${lng}/blog/${post.slug}`}
+                    to={`/${lng}/blog?${post?.id != null ? `id=${post.id}` : `slug=${post.slug}`}`}
                     className="mt-3 inline-flex items-center gap-2 text-sm font-semibold text-emerald-600 dark:text-emerald-300"
                 >
                     {t("list.readMore")}

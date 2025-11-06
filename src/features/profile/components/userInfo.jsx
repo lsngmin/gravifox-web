@@ -29,7 +29,7 @@ export default function UserInfo({ theme = "dark", onThemeChange }) {
 
   return (
     <div
-      className={`relative mx-auto mt-10 max-w-[1250px] px-2.5 sm:px-4 ${
+      className={`relative mt-10 w-full ${
         isDark ? "text-slate-100" : "text-gray-900"
       }`}
     >

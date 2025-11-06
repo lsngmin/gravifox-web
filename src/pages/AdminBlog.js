@@ -455,7 +455,7 @@ const AdminBlog = () => {
                                                 </p>
                                             </div>
                                             <a
-                                                href={`/${lng}/blog/${post.slug}`}
+                                                href={`/${lng}/blog?${post?.id != null ? `id=${post.id}` : `slug=${post.slug}`}`}
                                                 target="_blank"
                                                 rel="noreferrer"
                                                 className="inline-flex items-center gap-2 rounded-full border border-slate-300 bg-white px-3 py-1 text-xs font-medium text-slate-700 transition hover:border-slate-400 hover:text-slate-900 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-200 dark:hover:border-slate-500 dark:hover:text-white"

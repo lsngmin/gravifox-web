@@ -57,7 +57,7 @@ export default function HowItWorksSection({ theme = 'light' }) {
 
     return (
         <section
-            className={`mt-12 mx-auto w-full max-w-5xl px-4 sm:px-6 lg:px-8 transition-colors duration-300 ${
+            className={`mt-12 mx-auto w-full max-w-7xl px-4 sm:px-6 lg:px-8 transition-colors duration-300 ${
                 isDark ? 'text-slate-100' : 'text-slate-900'
             }`}
         >
