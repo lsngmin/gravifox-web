@@ -41,9 +41,12 @@ const AdminUserActions = ({
         aria-expanded={open}
         onClick={() => setOpen((v) => !v)}
         className={clsx(
-          "inline-flex items-center rounded-full border px-2.5 py-1.5 text-xs font-medium text-slate-600 transition",
+          // Circular icon button (32x32)
+          "inline-flex h-8 w-8 items-center justify-center rounded-full border text-slate-600 transition",
           "border-slate-300 bg-white hover:border-slate-400 hover:bg-slate-50",
-          "dark:border-slate-700 dark:bg-slate-900/80 dark:text-slate-200 dark:hover:border-slate-500"
+          "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-slate-500 focus-visible:ring-offset-2 focus-visible:ring-offset-white",
+          "dark:border-slate-700 dark:bg-slate-900/80 dark:text-slate-200 dark:hover:border-slate-500",
+          "dark:focus-visible:ring-slate-400 dark:focus-visible:ring-offset-slate-950"
         )}
       >
         <EllipsisVerticalIcon className="h-4 w-4" />
@@ -54,7 +57,7 @@ const AdminUserActions = ({
         <div
           role="menu"
           className={clsx(
-            "absolute right-0 z-30 mt-1 w-56 overflow-hidden rounded-xl border bg-white shadow-lg",
+            "absolute right-0 z-30 mt-1 w-56 overflow-hidden rounded-2xl border bg-white shadow-lg",
             "border-slate-200 dark:border-slate-700 dark:bg-slate-900"
           )}
         >
@@ -64,7 +67,7 @@ const AdminUserActions = ({
               onClick={() => { setOpen(false); onReset?.(user?.userNo); }}
               disabled={isResetting}
               className={clsx(
-                "flex w-full items-center gap-2 rounded-lg px-3 py-2 text-left text-sm",
+                "flex w-full items-center gap-2 rounded-xl px-3 py-2 text-left text-sm",
                 isResetting
                   ? "cursor-wait text-slate-400"
                   : "text-slate-700 hover:bg-slate-100 dark:text-slate-200 dark:hover:bg-slate-800"
@@ -78,7 +81,7 @@ const AdminUserActions = ({
               <a
                 role="menuitem"
                 href={mailPath}
-                className="flex w-full items-center gap-2 rounded-lg px-3 py-2 text-sm text-slate-700 hover:bg-slate-100 dark:text-slate-200 dark:hover:bg-slate-800"
+                className="flex w-full items-center gap-2 rounded-xl px-3 py-2 text-sm text-slate-700 hover:bg-slate-100 dark:text-slate-200 dark:hover:bg-slate-800"
                 onClick={() => setOpen(false)}
               >
                 <EnvelopeIcon className="h-4 w-4" />
@@ -91,7 +94,7 @@ const AdminUserActions = ({
               onClick={handleCopy}
               disabled={!email}
               className={clsx(
-                "flex w-full items-center gap-2 rounded-lg px-3 py-2 text-left text-sm",
+                "flex w-full items-center gap-2 rounded-xl px-3 py-2 text-left text-sm",
                 email
                   ? "text-slate-700 hover:bg-slate-100 dark:text-slate-200 dark:hover:bg-slate-800"
                   : "cursor-not-allowed text-slate-400"
@@ -104,7 +107,7 @@ const AdminUserActions = ({
             <button
               role="menuitem"
               disabled
-              className="flex w-full items-center gap-2 rounded-lg px-3 py-2 text-left text-sm text-slate-400"
+              className="flex w-full items-center gap-2 rounded-xl px-3 py-2 text-left text-sm text-slate-400"
             >
               <UserIcon className="h-4 w-4" />
               <span>사용자 상세 (준비 중)</span>
@@ -117,4 +120,3 @@ const AdminUserActions = ({
 };
 
 export default AdminUserActions;
-

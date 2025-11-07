@@ -131,8 +131,10 @@ const AdminUsers = () => {
                     return (
                       <tr key={user.userNo}>
                         <td className={tableBodyCellClass}>
-                          <div className="font-medium text-slate-900 dark:text-slate-100">{email}</div>
-                          <div className="text-xs text-slate-500 dark:text-slate-400">#{user.userNo}</div>
+                          <div className="font-medium text-slate-900 dark:text-slate-100">
+                            {email}
+                            <span className="ml-2 align-middle text-xs font-normal text-slate-500 dark:text-slate-400">#{user.userNo}</span>
+                          </div>
                         </td>
                         <td className={tableBodyCellClass}><span className={badgeClass}>{user.subscriptionPlan ?? "Free"}</span></td>
                         <td className={tableBodyCellClass}>

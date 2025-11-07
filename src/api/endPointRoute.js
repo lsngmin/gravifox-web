@@ -60,6 +60,7 @@ export const FREETRIAL_ENDPOINTS = {
 export const ISSUE_ENDPOINTS = {
     GET_ISSUE:    `${API_BASE}/api/v1/issue/`,
     CREATE_ISSUE: `${API_BASE}/api/v1/issue/`,
+    UPDATE_STATE: (id) => `${API_BASE}/api/v1/issue/${encodeURIComponent(String(id))}/state`,
 };
 
 export const DASHBOARD_ENDPOINTS = {

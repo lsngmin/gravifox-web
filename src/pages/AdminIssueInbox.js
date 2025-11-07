@@ -9,8 +9,12 @@ import {
     QuestionMarkCircleIcon,
     SparklesIcon,
     Squares2X2Icon,
+    ChevronDownIcon,
+    ChevronUpIcon,
+    EnvelopeIcon,
 } from "@heroicons/react/24/outline";
 import IssueFetchDataAPI from "features/issues/api/issueFetchDataAPI";
+import IssueAdminAPI from "features/issues/api/issueAdminAPI";
 import AdminPageTopBar from "../components/admin/AdminPageTopBar";
 
 const CATEGORY_META = {
@@ -46,7 +50,8 @@ const CATEGORY_META = {
     },
 };
 
-const CATEGORY_KEYS = ["bug-report", "feature-request", "support-contact", "uncategorized"];
+// 통계 카드에서 '기타/미분류' 컨테이너는 숨깁니다.
+const CATEGORY_KEYS = ["bug-report", "feature-request", "support-contact"];
 
 const normalizeString = (value) => (typeof value === "string" ? value.toLowerCase() : "");
 
@@ -113,11 +118,14 @@ const toStateLabel = (state) => {
 const AdminIssueInbox = () => {
     const { lng = "ko" } = useParams();
     const { fetchData } = IssueFetchDataAPI();
+    const { updateState } = IssueAdminAPI();
     const [issues, setIssues] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
     const [activeFilter, setActiveFilter] = useState("all");
     const [lastUpdatedAt, setLastUpdatedAt] = useState(null);
+    const [expandedIds, setExpandedIds] = useState(() => new Set());
+    const [closingIds, setClosingIds] = useState(() => new Set());
 
     const ingestIssues = useCallback((payload) => {
         if (!payload) return [];
@@ -171,6 +179,7 @@ const AdminIssueInbox = () => {
     }, [fetchData, ingestIssues]);
 
     useEffect(() => {
+        // 최초 마운트 및 토큰 변경 시 1회 로드
         loadIssues();
     }, [loadIssues]);
 
@@ -201,6 +210,7 @@ const AdminIssueInbox = () => {
     }, [activeFilter, issues]);
 
     const supportEntryPath = `/${lng}/support`;
+    const mailPath = `/${lng}/admin/mail`;
 
     const pageClass =
         "min-h-screen bg-slate-50 text-slate-900 transition-colors duration-300 dark:bg-slate-950 dark:text-slate-100";
@@ -226,7 +236,7 @@ const AdminIssueInbox = () => {
     const tableHeaderCellClass =
         "px-6 py-4 text-left text-xs font-semibold uppercase tracking-wide text-slate-600 dark:text-slate-300";
     const tableBodyCellClass = "px-6 py-4 align-top text-sm text-slate-600 dark:text-slate-300";
-    const detailTextClass = "line-clamp-4 whitespace-pre-line text-sm text-slate-600 dark:text-slate-300";
+    const detailTextClass = "line-clamp-4 whitespace-pre-line text-left text-sm text-slate-600 dark:text-slate-300";
     const repoTextClass = "mt-2 text-xs text-slate-500 dark:text-slate-500";
     const errorBannerClass =
         "border border-rose-200 bg-rose-50 px-6 py-4 text-sm text-rose-600 dark:border-rose-900/40 dark:bg-rose-950/40 dark:text-rose-200";
@@ -335,7 +345,15 @@ const AdminIssueInbox = () => {
                             : filteredIssues.length > 0
                             ? filteredIssues.map((issue) => (
                                   <article key={issue.id || issue.number || issue.title} className={mobileCardClass}>
-                                      <h3 className={mobileTitleClass}>{issue.title || "제목 미상"}</h3>
+                                      <h3 className={mobileTitleClass}>
+                                          {issue.title || "제목 미상"}
+                                          <span className="ml-2 align-middle text-xs font-normal text-slate-500 dark:text-slate-400">#{issue.number ?? "—"}</span>
+                                      </h3>
+                                      {issue.reporterEmail && (
+                                          <p className="mt-1 text-xs text-slate-500 dark:text-slate-500">
+                                              작성자: {issue.reporterEmail}
+                                          </p>
+                                      )}
                                       <div className="mt-3 flex flex-wrap items-center gap-3 text-xs">
                                           <span className={mobileMetaLabelClass}>유형</span>
                                           <span className={mobileMetaValueClass}>
@@ -348,9 +366,90 @@ const AdminIssueInbox = () => {
                                               {formatDateTime(issue.resolvedUpdatedAt)}
                                           </span>
                                       </div>
-                                      <p className={mobileBodyTextClass}>
-                                          {issue.body?.trim() || "내용이 비어 있습니다."}
-                                      </p>
+                                      {(() => {
+                                          const rowKey = issue.id || issue.number || issue.title;
+                                          const isExpanded = expandedIds.has(rowKey);
+                                          const toggle = () => {
+                                              setExpandedIds((prev) => {
+                                                  // 단일 행만 확장되도록 유지
+                                                  if (prev.has(rowKey)) {
+                                                      return new Set();
+                                                  }
+                                                  const onlyThis = new Set();
+                                                  onlyThis.add(rowKey);
+                                                  return onlyThis;
+                                              });
+                                          };
+                                          const id = issue.id || issue.number;
+                                          const isClosing = closingIds.has(id);
+                                          const handleClose = async () => {
+                                              if (!id) return;
+                                              setClosingIds(prev => new Set(prev).add(id));
+                                              try {
+                                                  const data = await updateState(id, 'closed');
+                                                  setIssues(prev => prev.map(it => {
+                                                      const key = it.id || it.number;
+                                                      if (String(key) === String(id)) {
+                                                          return { ...it, state: 'closed', updatedAt: data?.updatedAt || it.updatedAt };
+                                                      }
+                                                      return it;
+                                                  }));
+                                              } catch (e) {
+                                                  console.error('close failed', e);
+                                              } finally {
+                                                  setClosingIds(prev => { const next = new Set(prev); next.delete(id); return next; });
+                                              }
+                                          };
+                                          return (
+                                              <>
+                                                  <div className="mt-2 flex items-center justify-between">
+                                                      <div className="flex items-center gap-2">
+                                                        {String(issue.state).toLowerCase() !== 'closed' && (
+                                                            <button
+                                                                type="button"
+                                                                onClick={handleClose}
+                                                                disabled={isClosing}
+                                                                className="inline-flex items-center gap-1 rounded-full border border-rose-300 bg-rose-50 px-2.5 py-1 text-xs font-medium text-rose-700 transition hover:border-rose-400 hover:bg-rose-100 disabled:cursor-not-allowed disabled:opacity-60 dark:border-rose-500/50 dark:bg-rose-500/10 dark:text-rose-200"
+                                                            >
+                                                                {isClosing ? '닫는 중…' : '닫기'}
+                                                            </button>
+                                                        )}
+                                                        <a
+                                                            href={mailPath}
+                                                            className="inline-flex items-center gap-1 rounded-full border border-emerald-400 bg-emerald-50 px-2.5 py-1 text-xs font-medium text-emerald-700 transition hover:border-emerald-400 hover:bg-emerald-100 dark:border-emerald-500/60 dark:bg-emerald-500/10 dark:text-emerald-100"
+                                                        >
+                                                            <EnvelopeIcon className="h-4 w-4" />
+                                                            답변
+                                                        </a>
+                                                      </div>
+                                                      <button
+                                                          type="button"
+                                                          onClick={toggle}
+                                                          className="inline-flex items-center gap-1 rounded-full border border-slate-300 bg-white px-2.5 py-1 text-xs font-medium text-slate-700 transition hover:border-slate-400 hover:text-slate-900 dark:border-slate-700 dark:bg-slate-900/70 dark:text-slate-200 dark:hover:border-slate-500"
+                                                      >
+                                                          {isExpanded ? (
+                                                              <>
+                                                                  접기
+                                                                  <ChevronUpIcon className="h-4 w-4" />
+                                                              </>
+                                                          ) : (
+                                                              <>
+                                                                  펼치기
+                                                                  <ChevronDownIcon className="h-4 w-4" />
+                                                              </>
+                                                          )}
+                                                      </button>
+                                                  </div>
+                                                  {isExpanded && (
+                                                      <>
+                                                          <p className={`${mobileBodyTextClass} text-left`}>
+                                                              {issue.body?.trim() || "내용이 비어 있습니다."}
+                                                          </p>
+                                                      </>
+                                                  )}
+                                              </>
+                                          );
+                                      })()}
                                       {issue?.repository_url && (
                                           <p className="mt-2 text-xs text-slate-500 dark:text-slate-500">
                                               저장소:{" "}
@@ -377,7 +476,7 @@ const AdminIssueInbox = () => {
                                         <th className={tableHeaderCellClass}>유형</th>
                                         <th className={tableHeaderCellClass}>상태</th>
                                         <th className={tableHeaderCellClass}>최근 업데이트</th>
-                                        <th className={tableHeaderCellClass}>세부 내용</th>
+                                        <th className={tableHeaderCellClass}>조치</th>
                                     </tr>
                                 </thead>
                                 <tbody className="divide-y divide-slate-200 dark:divide-slate-800">
@@ -411,44 +510,120 @@ const AdminIssueInbox = () => {
                                     )}
 
                                     {!loading &&
-                                        filteredIssues.map((issue) => (
-                                            <tr key={issue.id || issue.number || issue.title}>
-                                                <td className={tableBodyCellClass}>
-                                                    <p className="font-medium text-slate-900 dark:text-slate-100">
-                                                        {issue.title || "제목 미상"}
-                                                    </p>
-                                                    <p className="mt-1 text-xs text-slate-500 dark:text-slate-500">
-                                                        #{issue.number ?? "—"}
-                                                    </p>
-                                                </td>
-                                                <td className={tableBodyCellClass}>
-                                                    <span className="rounded-full border border-slate-300 bg-slate-100 px-3 py-1 text-xs font-semibold text-slate-600 dark:border-slate-600 dark:bg-slate-800/70 dark:text-slate-200">
-                                                        {CATEGORY_META[issue.category]?.label ?? "기타"}
-                                                    </span>
-                                                </td>
-                                                <td className={tableBodyCellClass}>
-                                                    <span className={statusBadgeClass(issue.state)}>
-                                                        {toStateLabel(issue.state)}
-                                                    </span>
-                                                </td>
-                                                <td className={tableBodyCellClass}>
-                                                    {formatDateTime(issue.resolvedUpdatedAt)}
-                                                </td>
-                                                <td className={tableBodyCellClass}>
-                                                    <p className={detailTextClass}>
-                                                        {issue.body?.trim() || "내용이 비어 있습니다."}
-                                                    </p>
-                                                    {issue?.repository_url && (
-                                                        <p className={repoTextClass}>
-                                                            저장소:{" "}
-                                                            <span className="underline decoration-dotted underline-offset-2">
-                                                                {issue.repository_url}
+                                        filteredIssues.map((issue) => {
+                                            const rowKey = issue.id || issue.number || issue.title;
+                                            const isExpanded = expandedIds.has(rowKey);
+                                            const toggle = () => {
+                                                setExpandedIds((prev) => {
+                                                    if (prev.has(rowKey)) return new Set();
+                                                    const onlyThis = new Set();
+                                                    onlyThis.add(rowKey);
+                                                    return onlyThis;
+                                                });
+                                            };
+                                            const handleClose = async () => {
+                                                const id = issue.id || issue.number;
+                                                if (!id) return;
+                                                setClosingIds(prev => new Set(prev).add(id));
+                                                try {
+                                                    const data = await updateState(id, 'closed');
+                                                    setIssues(prev => prev.map(it => {
+                                                        const key = it.id || it.number;
+                                                        if (String(key) === String(id)) {
+                                                            return { ...it, state: 'closed', updatedAt: data?.updatedAt || it.updatedAt };
+                                                        }
+                                                        return it;
+                                                    }));
+                                                } catch (e) {
+                                                    console.error('close failed', e);
+                                                } finally {
+                                                    setClosingIds(prev => { const next = new Set(prev); next.delete(id); return next; });
+                                                }
+                                            };
+                                            return (
+                                                <React.Fragment key={rowKey}>
+                                                    <tr>
+                                                        <td className={tableBodyCellClass}>
+                                                            <p className="font-medium text-slate-900 dark:text-slate-100">
+                                                                {issue.title || "제목 미상"}
+                                                                <span className="ml-2 align-middle text-xs font-normal text-slate-500 dark:text-slate-500">#{issue.number ?? "—"}</span>
+                                                                {issue.reporterEmail && (
+                                                                    <span className="ml-2 align-middle text-xs font-normal text-slate-500 dark:text-slate-500">· {issue.reporterEmail}</span>
+                                                                )}
+                                                            </p>
+                                                        </td>
+                                                        <td className={tableBodyCellClass}>
+                                                            <span className="rounded-full border border-slate-300 bg-slate-100 px-3 py-1 text-xs font-semibold text-slate-600 dark:border-slate-600 dark:bg-slate-800/70 dark:text-slate-200">
+                                                                {CATEGORY_META[issue.category]?.label ?? "기타"}
                                                             </span>
-                                                        </p>
+                                                        </td>
+                                                        <td className={tableBodyCellClass}>
+                                                            <span className={statusBadgeClass(issue.state)}>
+                                                                {toStateLabel(issue.state)}
+                                                            </span>
+                                                        </td>
+                                                        <td className={tableBodyCellClass}>
+                                                            {formatDateTime(issue.resolvedUpdatedAt)}
+                                                        </td>
+                                                        <td className={tableBodyCellClass}>
+                                                            <div className="flex items-center justify-end gap-2">
+                                                                <button
+                                                                    type="button"
+                                                                    onClick={toggle}
+                                                                    className="inline-flex items-center gap-1 rounded-full border border-slate-300 bg-white px-2.5 py-1 text-xs font-medium text-slate-700 transition hover:border-slate-400 hover:text-slate-900 dark:border-slate-700 dark:bg-slate-900/70 dark:text-slate-200 dark:hover:border-slate-500"
+                                                                >
+                                                                    {isExpanded ? (
+                                                                        <>
+                                                                            접기
+                                                                            <ChevronUpIcon className="h-4 w-4" />
+                                                                        </>
+                                                                    ) : (
+                                                                        <>
+                                                                            펼치기
+                                                                            <ChevronDownIcon className="h-4 w-4" />
+                                                                        </>
+                                                                    )}
+                                                                </button>
+                                                                {String(issue.state).toLowerCase() !== 'closed' && (
+                                                                    <button
+                                                                        type="button"
+                                                                        onClick={handleClose}
+                                                                        disabled={closingIds.has(issue.id || issue.number)}
+                                                                        className="inline-flex items-center gap-1 rounded-full border border-rose-300 bg-rose-50 px-2.5 py-1 text-xs font-medium text-rose-700 transition hover:border-rose-400 hover:bg-rose-100 disabled:cursor-not-allowed disabled:opacity-60 dark:border-rose-500/50 dark:bg-rose-500/10 dark:text-rose-200"
+                                                                    >
+                                                                        {closingIds.has(issue.id || issue.number) ? '닫는 중…' : '닫기'}
+                                                                    </button>
+                                                                )}
+                                                                <a
+                                                                    href={mailPath}
+                                                                    className="inline-flex items-center gap-1 rounded-full border border-emerald-400 bg-emerald-50 px-2.5 py-1 text-xs font-medium text-emerald-700 transition hover:border-emerald-400 hover:bg-emerald-100 dark:border-emerald-500/60 dark:bg-emerald-500/10 dark:text-emerald-100"
+                                                                >
+                                                                    <EnvelopeIcon className="h-4 w-4" />
+                                                                    답변
+                                                                </a>
+                                                            </div>
+                                                        </td>
+                                                    </tr>
+                                                    {isExpanded && (
+                                                        <tr>
+                                                            <td colSpan={5} className={tableBodyCellClass}>
+                                                                <p className="whitespace-pre-line text-left text-sm text-slate-600 dark:text-slate-300">
+                                                                    {issue.body?.trim() || "내용이 비어 있습니다."}
+                                                                </p>
+                                                                {issue?.repository_url && (
+                                                                    <p className={repoTextClass}>
+                                                                        저장소:{" "}
+                                                                        <span className="underline decoration-dotted underline-offset-2">
+                                                                            {issue.repository_url}
+                                                                        </span>
+                                                                    </p>
+                                                                )}
+                                                            </td>
+                                                        </tr>
                                                     )}
-                                                </td>
-                                            </tr>
-                                        ))}
+                                                </React.Fragment>
+                                            );
+                                        })}
                                 </tbody>
                             </table>
                         </div>
@@ -457,6 +632,15 @@ const AdminIssueInbox = () => {
                     {error && (
                         <div className={errorBannerClass}>
                             피드백 데이터를 불러오지 못했습니다. 네트워크 상태를 확인한 뒤 다시 시도해 주세요.
+                            {(() => {
+                                const detail = error?.response?.data?.message || error?.message;
+                                return detail ? (
+                                    <>
+                                        <br />
+                                        <span className="text-xs opacity-80">세부: {String(detail)}</span>
+                                    </>
+                                ) : null;
+                            })()}
                         </div>
                     )}
                 </section>

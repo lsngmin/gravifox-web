@@ -364,9 +364,7 @@ const AdminPreview = () => {
                                                         <td className={tableBodyCellClass}>
                                                             <div className="font-medium text-slate-900 dark:text-slate-100">
                                                                 {user.email || user.userId || "이메일 미상"}
-                                                            </div>
-                                                            <div className="text-xs text-slate-500 dark:text-slate-400">
-                                                                #{user.userNo}
+                                                                <span className="ml-2 align-middle text-xs font-normal text-slate-500 dark:text-slate-400">#{user.userNo}</span>
                                                             </div>
                                                         </td>
                                                         <td className={tableBodyCellClass}>

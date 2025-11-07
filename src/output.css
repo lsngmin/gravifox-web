@@ -5611,6 +5611,10 @@ video {
   vertical-align: top;
 }
 
+.align-middle {
+  vertical-align: middle;
+}
+
 .font-sans {
   font-family: Pretendard Variable, system-ui, sans-serif;
 }
@@ -7816,6 +7820,11 @@ body {
 
 .hover\:border-white\/50:hover {
   border-color: rgb(255 255 255 / 0.5);
+}
+
+.hover\:border-rose-400:hover {
+  --tw-border-opacity: 1;
+  border-color: rgb(251 113 133 / var(--tw-border-opacity, 1));
 }
 
 .hover\:bg-amber-100:hover {

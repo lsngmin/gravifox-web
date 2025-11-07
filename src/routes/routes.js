@@ -34,15 +34,22 @@ import AdminServiceHealth from "../pages/AdminServiceHealth";
 import AdminUsers from "../pages/AdminUsers";
 import AdminLatestAnalysis from "../pages/AdminLatestAnalysis";
 
+const SUPPORTED_LOCALES = ['en', 'ko'];
+const getLocaleFromPath = (pathname = '/') => {
+    const match = pathname.match(/^\/([a-zA-Z-]{2,5})(?=\/|$)/);
+    if (!match) return null;
+    const candidate = match[1].toLowerCase();
+    return SUPPORTED_LOCALES.includes(candidate) ? candidate : null;
+};
+
 // Create/update canonical link to point to language-prefixed URL
 function CanonicalLink() {
     const loc = useLocation();
     const { t, i18n } = useTranslation(['home','common']);
     useEffect(() => {
         const origin = window.location.origin;
-        const supported = ['en','ko'];
         let lng = (i18n.language || 'en').slice(0,2);
-        if (!supported.includes(lng)) lng = 'en';
+        if (!SUPPORTED_LOCALES.includes(lng)) lng = 'en';
         let path = loc.pathname || '/';
         if (!path.startsWith('/en') && !path.startsWith('/ko')) {
             path = '/' + lng + (path === '/' ? '' : path);
@@ -92,15 +99,35 @@ function CanonicalLink() {
     return null;
 }
 
+// Keeps i18n language aligned with the current /:lng prefix so translations match the URL.
+function LanguageSync() {
+    const loc = useLocation();
+    const { i18n } = useTranslation();
+    useEffect(() => {
+        const next = getLocaleFromPath(loc.pathname);
+        if (!next) return;
+        const current = (i18n.language || '').slice(0,2);
+        if (current === next) return;
+        i18n.changeLanguage(next);
+        if (typeof window !== 'undefined') {
+            try {
+                window.localStorage.setItem('i18nextLng', next);
+            } catch {}
+        }
+    }, [loc.pathname, i18n]);
+    return null;
+}
+
 // Legacy (non-prefixed) route → detect language and redirect to prefixed
 function LegacyToLocalized() {
     const nav = useNavigate();
     const loc = useLocation();
     useEffect(() => {
-        const supported = ['en','ko'];
         const browser = (navigator.language || 'en').slice(0,2);
         const stored = (typeof localStorage !== 'undefined' && localStorage.getItem('i18nextLng')) || '';
-        const pick = supported.includes(stored) ? stored : (supported.includes(browser) ? browser : 'en');
+        const pick = SUPPORTED_LOCALES.includes(stored)
+            ? stored
+            : (SUPPORTED_LOCALES.includes(browser) ? browser : 'en');
         const remapPath = (pathname) => {
             if (pathname.startsWith('/analyze/mobile/upload')) return '/analyze/upload';
             if (pathname.startsWith('/analyze/mobile/result')) return '/analyze/result';
@@ -117,10 +144,11 @@ function LangRedirect() {
     const nav = useNavigate();
     const loc = useLocation();
     useEffect(() => {
-        const supported = ['en','ko'];
         const browser = (navigator.language || 'en').slice(0,2);
         const stored = (typeof localStorage !== 'undefined' && localStorage.getItem('i18nextLng')) || '';
-        const pick = supported.includes(stored) ? stored : (supported.includes(browser) ? browser : 'en');
+        const pick = SUPPORTED_LOCALES.includes(stored)
+            ? stored
+            : (SUPPORTED_LOCALES.includes(browser) ? browser : 'en');
         const path = loc.pathname === '/' ? '' : loc.pathname;
         nav(`/${pick}${path}${loc.search}${loc.hash}`, { replace: true, state: loc.state });
     }, [loc.hash, loc.pathname, loc.search, loc.state, nav]);
@@ -133,6 +161,7 @@ function AnimatedRoutes() {
     return (
         <>
             <CanonicalLink />
+            <LanguageSync />
             <AnimatePresence mode="wait">
                 <Routes location={location} key={location.pathname}>
                 {/* Root -> language prefixed redirect */}
