@@ -31,6 +31,7 @@ import AdminMail from "../pages/AdminMail";
 import AdminBlog from "../pages/AdminBlog";
 import AdminIssueInbox from "../pages/AdminIssueInbox";
 import AdminServiceHealth from "../pages/AdminServiceHealth";
+import AdminUsers from "../pages/AdminUsers";
 
 // Create/update canonical link to point to language-prefixed URL
 function CanonicalLink() {
@@ -162,6 +163,7 @@ function AnimatedRoutes() {
                 <Route path=":lng/admin/blog" element={<motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -12 }} transition={{ duration: 0.35, ease: "easeOut" }}><AdminBlog /></motion.div>} />
                 <Route path=":lng/admin/issues" element={<motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -12 }} transition={{ duration: 0.35, ease: "easeOut" }}><AdminIssueInbox /></motion.div>} />
                 <Route path=":lng/admin/service-health" element={<motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -12 }} transition={{ duration: 0.4, ease: "easeOut" }}><AdminServiceHealth /></motion.div>} />
+                <Route path=":lng/admin/users" element={<motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -12 }} transition={{ duration: 0.35, ease: "easeOut" }}><AdminUsers /></motion.div>} />
 
                 {/* Legacy non-prefixed routes → redirect to localized */}
                 <Route path="/login" element={<LegacyToLocalized />} />
@@ -192,6 +194,7 @@ function AnimatedRoutes() {
                 <Route path="/admin/blog" element={<LegacyToLocalized />} />
                 <Route path="/admin/issues" element={<LegacyToLocalized />} />
                 <Route path="/admin/service-health" element={<LegacyToLocalized />} />
+                <Route path="/admin/users" element={<LegacyToLocalized />} />
 
                 <Route path="/*" element={<motion.div><CustomErrorPage status={"404"} /></motion.div>} />
                 </Routes>

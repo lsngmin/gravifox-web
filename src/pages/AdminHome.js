@@ -8,6 +8,7 @@ import {
     QueueListIcon,
     ShieldCheckIcon,
     Squares2X2Icon,
+    UserGroupIcon,
 } from "@heroicons/react/24/outline";
 import clsx from "clsx";
 import AdminThemeToggle from "../components/admin/AdminThemeToggle";
@@ -19,6 +20,7 @@ const AdminHome = () => {
     const mailPath = `/${lng}/admin/mail`;
     const blogPath = `/${lng}/admin/blog`;
     const inboxPath = `/${lng}/admin/issues`;
+    const usersPath = `/${lng}/admin/users`;
     const serviceHealthPath = `/${lng}/admin/service-health`;
 
     const sections = useMemo(
@@ -32,6 +34,16 @@ const AdminHome = () => {
                 to: serviceHealthPath,
                 icon: ShieldCheckIcon,
                 accent: "from-cyan-500 via-sky-500 to-emerald-500",
+            },
+            {
+                id: "users",
+                title: "사용자 목록",
+                description:
+                    "가입자 정보를 확인하고 월별 사용량을 관리합니다.",
+                hint: "Users",
+                to: usersPath,
+                icon: UserGroupIcon,
+                accent: "from-indigo-500 via-sky-500 to-emerald-400",
             },
             {
                 id: "inbox",
@@ -84,7 +96,7 @@ const AdminHome = () => {
                 accent: "from-slate-500 via-slate-400 to-slate-300",
             },
         ],
-        [blogPath, inboxPath, mailPath, previewPath, serviceHealthPath]
+        [blogPath, inboxPath, mailPath, previewPath, serviceHealthPath, usersPath]
     );
 
     const handleNavigate = (target) => {

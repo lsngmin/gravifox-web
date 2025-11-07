@@ -122,7 +122,8 @@ const AdminPreview = () => {
     const handleResetQuota = async (userNo) => {
         setResettingIds((prev) => new Set(prev).add(userNo));
         try {
-            await resetAdminUserQuota({ userNo });
+            // API는 원시 userNo 값을 기대하므로 객체가 아닌 숫자를 전달합니다.
+            await resetAdminUserQuota(userNo);
             setUserItems((prev) =>
                 prev.map((item) =>
                     item.userNo === userNo
@@ -360,7 +361,7 @@ const AdminPreview = () => {
                                                     <tr key={user.userNo}>
                                                         <td className={tableBodyCellClass}>
                                                             <div className="font-medium text-slate-900 dark:text-slate-100">
-                                                                {user.email ?? "이메일 미상"}
+                                                                {user.email || user.userId || "이메일 미상"}
                                                             </div>
                                                             <div className="text-xs text-slate-500 dark:text-slate-400">
                                                                 #{user.userNo}
