@@ -54,7 +54,7 @@ const AdminUsers = () => {
     setResetting((prev) => new Set(prev).add(userNo));
     try {
       await resetAdminUserQuota(userNo);
-      setItems((prev) => prev.map((it) => it.userNo === userNo ? { ...it, monthlyQuotaUsed: 0, monthlyQuotaLimit: it.monthlyQuotaLimit ?? 0 } : it));
+      setItems((prev) => prev.map((it) => it.userNo === userNo ? { ...it, monthlyQuotaUsed: 0 } : it));
     } catch (e) {
       console.error("reset quota failed", e);
     } finally {
@@ -96,9 +96,8 @@ const AdminUsers = () => {
           </div>
         ) : null}
 
-        <section className="overflow-hidden rounded-2xl border border-slate-200 dark:border-slate-800">
-          <div className="max-h-[70vh] overflow-y-auto">
-            <table className="min-w-full divide-y divide-slate-200 text-sm dark:divide-slate-800">
+        <section className="rounded-2xl border border-slate-200 dark:border-slate-800">
+          <table className="min-w-full divide-y divide-slate-200 text-sm dark:divide-slate-800">
               <thead className="bg-slate-100/80 backdrop-blur dark:bg-slate-900/70">
                 <tr>
                   <th className={tableHeaderCellClass}>이메일</th>
@@ -124,10 +123,10 @@ const AdminUsers = () => {
                 ) : (
                   items.map((user) => {
                     const email = user.email || user.userId || "이메일 미상";
-                    const quota = user.monthlyQuotaLimit ?? 0;
-                    const used = user.monthlyQuotaUsed ?? 0;
-                    const ratio = quota > 0 ? Math.min((used / quota) * 100, 100) : 0;
-                    const joinedAt = user.createdAt || user.created_at || user.joinedAt || user.createdDate || user.created_date;
+                    const quotaLimit = typeof user.monthlyQuotaLimit === "number" ? user.monthlyQuotaLimit : null;
+                    const used = typeof user.monthlyQuotaUsed === "number" ? user.monthlyQuotaUsed : 0;
+                    const ratio = quotaLimit && quotaLimit > 0 ? Math.min((used / quotaLimit) * 100, 100) : 0;
+                    const joinedAt = user.createdAt || user.joinedAt || user.created_at || user.createdDate || user.created_date;
                     return (
                       <tr key={user.userNo}>
                         <td className={tableBodyCellClass}>
@@ -137,7 +136,10 @@ const AdminUsers = () => {
                         <td className={tableBodyCellClass}><span className={badgeClass}>{user.subscriptionPlan ?? "Free"}</span></td>
                         <td className={tableBodyCellClass}>
                           <div className="flex flex-col gap-1">
-                            <div className="flex items-center justify-between text-xs text-slate-500 dark:text-slate-400"><span>{used}/{quota || "∞"}</span><span>{ratio.toFixed(0)}%</span></div>
+                            <div className="flex items-center justify-between text-xs text-slate-500 dark:text-slate-400">
+                              <span>{quotaLimit != null ? `${used}/${quotaLimit}` : `${used}/—`}</span>
+                              <span>{quotaLimit != null ? `${ratio.toFixed(0)}%` : "—"}</span>
+                            </div>
                             <div className="h-2 rounded-full bg-slate-200 dark:bg-slate-800">
                               <div className="h-2 rounded-full bg-sky-400 transition-all dark:bg-sky-500" style={{ width: `${ratio}%` }} />
                             </div>
@@ -169,7 +171,6 @@ const AdminUsers = () => {
                 ) : null}
               </tbody>
             </table>
-          </div>
         </section>
 
         <div className="flex items-center justify-center">
@@ -192,4 +193,3 @@ const AdminUsers = () => {
 };
 
 export default AdminUsers;
-

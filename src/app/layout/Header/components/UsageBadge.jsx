@@ -74,10 +74,23 @@ const UsageBadge = () => {
         return 0;
     })();
 
-    const accent = clampedPercent >= 90 ? '#f87171' : clampedPercent >= 70 ? '#fbbf24' : '#34d399';
-    const ringStyle = {
-        background: `conic-gradient(${accent} ${clampedPercent}%, rgba(148, 163, 184, 0.25) ${clampedPercent}% 100%)`,
-    };
+    // Traffic light thresholds based on used percent
+    const greenActive = clampedPercent < 70;
+    const yellowActive = clampedPercent >= 70 && clampedPercent < 90;
+    const redActive = clampedPercent >= 90;
+
+    const activeVariant = greenActive ? 'green' : yellowActive ? 'amber' : 'red';
+    const activeTitle = greenActive
+        ? t('navigation.usage.green', '충분함')
+        : yellowActive
+        ? t('navigation.usage.yellow', '주의')
+        : t('navigation.usage.red', '한계 임박');
+    const activeClassName =
+        activeVariant === 'green'
+            ? 'bg-green-500 shadow-[0_0_8px_rgba(34,197,94,0.6)] ring-1 ring-green-300/60'
+            : activeVariant === 'amber'
+            ? 'bg-amber-500 shadow-[0_0_8px_rgba(245,158,11,0.6)] ring-1 ring-amber-300/60'
+            : 'bg-red-500 shadow-[0_0_8px_rgba(239,68,68,0.6)] ring-1 ring-red-300/60';
 
     const srLabel = (() => {
         if (limit != null && used != null) {
@@ -134,10 +147,16 @@ const UsageBadge = () => {
     })();
 
     return (
-        <div className="inline-flex items-center gap-2 rounded-full border border-slate-200/80 bg-white/80 px-2.5 py-1 shadow-sm dark:border-slate-700 dark:bg-slate-800/80">
-            <span className="relative flex h-4 w-4 items-center justify-center" aria-hidden="true">
-                <span className="absolute inset-0 rounded-full" style={ringStyle} />
-                <span className="absolute inset-[2px] rounded-full bg-white dark:bg-slate-900" />
+        <div
+            className="inline-flex items-center gap-2 rounded-full border border-slate-200/80 bg-white/80 px-2.5 py-1 shadow-sm dark:border-slate-700 dark:bg-slate-800/80"
+            role="status"
+            aria-live="polite"
+        >
+            <span className="flex items-center" aria-hidden="true">
+                <span
+                    className={"h-3 w-3 rounded-full transition-all " + activeClassName}
+                    title={activeTitle}
+                />
             </span>
             <span className="text-[11px] font-semibold text-slate-700 dark:text-slate-200">{labelShort}</span>
             <span className="sr-only">{srLabel}</span>

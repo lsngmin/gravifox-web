@@ -213,10 +213,10 @@ export default function AnalyzeResult() {
 
   const ids = jobIds;
   const statItems = [
-    { label: "총 요청", value: summary.total, accent: "text-white" },
-    { label: "진행 중", value: summary.running, accent: "text-indigo-100" },
-    { label: "완료", value: summary.done, accent: "text-emerald-100" },
-    { label: "실패", value: summary.failed, accent: "text-rose-100" },
+    { label: "총 요청", value: summary.total, accent: "text-slate-900 dark:text-white" },
+    { label: "진행 중", value: summary.running, accent: "text-indigo-600 dark:text-indigo-100" },
+    { label: "완료", value: summary.done, accent: "text-emerald-600 dark:text-emerald-100" },
+    { label: "실패", value: summary.failed, accent: "text-rose-600 dark:text-rose-100" },
   ];
   const formatNumber = (v) => {
     if (typeof v !== "number" || Number.isNaN(v)) return "-";
@@ -224,54 +224,48 @@ export default function AnalyzeResult() {
   };
 
   return (
-    <div className="flex min-h-screen flex-col bg-slate-100">
+    <div className="flex min-h-screen flex-col bg-white text-slate-900 dark:bg-slate-950 dark:text-slate-100">
       <Header />
       <main className="flex-1">
-        <section className="relative overflow-hidden bg-gradient-to-br from-slate-950 via-slate-900 to-indigo-900 text-slate-100">
-          <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_top_left,rgba(99,102,241,0.28),transparent_60%)]" aria-hidden />
-          <div className="pointer-events-none absolute inset-x-0 bottom-0 h-32 bg-gradient-to-t from-slate-900/60 via-transparent" aria-hidden />
-          <div className="relative z-10 mx-auto w-full max-w-7xl px-5 py-16 sm:px-6 lg:px-8 lg:py-20">
+        <section className="relative overflow-hidden bg-white text-slate-900 dark:bg-gradient-to-br dark:from-slate-950 dark:via-slate-900 dark:to-indigo-900 dark:text-slate-100">
+          <div className="pointer-events-none absolute inset-0 hidden dark:block bg-[radial-gradient(circle_at_top_left,rgba(99,102,241,0.28),transparent_60%)]" aria-hidden />
+          <div className="pointer-events-none absolute inset-x-0 bottom-0 hidden h-32 bg-gradient-to-t from-slate-100 via-transparent dark:block dark:from-slate-900/60" aria-hidden />
+          <div className="relative z-10 mx-auto w-full max-w-5xl px-5 py-12 sm:px-6 lg:px-8 lg:py-16">
             <div className="flex flex-col gap-10 lg:flex-row lg:items-end">
               <div className="flex-1">
-                <span className="inline-flex items-center rounded-full border border-white/10 bg-white/10 px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.18em] text-slate-200">
-                  Analyze Result
-                </span>
-                <h1 className="mt-4 text-3xl font-semibold tracking-tight text-white sm:text-4xl">
-                  미디어 분석 리포트가 준비됐어요
-                </h1>
-                <p className="mt-4 max-w-2xl text-sm text-slate-300 sm:text-base">
-                  업로드한 미디어에 대한 판정과 핵심 지표를 한눈에 확인해 보세요. 필요한 경우 PDF로 저장하거나 추가 분석을 바로 진행할 수 있어요.
-                </p>
+                <span className="inline-flex items-center rounded-full border px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.18em] border-slate-200 bg-slate-50 text-slate-600 dark:border-white/10 dark:bg-white/10 dark:text-slate-200">Analyze Result</span>
+                <h1 className="mt-4 text-3xl font-semibold tracking-tight text-slate-900 dark:text-white sm:text-4xl">미디어 분석 리포트가 준비됐어요</h1>
+                <p className="mt-4 max-w-2xl text-sm text-slate-600 dark:text-slate-300 sm:text-base">업로드한 미디어에 대한 판정과 핵심 지표를 한눈에 확인해 보세요. 필요한 경우 PDF로 저장하거나 추가 분석을 바로 진행할 수 있어요.</p>
                 <div className="mt-8 flex flex-wrap items-center gap-3">
                   <button
                     type="button"
                     onClick={() => navigate("/analyze")}
-                    className="inline-flex items-center justify-center rounded-full border border-white/20 bg-white/5 px-5 py-2 text-sm font-semibold text-slate-100 transition hover:border-white/40 hover:bg-white/10"
+                    className="inline-flex items-center justify-center rounded-full border px-5 py-2 text-sm font-semibold transition border-slate-200 bg-white text-slate-700 hover:border-slate-300 hover:bg-slate-50 dark:border-white/20 dark:bg-white/5 dark:text-slate-100 dark:hover:border-white/40 dark:hover:bg-white/10"
                   >
                     돌아가기
                   </button>
                   <button
                     type="button"
                     onClick={() => window.print()}
-                    className="inline-flex items-center justify-center rounded-full bg-white px-5 py-2 text-sm font-semibold text-slate-900 shadow-lg shadow-slate-900/20 transition hover:bg-slate-100"
+                    className="inline-flex items-center justify-center rounded-full bg-slate-900 px-5 py-2 text-sm font-semibold text-white shadow-sm transition hover:bg-slate-800 dark:bg-white dark:text-slate-900 dark:shadow-lg dark:shadow-slate-900/20 dark:hover:bg-slate-100"
                   >
                     PDF로 저장
                   </button>
                 </div>
               </div>
               {summary.total > 0 && (
-                <div className="w-full max-w-sm rounded-2xl border border-white/10 bg-white/10 p-5 shadow-xl shadow-black/10 backdrop-blur-sm">
-                  <div className="flex items-center justify-between text-xs font-semibold uppercase tracking-wide text-slate-200">
+                <div className="w-full max-w-sm rounded-2xl border p-5 shadow-sm border-slate-200 bg-white text-slate-900 dark:border-white/10 dark:bg-white/10 dark:shadow-xl dark:shadow-black/10 dark:text-slate-200 backdrop-blur-sm">
+                  <div className="flex items-center justify-between text-xs font-semibold uppercase tracking-wide">
                     <span>전체 진행률</span>
                     <span>{summary.pct}%</span>
                   </div>
-                  <div className="mt-3 h-2 w-full overflow-hidden rounded-full bg-white/10">
+                  <div className="mt-3 h-2 w-full overflow-hidden rounded-full bg-slate-100 dark:bg-white/10">
                     <div
                       className="h-full rounded-full bg-gradient-to-r from-indigo-400 via-sky-400 to-emerald-300 transition-all duration-500"
                       style={{ width: `${summary.pct}%` }}
                     />
                   </div>
-                  <p className="mt-4 text-xs text-slate-300">
+                  <p className="mt-4 text-xs text-slate-600 dark:text-slate-300">
                     {summary.done > 0 ? `완료 ${summary.done.toLocaleString()}건, 진행 ${summary.running.toLocaleString()}건, 실패 ${summary.failed.toLocaleString()}건` : "분석이 진행 중이에요."}
                   </p>
                 </div>
@@ -283,11 +277,11 @@ export default function AnalyzeResult() {
                 {statItems.map((item) => (
                   <div
                     key={item.label}
-                    className="group relative overflow-hidden rounded-2xl border border-white/10 bg-white/[0.08] p-5 shadow-lg shadow-slate-950/5 backdrop-blur"
+                    className="group relative overflow-hidden rounded-2xl border p-5 shadow-sm border-slate-200 bg-white text-slate-900 dark:border-white/10 dark:bg-white/[0.08] dark:shadow-lg dark:shadow-slate-950/5 backdrop-blur"
                   >
                     <div className="absolute inset-0 translate-y-8 scale-[1.15] bg-[radial-gradient(circle_at_top,rgba(255,255,255,0.16),transparent_55%)] opacity-0 transition duration-500 group-hover:translate-y-0 group-hover:opacity-100" aria-hidden />
                     <div className="relative z-10 flex flex-col">
-                      <span className="text-xs font-medium uppercase tracking-[0.14em] text-slate-300">{item.label}</span>
+                      <span className="text-xs font-medium uppercase tracking-[0.14em] text-slate-500 dark:text-slate-300">{item.label}</span>
                       <span className={`mt-3 text-2xl font-semibold ${item.accent}`}>
                         {formatNumber(item.value)}
                       </span>

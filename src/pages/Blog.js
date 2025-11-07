@@ -40,7 +40,7 @@ const Blog = () => {
             <div className="relative isolate min-h-screen bg-slate-50 text-slate-900 transition-colors dark:bg-slate-950 dark:text-slate-100">
                 <BlogBackground />
                 <main className="relative z-10">
-                    <div className="mx-auto w-full max-w-sm md:max-w-md lg:max-w-lg xl:max-w-2xl 2xl:max-w-3xl px-5 pb-24 pt-28 lg:pb-32 lg:pt-32">
+                    <div className="mx-auto w-full max-w-sm md:max-w-md lg:max-w-5xl xl:max-w-6xl 2xl:max-w-7xl px-5 pb-24 pt-28 lg:pb-32 lg:pt-32">
                         <BlogHero />
 
                         <div className="mt-10 lg:mt-12">

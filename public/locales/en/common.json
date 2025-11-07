@@ -242,12 +242,26 @@
       "footer": "You'll be redirected automatically when results are ready."
     },
     "report": {
+      "detailTitle": "Detail Report",
+      "fileInfo": "File information",
+      "file": {
+        "name": "File name",
+        "size": "File size",
+        "type": "Type",
+        "storedAt": "Stored at",
+        "jobId": "Job ID"
+      },
+      "desktopHint": "View full graphs and download options on the desktop dashboard. For critical decisions, upload the same file again to double-check.",
+      "loadFailed": "We couldn’t load the report. Please try again shortly.",
       "badge": {
         "real": "REAL",
         "fake": "FAKE",
         "unknown": "UNKNOWN"
       },
       "metrics": {
+        "generationProbability": "Generation probability",
+        "realProbability": "Real probability",
+        "suspicionScore": "Suspicion score",
         "title": "Decision rationale",
         "probFake": "Suspicion probability",
         "probFakeHint": "Likelihood that the image is synthetic.",

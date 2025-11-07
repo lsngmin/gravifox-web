@@ -17,9 +17,6 @@ const AdminPageTopBar = ({ lng = "ko", currentLabel, className }) => {
                     <ArrowLeftIcon className="h-4 w-4" />
                     운영 허브로 돌아가기
                 </Link>
-                {currentLabel ? (
-                    <span className="text-sm text-slate-500 dark:text-slate-400">({`/${currentLabel}`})</span>
-                ) : null}
             </div>
             <AdminThemeToggle />
         </div>
