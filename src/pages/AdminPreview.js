@@ -11,6 +11,7 @@ import {
 } from "@heroicons/react/24/outline";
 import { fetchAdminLatestAnalysisReports, fetchAdminUsers, resetAdminUserQuota } from "../api/admin";
 import AdminPageTopBar from "../components/admin/AdminPageTopBar";
+import AdminUserActions from "../components/admin/AdminUserActions";
 
 const activityFeed = [
     {
@@ -57,6 +58,7 @@ const AdminPreview = () => {
         return fallback.slice(0, 2);
     }, [paramsLng, i18n.language]);
     const mailPath = `/${resolvedLng}/admin/mail`;
+    const latestAnalysisPath = `/${resolvedLng}/admin/analysis`;
 
     const [recentAnalyses, setRecentAnalyses] = useState([]);
     const [recentLoading, setRecentLoading] = useState(false);
@@ -392,14 +394,12 @@ const AdminPreview = () => {
                                                                 : "—"}
                                                         </td>
                                                         <td className={tableBodyCellClass}>
-                                                            <button
-                                                                type="button"
-                                                                onClick={() => handleResetQuota(user.userNo)}
-                                                                disabled={resettingIds.has(user.userNo)}
-                                                                className="rounded-full border border-slate-300 px-3 py-1 text-xs font-medium text-slate-600 transition hover:border-slate-400 hover:text-slate-900 disabled:cursor-wait disabled:opacity-60 dark:border-slate-700 dark:text-slate-300 dark:hover:border-slate-500 dark:hover:text-white"
-                                                            >
-                                                                {resettingIds.has(user.userNo) ? "초기화 중..." : "할당량 초기화"}
-                                                            </button>
+                                                            <AdminUserActions
+                                                                user={user}
+                                                                onReset={handleResetQuota}
+                                                                isResetting={resettingIds.has(user.userNo)}
+                                                                mailPath={mailPath}
+                                                            />
                                                         </td>
                                                     </tr>
                                                 );
@@ -425,7 +425,7 @@ const AdminPreview = () => {
                     </article>
 
                     <aside className={sectionCardClass}>
-                        <header className="flex items-center justify-between border-b border-slate-200 pb-4 dark:border-slate-800">
+                        <header className="flex flex-wrap items-center justify-between gap-3 border-b border-slate-200 pb-4 dark:border-slate-800">
                             <div>
                                 <h2 className="text-lg font-semibold text-slate-900 dark:text-slate-50">
                                     최신 분석
@@ -434,14 +434,22 @@ const AdminPreview = () => {
                                     전체 사용자 최신 {RECENT_ANALYSIS_LIMIT}건을 생성일 기준으로 정렬합니다.
                                 </p>
                             </div>
-                            <button
-                                type="button"
-                                onClick={loadRecentAnalyses}
-                                disabled={recentLoading}
-                                className="rounded-full border border-slate-300 bg-white px-3 py-1 text-xs font-medium text-slate-700 transition hover:border-slate-400 hover:text-slate-900 disabled:cursor-wait disabled:opacity-60 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-200 dark:hover:border-slate-500 dark:hover:text-white"
-                            >
-                                {recentLoading ? "불러오는 중..." : "새로고침"}
-                            </button>
+                            <div className="flex flex-wrap items-center gap-2">
+                                <button
+                                    type="button"
+                                    onClick={loadRecentAnalyses}
+                                    disabled={recentLoading}
+                                    className="rounded-full border border-slate-300 bg-white px-3 py-1 text-xs font-medium text-slate-700 transition hover:border-slate-400 hover:text-slate-900 disabled:cursor-wait disabled:opacity-60 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-200 dark:hover:border-slate-500 dark:hover:text-white"
+                                >
+                                    {recentLoading ? "불러오는 중..." : "새로고침"}
+                                </button>
+                                <Link
+                                    to={latestAnalysisPath}
+                                    className="rounded-full border border-slate-300 bg-white px-3 py-1 text-xs font-medium text-slate-700 transition hover:border-slate-400 hover:text-slate-900 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-slate-500 focus-visible:ring-offset-2 focus-visible:ring-offset-white dark:border-slate-700 dark:bg-slate-900 dark:text-slate-200 dark:hover:border-slate-500 dark:hover:text-white dark:focus-visible:ring-slate-400 dark:focus-visible:ring-offset-slate-950"
+                                >
+                                    전체 보기
+                                </Link>
+                            </div>
                         </header>
 
                         {recentLoading ? (

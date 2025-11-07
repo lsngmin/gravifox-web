@@ -4,6 +4,7 @@ import dayjs from "dayjs";
 import clsx from "clsx";
 import { fetchAdminUsers, resetAdminUserQuota } from "../api/admin";
 import AdminPageTopBar from "../components/admin/AdminPageTopBar";
+import AdminUserActions from "../components/admin/AdminUserActions";
 
 const PAGE_SIZE = 20;
 
@@ -147,18 +148,12 @@ const AdminUsers = () => {
                         </td>
                         <td className={tableBodyCellClass}>{formatDateTime(joinedAt)}</td>
                         <td className={tableBodyCellClass}>
-                          <button
-                            onClick={() => handleReset(user.userNo)}
-                            disabled={resetting.has(user.userNo)}
-                            className={clsx(
-                              "inline-flex items-center rounded-full border px-3 py-1.5 text-xs font-medium transition",
-                              resetting.has(user.userNo)
-                                ? "cursor-wait border-slate-300 bg-slate-100 text-slate-400 dark:border-slate-700 dark:bg-slate-900/70 dark:text-slate-500"
-                                : "border-sky-500 bg-sky-50 text-sky-700 hover:bg-sky-100 dark:border-sky-500/50 dark:bg-sky-500/10 dark:text-sky-100"
-                            )}
-                          >
-                            {resetting.has(user.userNo) ? "초기화 중…" : "할당량 초기화"}
-                          </button>
+                          <AdminUserActions
+                            user={user}
+                            onReset={handleReset}
+                            isResetting={resetting.has(user.userNo)}
+                            mailPath={`/${lng}/admin/mail`}
+                          />
                         </td>
                       </tr>
                     );

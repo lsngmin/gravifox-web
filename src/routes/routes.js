@@ -32,6 +32,7 @@ import AdminBlog from "../pages/AdminBlog";
 import AdminIssueInbox from "../pages/AdminIssueInbox";
 import AdminServiceHealth from "../pages/AdminServiceHealth";
 import AdminUsers from "../pages/AdminUsers";
+import AdminLatestAnalysis from "../pages/AdminLatestAnalysis";
 
 // Create/update canonical link to point to language-prefixed URL
 function CanonicalLink() {
@@ -159,6 +160,7 @@ function AnimatedRoutes() {
                 <Route path=":lng/blog/:slug" element={<motion.div initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -16 }} transition={{ duration: 0.3, ease: "easeOut" }}><BlogPost /></motion.div>} />
                 <Route path=":lng/admin" element={<motion.div initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -16 }} transition={{ duration: 0.35, ease: "easeOut" }}><AdminHome /></motion.div>} />
                 <Route path=":lng/admin/preview" element={<motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -12 }} transition={{ duration: 0.4, ease: "easeOut" }}><AdminPreview /></motion.div>} />
+                <Route path=":lng/admin/analysis" element={<motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -12 }} transition={{ duration: 0.4, ease: "easeOut" }}><AdminLatestAnalysis /></motion.div>} />
                 <Route path=":lng/admin/mail" element={<motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -12 }} transition={{ duration: 0.35, ease: "easeOut" }}><AdminMail /></motion.div>} />
                 <Route path=":lng/admin/blog" element={<motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -12 }} transition={{ duration: 0.35, ease: "easeOut" }}><AdminBlog /></motion.div>} />
                 <Route path=":lng/admin/issues" element={<motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -12 }} transition={{ duration: 0.35, ease: "easeOut" }}><AdminIssueInbox /></motion.div>} />
@@ -190,6 +192,7 @@ function AnimatedRoutes() {
                 <Route path="/blog/:slug" element={<LegacyToLocalized />} />
                 <Route path="/admin" element={<LegacyToLocalized />} />
                 <Route path="/admin/preview" element={<LegacyToLocalized />} />
+                <Route path="/admin/analysis" element={<LegacyToLocalized />} />
                 <Route path="/admin/mail" element={<LegacyToLocalized />} />
                 <Route path="/admin/blog" element={<LegacyToLocalized />} />
                 <Route path="/admin/issues" element={<LegacyToLocalized />} />

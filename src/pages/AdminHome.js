@@ -3,6 +3,7 @@ import { useNavigate, useParams } from "react-router-dom";
 import {
     ArrowRightIcon,
     ChartPieIcon,
+    ClipboardDocumentListIcon,
     EnvelopeIcon,
     PencilSquareIcon,
     QueueListIcon,
@@ -22,6 +23,7 @@ const AdminHome = () => {
     const inboxPath = `/${lng}/admin/issues`;
     const usersPath = `/${lng}/admin/users`;
     const serviceHealthPath = `/${lng}/admin/service-health`;
+    const latestAnalysisPath = `/${lng}/admin/analysis`;
 
     const sections = useMemo(
         () => [
@@ -66,6 +68,16 @@ const AdminHome = () => {
                 accent: "from-sky-500 via-cyan-400 to-emerald-400",
             },
             {
+                id: "latest-analysis",
+                title: "최신 분석 피드",
+                description:
+                    "서비스 모니터링 카드에서 분리된 최신 분석 리포트를 전용 화면에서 자세히 검토합니다.",
+                hint: "Analysis Feed",
+                to: latestAnalysisPath,
+                icon: ClipboardDocumentListIcon,
+                accent: "from-indigo-500 via-sky-500 to-violet-400",
+            },
+            {
                 id: "mail",
                 title: "운영자 메일 발송",
                 description:
@@ -96,7 +108,7 @@ const AdminHome = () => {
                 accent: "from-slate-500 via-slate-400 to-slate-300",
             },
         ],
-        [blogPath, inboxPath, mailPath, previewPath, serviceHealthPath, usersPath]
+        [blogPath, inboxPath, latestAnalysisPath, mailPath, previewPath, serviceHealthPath, usersPath]
     );
 
     const handleNavigate = (target) => {
