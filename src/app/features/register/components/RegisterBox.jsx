@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import { useNavigate, useParams, useSearchParams } from "react-router-dom";
 import signupAPI from "../../../../features/login/api/signupAPI";
 import { useTranslation } from 'react-i18next';
+import ErrorModal from "../../../../features/analyze/components/ErrorModal";
 
 const RegisterBox = ({ variant = 'default' }) => {
   const [searchParams] = useSearchParams();
@@ -35,6 +36,7 @@ const RegisterBox = ({ variant = 'default' }) => {
     dob: false,
   });
   const [canSubmit, setCanSubmit] = useState(false);
+  const [serverErrorModal, setServerErrorModal] = useState({ open: false, messages: [] });
 
   useEffect(() => {
     if (termsCookieParam == null && termsMarketingParam == null) {
@@ -168,6 +170,28 @@ const RegisterBox = ({ variant = 'default' }) => {
     setCanSubmit(ok);
   }, [formState]);
 
+  const resolveServerErrorMessages = (error) => {
+    const status = Number(error?.status) || null;
+    let friendly = null;
+    if (status === 409) {
+      friendly = t('registerPage.serverErrors.duplicateEmail', 'This email is already registered. Try logging in instead.');
+    } else if (status === 400) {
+      friendly = t('registerPage.serverErrors.badRequest', 'Please double-check the information you entered.');
+    } else if (status === 429) {
+      friendly = t('registerPage.serverErrors.rateLimited', 'Too many attempts. Please wait a moment and try again.');
+    } else if (status >= 500) {
+      friendly = t('registerPage.serverErrors.server', 'Our server is having trouble. Please try again soon.');
+    }
+    const backendMsg = typeof error?.message === 'string' && error.message.trim().length > 0 ? error.message : null;
+    const fallback = t('registerPage.serverErrors.default', 'We could not complete your sign-up. Please try again later.');
+    const uniqueMessages = [friendly, backendMsg].filter((msg, idx, arr) => msg && arr.indexOf(msg) === idx);
+    return uniqueMessages.length > 0 ? uniqueMessages : [fallback];
+  };
+
+  const handleCloseServerErrorModal = () => {
+    setServerErrorModal({ open: false, messages: [] });
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (!canSubmit) return;
@@ -182,7 +206,8 @@ const RegisterBox = ({ variant = 'default' }) => {
       });
       navigate('/verify', { state: { email: formState.email } });
     } catch (err) {
-      // TODO: server error handling
+      const messages = resolveServerErrorMessages(err);
+      setServerErrorModal({ open: true, messages });
     }
   };
 
@@ -320,6 +345,13 @@ const RegisterBox = ({ variant = 'default' }) => {
           </button>
         </div>
       </form>
+      <ErrorModal
+        open={serverErrorModal.open}
+        onClose={handleCloseServerErrorModal}
+        title={t('registerPage.serverErrors.title', 'Sign-up couldn’t be completed')}
+        messages={serverErrorModal.messages}
+        closeLabel={t('registerPage.serverErrors.close', 'Got it')}
+      />
     </div>
   );
 };

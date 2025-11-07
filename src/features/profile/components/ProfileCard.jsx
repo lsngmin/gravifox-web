@@ -136,7 +136,7 @@ export default function ProfileCard({ theme = 'dark' }) {
               >
                 닉네임
               </label>
-              <div className="mt-2 flex flex-col gap-2 sm:flex-row sm:items-center sm:gap-2.5">
+              <div className="mt-2 flex flex-col gap-2 sm:flex-row sm:flex-wrap sm:items-center sm:gap-2.5">
                 {editing ? (
                   <>
                     <input
@@ -148,7 +148,7 @@ export default function ProfileCard({ theme = 'dark' }) {
                       }}
                       maxLength={NICKNAME_MAX_LENGTH}
                       disabled={savingName}
-                      className={`w-full rounded-lg border px-3 py-2 text-sm font-medium transition focus:outline-none ${
+                      className={`order-1 w-full min-w-0 rounded-lg border px-3 py-2 text-sm font-medium transition focus:outline-none sm:flex-1 ${
                         isDark
                           ? 'border-white/20 bg-white/8 text-white placeholder-slate-500 focus:border-indigo-400 focus:ring-2 focus:ring-indigo-300/60'
                           : 'border-gray-200 bg-white text-gray-900 placeholder-gray-400 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200'
@@ -156,12 +156,8 @@ export default function ProfileCard({ theme = 'dark' }) {
                       placeholder="표시할 이름을 입력하세요"
                       aria-invalid={nicknameError ? 'true' : 'false'}
                     />
-                    {/* Guide + counter under input, right-aligned */}
-                    <div className={`mt-1 text-right text-[10px] ${isDark ? 'text-slate-300/70' : 'text-gray-500'}`}>
-                      <span>한글 포함 {NICKNAME_MAX_LENGTH}자 이내로 입력할 수 있어요.</span>
-                      <span className="ml-2">{nickname.length}/{NICKNAME_MAX_LENGTH}</span>
-                    </div>
-                    <div className="flex items-center gap-2">
+                    {/* Save / cancel buttons stay inline while helper text wraps below on wide viewports */}
+                    <div className="order-3 flex flex-nowrap items-center gap-2 sm:order-2 sm:flex-none sm:shrink-0">
                       <button
                         type="button"
                         onClick={handleConfirmNickname}
@@ -194,8 +190,19 @@ export default function ProfileCard({ theme = 'dark' }) {
                         취소
                       </button>
                     </div>
+                    {/* Guide + counter under input, right-aligned */}
+                    <div
+                      className={`order-2 mt-1 w-full text-left text-[10px] ${isDark ? 'text-slate-300/70' : 'text-gray-500'} sm:order-3 sm:basis-full sm:text-right`}
+                    >
+                      <span>한글 포함 {NICKNAME_MAX_LENGTH}자 이내로 입력할 수 있어요.</span>
+                      <span className="ml-2">{nickname.length}/{NICKNAME_MAX_LENGTH}</span>
+                    </div>
                     {nicknameError && (
-                      <p className={`mt-2 text-xs ${isDark ? 'text-rose-300' : 'text-rose-600'}`}>{nicknameError}</p>
+                      <p
+                        className={`order-4 mt-2 w-full text-xs ${isDark ? 'text-rose-300' : 'text-rose-600'} sm:basis-full`}
+                      >
+                        {nicknameError}
+                      </p>
                     )}
                   </>
                 ) : (

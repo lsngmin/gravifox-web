@@ -518,13 +518,12 @@ export default function MobileAnalyzeUpload() {
 
   const handleEmailVerificationNeeded = useCallback(
     (email) => {
-      setAwaitingEmailVerification(email || '');
-      setErrorMsgs([
-        t('mobileAnalyze.uploadPage.errors.emailNotVerified', '이메일 인증이 필요해요. 받은 메일함의 인증 링크를 확인해 주세요.'),
-      ]);
-      setErrorOpen(true);
+      const nextEmail = email || '';
+      setAwaitingEmailVerification(nextEmail);
+      setLoginModalOpen(false);
+      navigate(localizedPath('/verify'), { state: { email: nextEmail } });
     },
-    [t]
+    [localizedPath, navigate]
   );
 
   const handleNavigateSignup = useCallback(() => {

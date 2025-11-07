@@ -3,8 +3,10 @@ import { Transition } from '@headlessui/react';
 import { createPortal } from 'react-dom';
 
 import { useHeaderContext } from '../context';
+import { useAuth } from 'providers/authProvider';
 
 import MenuAccountSection from './MenuAccountSection';
+import MenuGuestPreferences from './MenuGuestPreferences';
 import MenuHeader from './MenuHeader';
 import MenuNavigation from './MenuNavigation';
 import MenuUserBadge from './MenuUserBadge';
@@ -12,6 +14,8 @@ import UsageSummary from './UsageSummary';
 
 const FloatingMenu = () => {
     const { isMenuOpen, closeMenu, shouldReduceMotion } = useHeaderContext();
+    const { accessToken } = useAuth();
+    const isGuest = !accessToken;
 
     useEffect(() => {
         if (!isMenuOpen) return undefined;
@@ -70,7 +74,7 @@ const FloatingMenu = () => {
                             <MenuHeader />
                             <MenuUserBadge onNavigate={closeMenu} />
                             <div className="px-5 mt-3">
-                                <UsageSummary />
+                                {isGuest ? <MenuGuestPreferences /> : <UsageSummary />}
                             </div>
                             <div className="px-5 pb-6">
                                 <MenuNavigation />

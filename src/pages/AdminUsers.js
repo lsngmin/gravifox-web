@@ -77,7 +77,9 @@ const AdminUsers = () => {
   const headerTextClass = "max-w-3xl text-sm text-slate-600 md:text-base dark:text-slate-400";
   const tableHeaderCellClass = "px-6 py-4 text-left text-xs font-semibold uppercase tracking-wide text-slate-500 dark:text-slate-300";
   const tableBodyCellClass = "px-6 py-4 text-sm text-slate-600 dark:text-slate-300";
-  const badgeClass = "rounded-full border border-slate-300 bg-slate-100 px-3 py-1 text-xs font-medium text-slate-600 dark:border-slate-700 dark:bg-slate-800/70 dark:text-slate-200";
+  const planBadgeBaseClass = "rounded-full px-3 py-1 text-xs font-medium";
+  const planBadgeVerifiedClass = "border border-slate-300 bg-slate-100 text-slate-600 dark:border-slate-700 dark:bg-slate-800/70 dark:text-slate-200";
+  const planBadgeUnverifiedClass = "border border-amber-300 bg-amber-50 text-amber-700 dark:border-amber-400/70 dark:bg-amber-500/20 dark:text-amber-100";
   const errorBannerClass = "rounded-2xl border border-rose-200 bg-rose-50 px-4 py-3 text-sm text-rose-600 dark:border-rose-900/40 dark:bg-rose-950/40 dark:text-rose-200";
 
   return (
@@ -128,6 +130,19 @@ const AdminUsers = () => {
                     const used = typeof user.monthlyQuotaUsed === "number" ? user.monthlyQuotaUsed : 0;
                     const ratio = quotaLimit && quotaLimit > 0 ? Math.min((used / quotaLimit) * 100, 100) : 0;
                     const joinedAt = user.createdAt || user.joinedAt || user.created_at || user.createdDate || user.created_date;
+                    const emailVerifiedRaw = user.emailVerified;
+                    const isEmailVerified =
+                      emailVerifiedRaw === true ||
+                      emailVerifiedRaw === 1 ||
+                      emailVerifiedRaw === 'true' ||
+                      emailVerifiedRaw === 'TRUE' ||
+                      emailVerifiedRaw === 'y' ||
+                      emailVerifiedRaw === 'Y';
+                    const planLabel = isEmailVerified ? (user.subscriptionPlan ?? "Free") : "이메일 미인증";
+                    const planBadgeClass = clsx(
+                      planBadgeBaseClass,
+                      isEmailVerified ? planBadgeVerifiedClass : planBadgeUnverifiedClass
+                    );
                     return (
                       <tr key={user.userNo}>
                         <td className={tableBodyCellClass}>
@@ -136,7 +151,9 @@ const AdminUsers = () => {
                             <span className="ml-2 align-middle text-xs font-normal text-slate-500 dark:text-slate-400">#{user.userNo}</span>
                           </div>
                         </td>
-                        <td className={tableBodyCellClass}><span className={badgeClass}>{user.subscriptionPlan ?? "Free"}</span></td>
+                        <td className={tableBodyCellClass}>
+                          <span className={planBadgeClass}>{planLabel}</span>
+                        </td>
                         <td className={tableBodyCellClass}>
                           <div className="flex flex-col gap-1">
                             <div className="flex items-center justify-between text-xs text-slate-500 dark:text-slate-400">

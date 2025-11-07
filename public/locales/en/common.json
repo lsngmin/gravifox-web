@@ -27,6 +27,15 @@
       "nameRequired": "Name is required.",
       "dobRequired": "Date of Birth is required.",
       "dobFormat": "Use YYYYMMDD format."
+    },
+    "serverErrors": {
+      "title": "We couldn’t finish your sign-up",
+      "default": "Something went wrong on our side. Please try again in a moment.",
+      "duplicateEmail": "That email is already registered. Try logging in or use another email.",
+      "badRequest": "Please check that your information is correct and try again.",
+      "rateLimited": "You’ve tried too many times recently. Please wait a moment and try again.",
+      "server": "Our servers are having trouble right now. Please try again soon.",
+      "close": "Got it"
     }
   },
   "navigation": {
@@ -89,6 +98,52 @@
       "remainingShort": "{{count}} left",
       "compact": "{{used}}/{{limit}}",
       "errorFallback": "There was a problem fetching your usage info."
+    },
+    "language": {
+      "title": "Language",
+      "current": "Selected",
+      "currentShort": "Current"
+    },
+    "theme": {
+      "title": "Theme",
+      "currentLight": "Light mode enabled",
+      "currentDark": "Dark mode enabled"
+    }
+  },
+  "emailVerification": {
+    "page": {
+      "subtitle": "Check your inbox to finish signing up."
+    },
+    "redirect": {
+      "title": "Verification complete!",
+      "message": "You'll be redirected home shortly."
+    },
+    "hero": {
+      "title": "Please complete your email verification",
+      "description": "We sent a confirmation link to the email you used during sign-up.",
+      "helper": "Tap the \"Verify\" button in that email once and you're good to go."
+    },
+    "actions": {
+      "resend": "Resend verification email",
+      "login": "Back to login"
+    },
+    "messages": {
+      "missingEmail": "We couldn't find your email information. Please log in and try again.",
+      "resendSuccess": "We sent another verification email.",
+      "resendPending": "Please try again in a moment.",
+      "resendFailed": "We couldn't resend the email. Please try again shortly.",
+      "cooldown": "{{count}} seconds left before you can resend."
+    },
+    "checklist": {
+      "label": "Checklist",
+      "title": "How to confirm your email",
+      "description": "Follow the steps below to finish verification quickly.",
+      "steps": [
+        "Open your inbox and look for the email titled \"GraviFox email verification.\"",
+        "Click the \"Verify\" button inside that email once.",
+        "Return to the login page and sign in again."
+      ],
+      "sentLabel": "Email sent to"
     }
   },
   "mobileAnalyze": {
