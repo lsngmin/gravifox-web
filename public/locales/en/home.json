@@ -4,6 +4,8 @@
     "title": "Check image and video authenticity with ease",
     "title2": "See instant results right in your browser",
     "subtitle": "Drop a photo and we tell you right away if AI made it. We point out the clues so you can understand at a glance.",
+    "subtitle1": "Drop a photo and we tell you right away if AI made it.",
+    "subtitle2": "We point out the clues so you can understand at a glance.",
     "subcaption": "During the test period, you can try AI detection for free with limited usage — no login required.",
     "ribbon": "AI-FIRST DEFENSE STACK",
     "feedback": "Send feedback and feature ideas",
@@ -28,6 +30,10 @@
         "title": "Multi-language & multi-format support",
         "description": "Analyze images, videos, and thumbnails together with multilingual reports."
       }
+    },
+    "cta": {
+      "start": "Get started free",
+      "pricing": "View pricing"
     },
     "metrics": {
       "latency": {

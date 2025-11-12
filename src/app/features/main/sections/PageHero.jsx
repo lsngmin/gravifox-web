@@ -6,6 +6,9 @@ export default function PageHero() {
     const { t, i18n } = useTranslation("home");
     const lng = (i18n.language || "en").slice(0, 2);
 
+    const heroCtaStart = t("hero.cta.start", t("cta.start", "Get started free"));
+    const heroCtaPricing = t("hero.cta.pricing", t("cta.pricing", "View pricing"));
+
     const highlightItems = [
         {
             icon: "check-circle",
@@ -81,20 +84,26 @@ export default function PageHero() {
                 aria-hidden="true"
             />
 
-            <div className="relative mx-auto max-w-6xl px-6 py-24 sm:py-28 lg:py-32">
+            <div className="relative mx-auto max-w-6xl px-6 pt-24 pb-12 sm:pt-28 sm:pb-16 lg:pt-32 lg:pb-20">
                 <div className="flex flex-col gap-12 text-slate-900 dark:text-indigo-50">
-                    <div className="space-y-6">
+                    <div className="space-y-10">
                         <span className="inline-flex items-center gap-2 rounded-full border border-indigo-400/30 bg-indigo-100/50 px-4 py-1 text-xs font-semibold uppercase tracking-[0.28em] text-indigo-700 shadow-[0_14px_32px_-18px_rgba(99,102,241,0.45)] dark:border-indigo-200/30 dark:bg-indigo-200/10 dark:text-indigo-100/90 dark:shadow-[0_0_30px_rgba(129,140,248,0.35)]">
                             {t("hero.ribbon")}
                         </span>
-                        <div className="space-y-4">
+                        <div className="space-y-3">
                             <h1 className="text-[28px] sm:text-5xl md:text-6xl font-black leading-tight text-transparent bg-gradient-to-br from-indigo-700 via-indigo-500 to-indigo-400 bg-clip-text drop-shadow-[0_18px_48px_rgba(79,70,229,0.25)] dark:from-indigo-50 dark:via-white dark:to-indigo-200 dark:drop-shadow-[0_18px_48px_rgba(30,64,175,0.26)]">
                                 {t("hero.headline")}
                             </h1>
                             <p className="text-base sm:text-lg md:text-xl leading-relaxed text-slate-600 dark:text-indigo-100/90">
                                 {t(
-                                    "hero.subtitle",
-                                    "딥러닝 기반 진위 판별 엔진과 신뢰할 수 있는 보고서를 단 몇 초 만에 받아보세요."
+                                    "hero.subtitle1",
+                                    "Drop a photo and we tell you right away if AI made it."
+                                )}
+                            </p>
+                            <p className="text-base sm:text-lg md:text-xl leading-relaxed text-slate-600 dark:text-indigo-100/90">
+                                {t(
+                                    "hero.subtitle2",
+                                    "We point out the clues so you can understand at a glance."
                                 )}
                             </p>
                             <p className="text-sm sm:text-base md:text-lg leading-relaxed text-slate-500 dark:text-indigo-200/85">
@@ -110,57 +119,61 @@ export default function PageHero() {
                                 href={`/${lng}/analyze`}
                                 className="inline-flex items-center justify-center rounded-full bg-indigo-600 px-6 py-3 text-sm sm:text-base font-semibold text-white shadow-[0_20px_36px_-18px_rgba(79,70,229,0.55)] transition hover:bg-indigo-500 hover:shadow-[0_28px_48px_-22px_rgba(99,102,241,0.6)] dark:bg-white dark:text-slate-900 dark:shadow-[0_24px_48px_-20px_rgba(129,140,248,0.65)] dark:hover:bg-indigo-50/95 dark:hover:shadow-[0_32px_60px_-24px_rgba(99,102,241,0.65)]"
                             >
-                                {t("cta.start")}
+                                {heroCtaStart}
                                 <Icon name="arrow-outward" className="ml-2 h-4 w-4 sm:h-5 sm:w-5" />
                             </a>
                             <a
                                 href={`/${lng}/pricing`}
                                 className="inline-flex items-center justify-center rounded-full border border-indigo-200 bg-white px-6 py-3 text-sm sm:text-base font-semibold text-indigo-700 transition hover:border-indigo-300 hover:bg-indigo-50 dark:border-white/25 dark:bg-transparent dark:text-indigo-100 dark:hover:border-white/40 dark:hover:bg-white/10"
                             >
-                                {t("cta.pricing", "요금제 보기")}
+                                {heroCtaPricing}
                             </a>
                         </div>
 
-                        <ul className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-                            {highlightItems.map(({ icon, title, description }) => (
-                                <li
-                                    key={title}
-                                    className="group relative overflow-hidden rounded-3xl border border-indigo-200/40 bg-white p-5 text-slate-700 shadow-sm transition-colors duration-300 hover:border-indigo-300 hover:bg-indigo-50 dark:border-white/10 dark:bg-white/5 dark:text-indigo-50"
-                                >
-                                    <div className="absolute inset-0 opacity-0 transition-opacity duration-300 group-hover:opacity-100 bg-gradient-to-br from-indigo-200/30 via-transparent to-transparent dark:from-white/10 dark:via-indigo-500/10 dark:to-transparent" />
-                                    <div className="relative flex items-start gap-3">
-                                        <span className="flex h-10 w-10 flex-none items-center justify-center rounded-2xl bg-indigo-100 text-indigo-600 shadow-inner shadow-indigo-200 dark:bg-indigo-500/15 dark:text-indigo-100 dark:shadow-indigo-500/30">
-                                            <Icon name={icon} className="h-5 w-5" />
-                                        </span>
-                                        <div className="space-y-1.5">
-                                            <h3 className="text-base font-semibold text-indigo-900 dark:text-white">{title}</h3>
-                                            <p className="text-sm leading-snug text-slate-600 dark:text-indigo-100/75">{description}</p>
+                        <div className="space-y-8">
+                            <ul className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+                                {highlightItems.map(({ icon, title, description }) => (
+                                    <li
+                                        key={title}
+                                        className="group relative overflow-hidden rounded-3xl border border-indigo-200/40 bg-white p-5 text-slate-700 shadow-sm transition-colors duration-300 hover:border-indigo-300 hover:bg-indigo-50 dark:border-white/10 dark:bg-white/5 dark:text-indigo-50"
+                                    >
+                                        <div className="absolute inset-0 opacity-0 transition-opacity duration-300 group-hover:opacity-100 bg-gradient-to-br from-indigo-200/30 via-transparent to-transparent dark:from-white/10 dark:via-indigo-500/10 dark:to-transparent" />
+                                        <div className="relative flex items-start gap-3">
+                                            <span className="flex h-10 w-10 flex-none items-center justify-center rounded-2xl bg-indigo-100 text-indigo-600 shadow-inner shadow-indigo-200 dark:bg-indigo-500/15 dark:text-indigo-100 dark:shadow-indigo-500/30">
+                                                <Icon name={icon} className="h-5 w-5" />
+                                            </span>
+                                            <div className="space-y-1.5">
+                                                <h3 className="text-base font-semibold text-indigo-900 dark:text-white">{title}</h3>
+                                                <p className="text-sm leading-snug text-slate-600 dark:text-indigo-100/75">{description}</p>
+                                            </div>
                                         </div>
-                                    </div>
-                                </li>
-                            ))}
-                        </ul>
+                                    </li>
+                                ))}
+                            </ul>
 
-                        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-                            {supportLinks.map(({ title, description, href, cta, icon }) => (
-                                <a
-                                    key={title}
-                                    href={href}
-                                    className="group relative flex h-full flex-col gap-3 overflow-hidden rounded-3xl border border-indigo-200/40 bg-white p-5 text-slate-700 shadow-sm transition hover:border-indigo-300 hover:bg-indigo-50 dark:border-white/10 dark:bg-white/5 dark:text-indigo-100 dark:hover:border-white/30 dark:hover:bg-white/10"
-                                >
-                                    <div className="absolute inset-0 opacity-0 transition-opacity duration-300 group-hover:opacity-100 bg-gradient-to-tr from-indigo-200/25 via-transparent to-transparent dark:from-indigo-300/15 dark:via-transparent dark:to-transparent" />
-                                    <div className="relative flex items-center gap-2 text-sm font-semibold text-indigo-700 dark:text-indigo-100">
-                                        <Icon name={icon} className="h-4 w-4 flex-none text-indigo-500 dark:text-indigo-200" />
-                                        <span>{title}</span>
-                                    </div>
-                                    <p className="relative text-xs sm:text-sm leading-snug text-slate-500 dark:text-indigo-100/70">
-                                        {description}
-                                    </p>
-                                    <span className="relative text-xs font-semibold text-indigo-600 transition group-hover:text-indigo-800 dark:text-indigo-200 dark:group-hover:text-white">
-                                        {cta}
-                                    </span>
-                                </a>
-                            ))}
+                            <div className="border-t border-slate-200/40 pt-10">
+                                <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+                                    {supportLinks.map(({ title, description, href, cta, icon }) => (
+                                        <a
+                                            key={title}
+                                            href={href}
+                                        className="group relative flex h-full flex-col gap-2 overflow-hidden rounded-3xl border border-indigo-200/40 bg-white p-4 text-slate-700 shadow-sm transition hover:border-indigo-300 hover:bg-indigo-50 dark:border-white/10 dark:bg-white/5 dark:text-indigo-100 dark:hover:border-white/30 dark:hover:bg-white/10"
+                                        >
+                                            <div className="absolute inset-0 opacity-0 transition-opacity duration-300 group-hover:opacity-100 bg-gradient-to-tr from-indigo-200/25 via-transparent to-transparent dark:from-indigo-300/15 dark:via-transparent dark:to-transparent" />
+                                            <div className="relative flex items-center gap-2 text-sm font-semibold text-indigo-700 dark:text-indigo-100">
+                                                <Icon name={icon} className="h-4 w-4 flex-none text-indigo-500 dark:text-indigo-200" />
+                                                <span>{title}</span>
+                                            </div>
+                                            <p className="relative text-xs sm:text-sm leading-snug text-slate-500 dark:text-indigo-100/70">
+                                                {description}
+                                            </p>
+                                            <span className="relative self-end text-right mt-2 text-xs font-semibold text-indigo-600 transition group-hover:text-indigo-800 dark:text-indigo-200 dark:group-hover:text-white">
+                                                {cta}
+                                            </span>
+                                        </a>
+                                    ))}
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>

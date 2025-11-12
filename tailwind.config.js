@@ -11,8 +11,8 @@ module.exports = {
   theme: {
     extend: {
       fontFamily: {
-        display: ['"Space Grotesk"', 'Pretendard Variable', 'system-ui', 'sans-serif'], // 헤드라인용
-        sans: ['Pretendard Variable', 'system-ui', 'sans-serif'], // 본문용
+        display: ['"Pretendard"', '"Space Grotesk"', 'system-ui', 'sans-serif'], // 헤드라인용
+        sans: ['Pretendard', 'system-ui', 'sans-serif'], // 본문용
       },
       fontSize: {
         'xxs': '0.5rem',
@@ -31,4 +31,3 @@ module.exports = {
   },
   plugins: [require('@tailwindcss/typography')],
 }
-
