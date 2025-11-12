@@ -23,25 +23,26 @@ const FEATURE_STEPS = [
 
 export default function FeatureHighlights() {
     const { t } = useTranslation("home");
+    const eyebrowLabel = t("feature.eyebrow", "업로드부터 AI 분석까지 한 번에");
 
     return (
         <section
             id="feature"
-            className="relative isolate overflow-hidden py-16 sm:py-20 bg-white dark:bg-slate-950"
+            className="relative isolate overflow-hidden py-10 sm:py-12 bg-white dark:bg-slate-950"
         >
             <div
                 className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_top,_rgba(79,70,229,0.16),_transparent_60%)] dark:bg-[radial-gradient(circle_at_top,_rgba(79,70,229,0.22),_transparent_60%)]"
                 aria-hidden="true"
             />
             <div className="relative mx-auto grid max-w-6xl gap-10 px-6 lg:grid-cols-[1fr_1fr] lg:items-center">
-                <div className="space-y-6">
-                    <span className="inline-flex items-center gap-2 rounded-full bg-indigo-50 px-3 py-1 text-[10px] font-semibold uppercase tracking-[0.25em] text-indigo-500 ring-1 ring-indigo-100 dark:bg-indigo-500/15 dark:text-indigo-200 dark:ring-indigo-400/40">
-                        {t("feature.eyebrow", "직접 체험하기")}
-                    </span>
-                    <h2 className="text-2xl font-bold leading-tight text-slate-900 sm:text-3xl md:text-4xl lg:text-5xl dark:text-white">
+                <div className="space-y-4">
+                    <h3 className="text-[11px] font-semibold uppercase tracking-[0.25em] text-indigo-500 dark:text-indigo-300 sm:text-xs">
+                        {eyebrowLabel}
+                    </h3>
+                    <p className="mt-3 text-xl font-bold tracking-tight text-slate-900 sm:text-3xl md:text-4xl dark:text-white">
                         {t("feature.title", "사진이나 영상을 올리면, AI가 분석해요")}
-                    </h2>
-                    <p className="max-w-xl text-[12px] leading-relaxed text-slate-600 sm:text-sm md:text-base lg:text-lg dark:text-indigo-100/80">
+                    </p>
+                    <p className="mt-4 text-[13px] leading-relaxed text-slate-600 sm:text-base md:text-lg dark:text-indigo-100/80">
                         {t("feature.subtitle", "회원가입부터 결과 공유까지, 세 단계면 충분합니다.")}
                     </p>
                 </div>

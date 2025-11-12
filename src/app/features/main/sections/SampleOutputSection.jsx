@@ -55,8 +55,8 @@ export default function SampleOutputSection() {
                         </div>
                         <ul className="space-y-3">
                             {insightItems.map((item, index) => (
-                                <li key={index} className="flex gap-3 text-left">
-                                    <span className="mt-1 inline-flex h-2.5 w-2.5 flex-shrink-0 rounded-full bg-indigo-500" aria-hidden="true" />
+                                <li key={index} className="flex items-center gap-3 text-left">
+                                    <span className="inline-flex h-2.5 w-2.5 flex-shrink-0 rounded-full bg-indigo-500" aria-hidden="true" />
                                     <span className="text-sm leading-relaxed text-slate-600 dark:text-indigo-100/80">{item}</span>
                                 </li>
                             ))}

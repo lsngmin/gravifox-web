@@ -56,9 +56,6 @@ export default function FAQSection() {
                                     <div className="relative">
                                         <Disclosure.Button className="flex w-full items-center justify-between gap-4 text-left">
                                             <div className="flex flex-col gap-1">
-                                                <span className="text-sm font-semibold uppercase tracking-wide text-indigo-500 dark:text-indigo-300">
-                                                    {t("faq.stepLabel", "Topic")} {idx + 1}
-                                                </span>
                                                 <span className="text-base font-semibold text-slate-900 sm:text-lg dark:text-white">
                                                     {item.q}
                                                 </span>
@@ -67,7 +64,7 @@ export default function FAQSection() {
                                                 {open ? <MinusIcon fontSize="small" /> : <PlusIcon fontSize="small" />}
                                             </span>
                                         </Disclosure.Button>
-                                        <Disclosure.Panel className="mt-4 rounded-2xl border border-indigo-100/60 bg-white/80 px-4 py-3 text-sm text-slate-600 shadow-inner shadow-indigo-200/40 dark:border-indigo-500/30 dark:bg-slate-900/60 dark:text-indigo-100/80">
+                                        <Disclosure.Panel className="mt-4 text-sm text-slate-600 dark:text-indigo-100/80">
                                             {item.a}
                                         </Disclosure.Panel>
                                     </div>

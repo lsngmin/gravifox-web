@@ -17,6 +17,7 @@ const HOW_STEPS = [
 
 export default function HowItWorksSection() {
     const { t } = useTranslation("home");
+    const eyebrowLabel = t("how.eyebrow", "분석 흐름");
     const prevRef = useRef(null);
     const nextRef = useRef(null);
     const paginationRef = useRef(null);
@@ -58,19 +59,22 @@ export default function HowItWorksSection() {
 
     return (
         <section
-            id="how"
-            className="relative overflow-hidden bg-gradient-to-b from-white via-slate-50/60 to-white py-16 sm:py-20 dark:from-slate-900 dark:via-slate-900/80 dark:to-slate-950"
+        id="how"
+        className="relative overflow-hidden bg-gradient-to-b from-white via-slate-50/60 to-white dark:from-slate-900 dark:via-slate-900/80 dark:to-slate-950 py-6"
         >
             <div className="absolute inset-0 pointer-events-none opacity-40 mix-blend-soft-light dark:opacity-60" aria-hidden="true">
                 <div className="absolute left-[10%] top-[-5%] h-64 w-64 rounded-full bg-indigo-200 blur-3xl dark:bg-indigo-600/40" />
                 <div className="absolute right-[-12%] bottom-[-12%] h-72 w-72 rounded-full bg-purple-200 blur-3xl dark:bg-purple-600/30" />
             </div>
 
-            <div className="relative mx-auto flex max-w-5xl flex-col items-center justify-center px-4 text-center sm:px-6 lg:px-8">
+            <div className="relative mx-auto flex max-w-5xl flex-col items-center justify-center px-4 text-center sm:px-6 lg:px-8 pb-6">
+                <h3 className="text-[11px] font-semibold uppercase tracking-[0.25em] text-indigo-500 dark:text-indigo-300 sm:text-xs">
+                    {eyebrowLabel}
+                </h3>
                 <p className="mt-3 text-xl font-bold tracking-tight text-slate-900 sm:text-3xl md:text-4xl dark:text-white">
                     {t("how.title", "올리고 나면 바로 시작돼요")}
                 </p>
-                <p className="mt-4 text-[13px] text-slate-600 sm:text-base md:text-lg dark:text-indigo-100/80">
+                <p className="mt-4 text-[13px] leading-relaxed text-slate-600 sm:text-base md:text-lg dark:text-indigo-100/80">
                     {t("how.subtitle", "다른 일을 하러 가도 분석은 백그라운드에서 계속돼요.")}
                 </p>
 
