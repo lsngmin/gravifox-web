@@ -68,7 +68,7 @@ const Docs = () => {
             <div style={{ flex: 1 }}>
                 <iframe
                     src="/swagger.html"
-                    title="GraviFox API Docs"
+                    title="Rekwiem API Docs"
                     width="100%"
                     height="100%"
                     style={{ border: 'none' }}

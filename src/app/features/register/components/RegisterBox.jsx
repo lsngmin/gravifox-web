@@ -19,7 +19,6 @@ const RegisterBox = ({ variant = 'default' }) => {
     email: "",
     password: "",
     name: "",
-    dob: "",
     termsCookie: "",
     termsMarketing: "",
   });
@@ -27,13 +26,11 @@ const RegisterBox = ({ variant = 'default' }) => {
     email: null,
     password: null,
     name: null,
-    dob: null,
   });
   const [touched, setTouched] = useState({
     email: false,
     password: false,
     name: false,
-    dob: false,
   });
   const [canSubmit, setCanSubmit] = useState(false);
   const [serverErrorModal, setServerErrorModal] = useState({ open: false, messages: [] });
@@ -81,32 +78,12 @@ const RegisterBox = ({ variant = 'default' }) => {
   }, [t]);
 
   const validateName = useCallback((value) => {
-    return value.trim() ? null : t('registerPage.errors.nameRequired', 'Name is required.');
-  }, [t]);
-
-  const validateDob = useCallback((value) => {
-    const raw = String(value || '').trim();
-    if (!raw) return t('registerPage.errors.dobRequired', 'Date of Birth is required.');
-    const digits = raw.replace(/\D/g, '');
-    if (digits.length !== 8) return t('registerPage.errors.dobFormat', 'Use YYYYMMDD format.');
-    const yyyy = Number(digits.slice(0, 4));
-    const mm = Number(digits.slice(4, 6));
-    const dd = Number(digits.slice(6, 8));
-    if (Number.isNaN(yyyy) || Number.isNaN(mm) || Number.isNaN(dd)) return t('registerPage.errors.dobFormat', 'Use YYYYMMDD format.');
-    if (mm < 1 || mm > 12) return t('registerPage.errors.dobFormat', 'Use YYYYMMDD format.');
-    const daysInMonth = [31, (yyyy % 4 === 0 && yyyy % 100 !== 0) || (yyyy % 400 === 0) ? 29 : 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31];
-    if (dd < 1 || dd > daysInMonth[mm - 1]) return t('registerPage.errors.dobFormat', 'Use YYYYMMDD format.');
-    return null;
+    return value.trim() ? null : t('registerPage.errors.nameRequired', 'Nickname is required.');
   }, [t]);
 
   const handleInputChange = (field) => (e) => {
     const newValue = e.target.value;
-    if (field === 'dob') {
-      const digits = String(newValue || '').replace(/\D/g, '').slice(0, 8);
-      setFormState((prev) => ({ ...prev, [field]: digits }));
-    } else {
-      setFormState((prev) => ({ ...prev, [field]: newValue }));
-    }
+    setFormState((prev) => ({ ...prev, [field]: newValue }));
 
     let errorMsg = null;
     switch (field) {
@@ -121,10 +98,6 @@ const RegisterBox = ({ variant = 'default' }) => {
       case "name":
         errorMsg = touched.name ? validateName(newValue) : null;
         setErrors((prev) => ({ ...prev, name: errorMsg }));
-        return;
-      case "dob":
-        errorMsg = touched.dob && newValue.length === 8 ? validateDob(newValue) : null;
-        setErrors((prev) => ({ ...prev, dob: errorMsg }));
         return;
       default:
         return;
@@ -153,9 +126,6 @@ const RegisterBox = ({ variant = 'default' }) => {
       case "name":
         errorMsg = validateName(value);
         break;
-      case "dob":
-        if (value.length === 8) errorMsg = validateDob(value);
-        break;
       default:
         break;
     }
@@ -165,10 +135,9 @@ const RegisterBox = ({ variant = 'default' }) => {
   useEffect(() => {
     const ok = !validateEmail(formState.email)
       && !validatePassword(formState.password)
-      && !validateName(formState.name)
-      && formState.dob && formState.dob.length === 8 && !validateDob(formState.dob);
+      && !validateName(formState.name);
     setCanSubmit(ok);
-  }, [formState, validateEmail, validatePassword, validateName, validateDob]);
+  }, [formState, validateEmail, validatePassword, validateName]);
 
   const resolveServerErrorMessages = (error) => {
     const status = Number(error?.status) || null;
@@ -200,7 +169,6 @@ const RegisterBox = ({ variant = 'default' }) => {
         email: formState.email,
         password: formState.password,
         name: formState.name,
-        dob: formState.dob,
         termsCookie: formState.termsCookie,
         termsMarketing: formState.termsMarketing,
       });
@@ -281,52 +249,26 @@ const RegisterBox = ({ variant = 'default' }) => {
           )}
         </div>
 
-        {/* Name */}
+        {/* Nickname */}
         <div>
-          <label htmlFor="name" className={`${isMobileDark ? 'mb-2 block text-slate-100' : 'mb-2 block text-gray-700'}`}>{t('registerPage.nameLabel', 'Name')}</label>
+          <label htmlFor="name" className={`${isMobileDark ? 'mb-2 block text-slate-100' : 'mb-2 block text-gray-700'}`}>{t('registerPage.nameLabel', 'Nickname')}</label>
           <input
             type="text"
             id="name"
             value={formState.name}
             onChange={handleInputChange("name")}
             onBlur={handleBlur("name")}
-            autoComplete="name"
+            autoComplete="nickname"
             enterKeyHint="next"
             aria-invalid={!!errors.name}
             aria-describedby={errors.name ? 'name-error' : undefined}
             className={`${isMobileDark
               ? 'block w-full rounded-2xl bg-slate-900/55 px-3 py-3 text-sm text-slate-100 ring-1 ring-slate-600 transition placeholder:text-slate-300 focus:outline-none focus:border-transparent focus:ring-2 focus:ring-indigo-400/40'
               : 'block w-full rounded-lg border border-gray-300 bg-white px-3 py-3 text-sm text-gray-900 transition placeholder:text-gray-400 focus:border-blue-500 focus:ring-2 focus:ring-blue-200'}`}
-            placeholder={t('registerPage.placeholders.name', 'Your name')}
+            placeholder={t('registerPage.placeholders.name', 'Your nickname')}
           />
           {errors.name && (
             <p id="name-error" className="mt-1 text-xs text-red-500">{errors.name}</p>
-          )}
-        </div>
-
-        {/* Date of Birth */}
-        <div>
-          <label htmlFor="dob" className={`${isMobileDark ? 'mb-2 block text-slate-200' : 'mb-2 block text-gray-700'}`}>{t('registerPage.dobLabel', 'Date of Birth (YYYYMMDD)')}</label>
-          <input
-            type="text"
-            id="dob"
-            value={formState.dob}
-            onChange={handleInputChange("dob")}
-            onBlur={handleBlur("dob")}
-            maxLength={8}
-            inputMode="numeric"
-            pattern="[0-9]{8}"
-            autoComplete="bday"
-            enterKeyHint="done"
-            aria-invalid={!!errors.dob}
-            aria-describedby={errors.dob ? 'dob-error' : undefined}
-            className={`${isMobileDark
-              ? 'block w-full rounded-2xl bg-slate-900/60 px-3 py-3 text-sm text-slate-100 ring-1 ring-slate-700 transition placeholder:text-slate-500 focus:outline-none focus:border-transparent focus:ring-2 focus:ring-indigo-400/30'
-              : 'block w-full rounded-lg border border-gray-300 bg-white px-3 py-3 text-sm text-gray-900 transition placeholder:text-gray-400 focus:border-blue-500 focus:ring-2 focus:ring-blue-200'}`}
-            placeholder={t('registerPage.placeholders.dob', 'YYYYMMDD')}
-          />
-          {errors.dob && (
-            <p id="dob-error" className="mt-1 text-xs text-red-500">{errors.dob}</p>
           )}
         </div>
 

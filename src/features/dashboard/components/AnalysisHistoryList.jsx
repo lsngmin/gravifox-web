@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useRef, useState } from "react";
+import React, { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useTranslation } from 'react-i18next';
 import { ArrowPathIcon, StarIcon } from "@heroicons/react/24/outline";
 import AnalysisReport from "../../analyze/components/report/AnalysisReport";
@@ -9,40 +9,141 @@ import { ANALYZE_ENDPOINTS, FASTAPI_ENDPOINTS } from "../../../api/endPointRoute
 import axios from "../../../api/http";
 import ensureUploadToken from "../../analyze/api/uploadTokenClient";
 import { Transition } from '@headlessui/react';
-import { buildStoredFailure, buildStoredReport, parseStoredReport } from "../../../utils/reportStorage";
+import { buildStoredFailure, buildStoredReport } from "../../../utils/reportStorage";
+import { AnalysisReportAPI } from "../api/dashboardAPI";
+import { normalizeAnalysisResult } from "../../analyze/utils/normalizeResult";
 
-function readLocalReports() {
+const PAGE_SIZE = 12;
+const DEFAULT_THRESHOLD = 0.5;
+
+const clamp01 = (value) => {
+  if (typeof value !== 'number' || Number.isNaN(value)) return null;
+  if (value < 0) return 0;
+  if (value > 1) return 1;
+  return value;
+};
+
+const parseJsonSafe = (raw) => {
+  if (!raw) return null;
   try {
-    const items = [];
-    for (let i = 0; i < sessionStorage.length; i++) {
-      const key = sessionStorage.key(i);
-      if (!key || !key.startsWith("sse:report:")) continue;
-      const jobId = key.replace("sse:report:", "");
-      try {
-        const raw = sessionStorage.getItem(key);
-        const stored = parseStoredReport(raw);
-        let meta = stored.fileMeta;
-        if (!meta) {
-          try {
-            const m = sessionStorage.getItem(`sse:meta:${jobId}`);
-            meta = m ? JSON.parse(m) : null;
-          } catch {}
-        }
-        if (stored.result && jobId) {
-          items.push({ jobId, data: stored.result, meta, storedAt: stored.storedAt || null });
-        }
-      } catch {}
-    }
-    // stable order
-    return items.sort((a, b) => (a.jobId > b.jobId ? -1 : 1));
+    return typeof raw === 'string' ? JSON.parse(raw) : raw;
   } catch {
-    return [];
+    return null;
   }
-}
+};
+
+const toTimestamp = (value) => {
+  if (!value) return null;
+  const ts = new Date(value).getTime();
+  return Number.isFinite(ts) ? ts : null;
+};
+
+const toClientLabel = (value) => {
+  if (!value) return 'UNKNOWN';
+  const upper = String(value).toUpperCase();
+  if (upper === 'AI') return 'FAKE';
+  if (upper === 'FAKE' || upper === 'REAL' || upper === 'UNKNOWN') return upper;
+  return 'UNKNOWN';
+};
+
+const deriveMetaFromDetail = (detail, normalized) => {
+  if (!detail) return null;
+  const mediaType = typeof detail.mediaType === 'string' ? detail.mediaType.toLowerCase() : null;
+
+  const candidateMetas = [
+    normalized?.mediaMeta,
+    normalized?.meta,
+    normalized?.file,
+    normalized?.media,
+  ].filter((meta) => meta && typeof meta === 'object');
+  const resolvedMeta = candidateMetas[0] || {};
+  const resolvedName =
+    resolvedMeta.name ||
+    normalized?.name ||
+    normalized?.params?.fileName ||
+    detail.uploadId ||
+    'media';
+  const resolvedType =
+    resolvedMeta.type ||
+    normalized?.params?.fileType ||
+    (mediaType ? `${mediaType}/unknown` : null);
+  const resolvedSize =
+    typeof resolvedMeta.size === 'number'
+      ? resolvedMeta.size
+      : typeof normalized?.params?.fileSize === 'number'
+        ? normalized.params.fileSize
+        : null;
+
+  return {
+    name: resolvedName,
+    type: resolvedType,
+    size: resolvedSize,
+    uploadId: detail.uploadId,
+    mediaType,
+  };
+};
+
+const normalizeDetailRecord = (detail) => {
+  if (!detail || !detail.uploadId) return null;
+  const parsed = parseJsonSafe(detail.metaJson) || {};
+  const normalized = normalizeAnalysisResult(parsed);
+  const label = toClientLabel(normalized?.label || detail.label);
+  normalized.label = label;
+  if (!normalized.modelVersion && detail.modelVersion) {
+    normalized.modelVersion = detail.modelVersion;
+  }
+  const detailScoreRaw = typeof detail.score === 'number' ? detail.score : Number(detail.score);
+  const detailScore = clamp01(detailScoreRaw);
+  if (typeof normalized.prob_fake !== 'number' && detailScore !== null) {
+    normalized.prob_fake = label === 'REAL' ? clamp01(1 - detailScore) : detailScore;
+  }
+  if (typeof normalized.threshold !== 'number') {
+    normalized.threshold = DEFAULT_THRESHOLD;
+  }
+  const meta = deriveMetaFromDetail(detail, normalized);
+  return {
+    jobId: detail.uploadId,
+    data: normalized,
+    meta,
+    storedAt: toTimestamp(detail.updatedAt || detail.createdAt),
+  };
+};
+
+const buildSummaryFallback = (item) => {
+  if (!item || !item.uploadId) return null;
+  const label = toClientLabel(item.label);
+  const scoreValue = typeof item.score === 'number' ? item.score : Number(item.score);
+  const normalizedScore = clamp01(scoreValue);
+  let probFake = null;
+  if (typeof normalizedScore === 'number') {
+    probFake = label === 'REAL' ? clamp01(1 - normalizedScore) : normalizedScore;
+  }
+  return {
+    jobId: item.uploadId,
+    data: {
+      label,
+      prob_fake: typeof probFake === 'number' ? probFake : null,
+      threshold: DEFAULT_THRESHOLD,
+      modelVersion: item?.modelVersion || null,
+    },
+    meta: {
+      name: item.uploadId,
+      type: item.mediaType ? `${item.mediaType}/unknown` : null,
+      size: null,
+      uploadId: item.uploadId,
+      mediaType: item.mediaType,
+    },
+    storedAt: toTimestamp(item.createdAt),
+  };
+};
 
 export default function AnalysisHistoryList() {
   const { t } = useTranslation('dashboard');
-  const [local, setLocal] = useState(() => readLocalReports());
+  const { fetchReports, fetchReportDetail } = AnalysisReportAPI();
+  const [pageData, setPageData] = useState({ items: [], page: 0, size: PAGE_SIZE, totalPages: 0, totalElements: 0 });
+  const [detailCache, setDetailCache] = useState({});
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState(null);
   const search = "";
   const [labelTab, setLabelTab] = useState("ALL"); // ALL | REAL | FAKE | UNKNOWN
   const [favOnly, setFavOnly] = useState(false);
@@ -57,18 +158,94 @@ export default function AnalysisHistoryList() {
   const [openRe, setOpenRe] = useState(() => new Set());
   const [drawerReport, setDrawerReport] = useState(null);
 
+  const loadReports = useCallback(async ({ resetDetails = false } = {}) => {
+    setLoading(true);
+    setError(null);
+    try {
+      const response = await fetchReports({ page: 0, size: PAGE_SIZE });
+      const items = Array.isArray(response?.items) ? response.items : [];
+      setPageData({
+        items,
+        page: typeof response?.page === 'number' ? response.page : 0,
+        size: typeof response?.size === 'number' ? response.size : PAGE_SIZE,
+        totalPages: typeof response?.totalPages === 'number' ? response.totalPages : 0,
+        totalElements: typeof response?.totalElements === 'number' ? response.totalElements : items.length,
+      });
+      setDetailCache((prev) => {
+        if (resetDetails) {
+          return {};
+        }
+        if (!items.length) {
+          return {};
+        }
+        const keep = new Set(items.map((item) => item?.uploadId).filter(Boolean));
+        const next = {};
+        keep.forEach((id) => {
+          if (Object.prototype.hasOwnProperty.call(prev, id)) {
+            next[id] = prev[id];
+          }
+        });
+        return next;
+      });
+    } catch (err) {
+      const message = err?.response?.data?.message || err?.message || '분석 기록을 불러오지 못했어요.';
+      setError(message);
+    } finally {
+      setLoading(false);
+    }
+  }, [fetchReports]);
+
+  const handleRefresh = useCallback(() => {
+    loadReports({ resetDetails: true });
+  }, [loadReports]);
+
   useEffect(() => {
-    setLocal(readLocalReports());
-  }, []);
+    loadReports({ resetDetails: true });
+  }, [loadReports]);
+
+  const missingUploadIds = useMemo(() => {
+    if (!Array.isArray(pageData.items) || pageData.items.length === 0) return [];
+    return pageData.items
+      .map((item) => item?.uploadId)
+      .filter((uploadId) => uploadId && !Object.prototype.hasOwnProperty.call(detailCache, uploadId));
+  }, [pageData.items, detailCache]);
+
+  useEffect(() => {
+    if (!missingUploadIds.length) return;
+    let cancelled = false;
+    (async () => {
+      const results = await Promise.allSettled(missingUploadIds.map((uploadId) => fetchReportDetail(uploadId)));
+      if (cancelled) return;
+      setDetailCache((prev) => {
+        const next = { ...prev };
+        missingUploadIds.forEach((uploadId, idx) => {
+          const res = results[idx];
+          if (res?.status === 'fulfilled' && res.value) {
+            const normalized = normalizeDetailRecord(res.value);
+            if (normalized) {
+              next[uploadId] = normalized;
+            }
+          } else if (!Object.prototype.hasOwnProperty.call(next, uploadId)) {
+            next[uploadId] = null;
+          }
+        });
+        return next;
+      });
+    })();
+    return () => {
+      cancelled = true;
+    };
+  }, [missingUploadIds, fetchReportDetail]);
 
   const items = useMemo(() => {
-    if (local.length > 0) return local;
-    // skeleton placeholder items (not connected yet)
-    return [
-      { jobId: "EXAMPLE-001", data: { label: "REAL", prob_fake: 0.12, threshold: 0.50 }, meta: { name: 'example1.jpg', type: 'image/jpeg', size: 123456 } },
-      { jobId: "EXAMPLE-002", data: { label: "FAKE", prob_fake: 0.86, threshold: 0.50 }, meta: { name: 'example2.mp4', type: 'video/mp4', size: 5242880 } },
-    ];
-  }, [local]);
+    const source = Array.isArray(pageData.items) ? pageData.items : [];
+    return source
+      .map((item) => {
+        const cached = detailCache[item.uploadId];
+        return cached || buildSummaryFallback(item);
+      })
+      .filter(Boolean);
+  }, [pageData.items, detailCache]);
 
   const computeLabel = (d) => {
     const L = d?.label;
@@ -151,6 +328,17 @@ export default function AnalysisHistoryList() {
   }, [filtered]);
 
   const hasTopStats = filtered.length > 0 || averageProb !== null;
+  const showCallout = loading || error || items.length > 0;
+  const calloutTitle = loading
+    ? t('callout.loadingTitle', { defaultValue: '최근 분석 데이터를 불러오는 중이에요' })
+    : error
+      ? t('callout.errorTitle', { defaultValue: '분석 데이터를 불러오지 못했어요.' })
+      : t('callout.readyTitle', { defaultValue: '최근 분석 데이터를 확인해 보세요' });
+  const calloutHint = loading
+    ? t('callout.loadingHint', { defaultValue: '결과가 보이지 않는다면 오른쪽 새로고침을 눌러주세요.' })
+    : error
+      ? t('callout.errorHint', { defaultValue: '새로고침을 눌러 다시 시도해 주세요.' })
+      : t('callout.refreshHint', { defaultValue: '결과가 보이지 않는다면 오른쪽 새로고침을 눌러주세요.' });
 
   return (
     <div className="mt-4 space-y-3">
@@ -168,19 +356,20 @@ export default function AnalysisHistoryList() {
           )}
         </div>
       )}
-      {items.length > 0 && (
+      {showCallout && (
         <div className="rounded-xl border border-indigo-200 bg-indigo-50 px-4 py-3 text-xs text-indigo-700 shadow-sm backdrop-blur dark:border-indigo-500/35 dark:bg-slate-900/75 dark:text-indigo-100 dark:shadow-lg dark:shadow-indigo-900/35">
           <div className="flex items-center justify-between gap-4">
             <div className="min-w-0 space-y-1">
-              <p className="text-sm font-semibold text-indigo-700 dark:text-indigo-100">{t('callout.loadingTitle', { defaultValue: '최근 분석 데이터를 불러오는 중이에요' })}</p>
+              <p className="text-sm font-semibold text-indigo-700 dark:text-indigo-100">{calloutTitle}</p>
               <p className="text-xs leading-relaxed text-indigo-600 dark:text-indigo-200/85">
-                {t('callout.loadingHint', { defaultValue: '결과가 보이지 않는다면 오른쪽 새로고침을 눌러주세요.' })}
+                {error || calloutHint}
               </p>
             </div>
             <button
               type="button"
-              onClick={() => setLocal(readLocalReports())}
-              className="inline-flex h-12 w-12 flex-none items-center justify-center rounded-full border border-indigo-300 bg-indigo-100 text-indigo-800 transition hover:bg-indigo-200 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-300 dark:border-indigo-400/40 dark:bg-indigo-500/25 dark:text-indigo-100 dark:hover:bg-indigo-500/35"
+              onClick={handleRefresh}
+              disabled={loading}
+              className="inline-flex h-12 w-12 flex-none items-center justify-center rounded-full border border-indigo-300 bg-indigo-100 text-indigo-800 transition hover:bg-indigo-200 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-300 disabled:cursor-not-allowed disabled:opacity-60 dark:border-indigo-400/40 dark:bg-indigo-500/25 dark:text-indigo-100 dark:hover:bg-indigo-500/35"
               aria-label={t('toolbar.refreshAria', { defaultValue: '최근 분석 새로고침' })}
             >
               <ArrowPathIcon className="h-6 w-6" aria-hidden="true" />
@@ -229,7 +418,7 @@ export default function AnalysisHistoryList() {
         </div>
       </div>
 
-      {items.length === 0 && (
+      {!loading && !error && items.length === 0 && (
         <div className="rounded-xl border border-slate-200 bg-white p-4 text-sm text-slate-600 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-300">
           {t('empty.noHistory', { defaultValue: '분석 기록이 없어요. Analyze에서 파일을 업로드해 보세요.' })}
         </div>
@@ -252,7 +441,7 @@ export default function AnalysisHistoryList() {
               if (next.has(jobId)) next.delete(jobId); else next.add(jobId);
               setOpenRe(next);
             }}
-            onReanalyzeFinish={() => setLocal(readLocalReports())}
+            onReanalyzeFinish={handleRefresh}
           />
         ))}
       </div>

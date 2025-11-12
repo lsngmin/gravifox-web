@@ -10,6 +10,7 @@ import LoginRequiredModal from '../features/analyze/components/LoginRequiredModa
 import { useAuth } from 'providers/authProvider';
 import { useAnalyzeFlow } from '../features/analyze/contexts/AnalyzeFlowContext';
 import { persistPreviewForJob } from '../utils/previewStore';
+import { useThemeMode } from '../app/hooks/useThemeMode';
 import {
   rememberReturnCheckpoint,
   clearReturnCheckpoint,
@@ -79,6 +80,8 @@ export default function MobileAnalyzeUpload() {
   const location = useLocation();
   const { accessToken, userInfo } = useAuth();
   const { fetchQuotaSummary: resolveQuotaSummary, fetchModels, submitAnalyzeFiles: runSubmitAnalyze } = useAnalyzeFlow();
+  const { themeMode } = useThemeMode();
+  const isDarkMode = themeMode === 'dark';
 
   const [files, setFiles] = useState([]);
   const [errorOpen, setErrorOpen] = useState(false);
@@ -493,12 +496,18 @@ export default function MobileAnalyzeUpload() {
     const glow = (0.2 + gradientIntensity * 0.35).toFixed(3);
     const border = (0.35 + gradientIntensity * 0.45).toFixed(3);
     const shadow = (0.35 + gradientIntensity * 0.3).toFixed(3);
+    const darkBackground = `linear-gradient(135deg, rgba(99,102,241,${glow}), rgba(15,23,42,0.9))`;
+    const lightBackground = `linear-gradient(135deg, rgba(79,70,229,${glow}), rgba(248,250,255,0.9))`;
+    const darkBorder = `rgba(99,102,241,${border})`;
+    const lightBorder = `rgba(148,163,184,${border})`;
+    const darkShadow = `0 24px 50px -30px rgba(99,102,241,${shadow})`;
+    const lightShadow = `0 24px 50px -34px rgba(148,163,184,${shadow})`;
     return {
-      background: `linear-gradient(135deg, rgba(99,102,241,${glow}), rgba(15,23,42,0.9))`,
-      borderColor: `rgba(99,102,241,${border})`,
-      boxShadow: `0 24px 50px -30px rgba(99,102,241,${shadow})`,
+      background: isDarkMode ? darkBackground : lightBackground,
+      borderColor: isDarkMode ? darkBorder : lightBorder,
+      boxShadow: isDarkMode ? darkShadow : lightShadow,
     };
-  }, [gradientIntensity]);
+  }, [gradientIntensity, isDarkMode]);
 
   const selectedModel = useMemo(() => models.find((item) => item.key === modelKey), [models, modelKey]);
   const hasFiles = files.length > 0;
@@ -708,13 +717,13 @@ export default function MobileAnalyzeUpload() {
                 ) : (
                   <div className="space-y-5">
                     <div
-                      className="flex items-center justify-between rounded-[26px] border px-5 py-3 text-[11px] font-semibold text-indigo-700 dark:text-indigo-100"
+                      className="flex min-h-[52px] items-center justify-between gap-4 rounded-[26px] border px-5 py-3 text-sm font-semibold text-indigo-700 dark:text-indigo-100"
                       style={countCardStyle}
                     >
-                      <span className="tracking-wide">{imageCountLabel}</span>
-                      <span className="inline-flex h-2 w-8 items-center rounded-full bg-indigo-300/30 dark:bg-indigo-200/30">
+                      <span className="leading-none tracking-wide">{imageCountLabel}</span>
+                      <span className="inline-flex h-2 w-14 items-center rounded-full bg-white/40 dark:bg-indigo-200/30">
                         <span
-                          className="h-full rounded-full bg-indigo-600 dark:bg-indigo-100"
+                          className="h-full rounded-full bg-indigo-600 transition-[width] duration-300 dark:bg-indigo-100"
                           style={{ width: `${Math.min(100, Math.max(12, gradientIntensity * 100))}%` }}
                         />
                       </span>

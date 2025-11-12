@@ -1,18 +1,16 @@
 {
   "app": {
-    "name": "GraviFox"
+    "name": "Rekwiem"
   },
   "registerPage": {
     "subtitle": "Enter your details to create your account.",
     "emailLabel": "Email",
     "passwordLabel": "Password",
-    "nameLabel": "Name",
-    "dobLabel": "Date of Birth (YYYYMMDD)",
+    "nameLabel": "Nickname",
     "placeholders": {
       "email": "you@example.com",
       "password": "8–20 chars incl. uppercase, letter, number, special",
-      "name": "Your name",
-      "dob": "YYYYMMDD"
+      "name": "Your nickname"
     },
     "submit": "Sign Up",
     "actions": {
@@ -24,9 +22,7 @@
       "invalidEmail": "Invalid email format.",
       "passwordRequired": "Password is required.",
       "passwordPolicy": "8–20 chars incl. uppercase, letter, number, special",
-      "nameRequired": "Name is required.",
-      "dobRequired": "Date of Birth is required.",
-      "dobFormat": "Use YYYYMMDD format."
+      "nameRequired": "Nickname is required."
     },
     "serverErrors": {
       "title": "We couldn’t finish your sign-up",
@@ -51,13 +47,11 @@
       "subtitle": "Enter your details to create your account.",
       "emailLabel": "Email",
       "passwordLabel": "Password",
-      "nameLabel": "Name",
-      "dobLabel": "Date of Birth (YYYYMMDD)",
+      "nameLabel": "Nickname",
       "placeholders": {
         "email": "you@example.com",
         "password": "8–20 chars incl. uppercase, letter, number, special",
-        "name": "Your name",
-        "dob": "YYYYMMDD"
+        "name": "Your nickname"
       },
       "submit": "Sign Up",
       "actions": {
@@ -69,9 +63,7 @@
         "invalidEmail": "Invalid email format.",
         "passwordRequired": "Password is required.",
         "passwordPolicy": "8–20 chars incl. uppercase, letter, number, special",
-        "nameRequired": "Name is required.",
-        "dobRequired": "Date of Birth is required.",
-        "dobFormat": "Use YYYYMMDD format."
+        "nameRequired": "Nickname is required."
       }
     },
     "openMenu": "Open main menu",

@@ -15,14 +15,6 @@ const FooterNavLinks = ({ currentLng }) => {
 
     return (
         <div className="mt-4 flex flex-wrap items-center justify-center gap-x-4 gap-y-2 text-sm text-inherit">
-            <button type="button" onClick={() => goTo("/feature")} className={linkClass}>
-                About
-            </button>
-            <Separator />
-            <button type="button" onClick={() => goTo("/support")} className={linkClass}>
-                Contact
-            </button>
-            <Separator />
             <button type="button" onClick={() => goTo("/docs")} className={linkClass}>
                 Terms
             </button>

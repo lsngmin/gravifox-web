@@ -105,6 +105,11 @@ export const ANALYZE_MODEL_ENDPOINTS = {
     LIST: `${API_BASE}/api/analyze/models`,
 };
 
+export const ANALYSIS_REPORT_ENDPOINTS = {
+    LIST: `${API_BASE}/api/v1/analysis/report`,
+    DETAIL: (uploadId = "") => `${API_BASE}/api/v1/analysis/report/${encodeURIComponent(String(uploadId))}`,
+};
+
 // FastAPI generic media upload endpoint (image/video)
 export const FASTAPI_ENDPOINTS = {
     UPLOAD: FASTAPI_BASE ? `${FASTAPI_BASE}/upload` : "",

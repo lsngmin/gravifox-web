@@ -63,9 +63,9 @@ function CanonicalLink() {
         link.setAttribute('href', href);
 
         // Basic meta
-        const title = t('meta.title', { ns: 'home', defaultValue: 'GraviFox — GenAI image authenticity API' });
+        const title = t('meta.title', { ns: 'home', defaultValue: 'Rekwiem — GenAI image authenticity API' });
         const desc = t('meta.description', { ns: 'home', defaultValue: 'Verify AI-generated images with a simple API. Fast, secure, and easy to integrate.' });
-        const siteName = t('app.name', { ns: 'common', defaultValue: 'GraviFox' });
+        const siteName = t('app.name', { ns: 'common', defaultValue: 'Rekwiem' });
         document.title = title;
         const ensureMeta = (name, attr = 'name') => {
             let m = document.querySelector(`meta[${attr}="${name}"]`);
@@ -82,14 +82,17 @@ function CanonicalLink() {
         ensureMeta('twitter:card').setAttribute('content', 'summary');
         ensureMeta('twitter:title').setAttribute('content', title);
         ensureMeta('twitter:description').setAttribute('content', desc);
-        ensureMeta('og:image', 'property').setAttribute('content', origin + '/gravifox.ico');
-        ensureMeta('twitter:image').setAttribute('content', origin + '/gravifox.ico');
+        const faviconBase = origin + '/favicon.ico';
+        const previewImage = faviconBase + '/ms-icon-310x310.png';
+        const logoImage = faviconBase + '/favicon-96x96.png';
+        ensureMeta('og:image', 'property').setAttribute('content', previewImage);
+        ensureMeta('twitter:image').setAttribute('content', previewImage);
 
         // JSON-LD
         const removeIfExists = (id) => { const n = document.getElementById(id); if (n) n.remove(); };
         removeIfExists('ld-org');
         removeIfExists('ld-app');
-        const org = { '@context': 'https://schema.org', '@type': 'Organization', name: siteName, url: origin, logo: origin + '/gravifox.ico' };
+        const org = { '@context': 'https://schema.org', '@type': 'Organization', name: siteName, url: origin, logo: logoImage };
         const app = { '@context': 'https://schema.org', '@type': 'SoftwareApplication', name: title, applicationCategory: 'AIApplication', operatingSystem: 'Web', url: href, description: desc };
         const s1 = document.createElement('script'); s1.type = 'application/ld+json'; s1.id = 'ld-org'; s1.text = JSON.stringify(org);
         const s2 = document.createElement('script'); s2.type = 'application/ld+json'; s2.id = 'ld-app'; s2.text = JSON.stringify(app);

@@ -1,12 +1,12 @@
 import React, { useEffect, useMemo, useState } from "react";
+import clsx from "clsx";
 import axios from "../../../api/http";
 import { AUTH_ENDPOINTS } from "../../../api/endPointRoute";
 import { useAuth } from "providers/authProvider";
 import { useTranslation } from "react-i18next";
+import { useThemeMode } from "../../../app/hooks/useThemeMode";
 import {rememberReturnCheckpoint} from "../../../lib/returnCheckpoint";
 import {CHECKPOINT_TYPES} from "../../../lib/returnCheckpoint/constants";
-const overlayClass =
-  "fixed inset-0 z-[200] flex items-center justify-center bg-slate-950/70 backdrop-blur-sm";
 
 export default function LoginRequiredModal({
   open,
@@ -17,12 +17,63 @@ export default function LoginRequiredModal({
   returnPath = "/analyze/upload",
   onNavigateSignup,
   onNavigateForgot,
+  theme,
 }) {
   const { setAccessToken, retryBootstrap } = useAuth();
   const { t } = useTranslation('common');
   const [form, setForm] = useState({ userId: defaultEmail, password: "" });
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
+  const { themeMode } = useThemeMode();
+
+  const effectiveTheme = theme || themeMode || "dark";
+  const isDark = effectiveTheme === "dark";
+
+  const overlayClass = clsx(
+    "fixed inset-0 z-[200] flex items-center justify-center backdrop-blur-sm",
+    isDark ? "bg-slate-950/70" : "bg-white/80"
+  );
+
+  const containerClass = clsx(
+    "mx-4 w-full max-w-md rounded-2xl border p-8 shadow-2xl sm:mx-auto transition",
+    isDark
+      ? "border-slate-800 bg-slate-950/95 text-slate-100"
+      : "border-slate-200 bg-white/90 text-slate-900"
+  );
+
+  const inputClass = clsx(
+    "w-full rounded-xl border px-4 py-3 text-sm outline-none transition focus:border-indigo-400 focus:ring-2 focus:ring-indigo-400/30",
+    isDark
+      ? "border-slate-700 bg-slate-900/70 text-slate-100 placeholder-slate-400"
+      : "border-slate-200 bg-white text-slate-900 placeholder-slate-500"
+  );
+
+  const labelClass = clsx(
+    "text-xs",
+    isDark ? "text-slate-400" : "text-slate-600"
+  );
+
+  const helperTextClass = clsx(
+    "text-[11px] font-semibold tracking-[0.25em]",
+    isDark ? "text-slate-400" : "text-slate-500"
+  );
+
+  const subtitleClass = clsx(
+    "text-sm",
+    isDark ? "text-slate-400" : "text-slate-500"
+  );
+
+  const bottomTextClass = clsx(
+    "text-sm",
+    isDark ? "text-slate-300" : "text-slate-500"
+  );
+
+  const closeButtonClass = clsx(
+    "rounded-full p-2 transition",
+    isDark
+      ? "bg-slate-800/60 text-slate-300 hover:text-white"
+      : "bg-white/80 text-slate-500 hover:text-slate-700"
+  );
 
   useEffect(() => {
     if (open) {
@@ -103,21 +154,28 @@ export default function LoginRequiredModal({
     window.location.href = AUTH_ENDPOINTS.GOOGLE;
   };
 
+  const googleButtonClass = clsx(
+    "mt-4 flex h-12 w-full items-center justify-center gap-2 rounded-xl border px-4 text-sm font-medium transition",
+    isDark
+      ? "border-slate-700 bg-slate-900/70 text-slate-100 hover:border-indigo-400/60 hover:bg-indigo-500/10"
+      : "border-slate-200 bg-white text-slate-900 hover:border-slate-300 hover:bg-slate-50"
+  );
+
   if (!open) return null;
 
   return (
     <div className={overlayClass} role="dialog" aria-modal="true">
-      <div className="w-full max-w-md rounded-2xl border border-slate-800 bg-slate-950/95 p-8 text-slate-100 shadow-2xl">
+      <div className={containerClass}>
         <div className="flex items-start justify-between gap-4">
           <div className="space-y-2">
             <h2 className="text-xl font-semibold">{t('loginModal.title', '로그인이 필요해요')}</h2>
-            <p className="text-sm text-slate-400">
+            <p className={subtitleClass}>
               {t('loginModal.subtitle', '이메일 또는 Google 계정으로 로그인해 주세요.')}
             </p>
           </div>
           <button
             type="button"
-            className="rounded-full bg-slate-800/60 p-2 text-slate-300 transition hover:text-white"
+            className={closeButtonClass}
             onClick={onClose}
             aria-label="닫기"
           >
@@ -138,7 +196,7 @@ export default function LoginRequiredModal({
         </div>
         <form className="mt-6 space-y-4" onSubmit={handleSubmit}>
           <div className="space-y-1">
-            <label htmlFor="modal-userId" className="text-xs text-slate-400">
+            <label htmlFor="modal-userId" className={labelClass}>
               이메일
             </label>
             <input
@@ -147,12 +205,12 @@ export default function LoginRequiredModal({
               autoComplete="email"
               value={form.userId}
               onChange={handleChange("userId")}
-              className="w-full rounded-xl border border-slate-700 bg-slate-900/70 px-4 py-3 text-sm text-slate-100 outline-none transition focus:border-indigo-400 focus:ring-2 focus:ring-indigo-400/30"
+              className={inputClass}
               placeholder="you@example.com"
             />
           </div>
           <div className="space-y-1">
-            <label htmlFor="modal-password" className="text-xs text-slate-400">
+            <label htmlFor="modal-password" className={labelClass}>
               비밀번호
             </label>
             <input
@@ -161,12 +219,12 @@ export default function LoginRequiredModal({
               autoComplete="current-password"
               value={form.password}
               onChange={handleChange("password")}
-              className="w-full rounded-xl border border-slate-700 bg-slate-900/70 px-4 py-3 text-sm text-slate-100 outline-none transition focus:border-indigo-400 focus:ring-2 focus:ring-indigo-400/30"
+              className={inputClass}
               placeholder="••••••••"
             />
           </div>
           {error && (
-            <p className="text-xs text-rose-300">
+            <p className={clsx("text-xs", isDark ? "text-rose-300" : "text-rose-600")}>
               {error}
             </p>
           )}
@@ -182,17 +240,15 @@ export default function LoginRequiredModal({
         </form>
 
         <div className="relative mt-6 flex items-center">
-          <span className="h-px flex-1 bg-slate-800" />
-          <span className="px-3 text-[11px] font-semibold tracking-[0.25em] text-slate-500">
-            OR
-          </span>
-          <span className="h-px flex-1 bg-slate-800" />
+          <span className={clsx("h-px flex-1", isDark ? "bg-slate-800" : "bg-slate-200")} />
+          <span className={helperTextClass}>OR</span>
+          <span className={clsx("h-px flex-1", isDark ? "bg-slate-800" : "bg-slate-200")} />
         </div>
 
         <button
           type="button"
           onClick={handleGoogleLogin}
-          className="mt-4 flex h-12 w-full items-center justify-center gap-2 rounded-xl border border-slate-700 bg-slate-900/70 px-4 text-sm font-medium text-slate-100 transition hover:border-indigo-400/60 hover:bg-indigo-500/10"
+          className={googleButtonClass}
         >
           <img
             src="https://www.svgrepo.com/show/475656/google-color.svg"
@@ -202,9 +258,9 @@ export default function LoginRequiredModal({
           {t('loginModal.googleButton', 'Google로 계속하기')}
         </button>
 
-        <div className="mt-6 space-y-3 text-sm text-slate-300">
+        <div className="mt-6 space-y-3">
           <div className="flex items-center justify-between gap-3">
-            <span className="text-slate-400">{t('loginModal.signupPrompt', '아직 계정이 없으신가요?')}</span>
+            <span className={bottomTextClass}>{t('loginModal.signupPrompt', '아직 계정이 없으신가요?')}</span>
             <button
               type="button"
               onClick={() => onNavigateSignup?.()}
@@ -214,7 +270,7 @@ export default function LoginRequiredModal({
             </button>
           </div>
           <div className="flex items-center justify-between gap-3">
-            <span className="text-slate-400">{t('loginModal.forgotPrompt', '비밀번호를 잊으셨나요?')}</span>
+            <span className={bottomTextClass}>{t('loginModal.forgotPrompt', '비밀번호를 잊으셨나요?')}</span>
             <button
               type="button"
               onClick={() => onNavigateForgot?.()}

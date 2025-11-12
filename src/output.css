@@ -2348,6 +2348,10 @@ video {
   min-height: 100vh;
 }
 
+.min-h-\[52px\] {
+  min-height: 52px;
+}
+
 .\!w-auto {
   width: auto !important;
 }
@@ -4160,6 +4164,10 @@ video {
 
 .bg-white\/\[0\.06\] {
   background-color: rgb(255 255 255 / 0.06);
+}
+
+.bg-white\/40 {
+  background-color: rgb(255 255 255 / 0.4);
 }
 
 .bg-\[conic-gradient\(from_120deg_at_80\%_15\%\2c rgba\(16\2c 185\2c 129\2c 0\.28\)_0deg\2c transparent_120deg\)\] {
