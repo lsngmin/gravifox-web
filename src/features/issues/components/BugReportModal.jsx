@@ -5,12 +5,12 @@ import IssueReportAPI from "../api/issueReportAPI";
 
 const BugReportModal = ({ open, onClose, theme = "light" }) => {
     const { submitIssue } = IssueReportAPI();
-    const { t, i18n } = useTranslation("support");
+    const { t } = useTranslation("support");
 
     const strings = useMemo(() => {
         const data = t("modals.bug", { returnObjects: true });
         return data && typeof data === "object" ? data : {};
-    }, [t, i18n.language]);
+    }, [t]);
 
     const handleSubmit = (formData) => {
         formData.append("category", "bug-report");

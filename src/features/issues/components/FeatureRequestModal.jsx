@@ -5,12 +5,12 @@ import FeatureRequestAPI from "../api/featureRequestAPI";
 
 const FeatureRequestModal = ({ open, onClose, theme = "light" }) => {
     const { submitFeature } = FeatureRequestAPI();
-    const { t, i18n } = useTranslation("support");
+    const { t } = useTranslation("support");
 
     const strings = useMemo(() => {
         const data = t("modals.feature", { returnObjects: true });
         return data && typeof data === "object" ? data : {};
-    }, [t, i18n.language]);
+    }, [t]);
 
     const handleSubmit = (formData) => submitFeature(formData);
 

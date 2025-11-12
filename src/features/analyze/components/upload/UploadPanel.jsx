@@ -181,7 +181,7 @@ export default function UploadPanel({
         setErrorOpen(false);
         setPendingResultPath(null);
         try {
-            const { jobIds, errors: uploadErrors, remainingQuota } = await submitAnalyzeFiles(arr, {
+            const { jobIds, errors: uploadErrors } = await submitAnalyzeFiles(arr, {
                 modelKey: selectedModelKey,
                 buildMeta: async (file) => ({
                     name: file?.name,

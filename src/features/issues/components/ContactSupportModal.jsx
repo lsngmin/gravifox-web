@@ -5,12 +5,12 @@ import ContactSupportAPI from "../api/contactSupportAPI";
 
 const ContactSupportModal = ({ open, onClose, theme = "light" }) => {
     const { submitContact } = ContactSupportAPI();
-    const { t, i18n } = useTranslation("support");
+    const { t } = useTranslation("support");
 
     const strings = useMemo(() => {
         const data = t("modals.contact", { returnObjects: true });
         return data && typeof data === "object" ? data : {};
-    }, [t, i18n.language]);
+    }, [t]);
 
     const handleSubmit = (formData) => submitContact(formData);
 

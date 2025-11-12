@@ -40,25 +40,10 @@ function readLocalReports() {
   }
 }
 
-function formatFileSize(bytes) {
-  if (typeof bytes !== 'number' || !Number.isFinite(bytes) || bytes < 0) return '-';
-  if (bytes === 0) return '0B';
-  const units = ['KB', 'MB', 'GB', 'TB'];
-  let value = bytes;
-  let unitIndex = -1;
-  while (value >= 1024 && unitIndex < units.length - 1) {
-    value /= 1024;
-    unitIndex += 1;
-  }
-  if (unitIndex === -1) return `${value}B`;
-  const precision = value >= 100 ? 0 : value >= 10 ? 1 : 2;
-  return `${value.toFixed(precision)}${units[unitIndex]}`;
-}
-
 export default function AnalysisHistoryList() {
   const { t } = useTranslation('dashboard');
   const [local, setLocal] = useState(() => readLocalReports());
-  const [search, setSearch] = useState("");
+  const search = "";
   const [labelTab, setLabelTab] = useState("ALL"); // ALL | REAL | FAKE | UNKNOWN
   const [favOnly, setFavOnly] = useState(false);
   const [favs, setFavs] = useState(() => {
@@ -103,10 +88,6 @@ export default function AnalysisHistoryList() {
     const next = new Set(favs);
     if (next.has(jobId)) next.delete(jobId); else next.add(jobId);
     saveFavs(next);
-  };
-
-  const copyJobId = async (jid) => {
-    try { await navigator.clipboard.writeText(jid); } catch {}
   };
 
   // seen map (first-seen timestamps) for sorting

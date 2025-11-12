@@ -28,7 +28,7 @@ function formatPercent(value, fraction = 0) {
 }
 
 export default function MobileHeatmapPreview({ imageSrc, mediaName, heatmap, highlightTop = true }) {
-  const cells = Array.isArray(heatmap?.cells) ? heatmap.cells : [];
+  const cells = useMemo(() => (Array.isArray(heatmap?.cells) ? heatmap.cells : []), [heatmap?.cells]);
   const hasData = Boolean(imageSrc) && cells.length > 0;
   const availableScales = useMemo(() => {
     if (!hasData) return [];
