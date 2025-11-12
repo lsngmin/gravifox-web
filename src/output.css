@@ -3267,6 +3267,10 @@ video {
   border-top-width: 1px;
 }
 
+.border-t-0 {
+  border-top-width: 0px;
+}
+
 .border-dashed {
   border-style: dashed;
 }
@@ -8699,6 +8703,10 @@ body {
 .dark\:divide-slate-800:is(.dark *) > :not([hidden]) ~ :not([hidden]) {
   --tw-divide-opacity: 1;
   border-color: rgb(30 41 59 / var(--tw-divide-opacity, 1));
+}
+
+.dark\:border-t-0:is(.dark *) {
+  border-top-width: 0px;
 }
 
 .dark\:border-amber-400\/30:is(.dark *) {

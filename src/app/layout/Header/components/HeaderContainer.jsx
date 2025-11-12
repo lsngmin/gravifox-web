@@ -35,7 +35,7 @@ const HeaderContainer = () => {
 
     return (
         <header
-            className="fixed inset-x-0 top-0 border border-slate-200/70 bg-white/95 backdrop-blur-lg transition-[padding,top,border-radius,transform,left,right] duration-400 ease-out text-gray-900 dark:border-slate-700/60 dark:bg-slate-900/90 dark:text-slate-100"
+            className="fixed inset-x-0 top-0 border border-slate-200/70 border-t-0 bg-white/95 backdrop-blur-lg transition-[padding,top,border-radius,transform,left,right] duration-400 ease-out text-gray-900 dark:border-slate-700/60 dark:border-t-0 dark:bg-slate-900/90 dark:text-slate-100"
             style={headerStyle}
         >
             <div className="relative">
