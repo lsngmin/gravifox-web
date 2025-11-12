@@ -60,10 +60,10 @@ function buildConfidenceCopy({ percent, t }) {
 export default function MobileAnalysisReport({ report, t }) {
   const { themeMode } = useThemeMode();
   const isDark = themeMode === 'dark';
-  const data = report?.result || {};
+  const reportData = useMemo(() => report?.result || {}, [report?.result]);
   const fileName = report?.fileMeta?.name || '';
   const previewUrl = usePreviewUrl(report?.fileMeta);
-  const rawLabel = data.label || data.decision || 'UNKNOWN';
+  const rawLabel = reportData.label || reportData.decision || 'UNKNOWN';
   const label = typeof rawLabel === 'string' ? rawLabel.toUpperCase() : 'UNKNOWN';
 
   const labelCopy = useMemo(() => {
@@ -93,37 +93,37 @@ export default function MobileAnalysisReport({ report, t }) {
   }, [label]);
 
   const probFake =
-    typeof data.prob_fake === 'number'
-      ? data.prob_fake
-      : typeof data.pAi === 'number'
-      ? data.pAi
+    typeof reportData.prob_fake === 'number'
+      ? reportData.prob_fake
+      : typeof reportData.pAi === 'number'
+      ? reportData.pAi
       : null;
   const probReal =
-    typeof data.prob_real === 'number'
-      ? data.prob_real
-      : typeof data.pReal === 'number'
-      ? data.pReal
+    typeof reportData.prob_real === 'number'
+      ? reportData.prob_real
+      : typeof reportData.pReal === 'number'
+      ? reportData.pReal
       : null;
-  const confidence = typeof data.confidence === 'number' ? data.confidence : null;
+  const confidence = typeof reportData.confidence === 'number' ? reportData.confidence : null;
 
   const aiProbability = useMemo(() => {
     if (typeof probFake === 'number') return clamp01(probFake);
-    if (Array.isArray(data?.probabilities) && data.probabilities.length >= 2) {
-      const aiProb = data.probabilities[1];
+    if (Array.isArray(reportData?.probabilities) && reportData.probabilities.length >= 2) {
+      const aiProb = reportData.probabilities[1];
       if (typeof aiProb === 'number' && !Number.isNaN(aiProb)) return clamp01(aiProb);
-      const realProb = data.probabilities[0];
+      const realProb = reportData.probabilities[0];
       if (typeof realProb === 'number' && !Number.isNaN(realProb)) return clamp01(1 - realProb);
     }
-    if (typeof data?.pAi === 'number') return clamp01(data.pAi);
-    if (typeof data?.p_ai === 'number') return clamp01(data.p_ai);
-    if (typeof data?.ai_prob === 'number') return clamp01(data.ai_prob);
+    if (typeof reportData?.pAi === 'number') return clamp01(reportData.pAi);
+    if (typeof reportData?.p_ai === 'number') return clamp01(reportData.p_ai);
+    if (typeof reportData?.ai_prob === 'number') return clamp01(reportData.ai_prob);
     if (typeof probReal === 'number') return clamp01(1 - probReal);
-    if (typeof data?.pReal === 'number') return clamp01(1 - data.pReal);
+    if (typeof reportData?.pReal === 'number') return clamp01(1 - reportData.pReal);
     if (typeof confidence === 'number') {
       return clamp01(label === 'FAKE' ? confidence : 1 - confidence);
     }
     return null;
-  }, [probFake, data, probReal, confidence, label]);
+  }, [reportData, probFake, probReal, confidence, label]);
 
   const confidencePercent =
     aiProbability == null || Number.isNaN(aiProbability)
@@ -186,15 +186,6 @@ export default function MobileAnalysisReport({ report, t }) {
   const generationLabel = t?.('mobileAnalyze.report.metrics.generationProbability', '생성 확률');
   const detailLabel = t?.('mobileAnalyze.report.actions.viewDetail', '세부 리포트 보기');
   const percentDisplay = confidencePercent != null ? `${confidencePercent}%` : '—';
-
-  const gradientStyle = useMemo(
-    () => ({
-      background:
-        'radial-gradient(circle at 18% 24%, rgba(216,180,254,0.2), transparent 60%), radial-gradient(circle at 82% 22%, rgba(56,189,248,0.18), transparent 54%), linear-gradient(140deg, rgba(15,118,110,0.22), rgba(8,47,73,0.55))',
-      border: '1px solid rgba(255,255,255,0.08)',
-    }),
-    []
-  );
 
   const [modalOpen, setModalOpen] = useState(false);
   const reportContainerClass = `relative overflow-hidden rounded-[28px] p-4 shadow-sm ring-1 ${

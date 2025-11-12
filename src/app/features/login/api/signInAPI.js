@@ -13,8 +13,6 @@ const SignInAPI = () => {
     const navigate = useNavigate();
     const { setAccessToken } = useAuth();
 
-    const localeMatch = location.pathname?.match(/^\/([a-zA-Z-]{2,5})(?=\/|$)/);
-    const prefix = localeMatch ? `/${localeMatch[1]}` : "";
     // Default to site root when no previous path exists
     const defaultPath = "/";
     const fromLocation = location.state?.from;

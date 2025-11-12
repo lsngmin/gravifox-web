@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import { useNavigate, useParams, useSearchParams } from "react-router-dom";
 import signupAPI from "../../../../features/login/api/signupAPI";
 import { useTranslation } from 'react-i18next';
@@ -63,28 +63,28 @@ const RegisterBox = ({ variant = 'default' }) => {
 
   const { signup } = signupAPI();
 
-  const validateEmail = (value) => {
+  const validateEmail = useCallback((value) => {
     if (!value) return t('registerPage.errors.emailRequired', 'Email is required.');
     const v = String(value).trim();
     // Align with backend validator in RegisterController.userIdValidator
     const re = /^[a-zA-Z0-9_+&*-]+(?:\.[a-zA-Z0-9_+&*-]+)*@(?:[a-zA-Z0-9-]+\.)+[a-zA-Z]{2,63}$/;
     return re.test(v) ? null : t('registerPage.errors.invalidEmail', 'Invalid email format.');
-  };
+  }, [t]);
 
-  const validatePassword = (value) => {
+  const validatePassword = useCallback((value) => {
     if (!value) return t('registerPage.errors.passwordRequired', 'Password is required.');
     // Keep in sync with backend: hyphen first in the class to avoid ranges
-    const re = /^(?=.*[A-Za-z])(?=.*[A-Z])(?=.*\d)(?=.*[-!@#$%^&*()_+={}\[\]:";'<>?,./]).{8,20}$/;
+    const re = /^(?=.*[A-Za-z])(?=.*[A-Z])(?=.*\d)(?=.*[-!@#$%^&*()_+={}[\]:";'<>?,./]).{8,20}$/;
     return re.test(value)
       ? null
       : t('registerPage.errors.passwordPolicy', '8–20 chars incl. uppercase, letter, number, special');
-  };
+  }, [t]);
 
-  const validateName = (value) => {
+  const validateName = useCallback((value) => {
     return value.trim() ? null : t('registerPage.errors.nameRequired', 'Name is required.');
-  };
+  }, [t]);
 
-  const validateDob = (value) => {
+  const validateDob = useCallback((value) => {
     const raw = String(value || '').trim();
     if (!raw) return t('registerPage.errors.dobRequired', 'Date of Birth is required.');
     const digits = raw.replace(/\D/g, '');
@@ -97,7 +97,7 @@ const RegisterBox = ({ variant = 'default' }) => {
     const daysInMonth = [31, (yyyy % 4 === 0 && yyyy % 100 !== 0) || (yyyy % 400 === 0) ? 29 : 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31];
     if (dd < 1 || dd > daysInMonth[mm - 1]) return t('registerPage.errors.dobFormat', 'Use YYYYMMDD format.');
     return null;
-  };
+  }, [t]);
 
   const handleInputChange = (field) => (e) => {
     const newValue = e.target.value;
@@ -168,7 +168,7 @@ const RegisterBox = ({ variant = 'default' }) => {
       && !validateName(formState.name)
       && formState.dob && formState.dob.length === 8 && !validateDob(formState.dob);
     setCanSubmit(ok);
-  }, [formState]);
+  }, [formState, validateEmail, validatePassword, validateName, validateDob]);
 
   const resolveServerErrorMessages = (error) => {
     const status = Number(error?.status) || null;

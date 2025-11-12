@@ -5,7 +5,7 @@ import { useTranslation } from 'react-i18next';
 
 const AgreementBox = () => {
   const navigate = useNavigate();
-  const { i18n, t } = useTranslation('common');
+  const { i18n } = useTranslation('common');
   const { lng } = useParams();
   const isKo = (i18n?.language || '').slice(0,2) === 'ko';
 

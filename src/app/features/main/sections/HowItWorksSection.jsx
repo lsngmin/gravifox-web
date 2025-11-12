@@ -116,7 +116,7 @@ export default function HowItWorksSection() {
                             </SwiperSlide>
                             );
                         })}
-                        ))}
+
                     </Swiper>
 
                     <div className="mt-10 flex flex-wrap items-center justify-center gap-6">

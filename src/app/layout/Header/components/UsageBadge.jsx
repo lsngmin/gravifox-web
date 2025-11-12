@@ -77,7 +77,6 @@ const UsageBadge = () => {
     // Traffic light thresholds based on used percent
     const greenActive = clampedPercent < 70;
     const yellowActive = clampedPercent >= 70 && clampedPercent < 90;
-    const redActive = clampedPercent >= 90;
 
     const activeVariant = greenActive ? 'green' : yellowActive ? 'amber' : 'red';
     const activeTitle = greenActive
