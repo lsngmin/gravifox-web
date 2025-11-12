@@ -236,7 +236,6 @@ const AdminIssueInbox = () => {
     const tableHeaderCellClass =
         "px-6 py-4 text-left text-xs font-semibold uppercase tracking-wide text-slate-600 dark:text-slate-300";
     const tableBodyCellClass = "px-6 py-4 align-top text-sm text-slate-600 dark:text-slate-300";
-    const detailTextClass = "line-clamp-4 whitespace-pre-line text-left text-sm text-slate-600 dark:text-slate-300";
     const repoTextClass = "mt-2 text-xs text-slate-500 dark:text-slate-500";
     const errorBannerClass =
         "border border-rose-200 bg-rose-50 px-6 py-4 text-sm text-rose-600 dark:border-rose-900/40 dark:bg-rose-950/40 dark:text-rose-200";

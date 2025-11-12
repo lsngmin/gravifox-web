@@ -1,4 +1,4 @@
-import React, { useMemo } from 'react';
+import React from 'react';
 import Header from '../app/layout/Header';
 import { useTranslation } from 'react-i18next';
 import { motion } from 'framer-motion';
@@ -9,50 +9,11 @@ import {
   Sparkles,
   Layers,
   History,
-  BarChart3,
-  Share2,
-  Layers3
 } from "lucide-react";
 import Footer from "../app/layout/Footer/Footer";
-const Check = ({ className = 'text-emerald-500', size = 12 }) => (
-  <svg width={size} height={size} viewBox="0 0 16 16" fill="none" className={className}>
-    <path d="M13.4 4.36L6.12 11.64 2.6 8.12" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" />
-  </svg>
-);
-
 export default function Pricing() {
   const { t } = useTranslation('pricing');
   const isMobile = useMediaQuery({ maxWidth: 767 });
-
-  const heroMetrics = useMemo(
-    () => [
-      {
-        label: t('hero.metrics.timeLabel', '런칭 속도'),
-        value: t('hero.metrics.timeValue', '테스트 기간에도 전 기능 개방'),
-        copy: t(
-          'hero.metrics.timeCopy',
-          '빠른 템플릿과 샘플 파이프라인으로 첫 결과를 바로 확인할 수 있어요.'
-        ),
-      },
-      {
-        label: t('hero.metrics.scaleLabel', '확장 준비'),
-        value: t('hero.metrics.scaleValue', '유료 전환 없이도 확장 시뮬레이션'),
-        copy: t(
-          'hero.metrics.scaleCopy',
-          '현재는 Free 플랜으로도 예상 워크로드를 충분히 검증할 수 있어요.'
-        ),
-      },
-      {
-        label: t('hero.metrics.securityLabel', '안심 보안'),
-        value: t('hero.metrics.securityValue', '테스트 계정도 동일한 보호'),
-        copy: t(
-          'hero.metrics.securityCopy',
-          '권한 제어와 감사 로그를 기본으로 제공해 모든 팀원이 편하게 협업해요.'
-        ),
-      },
-    ],
-    [t]
-  );
 
   const animateProps = { opacity: 1, y: 0 };
 

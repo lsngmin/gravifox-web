@@ -67,9 +67,6 @@ export default function HowItWorksSection() {
             </div>
 
             <div className="relative mx-auto flex max-w-5xl flex-col items-center justify-center px-4 text-center sm:px-6 lg:px-8">
-                <h3 className="text-[11px] sm:text-xs font-semibold uppercase tracking-[0.25em] text-indigo-500 dark:text-indigo-300">
-                    {t("how.eyebrow", "이용방법")}
-                </h3>
                 <p className="mt-3 text-xl font-bold tracking-tight text-slate-900 sm:text-3xl md:text-4xl dark:text-white">
                     {t("how.title", "올리고 나면 바로 시작돼요")}
                 </p>
@@ -120,7 +117,7 @@ export default function HowItWorksSection() {
                         <button
                             ref={prevRef}
                             type="button"
-                            className="rounded-full border border-indigo-300 bg-white/80 px-3 py-2 text-indigo-500 backdrop-blur transition hover:bg-white dark:border-indigo-500/50 dark:bg-slate-900/70 dark:text-indigo-200"
+                            className="flex h-10 w-10 items-center justify-center rounded-full border border-indigo-300 bg-white/80 text-indigo-500 backdrop-blur transition hover:bg-white dark:border-indigo-500/50 dark:bg-slate-900/70 dark:text-indigo-200"
                         >
                             ‹
                         </button>
@@ -133,7 +130,7 @@ export default function HowItWorksSection() {
                         <button
                             ref={nextRef}
                             type="button"
-                            className="rounded-full border border-indigo-300 bg-white/80 px-3 py-2 text-indigo-500 backdrop-blur transition hover:bg-white dark:border-indigo-500/50 dark:bg-slate-900/70 dark:text-indigo-200"
+                            className="flex h-10 w-10 items-center justify-center rounded-full border border-indigo-300 bg-white/80 text-indigo-500 backdrop-blur transition hover:bg-white dark:border-indigo-500/50 dark:bg-slate-900/70 dark:text-indigo-200"
                         >
                             ›
                         </button>

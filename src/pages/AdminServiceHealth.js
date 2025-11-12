@@ -237,8 +237,7 @@ const AdminServiceHealth = () => {
                                     <div className="grid h-14 grid-flow-col auto-cols-fr items-end gap-2" role="list">
                                         {statusTimeline.map((entry) => {
                                             const state = entry.states[track.key];
-                                            const issue = entry.issues[track.key];
-                                            const isActive = hoveredEntry?.key === entry.key;
+                                        const isActive = hoveredEntry?.key === entry.key;
                                             return (
                                                 <div
                                                     key={`${track.key}-${entry.key}`}

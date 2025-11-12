@@ -140,7 +140,7 @@ const resolvePreferredTheme = () => {
 const Support = () => {
     const navigate = useNavigate();
     const { lng = "en" } = useParams();
-    const { t, i18n } = useTranslation("support");
+    const { t } = useTranslation("support");
     const [themeMode, setThemeMode] = useState(() => resolvePreferredTheme());
     const [bugModalOpen, setBugModalOpen] = useState(false);
     const [featureModalOpen, setFeatureModalOpen] = useState(false);
@@ -192,12 +192,12 @@ const Support = () => {
     const hero = useMemo(() => {
         const data = t("hero", { returnObjects: true });
         return data && typeof data === "object" ? data : {};
-    }, [t, i18n.language]);
+    }, [t]);
 
     const rawOptions = useMemo(() => {
         const data = t("options", { returnObjects: true });
         return Array.isArray(data) ? data : [];
-    }, [t, i18n.language]);
+    }, [t]);
 
     const supportOptions = useMemo(
         () =>
@@ -221,7 +221,7 @@ const Support = () => {
     const faqData = useMemo(() => {
         const data = t("faq", { returnObjects: true });
         return data && typeof data === "object" ? data : {};
-    }, [t, i18n.language]);
+    }, [t]);
 
     const faqItems = Array.isArray(faqData.items) ? faqData.items : [];
     const optionsHeading = t("optionsHeading");

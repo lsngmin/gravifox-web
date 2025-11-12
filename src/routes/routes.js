@@ -19,7 +19,6 @@ import Support from "pages/Support";
 import MediaAnalyze from "pages/MediaAnalyze";
 import EmailVerification from "pages/EmailVerification";
 import AnalyzeResult from "pages/AnalyzeResult";
-import Blog from "../pages/Blog";
 import BlogRoute from "../pages/BlogRoute";
 import MobileAnalyzeStart from "../pages/MobileAnalyzeStart";
 import MobileAnalyzeUpload from "../pages/MobileAnalyzeUpload";

@@ -131,7 +131,7 @@ export async function clearAllPreviews() {
   });
 }
 
-export default {
+const previewStore = {
   savePreviewBlob,
   getPreviewBlob,
   getPreviewObjectUrl,
@@ -139,3 +139,5 @@ export default {
   clearAllPreviews,
   persistPreviewForJob,
 };
+
+export default previewStore;

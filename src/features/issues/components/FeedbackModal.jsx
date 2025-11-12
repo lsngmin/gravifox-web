@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useRef, useState } from "react";
+import React, { useCallback, useEffect, useMemo, useRef, useState } from "react";
 
 const MAX_ATTACHMENT_SIZE = 10 * 1024 * 1024; // 10MB
 
@@ -29,6 +29,23 @@ const FeedbackModal = ({
     const initialFocusRef = useRef(null);
     const isDark = theme === "dark";
 
+    const resetState = useCallback(() => {
+        setTitle("");
+        setBody("");
+        setAttachment(null);
+        setError("");
+        setSuccess("");
+        if (fileInputRef.current) {
+            fileInputRef.current.value = "";
+        }
+    }, []);
+
+    const handleClose = useCallback(() => {
+        if (submitting) return;
+        resetState();
+        onClose?.();
+    }, [submitting, onClose, resetState]);
+
     useEffect(() => {
         if (!open) return;
         const prevOverflow = document.body.style.overflow;
@@ -50,24 +67,7 @@ const FeedbackModal = ({
             window.removeEventListener("keydown", handleKey);
             clearTimeout(timer);
         };
-    }, [open]);
-
-    const resetState = () => {
-        setTitle("");
-        setBody("");
-        setAttachment(null);
-        setError("");
-        setSuccess("");
-        if (fileInputRef.current) {
-            fileInputRef.current.value = "";
-        }
-    };
-
-    const handleClose = () => {
-        if (submitting) return;
-        resetState();
-        onClose?.();
-    };
+    }, [open, handleClose]);
 
     const handleFileChange = (event) => {
         const file = event.target.files?.[0];
@@ -297,4 +297,3 @@ const FeedbackModal = ({
 };
 
 export default FeedbackModal;
-
