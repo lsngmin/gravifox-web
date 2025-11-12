@@ -94,7 +94,10 @@ export default function HowItWorksSection() {
                         }}
                         className="pb-10"
                     >
-                        {HOW_STEPS.map(({ key, icon: Icon, glideKey }) => (
+                        {HOW_STEPS.map(({ key, icon: Icon, glideKey }) => {
+                            const desc1 = t(`${glideKey}.desc1`, { defaultValue: "" });
+                            const desc2 = t(`${glideKey}.desc2`, { defaultValue: "" });
+                            return (
                             <SwiperSlide key={key}>
                                 <article className="h-full rounded-3xl border border-indigo-100 bg-white/85 p-8 backdrop-blur sm:p-10 dark:border-indigo-500/30 dark:bg-slate-900/70">
                                     <div className="flex h-full flex-col items-center gap-6">
@@ -104,12 +107,15 @@ export default function HowItWorksSection() {
                                         <h4 className="text-lg font-semibold text-slate-900 dark:text-white">
                                             {t(`${glideKey}.title`)}
                                         </h4>
-                                        <p className="min-h-[4.5rem] text-sm leading-relaxed text-slate-600 dark:text-indigo-100/75">
-                                            {t(`${glideKey}.desc`)}
-                                        </p>
+                                        <div className="min-h-[4.5rem] text-sm leading-relaxed text-slate-600 dark:text-indigo-100/75">
+                                            {desc1 && <p>{desc1}</p>}
+                                            {desc2 && <p>{desc2}</p>}
+                                        </div>
                                     </div>
                                 </article>
                             </SwiperSlide>
+                            );
+                        })}
                         ))}
                     </Swiper>
 
