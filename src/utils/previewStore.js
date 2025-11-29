@@ -3,9 +3,43 @@ const STORE_NAME = 'previews';
 const DB_VERSION = 1;
 
 let dbPromise = null;
+const FALLBACK_PREFIX = 'preview:data:';
 
 function hasIndexedDB() {
   return typeof indexedDB !== 'undefined';
+}
+
+function trySetStorage(key, value) {
+  try {
+    sessionStorage.setItem(key, value);
+    return true;
+  } catch {}
+  try {
+    localStorage.setItem(key, value);
+    return true;
+  } catch {}
+  return false;
+}
+
+function tryGetStorage(key) {
+  try {
+    const v = sessionStorage.getItem(key);
+    if (v) return v;
+  } catch {}
+  try {
+    const v = localStorage.getItem(key);
+    if (v) return v;
+  } catch {}
+  return null;
+}
+
+function readAsDataUrl(file) {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onload = () => resolve(typeof reader.result === 'string' ? reader.result : null);
+    reader.onerror = () => reject(reader.error);
+    reader.readAsDataURL(file);
+  });
 }
 
 function openDatabase() {
@@ -66,6 +100,17 @@ export async function savePreviewBlob(id, blob) {
   });
 }
 
+async function savePreviewFallback(id, file) {
+  if (!id || !file) return false;
+  try {
+    const dataUrl = await readAsDataUrl(file);
+    if (!dataUrl) return false;
+    return trySetStorage(`${FALLBACK_PREFIX}${id}`, dataUrl);
+  } catch {
+    return false;
+  }
+}
+
 export async function getPreviewBlob(id) {
   if (!id || !hasIndexedDB()) return null;
   return withStore('readonly', (store) => store.get(id)).then((record) => {
@@ -94,13 +139,22 @@ export async function deletePreview(id) {
 
 export async function getPreviewObjectUrl(id) {
   const blob = await getPreviewBlob(id);
-  if (!blob) return null;
-  return URL.createObjectURL(blob);
+  if (blob) return URL.createObjectURL(blob);
+  const dataUrl = await getPreviewDataUrl(id);
+  if (!dataUrl) return null;
+  try {
+    const res = await fetch(dataUrl);
+    const fallbackBlob = await res.blob();
+    return URL.createObjectURL(fallbackBlob);
+  } catch {
+    return dataUrl;
+  }
 }
 
 export async function persistPreviewForJob(jobId, file) {
   if (!jobId || !file) return false;
   const saved = await savePreviewBlob(jobId, file);
+  const fallbackSaved = saved ? false : await savePreviewFallback(jobId, file);
   if (saved) {
     try {
       const raw = sessionStorage.getItem(`sse:meta:${jobId}`);
@@ -111,8 +165,21 @@ export async function persistPreviewForJob(jobId, file) {
         sessionStorage.setItem(`sse:meta:${jobId}`, JSON.stringify(parsed));
       }
     } catch {}
+  } else if (fallbackSaved) {
+    try {
+      const raw = sessionStorage.getItem(`sse:meta:${jobId}`);
+      const parsed = raw ? JSON.parse(raw) : {};
+      parsed.previewDataUrl = tryGetStorage(`${FALLBACK_PREFIX}${jobId}`);
+      parsed.previewStoreId = jobId;
+      sessionStorage.setItem(`sse:meta:${jobId}`, JSON.stringify(parsed));
+    } catch {}
   }
-  return saved;
+  return saved || fallbackSaved;
+}
+
+export async function getPreviewDataUrl(id) {
+  if (!id) return null;
+  return tryGetStorage(`${FALLBACK_PREFIX}${id}`);
 }
 
 export async function clearAllPreviews() {
@@ -138,6 +205,7 @@ const previewStore = {
   deletePreview,
   clearAllPreviews,
   persistPreviewForJob,
+  getPreviewDataUrl,
 };
 
 export default previewStore;

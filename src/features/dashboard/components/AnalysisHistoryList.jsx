@@ -473,7 +473,12 @@ function HistoryCard({
   onReanalyzeFinish,
 }) {
   const { t } = useTranslation('dashboard');
-  const previewUrl = usePreviewUrl(meta);
+  const previewMeta = useMemo(() => ({
+    ...(meta || {}),
+    // Fallback to jobId-based lookup for locally cached previews (session/local/IndexedDB)
+    previewStoreId: meta?.previewStoreId || jobId,
+  }), [meta, jobId]);
+  const previewUrl = usePreviewUrl(previewMeta);
   const label = computeLabel(data);
   const probValue = typeof data?.prob_fake === 'number' ? (data.prob_fake * 100).toFixed(1) : null;
   const prob = probValue !== null ? `${probValue}%` : '-';

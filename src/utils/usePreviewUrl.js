@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from 'react';
-import { getPreviewObjectUrl } from './previewStore';
+import { getPreviewObjectUrl, getPreviewDataUrl } from './previewStore';
 
 export function usePreviewUrl(meta) {
   const directUrl = typeof meta?.previewDataUrl === 'string' ? meta.previewDataUrl : null;
@@ -21,6 +21,11 @@ export function usePreviewUrl(meta) {
     }
 
     (async () => {
+      const inlineUrl = await getPreviewDataUrl(storeId);
+      if (inlineUrl) {
+        setResolvedUrl(inlineUrl);
+        return;
+      }
       const objectUrl = await getPreviewObjectUrl(storeId);
       if (cancelled) {
         if (objectUrl) URL.revokeObjectURL(objectUrl);
