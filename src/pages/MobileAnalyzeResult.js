@@ -27,6 +27,29 @@ const LOADING_MENTS = {
   POST: ['결과를 정리하고 있어요…', '리포트를 구성하고 있어요…'],
 };
 
+const DEMO_REPORTS = {
+  "demo-happy-1": {
+    label: "REAL",
+    pAi: 0.18,
+    pReal: 0.82,
+    threshold: 0.5,
+    confidence: 0.82,
+    latency_sec: 2.4,
+    runtime: { backend: "TensorRT", device: "A10G" },
+    faces: { samples: [] },
+  },
+  "demo-fake-1": {
+    label: "FAKE",
+    pAi: 0.93,
+    pReal: 0.07,
+    threshold: 0.5,
+    confidence: 0.95,
+    latency_sec: 3.2,
+    runtime: { backend: "ONNXRuntime", device: "A100" },
+    faces: { samples: [] },
+  },
+};
+
 function pickMent(stage) {
   const pool = [
     ...(LOADING_MENTS[stage?.toUpperCase?.()] || []),
@@ -117,6 +140,18 @@ export default function MobileAnalyzeResult() {
 
   useEffect(() => {
     if (!jobIds.length) return;
+    const allDemo = jobIds.every((jid) => DEMO_REPORTS[jid]);
+    if (allDemo) {
+      const next = {};
+      jobIds.forEach((jid) => {
+        const payload = normalizeAnalysisResult(DEMO_REPORTS[jid]);
+        const fileMeta = { name: `${jid}.jpg`, size: 512000, type: 'image/jpeg' };
+        next[jid] = { result: payload, fileMeta };
+        try { sessionStorage.setItem(`sse:report:${jid}`, JSON.stringify(buildStoredReport(payload, fileMeta))); } catch {}
+      });
+      setReports(next);
+      return;
+    }
     if (isTestMode) {
       ensureTestReports(jobIds);
     }

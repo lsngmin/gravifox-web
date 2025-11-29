@@ -35,6 +35,29 @@ const STAGE_LABELS = {
   POST: "결과 정리 중",
 };
 
+const DEMO_REPORTS = {
+  "demo-happy-1": {
+    label: "REAL",
+    pAi: 0.18,
+    pReal: 0.82,
+    threshold: 0.5,
+    confidence: 0.82,
+    latency_sec: 2.4,
+    runtime: { backend: "TensorRT", device: "A10G" },
+    faces: { samples: [] },
+  },
+  "demo-fake-1": {
+    label: "FAKE",
+    pAi: 0.93,
+    pReal: 0.07,
+    threshold: 0.5,
+    confidence: 0.95,
+    latency_sec: 3.2,
+    runtime: { backend: "ONNXRuntime", device: "A100" },
+    faces: { samples: [] },
+  },
+};
+
 function pickMent(stage) {
   const pool = [
     ...(LOADING_MENTS[stage?.toUpperCase?.()] || []),
@@ -143,6 +166,18 @@ export default function AnalyzeResult() {
       window.history.replaceState(null, '', `${window.location.pathname}?${sp.toString()}`);
     }
     if (!jobIds.length) return;
+
+    const allDemo = jobIds.every((jid) => DEMO_REPORTS[jid]);
+    if (allDemo) {
+      const next = {};
+      jobIds.forEach((jid) => {
+        const payload = normalizeAnalysisResult(DEMO_REPORTS[jid]);
+        next[jid] = { result: payload, connected: false, fileMeta: { name: `${jid}.jpg`, size: 512000, type: "image/jpeg" } };
+        try { sessionStorage.setItem(`sse:report:${jid}`, JSON.stringify(buildStoredReport(payload, next[jid].fileMeta))); } catch {}
+      });
+      setReports(next);
+      return;
+    }
 
     const sources = [];
     jobIds.forEach((jid) => {

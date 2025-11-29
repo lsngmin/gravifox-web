@@ -199,11 +199,12 @@ const AnalysisReport = forwardRef(function AnalysisReport({ data, mediaMeta }, r
         --badge-dot: #F43F5E;
       }
       /* Dark mode tone tweak: soften the FAKE badge so it doesn't bloom on dark backgrounds */
-      .dark .result-badge.is-fake {
-        --badge-bg: rgba(248,113,113,0.14);
-        --badge-fg: #fecdd3;
-        --badge-ring: rgba(248,113,113,0.22);
-        --badge-glow: rgba(248,113,113,0.18);
+      .dark .result-badge.is-fake,
+      [data-theme="dark"] .result-badge.is-fake {
+        --badge-bg: rgba(76,5,25,0.48);   /* deeper rose-950 base */
+        --badge-fg: #fecdd3;              /* muted light text */
+        --badge-ring: rgba(190,24,93,0.32);
+        --badge-glow: rgba(190,24,93,0.14);
         --badge-dot: #fb7185;
       }
       /* Tone: UNKNOWN (amber) */
@@ -267,10 +268,10 @@ const AnalysisReport = forwardRef(function AnalysisReport({ data, mediaMeta }, r
 
   return (
     <div ref={ref} className="mx-auto w-full max-w-5xl">
-      <div className="report-appear report-glow rounded-2xl border border-slate-200 bg-white p-6">
+      <div className="report-appear report-glow rounded-2xl border border-slate-200 bg-white p-6 dark:border-white/10 dark:bg-slate-900/80 dark:shadow-[0_40px_90px_-50px_rgba(0,0,0,0.85)]">
         <div className="flex items-start justify-between gap-4">
           <div>
-            <h2 className="text-xl font-semibold text-slate-900">미디어 분석 리포트</h2>
+            <h2 className="text-xl font-semibold text-slate-900 dark:text-slate-100">미디어 분석 리포트</h2>
           </div>
           <div className={`result-badge ${badgeTone(computedLabel)}`} role="status" aria-live="polite">
             <span className="result-badge__dot" aria-hidden />
@@ -283,10 +284,10 @@ const AnalysisReport = forwardRef(function AnalysisReport({ data, mediaMeta }, r
         </div>
 
         {mediaMeta && (
-          <div className="mt-4 rounded-xl border border-slate-200 p-4">
+          <div className="mt-4 rounded-xl border border-slate-200 p-4 dark:border-white/10 dark:bg-slate-900/60">
             <div className="flex flex-col gap-4 sm:flex-row">
               {previewUrl && (
-                <div className="w-full max-w-[220px] overflow-hidden rounded-lg border border-slate-200 bg-slate-50">
+                <div className="w-full max-w-[220px] overflow-hidden rounded-lg border border-slate-200 bg-slate-50 dark:border-white/10 dark:bg-slate-900/70">
                   <img
                     src={previewUrl}
                     alt={mediaMeta?.name ? `${mediaMeta.name} 미리보기` : '업로드한 미디어 미리보기'}
@@ -297,16 +298,16 @@ const AnalysisReport = forwardRef(function AnalysisReport({ data, mediaMeta }, r
               )}
               <div className="grid flex-1 grid-cols-1 gap-3 sm:grid-cols-3">
                 <div>
-                  <p className="text-xs text-slate-500">파일명</p>
-                  <p className="truncate text-sm font-medium text-slate-800">{mediaMeta?.name || '-'}</p>
+                  <p className="text-xs text-slate-500 dark:text-slate-400">파일명</p>
+                  <p className="truncate text-sm font-medium text-slate-800 dark:text-slate-100">{mediaMeta?.name || '-'}</p>
                 </div>
                 <div>
-                  <p className="text-xs text-slate-500">타입</p>
-                  <p className="text-sm font-medium text-slate-800">{mediaMeta?.type || '-'}</p>
+                  <p className="text-xs text-slate-500 dark:text-slate-400">타입</p>
+                  <p className="text-sm font-medium text-slate-800 dark:text-slate-100">{mediaMeta?.type || '-'}</p>
                 </div>
                 <div>
-                  <p className="text-xs text-slate-500">크기</p>
-                  <p className="text-sm font-medium text-slate-800">{prettyBytes(mediaMeta?.size)}</p>
+                  <p className="text-xs text-slate-500 dark:text-slate-400">크기</p>
+                  <p className="text-sm font-medium text-slate-800 dark:text-slate-100">{prettyBytes(mediaMeta?.size)}</p>
                 </div>
               </div>
             </div>
@@ -314,83 +315,83 @@ const AnalysisReport = forwardRef(function AnalysisReport({ data, mediaMeta }, r
         )}
 
         <div className="mt-6 grid grid-cols-1 gap-6 md:grid-cols-3">
-          <div className="col-span-1 rounded-xl border border-slate-200 p-4">
-            <div className="text-sm font-medium text-slate-700">
+          <div className="col-span-1 rounded-xl border border-slate-200 p-4 dark:border-white/10 dark:bg-slate-900/60">
+            <div className="text-sm font-medium text-slate-700 dark:text-slate-100">
               핵심 지표
             </div>
             <dl className="mt-3 space-y-2 text-sm">
               <div className="flex items-center justify-between">
-                <dt className="text-slate-600">의심 확률
+                <dt className="text-slate-600 dark:text-slate-300">의심 확률
                   <InfoHover text={infoText.prob_fake} className="ml-1" />
                 </dt>
-                <dd className="font-semibold text-slate-900">{typeof prob_fake === "number" ? toPct(prob_fake) : "-"}</dd>
+                <dd className="font-semibold text-slate-900 dark:text-slate-50">{typeof prob_fake === "number" ? toPct(prob_fake) : "-"}</dd>
               </div>
               <div className="flex items-center justify-between">
-                <dt className="text-slate-600">표준편차
+                <dt className="text-slate-600 dark:text-slate-300">표준편차
                   <InfoHover text={infoText.prob_std} className="ml-1" />
                 </dt>
-                <dd className="font-semibold text-slate-900">{typeof prob_std === "number" ? prob_std.toFixed(3) : "-"}</dd>
+                <dd className="font-semibold text-slate-900 dark:text-slate-50">{typeof prob_std === "number" ? prob_std.toFixed(3) : "-"}</dd>
               </div>
               <div className="flex items-center justify-between">
-                <dt className="text-slate-600">임계값
+                <dt className="text-slate-600 dark:text-slate-300">임계값
                   <InfoHover text={infoText.threshold} className="ml-1" />
                 </dt>
-                <dd className="font-semibold text-slate-900">{typeof threshold === "number" ? threshold.toFixed(2) : "-"}</dd>
+                <dd className="font-semibold text-slate-900 dark:text-slate-50">{typeof threshold === "number" ? threshold.toFixed(2) : "-"}</dd>
               </div>
               <div className="flex items-center justify-between">
-                <dt className="text-slate-600">고확신 구간 비율
+                <dt className="text-slate-600 dark:text-slate-300">고확신 구간 비율
                   <InfoHover text={infoText.high_conf_ratio} className="ml-1" />
                 </dt>
-                <dd className="font-semibold text-slate-900">{typeof high_conf_ratio === "number" ? toPct(high_conf_ratio) : "-"}</dd>
+                <dd className="font-semibold text-slate-900 dark:text-slate-50">{typeof high_conf_ratio === "number" ? toPct(high_conf_ratio) : "-"}</dd>
               </div>
             </dl>
 
-            <div className="mt-4 text-sm font-medium text-slate-700">처리 요약</div>
+            <div className="mt-4 text-sm font-medium text-slate-700 dark:text-slate-100">처리 요약</div>
             <dl className="mt-2 space-y-2 text-sm">
               <div className="flex items-center justify-between">
-                <dt className="text-slate-600">클립 수<InfoHover text={infoText.clip_len} className="ml-1" /></dt>
-                <dd className="font-semibold text-slate-900">{clips ?? "-"}</dd>
+                <dt className="text-slate-600 dark:text-slate-300">클립 수<InfoHover text={infoText.clip_len} className="ml-1" /></dt>
+                <dd className="font-semibold text-slate-900 dark:text-slate-50">{clips ?? "-"}</dd>
               </div>
               <div className="flex items-center justify-between">
-                <dt className="text-slate-600">총 프레임<InfoHover text={infoText.frames_total} className="ml-1" /></dt>
-                <dd className="font-semibold text-slate-900">{frames_total ?? "-"}</dd>
+                <dt className="text-slate-600 dark:text-slate-300">총 프레임<InfoHover text={infoText.frames_total} className="ml-1" /></dt>
+                <dd className="font-semibold text-slate-900 dark:text-slate-50">{frames_total ?? "-"}</dd>
               </div>
               <div className="flex items-center justify-between">
-                <dt className="text-slate-600">샘플링 FPS<InfoHover text={infoText.sample_fps} className="ml-1" /></dt>
-                <dd className="font-semibold text-slate-900">{sample_fps ?? "-"}</dd>
+                <dt className="text-slate-600 dark:text-slate-300">샘플링 FPS<InfoHover text={infoText.sample_fps} className="ml-1" /></dt>
+                <dd className="font-semibold text-slate-900 dark:text-slate-50">{sample_fps ?? "-"}</dd>
               </div>
               <div className="flex items-center justify-between">
-                <dt className="text-slate-600">분석 지연<InfoHover text={infoText.latency_sec} className="ml-1" /></dt>
-                <dd className="font-semibold text-slate-900">{typeof latency_sec === "number" ? `${latency_sec.toFixed(2)}s` : "-"}</dd>
+                <dt className="text-slate-600 dark:text-slate-300">분석 지연<InfoHover text={infoText.latency_sec} className="ml-1" /></dt>
+                <dd className="font-semibold text-slate-900 dark:text-slate-50">{typeof latency_sec === "number" ? `${latency_sec.toFixed(2)}s` : "-"}</dd>
               </div>
             </dl>
           </div>
 
-          <div className="col-span-1 rounded-xl border border-slate-200 p-4 md:col-span-2">
+          <div className="col-span-1 rounded-xl border border-slate-200 p-4 md:col-span-2 dark:border-white/10 dark:bg-slate-900/60">
             <div className="flex items-center justify-between">
-              <div className="text-sm font-medium text-slate-700">
+              <div className="text-sm font-medium text-slate-700 dark:text-slate-100">
                 타임라인
                 <InfoHover text={infoText.probs_timeline} className="ml-1" />
               </div>
               <TimelineHeaderExtras tStats={tStats} mediaMeta={mediaMeta} />
             </div>
-            <div className={`mt-3 rounded-lg border border-slate-100 bg-slate-50 p-3 transition-opacity duration-300 ease-in-out ${fade ? 'opacity-0' : 'opacity-100'}`} id="timeline-graph">
+            <div className={`mt-3 rounded-lg border border-slate-100 bg-slate-50 p-3 transition-opacity duration-300 ease-in-out ${fade ? 'opacity-0' : 'opacity-100'} dark:border-white/10 dark:bg-slate-900/60`} id="timeline-graph">
               <Sparkline data={probs_timeline} threshold={threshold} autoScale={useAutoScale()} pad={0.03} />
             </div>
             {tStats && typeof threshold === "number" && (
-              <p className="mt-2 text-xs text-slate-600">
-                임계값 초과 구간 비율: <span className="font-semibold text-slate-900">{toPct(tStats.aboveRatio)}</span>
+              <p className="mt-2 text-xs text-slate-600 dark:text-slate-300">
+                임계값 초과 구간 비율: <span className="font-semibold text-slate-900 dark:text-slate-100">{toPct(tStats.aboveRatio)}</span>
               </p>
             )}
           </div>
         </div>
 
         {samples.length > 0 && (
-          <div className="mt-6 rounded-xl border border-slate-200 p-4">
-            <div className="mb-2 text-sm font-medium text-slate-700">샘플 얼굴 (상위 확률)</div>
+          <div className="mt-6 rounded-xl border border-slate-200 p-4 dark:border-white/10 dark:bg-slate-900/60">
+            <div className="mb-2 text-sm font-medium text-slate-700 dark:text-slate-100">샘플 얼굴 (상위 확률)</div>
             <div className="grid grid-cols-2 gap-3 sm:grid-cols-4 md:grid-cols-5">
               {samples.map((s, i) => (
-                <div key={`${s.idx}-${i}`} className="overflow-hidden rounded-lg border border-slate-200 bg-white">
+                <div key={`${s.idx}-${i}`} className="overflow-hidden rounded-lg border border-slate-200 bg-white dark:border-white/10 dark:bg-slate-900/70">
                   <img
                     src={`data:image/jpeg;base64,${s.image_jpg_base64}`}
                     alt={`face sample #${s.idx}`}
@@ -404,46 +405,46 @@ const AnalysisReport = forwardRef(function AnalysisReport({ data, mediaMeta }, r
         )}
 
         <div className="mt-6 grid grid-cols-1 gap-6 md:grid-cols-2">
-          <div className="rounded-xl border border-slate-200 p-4">
-            <div className="text-sm font-medium text-slate-700">
+          <div className="rounded-xl border border-slate-200 p-4 dark:border-white/10 dark:bg-slate-900/60">
+            <div className="text-sm font-medium text-slate-700 dark:text-slate-100">
               안정성 지표
               <InfoHover text={infoText.stability} className="ml-1" />
             </div>
             <dl className="mt-3 space-y-2 text-sm">
               <div className="flex items-center justify-between">
-                <dt className="text-slate-600">얼굴 정렬 흔들림 (RMS)</dt>
-                <dd className="font-semibold text-slate-900">{stability?.lm_jitter_rms?.toFixed ? stability.lm_jitter_rms.toFixed(3) : "-"}</dd>
+                <dt className="text-slate-600 dark:text-slate-300">얼굴 정렬 흔들림 (RMS)</dt>
+                <dd className="font-semibold text-slate-900 dark:text-slate-50">{stability?.lm_jitter_rms?.toFixed ? stability.lm_jitter_rms.toFixed(3) : "-"}</dd>
               </div>
               <div className="flex items-center justify-between">
-                <dt className="text-slate-600">자세 변화(평균) Y / P / R</dt>
-                <dd className="font-semibold text-slate-900">
+                <dt className="text-slate-600 dark:text-slate-300">자세 변화(평균) Y / P / R</dt>
+                <dd className="font-semibold text-slate-900 dark:text-slate-50">
                   {stability?.pose_delta_mean ? `${stability.pose_delta_mean.yaw.toFixed(1)}° / ${stability.pose_delta_mean.pitch.toFixed(1)}° / ${stability.pose_delta_mean.roll.toFixed(1)}°` : "-"}
                 </dd>
               </div>
               <div className="flex items-center justify-between">
-                <dt className="text-slate-600">자세 변화 이상치 비율</dt>
-                <dd className="font-semibold text-slate-900">{stability?.pose_delta_outlier_ratio?.toFixed ? toPct(stability.pose_delta_outlier_ratio) : "-"}</dd>
+                <dt className="text-slate-600 dark:text-slate-300">자세 변화 이상치 비율</dt>
+                <dd className="font-semibold text-slate-900 dark:text-slate-50">{stability?.pose_delta_outlier_ratio?.toFixed ? toPct(stability.pose_delta_outlier_ratio) : "-"}</dd>
               </div>
             </dl>
           </div>
 
-          <div className="rounded-xl border border-slate-200 p-4">
-            <div className="text-sm font-medium text-slate-700">
+          <div className="rounded-xl border border-slate-200 p-4 dark:border-white/10 dark:bg-slate-900/60">
+            <div className="text-sm font-medium text-slate-700 dark:text-slate-100">
               스펙트럼 지표
               <InfoHover text={infoText.spectral} className="ml-1" />
             </div>
             <dl className="mt-3 space-y-2 text-sm">
               <div className="flex items-center justify-between">
-                <dt className="text-slate-600">고주파 비율(평균)</dt>
-                <dd className="font-semibold text-slate-900">{spectral?.highfreq_ratio_mean?.toFixed ? spectral.highfreq_ratio_mean.toFixed(3) : "-"}</dd>
+                <dt className="text-slate-600 dark:text-slate-300">고주파 비율(평균)</dt>
+                <dd className="font-semibold text-slate-900 dark:text-slate-50">{spectral?.highfreq_ratio_mean?.toFixed ? spectral.highfreq_ratio_mean.toFixed(3) : "-"}</dd>
               </div>
               <div className="flex items-center justify-between">
-                <dt className="text-slate-600">이상치 비율</dt>
-                <dd className="font-semibold text-slate-900">{spectral?.outlier_ratio?.toFixed ? toPct(spectral.outlier_ratio) : "-"}</dd>
+                <dt className="text-slate-600 dark:text-slate-300">이상치 비율</dt>
+                <dd className="font-semibold text-slate-900 dark:text-slate-50">{spectral?.outlier_ratio?.toFixed ? toPct(spectral.outlier_ratio) : "-"}</dd>
               </div>
               <div className="flex items-center justify-between">
-                <dt className="text-slate-600">r0 비율</dt>
-                <dd className="font-semibold text-slate-900">{spectral?.r0_ratio?.toFixed ? spectral.r0_ratio.toFixed(3) : "-"}</dd>
+                <dt className="text-slate-600 dark:text-slate-300">r0 비율</dt>
+                <dd className="font-semibold text-slate-900 dark:text-slate-50">{spectral?.r0_ratio?.toFixed ? spectral.r0_ratio.toFixed(3) : "-"}</dd>
               </div>
             </dl>
           </div>
@@ -464,11 +465,11 @@ const AnalysisReport = forwardRef(function AnalysisReport({ data, mediaMeta }, r
             </span>
           </div>
           {showAdvanced && (
-            <div className="mt-2 rounded-xl border border-slate-200 bg-white p-4 text-sm text-slate-600" />
+            <div className="mt-2 rounded-xl border border-slate-200 bg-white p-4 text-sm text-slate-600 dark:border-white/10 dark:bg-slate-900/70 dark:text-slate-200" />
           )}
         </div>
 
-        <div className="mt-6 rounded-xl border border-indigo-100 bg-indigo-50/30 p-4 text-sm text-slate-700">
+        <div className="mt-6 rounded-xl border border-indigo-100 bg-indigo-50/30 p-4 text-sm text-slate-700 dark:border-white/10 dark:bg-indigo-900/30 dark:text-slate-100">
           분석 결과는 제공된 임계값을 기준으로 해석됩니다. 촬영 환경(조명, 흔들림, 해상도)과
           얼굴 정렬 품질이 낮을 경우 결과의 신뢰도가 떨어질 수 있습니다.
         </div>

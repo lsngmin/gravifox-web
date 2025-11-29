@@ -82,8 +82,8 @@ export default function MobileAnalysisReport({ report, t }) {
     }
     if (label === 'FAKE') {
       return {
-        badge: 'border-rose-200 bg-rose-50 text-rose-700 dark:border-rose-300/50 dark:bg-rose-500/22 dark:text-rose-100',
-        dot: 'bg-rose-500 dark:bg-rose-300',
+        badge: 'border-rose-200 bg-rose-50 text-rose-700 dark:border-rose-500/55 dark:bg-[rgba(80,7,36,0.62)] dark:text-rose-100',
+        dot: 'bg-rose-500 dark:bg-rose-200',
       };
     }
     return {

@@ -5,6 +5,7 @@ import { Transition } from '@headlessui/react';
 import { XMarkIcon } from '@heroicons/react/24/outline';
 import usePreviewUrl from '../../../../utils/usePreviewUrl';
 import MobileHeatmapPreview from './MobileHeatmapPreview';
+import { useThemeMode } from '../../../../app/hooks/useThemeMode';
 
 const METRIC_DEFS = [
   { key: 'prob_std', label: '확률 표준편차', formatter: formatDecimal },
@@ -104,9 +105,9 @@ function getLabelTone(label) {
   }
   if (label === 'FAKE') {
     return {
-      badge: 'border-rose-200 bg-rose-50 text-rose-700 dark:border-rose-300/60 dark:bg-rose-500/22 dark:text-rose-100',
-      dot: 'bg-rose-500 dark:bg-rose-300 shadow-[0_0_12px_rgba(244,63,94,0.35)]',
-      headingAccent: 'text-rose-200',
+      badge: 'border-rose-200 bg-rose-50 text-rose-700 dark:border-rose-400/60 dark:bg-[rgba(80,7,36,0.6)] dark:text-rose-100',
+      dot: 'bg-rose-500 dark:bg-rose-200 shadow-[0_0_12px_rgba(244,63,94,0.28)]',
+      headingAccent: 'text-rose-100',
     };
   }
   return {
@@ -158,6 +159,8 @@ function cautionCopy(data) {
  */
 export default function MobileReportDrawer({ open, onClose = () => {}, data, mediaMeta, jobId }) {
   const { t } = useTranslation('common');
+  const { themeMode } = useThemeMode();
+  const isDark = themeMode === 'dark';
   // Lock body scroll and close on ESC while open
   useEffect(() => {
     if (!open) return;
@@ -277,20 +280,45 @@ export default function MobileReportDrawer({ open, onClose = () => {}, data, med
             <div className="flex-1 overflow-y-auto px-4 py-5 sm:px-5">
               {data ? (
                 <div className="flex flex-col gap-5 pb-4">
-                  <section className="relative overflow-hidden rounded-[28px] border p-[1px] shadow-sm border-slate-200 bg-white dark:border-emerald-400/25 dark:bg-gradient-to-br dark:from-emerald-500/15 dark:via-slate-900/85 dark:to-slate-950/95 dark:shadow-[0_28px_60px_-36px_rgba(15,23,42,0.85)]">
-                    <div className="absolute inset-0 hidden rounded-[28px] bg-[radial-gradient(circle_at_20%_15%,rgba(129,140,248,0.22),transparent_60%),radial-gradient(circle_at_82%_20%,rgba(56,189,248,0.18),transparent_65%)] dark:block" aria-hidden="true" />
-                    <div className="relative rounded-[27px] border p-5 sm:p-6 backdrop-blur border-slate-200 bg-white dark:border-white/5 dark:bg-slate-950/65">
+                  <section
+                    className={`relative overflow-hidden rounded-[28px] border p-[1px] shadow-sm ${
+                      isDark
+                        ? 'border-slate-800/70 bg-slate-950/92 shadow-[0_24px_50px_-32px_rgba(0,0,0,0.75)]'
+                        : 'border-slate-200 bg-white'
+                    }`}
+                  >
+                    <div
+                      className={`absolute inset-0 rounded-[28px] ${
+                        isDark
+                          ? 'bg-[radial-gradient(circle_at_20%_15%,rgba(129,140,248,0.12),transparent_60%),radial-gradient(circle_at_82%_20%,rgba(56,189,248,0.1),transparent_65%)]'
+                          : 'hidden'
+                      }`}
+                      aria-hidden="true"
+                    />
+                    <div
+                      className={`relative rounded-[27px] border p-5 sm:p-6 backdrop-blur ${
+                        isDark ? 'border-slate-800 bg-slate-950/95' : 'border-slate-200 bg-white'
+                      }`}
+                    >
                       <div className="flex flex-wrap items-center gap-3">
                         <span className={`inline-flex items-center gap-2 rounded-full border px-3.5 py-1.5 text-[11px] font-semibold uppercase tracking-[0.18em] ${tone.badge}`}>
                           <span className={`h-2.5 w-2.5 rounded-full ${tone.dot}`} />
                           {label}
                         </span>
-                        <span className="inline-flex items-center gap-2 rounded-full border px-3.5 py-1 text-[11px] font-semibold uppercase tracking-[0.18em] border-slate-200 bg-slate-50 text-slate-700 dark:border-indigo-400/40 dark:bg-indigo-500/15 dark:text-indigo-100">
+                        <span className={`inline-flex items-center gap-2 rounded-full border px-3.5 py-1 text-[11px] font-semibold uppercase tracking-[0.18em] ${
+                          isDark
+                            ? 'border-indigo-200/25 bg-indigo-950/70 text-indigo-100'
+                            : 'border-slate-200 bg-slate-50 text-slate-700'
+                        }`}>
                           {t('mobileAnalyze.report.metrics.generationProbability', '생성 확률')}
                           <span className="text-slate-900 dark:text-white">{probDisplay}</span>
                         </span>
                         {realDisplay && (
-                          <span className="inline-flex items-center gap-2 rounded-full border px-3.5 py-1 text-[11px] font-semibold uppercase tracking-[0.18em] border-slate-200 bg-slate-50 text-slate-700 dark:border-slate-400/30 dark:bg-slate-500/10 dark:text-slate-200">
+                          <span className={`inline-flex items-center gap-2 rounded-full border px-3.5 py-1 text-[11px] font-semibold uppercase tracking-[0.18em] ${
+                            isDark
+                              ? 'border-slate-700/50 bg-slate-950/80 text-slate-100'
+                              : 'border-slate-200 bg-slate-50 text-slate-700'
+                          }`}>
                             {t('mobileAnalyze.report.metrics.realProbability', '실제 확률')}
                             <span className="text-slate-900 dark:text-slate-100">{realDisplay}</span>
                           </span>
@@ -300,20 +328,20 @@ export default function MobileReportDrawer({ open, onClose = () => {}, data, med
                         <div className="flex flex-wrap items-end gap-x-6 gap-y-4">
                           <div>
                             <p className="text-xs uppercase tracking-[0.2em] text-slate-500 dark:text-slate-400">{t('mobileAnalyze.report.metrics.suspicionScore', '의심 점수')}</p>
-                            <p className={`mt-2 text-3xl font-semibold text-slate-900 dark:text-white ${tone.headingAccent}`}>
+                            <p className={`mt-2 text-3xl font-semibold text-slate-900 dark:text-slate-50 ${tone.headingAccent}`}>
                               {probDisplay}
                             </p>
                           </div>
                           {thresholdDisplay && (
                             <div>
-                              <p className="text-xs uppercase tracking-[0.2em] text-slate-500">{t('mobileAnalyze.report.metrics.threshold', '기준선')}</p>
-                              <p className="mt-2 text-lg font-semibold text-slate-800 dark:text-slate-200">{thresholdDisplay}</p>
+                              <p className="text-xs uppercase tracking-[0.2em] text-slate-500 dark:text-slate-400">{t('mobileAnalyze.report.metrics.threshold', '기준선')}</p>
+                              <p className="mt-2 text-lg font-semibold text-slate-800 dark:text-slate-100">{thresholdDisplay}</p>
                             </div>
                           )}
                         </div>
                         <p className="text-sm leading-relaxed text-slate-700 dark:text-slate-200/95">{verdict}</p>
                         {caution && (
-                          <p className="text-xs leading-6 text-slate-600 dark:text-slate-300/80">
+                          <p className="text-xs leading-6 text-slate-600 dark:text-slate-400">
                             {caution}
                           </p>
                         )}
@@ -322,13 +350,13 @@ export default function MobileReportDrawer({ open, onClose = () => {}, data, med
                   </section>
 
                   {metrics.length > 0 && (
-                    <section className="rounded-[26px] border border-slate-800/60 bg-slate-900/80 p-5">
-                      <h3 className="text-xs font-semibold uppercase tracking-[0.22em] text-slate-400">핵심 지표</h3>
+                    <section className="rounded-[26px] border border-slate-800/60 bg-slate-900/85 p-5 shadow-[0_22px_44px_-34px_rgba(0,0,0,0.65)]">
+                      <h3 className="text-xs font-semibold uppercase tracking-[0.22em] text-slate-300">핵심 지표</h3>
                       <div className="mt-4 grid grid-cols-1 gap-3 sm:grid-cols-2">
                         {metrics.map((item) => (
                           <div
                             key={item.key}
-                            className="rounded-[22px] border border-slate-800/70 bg-slate-950/70 p-4 shadow-[0_18px_32px_-28px_rgba(15,23,42,0.85)]"
+                            className="rounded-[22px] border border-slate-800/70 bg-slate-950/80 p-4 shadow-[0_18px_32px_-28px_rgba(0,0,0,0.75)]"
                           >
                             <p className="text-[11px] font-medium uppercase tracking-[0.18em] text-slate-400">
                               {item.label}
@@ -340,13 +368,13 @@ export default function MobileReportDrawer({ open, onClose = () => {}, data, med
                         ))}
                       </div>
                       {spectralDetails && (
-                        <div className="mt-4 rounded-2xl border border-indigo-500/25 bg-indigo-500/10 p-4">
-                          <p className="text-xs font-semibold uppercase tracking-[0.2em] text-indigo-200/80">
+                        <div className="mt-4 rounded-2xl border border-indigo-200/20 bg-indigo-950/40 p-4">
+                          <p className="text-xs font-semibold uppercase tracking-[0.2em] text-indigo-100/90">
                             스펙트럴 세부 지표
                           </p>
                           <div className="mt-3 grid grid-cols-1 gap-2 sm:grid-cols-2">
                             {spectralDetails.map((entry) => (
-                              <div key={entry.key} className="rounded-xl bg-slate-950/70 px-4 py-3 text-sm text-slate-100">
+                              <div key={entry.key} className="rounded-xl bg-slate-950/75 px-4 py-3 text-sm text-slate-100">
                                 <div className="text-[11px] uppercase tracking-[0.16em] text-slate-400">{entry.label}</div>
                                 <div className="mt-1 text-base font-semibold text-indigo-100">{entry.value}</div>
                               </div>
@@ -365,37 +393,37 @@ export default function MobileReportDrawer({ open, onClose = () => {}, data, med
                     />
                   )}
 
-                  <section className="rounded-[26px] border p-5 border-slate-200 bg-white dark:border-slate-800/60 dark:bg-slate-900/75">
+                  <section className="rounded-[26px] border p-5 border-slate-200 bg-white dark:border-slate-800/60 dark:bg-slate-950/70">
                     <h3 className="text-xs font-semibold uppercase tracking-[0.22em] text-slate-600 dark:text-slate-400">{t('mobileAnalyze.report.fileInfo', '파일 정보')}</h3>
                     <dl className="mt-4 grid grid-cols-1 gap-3 text-sm text-slate-700 dark:text-slate-200 sm:grid-cols-2">
                       <div>
-                        <dt className="text-xs uppercase tracking-[0.16em] text-slate-500">{t('mobileAnalyze.report.file.name', '파일명')}</dt>
-                        <dd className="mt-1 break-words text-slate-900 dark:text-slate-100">{mediaMeta?.name || '이름 없음'}</dd>
+                        <dt className="text-xs uppercase tracking-[0.16em] text-slate-500 dark:text-slate-400">{t('mobileAnalyze.report.file.name', '파일명')}</dt>
+                        <dd className="mt-1 break-words text-slate-900 dark:text-slate-50">{mediaMeta?.name || '이름 없음'}</dd>
                       </div>
                       <div>
-                        <dt className="text-xs uppercase tracking-[0.16em] text-slate-500">{t('mobileAnalyze.report.file.size', '파일 크기')}</dt>
-                        <dd className="mt-1 text-slate-900 dark:text-slate-100">{formatFileSize(mediaMeta?.size)}</dd>
+                        <dt className="text-xs uppercase tracking-[0.16em] text-slate-500 dark:text-slate-400">{t('mobileAnalyze.report.file.size', '파일 크기')}</dt>
+                        <dd className="mt-1 text-slate-900 dark:text-slate-50">{formatFileSize(mediaMeta?.size)}</dd>
                       </div>
                       <div>
-                        <dt className="text-xs uppercase tracking-[0.16em] text-slate-500">{t('mobileAnalyze.report.file.type', '형식')}</dt>
-                        <dd className="mt-1 text-slate-900 dark:text-slate-100">{mediaMeta?.type || '알 수 없음'}</dd>
+                        <dt className="text-xs uppercase tracking-[0.16em] text-slate-500 dark:text-slate-400">{t('mobileAnalyze.report.file.type', '형식')}</dt>
+                        <dd className="mt-1 text-slate-900 dark:text-slate-50">{mediaMeta?.type || '알 수 없음'}</dd>
                       </div>
                       {formattedStoredAt && (
                         <div>
-                          <dt className="text-xs uppercase tracking-[0.16em] text-slate-500">{t('mobileAnalyze.report.file.storedAt', '저장 시각')}</dt>
-                          <dd className="mt-1 text-slate-900 dark:text-slate-100">{formattedStoredAt}</dd>
+                          <dt className="text-xs uppercase tracking-[0.16em] text-slate-500 dark:text-slate-400">{t('mobileAnalyze.report.file.storedAt', '저장 시각')}</dt>
+                          <dd className="mt-1 text-slate-900 dark:text-slate-50">{formattedStoredAt}</dd>
                         </div>
                       )}
                       {jobId && (
                         <div>
-                          <dt className="text-xs uppercase tracking-[0.16em] text-slate-500">{t('mobileAnalyze.report.file.jobId', 'Job ID')}</dt>
-                          <dd className="mt-1 break-all text-slate-900 dark:text-slate-100">{jobId}</dd>
+                          <dt className="text-xs uppercase tracking-[0.16em] text-slate-500 dark:text-slate-400">{t('mobileAnalyze.report.file.jobId', 'Job ID')}</dt>
+                          <dd className="mt-1 break-all text-slate-900 dark:text-slate-50">{jobId}</dd>
                         </div>
                       )}
                     </dl>
                   </section>
 
-                  <section className="rounded-[24px] border px-5 py-4 text-xs leading-6 border-indigo-200 bg-indigo-50 text-indigo-700 dark:border-indigo-500/20 dark:bg-indigo-500/10 dark:text-indigo-100/90">
+                  <section className="rounded-[24px] border px-5 py-4 text-xs leading-6 border-indigo-200 bg-indigo-50 text-indigo-700 dark:border-white/10 dark:bg-slate-900/70 dark:text-slate-100">
                     {t('mobileAnalyze.report.desktopHint', '데스크톱 대시보드에서 세부 그래프와 다운로드 기능을 이용할 수 있어요. 중요한 판단이 필요하다면 동일 파일을 다시 업로드해 이중 확인해 주세요.')}
                   </section>
                 </div>
