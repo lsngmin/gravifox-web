@@ -145,7 +145,7 @@ export default function MobileAnalyzeResult() {
       const next = {};
       jobIds.forEach((jid) => {
         const payload = normalizeAnalysisResult(DEMO_REPORTS[jid]);
-        const fileMeta = { name: `${jid}.jpg`, size: 512000, type: 'image/jpeg' };
+        const fileMeta = { name: `${jid}.jpg`, size: 512000, type: 'image/jpeg', previewStoreId: jid };
         next[jid] = { result: payload, fileMeta };
         try { sessionStorage.setItem(`sse:report:${jid}`, JSON.stringify(buildStoredReport(payload, fileMeta))); } catch {}
       });
@@ -166,6 +166,9 @@ export default function MobileAnalyzeResult() {
       } catch {
         fileMeta = null;
       }
+      if (fileMeta) {
+        fileMeta.previewStoreId = fileMeta.previewStoreId || jid;
+      }
       setReports((prev) => ({
         ...prev,
         [jid]: {
@@ -180,6 +183,7 @@ export default function MobileAnalyzeResult() {
         const effectiveMeta = storedMeta || fileMeta;
         if (storedResult) {
           const normalized = normalizeAnalysisResult(storedResult);
+          const effectiveMeta = { ...(effectiveMeta || {}), previewStoreId: (effectiveMeta && effectiveMeta.previewStoreId) || jid };
           setReports((prev) => ({
             ...prev,
             [jid]: {

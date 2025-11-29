@@ -82,6 +82,7 @@ const deriveMetaFromDetail = (detail, normalized) => {
     size: resolvedSize,
     uploadId: detail.uploadId,
     mediaType,
+    previewStoreId: resolvedMeta.previewStoreId || detail.uploadId,
     previewDataUrl: previewUrl,
   };
 };
@@ -135,6 +136,7 @@ const buildSummaryFallback = (item) => {
       size: null,
       uploadId: item.uploadId,
       mediaType: item.mediaType,
+      previewStoreId: item.uploadId,
     },
     storedAt: toTimestamp(item.createdAt),
   };
