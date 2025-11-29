@@ -1,5 +1,5 @@
 import React, { useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
 import { useAuth } from 'providers/authProvider';
 
 import Header from '../../layout/Header';
@@ -10,13 +10,15 @@ import SignInForm from './SignInForm';
 export default function LoginPage() {
   const navigate = useNavigate();
   const { accessToken, isLoading } = useAuth();
+  const { lng } = useParams();
+  const homePath = lng ? `/${lng}` : '/';
 
   useEffect(() => {
     // If already logged in, prevent access to login page
     if (!isLoading && accessToken) {
-      navigate('/dashboard', { replace: true });
+      navigate(homePath, { replace: true });
     }
-  }, [isLoading, accessToken, navigate]);
+  }, [isLoading, accessToken, navigate, homePath]);
 
   if (isLoading) return null;
   return (
@@ -29,4 +31,3 @@ export default function LoginPage() {
     </div>
   );
 }
-

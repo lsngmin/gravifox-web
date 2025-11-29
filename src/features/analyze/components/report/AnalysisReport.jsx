@@ -198,6 +198,14 @@ const AnalysisReport = forwardRef(function AnalysisReport({ data, mediaMeta }, r
         --badge-glow: rgba(244,63,94,0.30);
         --badge-dot: #F43F5E;
       }
+      /* Dark mode tone tweak: soften the FAKE badge so it doesn't bloom on dark backgrounds */
+      .dark .result-badge.is-fake {
+        --badge-bg: rgba(248,113,113,0.14);
+        --badge-fg: #fecdd3;
+        --badge-ring: rgba(248,113,113,0.22);
+        --badge-glow: rgba(248,113,113,0.18);
+        --badge-dot: #fb7185;
+      }
       /* Tone: UNKNOWN (amber) */
       .result-badge.is-unknown {
         --badge-bg: rgba(245,158,11,0.12);

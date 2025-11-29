@@ -73,13 +73,16 @@ const deriveMetaFromDetail = (detail, normalized) => {
       : typeof normalized?.params?.fileSize === 'number'
         ? normalized.params.fileSize
         : null;
+  const previewUrl = resolvedMeta.previewDataUrl || resolvedMeta.url || null;
 
   return {
+    ...resolvedMeta,
     name: resolvedName,
     type: resolvedType,
     size: resolvedSize,
     uploadId: detail.uploadId,
     mediaType,
+    previewDataUrl: previewUrl,
   };
 };
 
