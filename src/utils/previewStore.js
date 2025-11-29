@@ -151,23 +151,30 @@ export async function getPreviewObjectUrl(id) {
   }
 }
 
-export async function persistPreviewForJob(jobId, file) {
+export async function persistPreviewForJob(jobId, file, aliasId = null) {
   if (!jobId || !file) return false;
-  const saved = await savePreviewBlob(jobId, file);
-  const fallbackSaved = await savePreviewFallback(jobId, file);
-  if (saved || fallbackSaved) {
-    try {
-      const raw = sessionStorage.getItem(`sse:meta:${jobId}`);
-      const parsed = raw ? JSON.parse(raw) : {};
-      parsed.previewStoreId = jobId;
-      const storedDataUrl = tryGetStorage(`${FALLBACK_PREFIX}${jobId}`);
-      if (storedDataUrl) {
-        parsed.previewDataUrl = storedDataUrl;
-      }
-      sessionStorage.setItem(`sse:meta:${jobId}`, JSON.stringify(parsed));
-    } catch {}
+  const targets = [jobId];
+  if (aliasId && aliasId !== jobId) targets.push(aliasId);
+
+  let anySaved = false;
+  for (const id of targets) {
+    const saved = await savePreviewBlob(id, file);
+    const fallbackSaved = await savePreviewFallback(id, file);
+    anySaved = anySaved || saved || fallbackSaved;
+    if (saved || fallbackSaved) {
+      try {
+        const raw = sessionStorage.getItem(`sse:meta:${id}`);
+        const parsed = raw ? JSON.parse(raw) : {};
+        parsed.previewStoreId = parsed.previewStoreId || id;
+        const storedDataUrl = tryGetStorage(`${FALLBACK_PREFIX}${id}`);
+        if (storedDataUrl) {
+          parsed.previewDataUrl = storedDataUrl;
+        }
+        sessionStorage.setItem(`sse:meta:${id}`, JSON.stringify(parsed));
+      } catch {}
+    }
   }
-  return saved || fallbackSaved;
+  return anySaved;
 }
 
 export async function getPreviewDataUrl(id) {

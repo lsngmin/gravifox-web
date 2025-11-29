@@ -415,7 +415,7 @@ export default function MobileAnalyzeUpload() {
         }),
         afterAnalyze: async (file, analyzeJson) => {
           if (!file || !analyzeJson?.jobId) return;
-          await persistPreviewForJob(analyzeJson.jobId, file);
+          await persistPreviewForJob(analyzeJson.jobId, file, resolvedUploadId);
         },
       });
 

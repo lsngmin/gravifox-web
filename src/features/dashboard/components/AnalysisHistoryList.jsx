@@ -83,6 +83,7 @@ const deriveMetaFromDetail = (detail, normalized) => {
     uploadId: detail.uploadId,
     mediaType,
     previewStoreId: resolvedMeta.previewStoreId || detail.uploadId,
+    jobId: resolvedMeta.jobId || detail.jobId || detail.uploadId,
     previewDataUrl: previewUrl,
   };
 };
@@ -478,7 +479,14 @@ function HistoryCard({
   const previewMeta = useMemo(() => ({
     ...(meta || {}),
     // Fallback to jobId-based lookup for locally cached previews (session/local/IndexedDB)
-    previewStoreId: meta?.previewStoreId || jobId,
+    previewStoreId: Array.from(new Set([
+      meta?.previewStoreId,
+      meta?.uploadId,
+      meta?.jobId,
+      jobId,
+      meta?.name,
+    ].filter(Boolean))),
+    jobId,
   }), [meta, jobId]);
   const previewUrl = usePreviewUrl(previewMeta);
   const label = computeLabel(data);
